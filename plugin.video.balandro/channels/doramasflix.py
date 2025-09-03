@@ -5,6 +5,7 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
+
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, jsontools, scrapertools, servertools, tmdb
@@ -15,10 +16,7 @@ from core.jsontools import json
 host = 'https://doramasflix.co/'
 
 
-api = 'https://doraflix.fluxcedene.net/api/gql'
-
-
-access_platform = 'IKBsMgPUcg_BxVYtZyAHDmg_t8YP5MTcwNTY5NDUzOA=='
+api = 'https://sv7.fluxcedene.net/graphql'
 
 
 perpage = 20
@@ -27,7 +25,7 @@ perpage = 20
 def do_downloadpage(query):
     post = json.dumps(query)
 
-    headers = {'Referer': host, 'Content-Type': 'application/json', 'x-access-platform': access_platform}
+    headers = {'Referer': host, 'Content-Type': 'application/json'}
 
     resp = httptools.downloadpage(api, headers=headers, post=post)
 
@@ -49,7 +47,6 @@ def mainlist(item):
     return itemlist
 
 
-
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
@@ -58,12 +55,13 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', search_type = 'movie' ))
+    # ~ itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por productora', action = 'productoras', search_type = 'movie', text_color = 'moccasin' ))
+    # ~ itemlist.append(item.clone( title = 'Por tema', action = 'temas', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
+    # ~ itemlist.append(item.clone( title = 'Por productora', action = 'productoras', search_type = 'movie', text_color = 'moccasin' ))
+
+    # ~ itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
 
     return itemlist
 
@@ -78,12 +76,13 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, _type = 'lasts', search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', search_type = 'tvshow' ))
+    # ~ itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por productora', action = 'productoras', search_type = 'tvshow', text_color = 'moccasin' ))
+    # ~ itemlist.append(item.clone( title = 'Por tema', action = 'temas', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'tvshow' ))
+    # ~ itemlist.append(item.clone( title = 'Por productora', action = 'productoras', search_type = 'tvshow', text_color = 'moccasin' ))
+
+    # ~ itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -98,12 +97,13 @@ def mainlist_doramas(item):
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, _type = 'lasts', group = 'doramas', search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'generos', group = 'doramas', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', group = 'doramas', search_type = 'tvshow' ))
+    # ~ itemlist.append(item.clone( title = 'Por género', action = 'generos', group = 'doramas', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por productora', action = 'productoras', group = 'doramas', search_type = 'tvshow', text_color = 'moccasin' ))
+    # ~ itemlist.append(item.clone( title = 'Por tema', action = 'temas', group = 'doramas', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', group = 'doramas', search_type = 'tvshow' ))
+    # ~ itemlist.append(item.clone( title = 'Por productora', action = 'productoras', group = 'doramas', search_type = 'tvshow', text_color = 'moccasin' ))
+
+    # ~ itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', group = 'doramas', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -114,12 +114,12 @@ def last_epis(item):
     perlast = 180
     if item.group == 'doramas': perlast = 65
 
-    if not config.get_setting('channels_charges', default=True):
+    if config.get_setting('channels_charges', default=True):
         platformtools.dialog_notification('DoramasFlix', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
 
     query = {
-            "operationName": "premiereEpisodes",
-            "variables": {"limit": perlast},
+            "operationName":"premiereEpisodes",
+            "variables":{"limit": perlast},
             "query": "query premiereEpisodes($limit: Float!) {\n"
             +" premiereEpisodes(limit: $limit) {\n"
             +" _id\n"
@@ -128,7 +128,6 @@ def last_epis(item):
             +" serie_name_es\n"
             +" slug\n"
             +" still_path\n"
-            +" serie_poster\n"
             +" season_number\n"
             +" episode_number\n"
             +" still_image\n"
@@ -137,7 +136,7 @@ def last_epis(item):
             +"}"
             }
 
-    return list_query(item, query)
+    return list_query(item, query, 1)
 
 
 def generos(item):
@@ -152,7 +151,7 @@ def generos(item):
     query = {
             "variables": {},
             "query": "{\n"
-            +" listGenres(filter: {platform: \"doramasgo\"}, sort: NUMBER_DESC) {\n"
+            +" listGenres(filter: {platform: \"doramasgo\"}, sort: NAME_DESC) {\n"
             +" name\n"
             +" _id\n"
             +" slug\n"
@@ -167,14 +166,14 @@ def generos(item):
 
     try:
        for genre in jdata['data']['listGenres']:
-           itemlist.append(item.clone( title = genre['name'], slug = genre['slug'], url = host, action = 'list_all', text_color = text_color ))
+           itemlist.append(item.clone( title = genre['name'], slug = genre['slug'], action = 'list_all', text_color = text_color ))
     except:
        return itemlist
 
     return sorted(itemlist, key=(lambda x: x.title))
 
 
-def categorias(item):
+def temas(item):
     logger.info()
     itemlist = []
 
@@ -186,12 +185,10 @@ def categorias(item):
     query = {
             "variables": {},
             "query": " {\n"
-            +" listLabels(filter: {platform: \"doramasgo\"}, sort: NUMBER_DESC) {\n"
-            +" _id\n"
+            +" listLabels(filter: {platform: \"doramasgo\"}, sort: NAME_DESC) {\n"
             +" name\n"
             +" slug\n"
             +" platforms {\n"
-            +" _id\n"
             +" platform\n"
             +" number\n"
             +" image_default\n"
@@ -212,17 +209,12 @@ def categorias(item):
 
     try:
        for label in jdata['data']['listLabels']:
-           title = label['name']
+           title = label['name'].strip()
 
            if title == '+18':
                if config.get_setting('descartar_xxx', default=False): continue
 
-           if 'Estrenos' in title: continue
-
-           elif title == 'aventura': title = 'Aventura'
-           elif title == 'cocina': title = 'Cocina'
-
-           itemlist.append(item.clone( title = title, label_id = label['_id'], url = host, action = 'list_all', text_color = text_color ))
+           itemlist.append(item.clone( title = title.capitalize(), label_id = label['slug'], action = 'list_all', text_color = text_color ))
     except:
        return itemlist
 
@@ -241,7 +233,7 @@ def productoras(item):
     query = {
             "variables": {},
             "query": "{\n"
-            +" listNetworks(filter: {platform: \"doramasgo\"}, sort: NUMBER_DESC) {\n"
+            +" listNetworks(filter: {platform: \"doramasgo\"}, sort: NAME_DESC) {\n"
             +" name\n"
             +" _id\n"
             +" slug\n"
@@ -256,18 +248,9 @@ def productoras(item):
 
     try:
        for network in jdata['data']['listNetworks']:
-           title = network['name']
+           title = network['name'].strip()
 
-           if title == 'bilibili': title = 'Bilibili'
-           elif title == 'jeki': title = 'Jeki'
-           elif title == 'kth': title = 'Kth'
-           elif title == 'vLive': title = 'Vlive'
-           elif title == 'watcha': title = 'Watcha'
-           elif title == 'wavve': title = 'Wavve'
-           elif title == 'tvN': title = 'Tvn'
-           elif title == 'tv asahi': title = 'Tv asahi'
-
-           itemlist.append(item.clone( title = title, net_slug = network['slug'], url = host, action = 'list_all', text_color = text_color ))
+           itemlist.append(item.clone( title = title, net_slug = network['slug'], action = 'list_all', text_color = text_color ))
     except:
        return itemlist
 
@@ -281,9 +264,9 @@ def idiomas(item):
     languages = get_idiomas()
 
     for lang in languages:
-        itemlist.append(item.clone( title = lang['name'], code_flix = lang['code_flix'], url = host, action = 'list_all', text_color = 'moccasin' ))
+        itemlist.append(item.clone( title = lang['name'], code_flix = lang['code_flix'], action = 'list_all', text_color = 'moccasin' ))
 
-    return itemlist
+    return sorted(itemlist, key=(lambda x: x.title))
 
 
 def list_all(item):
@@ -304,28 +287,20 @@ def list_all(item):
 
     if item.search_type == 'movie':
         query = {
-                "operationName": "paginationMovie",
-                "variables": {"perPage": perpage, "sort":"CREATEDAT_DESC", "filter": filters, "page": item.page},
-                "query":" query paginationMovie($page: Int, $perPage: Int, $sort: SortFindManyMovieInput, $filter: FilterFindManyMovieInput) {\n"
-                +" paginationMovie(page: $page, perPage: $perPage, sort: $sort, filter: $filter) {\n"
-                +" count\n"
-                +" pageInfo {\n"
-                +" currentPage\n"
+                "operationName":"PaginationMovie",
+                "variables": {"page": item.page, "limit": perpage, "filter": filters},
+                "query": "query PaginationMovie($sort: SortMovie, $limit: Int, $filter: FilterMoviesInput, $page: Int) {\n"
+                +" paginationMovie(sort: $sort, limit: $limit, filter: $filter, page: $page) {\n"
                 +" hasNextPage\n"
-                +" hasPreviousPage\n"
-                +" __typename\n"
-                +" }\n"
                 +" items {\n"
                 +" _id\n"
                 +" name\n"
                 +" name_es\n"
-                +" languages\n"
                 +" slug\n"
-                +" names\n"
-                +" popularity\n"
-                +" rating\n"
+                +" languages\n"
+                +" poster_path\n"
+                +" poster\n"
                 +" backdrop_path\n"
-                +" release_date\n"
                 +" backdrop\n"
                 +" __typename\n"
                 +" }\n"
@@ -338,27 +313,21 @@ def list_all(item):
         filters["isTVShow"] = False if item.group == 'doramas' else True
 
         query = {
-                "operationName": "paginationDorama",
-                "variables": {"perPage": perpage, "sort":"CREATEDAT_DESC", "filter": filters, "page": item.page},
-                "query": "query paginationDorama($page: Int, $perPage: Int, $sort: SortFindManyDoramaInput, $filter: FilterFindManyDoramaInput) {\n"
-                +" paginationDorama(page: $page, perPage: $perPage, sort: $sort, filter: $filter) {\n"
-                +" count\n"
-                +" pageInfo {\n"
-                +" currentPage\n"
+                "operationName":"PaginationDorama",
+                "variables":{"page": item.page, "limit": perpage, "filter": filters},
+                "query": "query PaginationDorama($sort: SortDorama, $limit: Int, $filter: FilterDoramasInput, $page: Int) {\n"
+                +" paginationDorama(sort: $sort, limit: $limit, filter: $filter, page: $page) {\n"
                 +" hasNextPage\n"
-                +" hasPreviousPage\n"
-                +" __typename\n"
-                +" }\n"
                 +" items {\n"
                 +" _id\n"
                 +" name\n"
                 +" name_es\n"
-                +" languages\n"
                 +" slug\n"
-                +" rating\n"
-                +" age_limit\n"
-                +" backdrop_path\n"
+                +" languages\n"
                 +" isTVShow\n"
+                +" poster_path\n"
+                +" poster\n"
+                +" backdrop_path\n"
                 +" backdrop\n"
                 +" __typename\n"
                 +" }\n"
@@ -367,7 +336,7 @@ def list_all(item):
                 +"}"
                 }
 
-    return list_query(item, query)
+    return list_query(item, query, item.page)
 
 
 def seasons(item):
@@ -379,8 +348,8 @@ def seasons(item):
     season = 1 if not item.contentSeason else item.contentSeason
 
     query = {"operationName": "detailSeasonExtra",
-             "variables": {"slug": item.slug, "season_number": season},
-             "query": "query detailSeasonExtra($slug: String!, $season_number: Float!) {\n"
+             "variables":{"slug": item.slug, "season_number": season},
+             "query":"query detailSeasonExtra($slug: String!, $season_number: Int!) {\n"
              +" listSeasons(sort: NUMBER_ASC, filter: {serie_slug: $slug}) {\n"
              +" slug\n"
              +" season_number\n"
@@ -389,7 +358,6 @@ def seasons(item):
              +" air_date\n"
              +" serie_name\n"
              +" trailer\n"
-             +" poster\n"
              +" backdrop\n"
              +" overview\n"
              +" _id\n"
@@ -401,8 +369,8 @@ def seasons(item):
              +" __typename\n"
              +" }\n"
              +" listEpisodes(\n"
-             +" sort: NUMBER_ASC\n"
-             +" filter: {type_serie: \"dorama\", serie_slug: $slug, season_number: $season_number}\n"
+			 +" sort: NUMBER_ASC\n"
+             +" filter: {serie_slug: $slug, season_number: $season_number}\n"
              +" ) {\n"
              +" _id\n"
              +" name\n"
@@ -414,7 +382,6 @@ def seasons(item):
              +" season_number\n"
              +" episode_number\n"
              +" languages\n"
-             +" poster\n"
              +" backdrop\n"
              +" __typename\n"
              +" }\n"
@@ -471,8 +438,10 @@ def seasons(item):
 
         thumb = thumb.format(episode['still_path'])
 
-        itemlist.append(Item (channel = item.channel, action='findvideos', title = title, contentSerieName = item.contentSerieName, url = url, thumbnail = thumb,
-                                        group = item.group, search_type = item.search_type, infoLabels=infoLabels))
+        itemlist.append(Item (channel = item.channel, action='findvideos', title=title, url=url, thumbnail=thumb, group=item.group,
+                              contentSerieName=item.contentSerieName, contentType='episode',
+							  contentSeason=infoLabels['season'], contentEpisodeNumber=infoLabels['episode'],
+                              search_type = item.search_type, infoLabels=infoLabels))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -495,32 +464,20 @@ def findvideos(item):
 
     videos = []
 
-    if item.search_type == 'movie':
-        query = {        
-                "operationName":"listProblemsItem",
-                "variables":{"problem_type": "movie", "problem_id": item.url},
-                "query":"query listProblemsItem($problem_type: EnumProblemProblem_type, $problem_id: MongoID!) {\n"
-                +" listProblems(\n"
-                +" filter: {problem_type: $problem_type, problem_id: $problem_id, WithServer: true}\n"
-                +" sort: _ID_DESC\n"
-                +" ) {\n"
-                +" server\n"
-                +" __typename\n"
-                +" }\n"
-                +"}"
-                }
-
-    if item.search_type == 'tvshow':
-        query = {
-                "operationName": "detailEpisodeLinks",
-                "variables": {"episode_id": item.url},
-                "query": "query detailEpisodeLinks($episode_id: MongoID!) {\n"
-                +" detailEpisode(filter: {_id: $episode_id}) {\n"
-                +" links_online\n"
-                +" __typename\n"
-                +" }\n"
-                +"}"
-                }
+    query = {
+            "operationName":"listProblemsItem",
+            "variables":{"problem_id" :item.url},
+            "query": "query listProblemsItem($problem_id: ID!) {\n"
+            +" listProblems(\n"
+            +" filter: {problem_id: $problem_id}\n"
+            +" ) {\n"
+            +" server{\n"
+            +" link\n"
+            +" lang\n"
+            +" }\n"
+            +" }\n"
+            +"}"
+            }
 
     jdata = do_downloadpage(query)
 
@@ -528,21 +485,16 @@ def findvideos(item):
 
     ses = 0
 
-    if item.search_type == 'movie':
-        try:
-           videos = jdata['data']['listProblems']
-        except:
-           return itemlist
-
-    if item.search_type == 'tvshow':
-        try:
-           videos = jdata['data']['detailEpisode']['links_online']
-        except:
-           return itemlist
+    try:
+       videos = jdata['data']['listProblems']
+    except:
+       return itemlist
 
     if not videos: return itemlist
 
     for video in videos:
+        if str(video) == "{'server': None}": continue
+
         ses += 1
 
         lang = scrapertools.find_single_match(str(video), "'lang': '(.*?)'")
@@ -566,7 +518,8 @@ def findvideos(item):
         if not servidor == 'directo':
             lng = get_lang(lang)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vose', quality = 'HD', other = other, age = lng ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                                  language = 'Vose', quality = 'HD', other = other, age = lng ))
 
     if not itemlist:
         if not ses == 0:
@@ -576,7 +529,7 @@ def findvideos(item):
     return itemlist
 
 
-def list_query(item, query):
+def list_query(item, query, page):
     logger.info()
     itemlist = []
 
@@ -586,21 +539,21 @@ def list_query(item, query):
 
     if not jdata: return itemlist
 
+    pages = []
+
     try:
        if item._type == 'search':
            datos = jdata['data']['searchDorama']
            datos.extend(jdata['data']['searchMovie'])
-           pages = []
        elif item._type == 'lasts':
            datos = jdata['data']['premiereEpisodes']
-           pages = []
        else:
            if item.search_type == 'movie':
                datos = jdata['data']['paginationMovie']['items']
-               pages = jdata['data']['paginationMovie']['pageInfo']
+               pages = jdata['data']['paginationMovie']['hasNextPage']
            elif item.search_type == 'tvshow':
                datos = jdata['data']['paginationDorama']['items']
-               pages = jdata['data']['paginationDorama']['pageInfo']
+               pages = jdata['data']['paginationDorama']['hasNextPage']
     except:
        return itemlist
 
@@ -655,10 +608,10 @@ def list_query(item, query):
     tmdb.set_infoLabels(itemlist)
 
     if pages:
-       if pages['hasNextPage']:
-           page = pages['currentPage'] + 1
+        if page:
+            page += 1
 
-           itemlist.append(item.clone( action="list_all", title='Siguientes ...',  page=page, text_color='coral' ))
+            itemlist.append(item.clone( action="list_all", title='Siguientes ...', page=page, text_color='coral' ))
 
     return itemlist
 
@@ -754,7 +707,7 @@ def search(item, texto):
                +"}"
                }
 
-       return list_query(item, query)
+       return list_query(item, query, 1)
     except:
        import sys
        for line in sys.exc_info():

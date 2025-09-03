@@ -74,12 +74,17 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
-    matches = re.compile('<article(.*?)</article>').findall(data)
+    bloque = data
+
+    if item.group == 'last': bloque = scrapertools.find_single_match(data, '>Episodes<(.*?)</section>')
+
+    matches = re.compile('<article(.*?)</article>').findall(bloque)
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
         title = scrapertools.find_single_match(match, '<div class="Title">(.*?)</div>')
+        if not title: title = scrapertools.find_single_match(match, 'data-subtitle="(.*?)"')
 
         if not url or not title: continue
 
@@ -100,6 +105,7 @@ def list_all(item):
         SerieName = SerieName.strip()
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
+        if not thumb: thumb = scrapertools.find_single_match(match, 'data-lazy-src="(.*?)"')
 
         titulo = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
@@ -108,8 +114,6 @@ def list_all(item):
         titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
 
         if item.group == 'last':
-            season = 1
-
             if '-temporada-' in url: season = scrapertools.find_single_match(url, '-temporada-(.*?)/')
             if not season: season = 1
 

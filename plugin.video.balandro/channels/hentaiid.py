@@ -198,7 +198,10 @@ def findvideos(item):
         if servidor == 'various': other = servertools.corregir_other(url)
 
         if url:
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vo', other = other ))
+            lang = 'Vo'
+            if '-sub-esp' in item.url or 'sub-esp' in item.url: lang = 'Vose'
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:

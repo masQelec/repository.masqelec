@@ -128,6 +128,23 @@ def list_all(item):
         tipo = 'movie' if '-movie-' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
+        season = 1
+
+        if 'Season' in title:
+            if '2nd' in title: season = 2
+            elif '3rd' in title: season = 3
+            elif '4th' in title: season = 4
+            elif '5th' in title: season = 5
+            elif '6th' in title: season = 6
+            elif '7th' in title: season = 7
+            elif '8th' in title: season = 8
+            elif '9th' in title: season = 9
+            else:
+               season = scrapertools.find_single_match(title, 'Season(.*?)Capítulo').strip()
+               if not season : season = scrapertools.find_single_match(title, 'Season(.*?)$').strip()
+
+               if not season: season = 1
+
         if item.group == 'last':
             if ':' in SerieName: SerieName = title.split(":")[0]
 
@@ -136,7 +153,7 @@ def list_all(item):
             titulo = titulo.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, infoLabels={'year': '-'},
-                                        contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber = 1))
+                                        contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = 1))
         else:
             if tipo == 'tvshow':
                 if item.search_type != 'all':
@@ -145,7 +162,7 @@ def list_all(item):
                 title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
                 itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
-                                             contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
+                                             contentType = 'tvshow', contentSerieName = SerieName, contentSeason = season, infoLabels={'year': '-'} ))
 
             if tipo == 'movie':
                 if item.search_type != 'all':
@@ -177,6 +194,8 @@ def episodios(item):
     if not item.perpage: item.perpage = 50
 
     data = httptools.downloadpage(item.url).data
+
+    if not 'var anime_info =' in data or not 'var episodes =' in data: return itemlist
 
     info = eval(scrapertools.find_single_match(data, "var anime_info = (\[.*?\])"))
     epis = eval(scrapertools.find_single_match(data, "var episodes = (\[.*?\])"))
@@ -230,12 +249,16 @@ def episodios(item):
 
     for epi in epis[item.page * item.perpage:]:
         url =  host + '/ver/' + '%s-%s' % (info[1], epi)
-        epi_num = epi
 
-        if item.contentSerieName: titulo = '1x' + str(epi) + ' ' + item.contentSerieName
-        else: titulo = item.title
+        if item.contentSerieName:
+            titulo = str(item.contentSeason) + 'x' + str(epi) + ' ' + item.contentSerieName
+            season = item.contentSeason
+        else:
+            titulo = item.title
+            season = 1
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, contentType = 'episode', contentSeason=1, contentEpisodeNumber=epi ))
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
+                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber = epi ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -263,6 +286,8 @@ def findvideos(item):
         if not '-1' in item.url: item.url = item.url.replace('/anime/', '/ver/') + '-1'
 
     data = httptools.downloadpage(item.url).data
+
+    if not 'var videos =' in data: return itemlist
 
     videos = eval(scrapertools.find_single_match(data, "var videos = (\[.*?);"))
 

@@ -188,6 +188,14 @@ def list_all(item):
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
+            season = 1
+
+            if 'Temporada' in title:
+                season = scrapertools.find_single_match(title, 'Temporada(.*?)Capítulo').strip()
+                if not season : season = scrapertools.find_single_match(title, 'Temporada(.*?)$').strip()
+
+                if not season: season = 1
+
             SerieName = corregir_SerieName(title)
 
             title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
@@ -196,7 +204,7 @@ def list_all(item):
             elif '[Castellano' in title or 'Castellano]' in title: lang = 'Esp'
 
             itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, lang=lang, fmt_sufijo=sufijo,
-                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
+                                        contentType = 'tvshow', contentSerieName = SerieName, contentSeason = season, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -285,9 +293,9 @@ def episodios(item):
         if len(str(epis)) >= 4:
             epis = 1
             titulo = title
-        else:
-            if item.contentSerieName: titulo = '1x' + str(epis) + ' ' + title + ' ' + item.contentSerieName
-            else: titulo = item.title
+        
+        if item.contentSerieName: titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title + ' ' + item.contentSerieName
+        else: titulo = item.title
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
 

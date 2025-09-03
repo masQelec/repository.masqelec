@@ -272,6 +272,32 @@ def findvideos(item):
     return itemlist
 
 
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if item.server == 'directo':
+        if url.endswith('.html'): url = ''
+
+    if url:
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
+
+        itemlist.append(item.clone( url=url, server=servidor ))
+
+    return itemlist
+
+
 def search(item, texto):
     logger.info()
     try:

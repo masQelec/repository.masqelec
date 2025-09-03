@@ -7,13 +7,19 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://doramedplay.com/'
+host = 'https://doramed.tv/'
 
 
 sub_host = 'https://doramedplay.net/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://doramedplay.com/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
@@ -58,8 +64,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'tvshows/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Subtitulados', action = 'list_all', url = sub_host + 'tvshows/', sub_host = True, search_type = 'tvshow', text_color = 'moccasin' ))
-
-    itemlist.append(item.clone( title = 'Destacados', action = 'list_all', url = sub_host + 'ratings/', sub_host = True, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'tendencias-2/?get=tv', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'ratings-2/?get=tv', search_type = 'tvshow' ))

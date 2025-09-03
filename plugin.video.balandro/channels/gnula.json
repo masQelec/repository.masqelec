@@ -6,12 +6,12 @@
   "active": true,
 
   "searchable": true,
-  "search_types": ["movie"],
+  "search_types": ["all", "movie", "tvshow"],
 
-  "categories": ["movie"],
+  "categories": ["movie", "tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["current", "notice", "news", "rankings", "languages", "kids", "docs", "vos"],
+  "clusters": ["current", "notice", "news", "rankings", "lasts", "countries", "producers", "kids", "docs", "vos", "anime"],
 
-  "notes": "Películas por géneros, idiomas. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Películas por géneros. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

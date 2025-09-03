@@ -3,7 +3,7 @@
   "name": "TusNovelas",
   "thumbnail": "tusnovelas.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["lasts", "vos", "tales"],
 
-  "notes": "Web dedicada exclusivamente en Novelas."
+  "notes": "Web ANULADA. Web dedicada exclusivamente en Novelas."
 }

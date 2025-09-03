@@ -7,11 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, jsontools
 
 
-host = 'https://www.cam4.com/'
+host = 'https://es.cam4.com/'
 
 
 def do_downloadpage(url, post=None, headers=None):
     data = httptools.downloadpage(url, post=post, headers=headers).data
+
     return data
 
 

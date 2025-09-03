@@ -436,8 +436,8 @@ def last_epis(item):
         epis = scrapertools.find_single_match(match, '<span class="ClB">.*?x(.*?)</span>')
         if not epis: epis = 1
 
-        if not str(temp) == '1': title = 'Episodio ' + str(temp) + 'x' + epis + ' ' + title
-        else: title = 'Episodio ' + epis + ' ' + title
+        if not str(temp) == '1': title = 'Episodio ' + str(temp) + 'x' + str(epis) + ' ' + title
+        else: title = 'Episodio ' + str(epis) + ' ' + title
 
         title = title.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
@@ -660,12 +660,13 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
-    if '>PELICULA<' in data or '>Pelicula' in data or '-movie-' in item.url:
-        peli = scrapertools.find_single_match(data, '<span class="Num">.*?<a href="(.*?)"')
+    if not '/episode/' in item.url:
+        if '>PELICULA<' in data or '>Pelicula' in data or '-movie-' in item.url:
+            peli = scrapertools.find_single_match(data, '<span class="Num">.*?<a href="(.*?)"')
 
-        peli = peli.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
+            peli = peli.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
 
-        if not '/disqus.' in peli: data = do_downloadpage(peli)
+            if not '/disqus.' in peli: data = do_downloadpage(peli)
 
     lang = scrapertools.find_single_match(data, '<h1 class="Title">(.*?)<span>')
 
@@ -697,7 +698,7 @@ def findvideos(item):
 
             data2 = do_downloadpage(url2)
 
-            player = scrapertools.find_single_match(data2, 'src="(.*?)"')
+            player = scrapertools.find_single_match(data2, '<iframe.*?src="(.*?)"')
 
             if player:
                 player = player.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&').strip()

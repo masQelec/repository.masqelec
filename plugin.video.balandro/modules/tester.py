@@ -133,8 +133,9 @@ dominioshdfull = [
          'https://hdfull.today/',
          'https://hd-full.biz/',
          'https://hdfull.sbs/',
-
          'https://hdfull.help/',
+         'https://hdfull.love/',
+
          'https://hdfull.cv/',
          'https://hdfull.monster/',
          'https://hdfull.cfd/',
@@ -147,14 +148,16 @@ dominioshdfull = [
          ]
 
 dominiosplaydede = [
-         'https://www11.playdede.link/'
+         'https://www12.playdede.link/',
+         'https://playdede.club/',
+         'https://playdede.in/'
          ]
 
 channels_poe = [
         ['gdrive', 'https://drive.google.com/drive/']
         ]
 
-channels_despised = ['beeg', 'cam4', 'pelisplushdlat', 'ytsmx']
+channels_despised = ['peliculasflix', 'ytsmx']
 
 servers_poe = ['directo', 'm3u8hls', 'torrent']
 
@@ -846,22 +849,30 @@ def test_channel(channel_name):
                      host = dominioshdfull[0]
 
               elif channel_id == 'playdede':
+                  if not host: host = dominiosplaydede[0]
+
                   try:
                       data_dom = httptools.downloadpage('https://privacidad.me/@playdede/').data
 
-                      sel_domain = scrapertools.find_single_match(data_dom, '>Dirección actual:(.*?)</a>').strip()
+                      bloque = scrapertools.find_single_match(data_dom, '<strong>ENTRARPLAYDEDE.COM<(.*?)<script>')
 
-                      if sel_domain:
-                          sel_domain = sel_domain.lower()
-                          if not 'playdede' in sel_domain: sel_domain = ''
+                      operative_domains = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
 
-                      if sel_domain:
-                          if not 'https' in sel_domain: sel_domain = 'https://' + sel_domain
-                          if not sel_domain.endswith('/'): sel_domain = sel_domain + '/'
+                      if not operative_domains: host = dominiosplaydede[0]
+                      else:
+                         for operative_domain in operative_domains:
+                             operative_domain = operative_domain.lower().strip()
 
-                          if sel_domain in str(dominiosplaydede):
-                              host = sel_domain
+                             if not 'playdede.' in operative_domain: continue
 
+                             if not 'https' in operative_domain: operative_domain = 'https://' + operative_domain
+                             if not operative_domain.endswith('/'): operative_domain = operative_domain + '/'
+
+                             if operative_domain in str(dominiosplaydede):
+                                 if host == operative_domain:
+                                     break
+
+                                 host = operative_domain
                   except:
                       host = dominiosplaydede[0]
 
@@ -1450,7 +1461,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                 txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
 
-                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'xxx/' or new_web == host + 'adult/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or (host + 'portal002') in new_web or (host + 'fvh56') in new_web or (host + 'es/inicio') in new_web or (host + 'pro') in new_web or '/es' in new_web:
+                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'xxx/' or new_web == host + 'adult/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or (host + 'portal002') in new_web or (host + 'fvh56') in new_web or (host + 'es/inicio') in new_web or (host + 'pro') in new_web or '/es' in new_web or (host + '?') in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1564,7 +1575,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto ó quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
 
-                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'xxx/' or new_web == host + 'adult/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or (host + 'portal002') in new_web or (host + 'fvh56') in new_web or host + 'es/inicio' in new_web or (host + 'pro') in new_web or '/es' in new_web:
+                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'xxx/' or new_web == host + 'adult/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or (host + 'portal002') in new_web or (host + 'fvh56') in new_web or host + 'es/inicio' in new_web or (host + 'pro') in new_web or '/es' in new_web or (host + '?') in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 

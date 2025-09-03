@@ -1,0 +1,17 @@
+{
+  "id": "zerowpanime",
+  "name": "ZeroWpAnime",
+  "thumbnail": "zerowpanime.jpg",
+
+  "active": true,
+
+  "searchable": false,
+  "search_types": ["tvshow"],
+
+  "categories": ["tvshow"],
+  "language": ["vose", "vo"],
+
+  "clusters": ["anime"],
+
+  "notes": "Canal con enlaces Streaming y Torrent. Web dedicada exclusivamente al anime."
+}

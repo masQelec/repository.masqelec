@@ -68,9 +68,9 @@ def do_downloadpage(url, post=None, headers=None):
                 timeout = config.get_setting('channels_repeat', default=30)
 
                 if hay_proxies:
-                    data = httptools.downloadpage_proxy('pelisgratishd', url, post=post, headers=headers, timeout=timeout).data
+                    data = httptools.downloadpage_proxy('pelisgratishd', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
-                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     return data
 
@@ -143,12 +143,15 @@ def generos(item):
     else: text_color = 'hotpink'
 
     data = do_downloadpage(host)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '<div class="site container flex-1">(.*?)</ul>')
 
     matches = scrapertools.find_multiple_matches(bloque, 'href="(.*?)">(.*?)</a>')
 
     for url, title in matches:
+        if title.startswith('ver '): continue
+
         if item.search_type == 'movie':
            if title == 'Reality': continue
            elif title == 'Talk': continue
@@ -215,11 +218,12 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        if "<div class='pagination" in data:
-            next_page = scrapertools.find_single_match(data, "<div class='pagination.*?current'>.*?href='(.*?)'")
+        if not '?s=' in item.url:
+            if "<div class='pagination" in data:
+                next_page = scrapertools.find_single_match(data, "<div class='pagination.*?current'>.*?href='(.*?)'")
 
-            if '/page/' in next_page:
-                itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color='coral' ))
+                if '/page/' in next_page:
+                    itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color='coral' ))
 
     return itemlist
 
@@ -350,7 +354,7 @@ def findvideos(item):
 
     if not embed: return itemlist
 
-    data = httptools.downloadpage(embed).data
+    data = do_downloadpage(embed)
 
     value = scrapertools.find_single_match(data, 'value="(.*?)"')
 
@@ -360,10 +364,12 @@ def findvideos(item):
         hay_proxies = False
         if config.get_setting('channel_pelisgratishd_proxies', default=''): hay_proxies = True
 
+        headers = {'Referer': embed}
+
         if hay_proxies:
-            new_url = httptools.downloadpage_proxy('pelisgratishd', host + 'play/', post={'Referer': item.url, 'token': value}, follow_redirects=False).headers['location']
+            new_url = httptools.downloadpage_proxy('pelisgratishd', host + 'play/', post={'token': value}, headers = headers, follow_redirects=False).headers['location']
         else:
-            new_url = httptools.downloadpage(host + 'play/', post={'Referer': item.url, 'token': value}, follow_redirects=False).headers['location']
+            new_url = httptools.downloadpage(host + 'play/', post={'token': value}, headers = headers, follow_redirects=False).headers['location']
     except:
         new_url = ''
 
@@ -507,6 +513,8 @@ def findvideos(item):
         if not matches: matches = scrapertools.find_multiple_matches(data, '<IFRAME SRC="(.*?)"')
 
         for url in matches:
+            ses += 1
+
             if '/1fichier.' in url: continue
             elif '/short.' in url: continue
             elif '/plustream.' in url: continue

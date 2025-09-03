@@ -275,12 +275,29 @@ def list_dir(item):
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
+            season = 1
+
+            if 'Season' in title:
+                if '2nd' in title: season = 2
+                elif '3rd' in title: season = 3
+                elif '4th' in title: season = 4
+                elif '5th' in title: season = 5
+                elif '6th' in title: season = 6
+                elif '7th' in title: season = 7
+                elif '8th' in title: season = 8
+                elif '9th' in title: season = 9
+                else:
+                   season = scrapertools.find_single_match(title, 'Season(.*?)Capítulo').strip()
+                   if not season : season = scrapertools.find_single_match(title, 'Season(.*?)$').strip()
+
+                   if not season: season = 1
+
             SerieName = corregir_SerieName(title)
 
             title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
             itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
-                                        contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': year} ))
+                                        contentType='tvshow', contentSerieName=SerieName, contentSeason = season, infoLabels={'year': year} ))
 
         if tipo == 'movie':
             if item.search_type != 'all':
@@ -339,10 +356,29 @@ def list_all(item):
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
+            season = 1
+
+            if 'Season' in title:
+                if '2nd' in title: season = 2
+                elif '3rd' in title: season = 3
+                elif '4th' in title: season = 4
+                elif '5th' in title: season = 5
+                elif '6th' in title: season = 6
+                elif '7th' in title: season = 7
+                elif '8th' in title: season = 8
+                elif '9th' in title: season = 9
+                else:
+                   season = scrapertools.find_single_match(title, 'Season(.*?)Capítulo').strip()
+                   if not season : season = scrapertools.find_single_match(title, 'Season(.*?)$').strip()
+
+                   if not season: season = 1
+
             SerieName = corregir_SerieName(title)
 
+            title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
+
             itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
-                                        contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': year} ))
+                                        contentType='tvshow', contentSerieName=SerieName, contentSeason = season, infoLabels={'year': year} ))
 
         if tipo == 'movie':
             if item.search_type != 'all':
@@ -382,12 +418,29 @@ def list_last(item):
         if year: title = title.replace('(' + year + ')', '')
         else: year = '-'
 
+        season = 1
+
+        if 'Season' in title:
+            if '2nd' in title: season = 2
+            elif '3rd' in title: season = 3
+            elif '4th' in title: season = 4
+            elif '5th' in title: season = 5
+            elif '6th' in title: season = 6
+            elif '7th' in title: season = 7
+            elif '8th' in title: season = 8
+            elif '9th' in title: season = 9
+            else:
+               season = scrapertools.find_single_match(title, 'Season(.*?)Capítulo').strip()
+               if not season : season = scrapertools.find_single_match(title, 'Season(.*?)$').strip()
+
+               if not season: season = 1
+
         SerieName = corregir_SerieName(title)
 
         title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
-                                    contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': year} ))
+                                    contentType='tvshow', contentSerieName=SerieName, contentSeason = season, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -409,6 +462,23 @@ def last_epis(item):
 
         title = title.replace('&quot;', '').replace('&amp;', '').replace('&#039;s', "'s").replace('&#039;', "'").strip()
 
+        season = 1
+
+        if 'Season' in title:
+            if '2nd' in title: season = 2
+            elif '3rd' in title: season = 3
+            elif '4th' in title: season = 4
+            elif '5th' in title: season = 5
+            elif '6th' in title: season = 6
+            elif '7th' in title: season = 7
+            elif '8th' in title: season = 8
+            elif '9th' in title: season = 9
+            else:
+               season = scrapertools.find_single_match(title, 'Season(.*?)-').strip()
+               if not season : season = scrapertools.find_single_match(title, 'Season(.*?)$').strip()
+
+               if not season: season = 1
+
         SerieName = title
 
         SerieName = SerieName.strip()
@@ -420,7 +490,7 @@ def last_epis(item):
         title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb,
-                                    contentSerieName=SerieName, contentType='episode', contentSeason=1, contentEpisodeNumber=epis ))
+                                    contentSerieName=SerieName, contentType='episode', contentSeason = season, contentEpisodeNumber=epis ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -474,15 +544,19 @@ def episodios(item):
 
         title = title.strip()
 
-        if item.contentSerieName: titulo = '1x' + str(nro) + ' ' + title.replace(' - ' + str(nro), '').strip()
-        else: titulo = item.title
+        if item.contentSerieName:
+            titulo = str(item.contentSeason) + 'x' + str(nro) + ' ' + title.replace(' - ' + str(nro), '').strip()
+            season = item.contentSeason
+        else:
+            titulo = item.title
+            season = 1
 
         titulo = titulo.replace('Season', '[COLOR tan]Temp.[/COLOR]')
 
         url = item.url + '/' + nro
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
-                                    contentType = 'episode', contentSeason=1, contentEpisodeNumber=nro ))
+                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber = nro ))
 
     if not str(i) == str(total):
        if config.get_setting('channels_charges', default=True):
@@ -504,15 +578,19 @@ def episodios(item):
 
                title = title.strip()
 
-               if item.contentSerieName: titulo = '1x' + str(nro) + ' ' + title.replace(' - ' + str(nro), '').strip()
-               else: titulo = item.title
+               if item.contentSerieName:
+                   titulo = str(item.contentSeason) + 'x' + str(nro) + ' ' + title.replace(' - ' + str(nro), '').strip()
+                   season = item.contentSeason
+               else:
+                   titulo = item.title
+                   season = 1
 
                titulo = titulo.replace('Season', '[COLOR tan]Temp.[/COLOR]')
 
                url = item.url + '/' + nro
 
                itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
-                                           contentType = 'episode', contentSeason=1, contentEpisodeNumber=nro ))
+                                           contentType = 'episode', contentSeason = season, contentEpisodeNumber = nro ))
 
            if not str(i) == str(total): continue
 

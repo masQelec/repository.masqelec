@@ -236,9 +236,11 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
-    bloque = scrapertools.find_single_match(data, '> Lista de Episodios<(.*?)</div></div>')
+    bloque = scrapertools.find_single_match(data, 'Lista de Episodios<(.*?)</ul></div></div>')
+    if not bloque: bloque = scrapertools.find_single_match(data, 'Listade Episodios<(.*?)</ul></div></div>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?<img src="(.*?)".*?<blockquote class="message sf fc-dark f-bold fs-16">(.*?)</blockquote>')
+    if not matches: matches = scrapertools.find_multiple_matches(bloque, '<ahref="(.*?)".*?<img src="(.*?)".*?<blockquote class="message sf fc-dark f-bold fs-16">(.*?)</blockquote>')
 
     if not matches:
         url = scrapertools.find_single_match(bloque, '<a href="(.*?)"')

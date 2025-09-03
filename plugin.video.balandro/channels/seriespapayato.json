@@ -6,9 +6,9 @@
   "active": true,
 
   "searchable": true,
-  "search_types": ["tvshow"],
+  "search_types": ["all", "movie", "tvshow"],
 
-  "categories": ["tvshow"],
+  "categories": ["movie", "tvshow"],
   "language": ["cast", "lat", "vose"],
 
   "clusters": ["current", "onlyone", "notice", "kids", "vos"],

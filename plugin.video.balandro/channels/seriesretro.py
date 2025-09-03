@@ -295,7 +295,7 @@ def list_all(item):
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
 
-        title = title.replace('&#038;', '&').replace('&#8217;s', "'s").replace('&#8211;', '').strip()
+        title = title.replace('&#038;', '&').replace('&#8217;s', "'s").replace('&#8211;', '').replace('&#8216;', "'").strip()
 
         tipo = 'movie' if '/movie/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
@@ -562,7 +562,11 @@ def findvideos(item):
 
         if not servidor or not url: continue
 
-        if 'opción' in servidor:
+        link_other = ''
+
+        if servidor == 'lamovie': servidor = 'clipwatching'
+
+        elif 'opción' in servidor:
             link_other = servidor
             servidor = 'directo'
         elif servidor == 'anavids':
@@ -574,8 +578,6 @@ def findvideos(item):
         elif servidor == 'utorrent':
             link_other = 'torrent'
             servidor = 'directo'
-
-        else: link_other = ''
 
         if servidor == 'various': link_other = servertools.corregir_other(srv)
 
@@ -594,7 +596,10 @@ def findvideos(item):
         elif 'Version Original' in lang: lang = 'VO'
         else: lang = '?'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', url=url, server=servidor, title = '', quality=qlty, language=lang, other=link_other ))
+        quality_num = puntuar_calidad(qlty)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', url=url, server=servidor, title = '',
+                              quality = qlty, quality_num = quality_num, language = lang, other = link_other ))
 
     # ~ Descargas
     matches = scrapertools.find_multiple_matches(data, '<span class="Num">(.*?)</tr>')
@@ -607,7 +612,9 @@ def findvideos(item):
 
         if not servidor: continue
 
-        if servidor == 'utorrent': servidor = 'torrent'
+        if servidor == 'lamovie': servidor = 'clipwatching'
+
+        elif servidor == 'utorrent': servidor = 'torrent'
         else: servidor = servertools.corregir_servidor(servidor)
 
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
@@ -629,7 +636,10 @@ def findvideos(item):
 
         other = 'D'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', url=url, server=servidor, title = '', quality=qlty, language=lang, other=other ))
+        quality_num = puntuar_calidad(qlty)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', url=url, server=servidor, title = '',
+                              quality = qlty, quality_num = quality_num, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -637,6 +647,12 @@ def findvideos(item):
             return
 
     return itemlist
+
+
+def puntuar_calidad(txt):
+    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'Full HD', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', 'HD', 'WEBRip 1080p', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
+    if txt not in orden: return 0
+    else: return orden.index(txt) + 1
 
 
 def play(item):

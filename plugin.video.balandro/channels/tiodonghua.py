@@ -105,6 +105,13 @@ def mainlist_animes(item):
 
     if config.get_setting('descartar_anime', default=False): return
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
@@ -113,7 +120,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'episodios/', group = 'last', search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Episodios Animes', action = 'list_all', url = host + 'anime/', group = 'lani', search_type = 'tvshow', text_color = 'springgreen' ))
+    itemlist.append(item.clone( title = 'Episodios Animes', action = 'list_all', url = host + 'genero/anime/', group = 'lani', search_type = 'tvshow', text_color = 'springgreen' ))
 
     itemlist.append(item.clone( title = 'Donghuas', action = 'list_all', url = host + 'genero/donghua/', search_type = 'tvshow' ))
 
@@ -194,8 +201,9 @@ def list_all(item):
         elif '>T9' in match: season = 9
         else: season = 1
 
-        if item.group == 'last':
+        if item.group == 'last' or 'Episodio' in title or 'EPISODIO' in title:
             epi = scrapertools.find_single_match(match, '>Episodio(.*?)</a>').strip()
+            if not epi: epi = scrapertools.find_single_match(url, '-episodio-(.*?)-').strip()
 
             if not epi: epi = 1
 
@@ -226,6 +234,8 @@ def list_all(item):
                                             contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epi ))
 
                 continue
+
+            title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
 
             itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, infoLabels={'year': year},
                                         contentSerieName = SerieName, contentType = 'tvshow', contentSeason = season  ))
@@ -334,8 +344,16 @@ def episodios(item):
     for thumb, temp_epi, url, title in epis[item.page * item.perpage:]:
         epi = scrapertools.find_single_match(temp_epi, '.*?-(.*?)$').strip()
 
-        if item.contentSerieName: titulo = '%sx%s %s' % (str(item.contentSeason), epi, title)
-        else: titulo = item.title
+        if item.contentSerieName:
+             if not item.contentSerieName in title:
+                 title = item.contentSerieName + ' ' + title
+             titulo = '%sx%s %s' % (str(item.contentSeason), epi, title)
+        else:
+             titulo = item.title
+
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        titulo = titulo.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('Temproada', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epi ))
@@ -358,11 +376,10 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(data, "<li id='player-option-(.*?)</span></li>")
     if not matches: matches = scrapertools.find_multiple_matches(data, '<li id="player-option-(.*?)</span></li>')
+
     ses = 0
 
     for match in matches:
-        ses += 1
-
         d_type = scrapertools.find_single_match(match, "data-type='(.*?)'")
         if not d_type: d_type = scrapertools.find_single_match(match, 'data-type="(.*?)"')
 
@@ -373,6 +390,8 @@ def findvideos(item):
         if not d_nume: d_nume = scrapertools.find_single_match(match, 'data-nume="(.*?)"')
 
         if not d_type or not d_post or not d_nume: continue
+
+        ses += 1
 
         post = {'action': 'doo_player_ajax', 'post': d_post, 'nume': d_nume, 'type': d_type}
 
@@ -565,8 +584,10 @@ def play(item):
     url_play = servertools.normalize_url(servidor, url_play)
 
     if servidor == 'directo':
-        new_server = servertools.corregir_other(url_play).lower()
-        if new_server.startswith("http"): servidor = new_server
+            new_server = servertools.corregir_other(url_play).lower()
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
     if '/filelions.' in url_play:
         url_play = url_play + '|Referer=' + host

@@ -410,10 +410,57 @@ def list_all(item):
 
                 SerieName = corregir_SerieName(title)
 
+                season = 1
+
+                if 'Season' in title:
+                    if '2nd' in title: season = 2
+                    elif '3rd' in title: season = 3
+                    elif '4th' in title: season = 4
+                    elif '5th' in title: season = 5
+                    elif '6th' in title: season = 6
+                    elif '7th' in title: season = 7
+                    elif '8th' in title: season = 8
+                    elif '9th' in title: season = 9
+                    else:
+                        season = scrapertools.find_single_match(title, 'Season(.*?)Capítulo').strip()
+                        if not season : season = scrapertools.find_single_match(title, 'Season(.*?)$').strip()
+
+                        if not season: season = 1
+                else:
+                    if ' S2 ' in title: season = 2
+                    elif ' S3 ' in title: season = 3
+                    elif ' S4 ' in title: season = 4
+                    elif ' S5 ' in title: season = 5
+                    elif ' S6 ' in title: season = 6
+                    elif ' S7 ' in title: season = 7
+                    elif ' S8 ' in title: season = 8
+                    elif ' S9 ' in title: season = 9
+
+                    elif ' T2 ' in title: season = 2
+                    elif ' T3 ' in title: season = 3
+                    elif ' T4 ' in title: season = 4
+                    elif ' T5 ' in title: season = 5
+                    elif ' T6 ' in title: season = 6
+                    elif ' T7 ' in title: season = 7
+                    elif ' T8 ' in title: season = 8
+                    elif ' T9 ' in title: season = 9
+
                 epis = scrapertools.find_single_match(title, 'Cap(.*?)$').strip()
                 if not epis: epis = 1
 
                 title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
+
+                title = title.replace(' S1 ', '[COLOR tan] S1 [/COLOR]').replace(' S2 ', '[COLOR tan] S2 [/COLOR]').replace(' S3 ', '[COLOR tan] S3 [/COLOR]').replace(' S4 ', '[COLOR tan] S4 [/COLOR]')
+
+                title = title.replace(' S5 ', '[COLOR tan] S5 [/COLOR]').replace(' S6 ', '[COLOR tan] S6 [/COLOR]').replace(' S7 ', '[COLOR tan] S7 [/COLOR]').replace(' S8 ', '[COLOR tan] S8 [/COLOR]')
+
+                title = title.replace(' S9 ', '[COLOR tan] S9 [/COLOR]')
+
+                title = title.replace(' T1 ', '[COLOR tan] T1 [/COLOR]').replace(' T2 ', '[COLOR tan] T2 [/COLOR]').replace(' T3 ', '[COLOR tan] T3 [/COLOR]').replace(' T4 ', '[COLOR tan] T4 [/COLOR]')
+
+                title = title.replace(' T5 ', '[COLOR tan] T5 [/COLOR]').replace(' T6 ', '[COLOR tan] T6 [/COLOR]').replace(' T7 ', '[COLOR tan] T7 [/COLOR]').replace(' T8 ', '[COLOR tan] T8 [/COLOR]')
+
+                title = title.replace(' T9 ', '[COLOR tan] T9 [/COLOR]')
 
                 title = title.replace('Cap ', '[COLOR goldenrod]Epis. [/COLOR]').replace('Episode ', '[COLOR goldenrod]Epis. [/COLOR]')
 
@@ -422,7 +469,7 @@ def list_all(item):
                 itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
                                             qualities=qlty, languages=lang, fmt_sufijo=sufijo,
                                             contentType = 'episode', contentSerieName = SerieName,
-                                            contentSeason = 1, contentEpisodeNumber=epis, infoLabels={'year': year} ))
+                                            contentSeason = season, contentEpisodeNumber=epis, infoLabels={'year': year} ))
 
                 continue
 
@@ -540,10 +587,15 @@ def episodios(item):
                 else: item.perpage = 50
 
     for epi in episodes[item.page * item.perpage:]:
-        epis = scrapertools.find_single_match(epi, "(.*?)'>")
-        if not epis: epis = scrapertools.find_single_match(epi, '(.*?)">')
+        if '>Episodio' in epi:
+            epis = scrapertools.find_single_match(epi, ">Episodio(.*?)</a>").strip()
 
-        if not epis: epis = 1
+            if not epis: epis = 1
+        else:
+            epis = scrapertools.find_single_match(epi, "(.*?)'>")
+            if not epis: epis = scrapertools.find_single_match(epi, '(.*?)">')
+
+            if not epis: epis = 1
 
         thumb = scrapertools.find_single_match(epi, "data-src='(.*?)'")
         if not thumb: thumb = scrapertools.find_single_match(epi, 'data-src="(.*?)"')

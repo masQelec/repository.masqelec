@@ -742,6 +742,9 @@ def play(item):
 
     url = item.url
 
+    if '/argtesa.' in url:
+         return 'Servidor [COLOR tan]No soportado[/COLOR]'
+
     if url:
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

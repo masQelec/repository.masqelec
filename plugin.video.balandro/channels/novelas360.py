@@ -446,7 +446,7 @@ def list_search(item):
 
             if not epis: epis = 1
 
-            titulo = title + ' Capítulo ' + epis
+            titulo = title + ' [COLOR goldenrod]Epis.[/COLOR] ' + epis
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, infoLabels={'year': '-'},
                                         contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber = epis ))

@@ -44,21 +44,28 @@ except:
    except: pass
 
 
-host = 'https://www11.playdede.link/'
+host = 'https://www12.playdede.link/'
+
+
+dominios = [
+         'https://www12.playdede.link/',
+         'https://playdede.club/',
+         'https://playdede.in/'
+         ]
 
 
 # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
-# ~ webs  0)-https://privacidad.me/@playdede  1)-https://entrarplaydede.com  2)-X https://x.com/playdedesocial
+# ~ webs  0)-https://privacidad.me/@playdede  1)-https://entrarplaydede.com  2)-X https://x.com/webplaydede
 
 
 # ~ por si viene de enlaces guardados posteriores
 ant_hosts = ['https://playdede.com/', 'https://playdede.org/', 'https://playdede.nu/',
              'https://playdede.to/', 'https://playdede.us/', 'https://playdede.eu/',
-             'https://playdede.me/', 'https://playdede.in/', 'https://playdede.link/',
-             'https://www1.playdede.link/', 'https://www2.playdede.link/', 'https://www3.playdede.link/',
-             'https://www4.playdede.link/', 'https://www5.playdede.link/', 'https://www6.playdede.link/',
-             'https://www7.playdede.link/', 'https://www8.playdede.link/', 'https://www9.playdede.link/',
-             'https://www10.playdede.link/']
+             'https://playdede.me/', 'https://playdede.link/', 'https://www1.playdede.link/',
+             'https://www2.playdede.link/', 'https://www3.playdede.link/', 'https://www4.playdede.link/',
+             'https://www5.playdede.link/', 'https://www6.playdede.link/', 'https://www7.playdede.link/',
+             'https://www8.playdede.link/', 'https://www9.playdede.link/', 'https://www10.playdede.link/',
+             'https://www11.playdede.link/']
 
 
 domain = config.get_setting('dominio', 'playdede', default='')
@@ -72,7 +79,7 @@ if domain:
 _dynamic = False
 
 cur_host = host
-new_host = dynamic.host(host)
+new_host = dynamic.host(host, dominios)
 
 if not cur_host == new_host:
     _dynamic = True
@@ -373,6 +380,43 @@ def logout(item):
     return False
 
 
+def item_configurar_dominio(item):
+    plot = 'Este canal tiene varios posibles dominios. Si uno no te funciona puedes probar con los otros antes de intentarlo con proxies.'
+    return item.clone( title = '[B]Configurar dominio a usar ...[/B]', action = 'configurar_dominio', folder=False, plot=plot, text_color='yellowgreen' )
+
+def configurar_dominio(item):
+    dominio = config.get_setting('dominio', 'playdede', default=dominios[0])
+    num_dominio = dominios.index(dominio) if dominio in dominios else 0
+    ret = platformtools.dialog_select('Dominio a usar PlayDede', dominios, preselect=num_dominio)
+    if ret == -1: return False
+
+    if dominios[ret] in str(ant_hosts):
+        platformtools.dialog_ok(config.__addon_name + ' PlayDede - Configurar Dominio', '[COLOR red][B]Dominio Obsoleto.[/B][/COLOR]', '[COLOR cyan][B]' + dominios[ret] + ' [/B][/COLOR]')
+        return False
+
+    if dominio == dominios[ret]:
+        return False
+
+    procesar = True
+
+    platformtools.dialog_ok(config.__addon_name + ' PlayDede - Configurar Dominio', '[COLOR yellow][B]Este Dominio, [COLOR plum](si no hay resultados)[/COLOR][COLOR yellow], Quizás Necesitará[/COLOR] [COLOR red] Configurar Proxies [/B][/COLOR]', '[COLOR cyan][B]' + dominios[ret] + ' [/B][/COLOR]')
+
+    if not config.get_setting('channel_playdede_proxies', default=''):
+        procesar = False
+
+    if procesar:
+        if config.get_setting('playdede_login', 'playdede', default=False):
+            logout(item)
+            login(item)
+        else:
+            login(item)
+
+    config.set_setting('dominio', dominios[ret], 'playdede')
+
+    platformtools.itemlist_refresh()
+    return True
+
+
 def item_configurar_proxies(item):
     color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
 
@@ -492,13 +536,13 @@ def acciones(item):
     username = config.get_setting('playdede_username', 'playdede', default='')
 
     if username:
-        itemlist.append(item.clone( action='show_current_domain', title='[B]Dominio Actual[COLOR dodgerblue] entrarplaydede.com[/B][/COLOR]',
+        itemlist.append(item.clone( action='show_currents_domains', title='[B]Dominios Actuales[COLOR dodgerblue] entrarplaydede.com[/B][/COLOR]',
                                     text_color='darkgoldenrod' ))
 
-        itemlist.append(item.clone( channel='domains', action='operative_domains_playdede', title='[B]Dominio Operativo Vigente' + '[COLOR dodgerblue] privacidad.me/@playdede[/B][/COLOR]',
+        itemlist.append(item.clone( channel='domains', action='operative_domains_playdede', title='[B]Dominios Operativos Vigentes' + '[COLOR dodgerblue] privacidad.me/@playdede[/B][/COLOR]',
                                     desde_el_canal = True, host_canal = url, text_color='mediumaquamarine' ))
 
-        itemlist.append(item.clone( channel='domains', action='last_domain_playdede', title='[B]Comprobar último dominio vigente[/B]',
+        itemlist.append(item.clone( channel='domains', action='last_domain_playdede', title='[B]Comprobar últimos dominios vigentes[/B]',
                                     desde_el_canal = True, host_canal = url, text_color='chocolate' ))
 
     if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
@@ -527,6 +571,7 @@ def acciones(item):
         itemlist.append(item.clone( title = '[COLOR springgreen][B]Credenciales[/B][/COLOR]', action = 'show_credenciales' ))
         itemlist.append(item.clone( channel='domains', action='del_datos_playdede', title='[B]Eliminar Credenciales[/B]', text_color='crimson' ))
 
+    itemlist.append(item_configurar_dominio(item))
     itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone(channel='helper', action = 'show_help_playdede_media_center', title = '[COLOR aquamarine][B]Aviso[/COLOR] [COLOR violet][B]Ubicación[/B][/COLOR] Media Center',  thumbnail=config.get_thumb('mediacenter') ))
@@ -802,6 +847,7 @@ def generos(item):
     bloque = scrapertools.find_single_match(data, 'const genreDict(.*?)const years')
 
     matches = re.compile("'(.*?)':(.*?),").findall(str(bloque))
+    if not matches: matches = re.compile('"(.*?)":(.*?),').findall(str(bloque))
 
     for title, genre in matches:
         if item.group == 'anime':
@@ -809,6 +855,8 @@ def generos(item):
 
         if config.get_setting('descartar_anime', default=False):
             if title == 'Anime': continue
+
+        title = clean_title(title, '')
 
         genre = genre.strip()
 
@@ -940,6 +988,11 @@ def calidades(item):
 
         itemlist.append(item.clone( title=title, action = 'list_all', url=url, qlty=calidad, text_color=text_color ))
 
+    if itemlist:
+        if item.search_type == 'movie':
+            if not '4K' in matches:
+                itemlist.append(item.clone( title='4K', action = 'list_all', url=url, qlty='4k', text_color=text_color ))
+
     return sorted(itemlist,key=lambda x: x.title)
 
 
@@ -991,7 +1044,7 @@ def paises(item):
 
         itemlist.append(item.clone( title=title, action = 'list_all', url=url, country=pais, text_color=text_color ))
 
-    return itemlist
+    return sorted(itemlist,key=lambda x: x.title)
 
 
 def list_all(item):
@@ -1564,6 +1617,13 @@ def episodios(item):
     return itemlist
 
 
+def puntuar_calidad(txt):
+    orden = ['CAM', 'cam', 'DVDRIP', 'dvdrip', 'HD720', 'hd720', 'HD1080', 'hd1080', '4K', '4k']
+    if txt not in orden: return 0
+
+    else: return orden.index(txt) + 1
+
+
 def findvideos(item):
     logger.info()
     itemlist = []
@@ -1641,73 +1701,85 @@ def findvideos(item):
         server = servertools.corregir_servidor(server)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', id = sid,
-                              language = lang, quality = qlty, other = other.capitalize() ))
+                              language = lang, quality = qlty, quality_num = puntuar_calidad(qlty), other = other.capitalize() ))
 
     # ~ Enlaces
     bloque = scrapertools.find_single_match(data, '<div class="linkSorter">(.*?)<div class="contEP contepID_3">')
 
-    matches = re.compile('data-quality="(.*?)".*?data-lang="(.*?)".*?href="(.*?)".*?<span>.*?">(.*?)</b>', re.DOTALL).findall(bloque)
+    matches = re.compile('data-quality="(.*?)".*?data-lang="(.*?)".*?href="(.*?)".*?<span>.*?">(.*?)</b>.*?data-id="(.*?)"', re.DOTALL).findall(bloque)
 
-    for qlty, lang, url, server in matches:
-        if not url or not server: continue
+    for qlty, lang, url, srv, id in matches:
+        if not srv: continue
 
-        if server == 'alternativo': continue
+        if srv == 'alternativo': continue
 
         ses += 1
 
-        server = server.lower().strip()
+        srv = srv.lower().strip()
 
-        if server == 'powvideo': continue
-        elif server == 'streamplay': continue
+        if srv == 'powvideo': continue
+        elif srv == 'streamplay': continue
 
         if lang.lower() == 'espsub': lang = 'Vose'
 
         lang = lang.capitalize()
 
-        if server == 'filelions': other = 'Filelions'
-        elif server == 'filemoon': other = 'Filemoon'
-        elif server == 'streamwish': other = 'Streamwish'
-        elif server == 'streamhub': other = 'Streamhub'
-        elif server == 'uploaddo': other = 'Uploaddo'
-        elif server == 'vembed': other = 'Vidguard'
-        elif server == 'hexupload': other = 'Hexupload'
-        elif server == 'userload': other = 'Userload'
-        elif server == 'streamruby': other = 'Streamruby'
-        elif server == 'streamsilk': other = 'Streamsilk'
+        if srv == 'filelions': other = 'Filelions'
+        elif srv == 'filemoon': other = 'Filemoon'
+        elif srv == 'streamwish': other = 'Streamwish'
+        elif srv == 'streamhub': other = 'Streamhub'
+        elif srv == 'uploaddo': other = 'Uploaddo'
+        elif srv == 'vembed': other = 'Vidguard'
+        elif srv == 'hexupload': other = 'Hexupload'
+        elif srv == 'userload': other = 'Userload'
+        elif srv == 'streamruby': other = 'Streamruby'
+        elif srv == 'streamsilk': other = 'Streamsilk'
 
-        elif server == 'luluvideo':
-              server = 'various'
+        elif srv == 'luluvideo':
+              srv = 'various'
               other = 'Lulustream'
 
-        elif 'bigwarp' in server or 'bgwp' in server:
-              server = 'zures'
+        elif 'bigwarp' in srv or 'bgwp' in srv:
+              srv = 'zures'
               other = 'Bigwarp'
 
         else: other = 'E'
 
-        server = servertools.corregir_servidor(server)
+        server = servertools.corregir_servidor(srv)
 
         if not server == 'directo':
-            if server == 'various': other = servertools.corregir_other(url)
+            if '/redirect.php?id=' in url: pass
+
+            elif server == 'various': other = servertools.corregir_other(url)
             elif server == 'zures': other = servertools.corregir_zures(url)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url,
-                              language = lang, quality = qlty, other = other.capitalize() ))
+        if '/redirect.php?id=' in url:
+            url = ''
+            id = id
+        else: id = ''
+
+        if not url:
+           if not id: continue
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url, id = id,
+                              language = lang, quality = qlty, quality_num = puntuar_calidad(qlty), other = other.capitalize() ))
 
     # ~ Descargas
-    bloque = scrapertools.find_single_match(data, '<div class="contEP contepID_3">(.*?)$')
+    bloque = scrapertools.find_single_match(data, '<div class="contEP contepID_3">(.*?)</div></div></div></div></div></div>')
 
-    matches = re.compile('data-quality="(.*?)".*?data-lang="(.*?)".*?href="(.*?)".*?<span>.*?">(.*?)</b>', re.DOTALL).findall(bloque)
+    matches = re.compile('data-quality="(.*?)".*?data-lang="(.*?)".*?href="(.*?)".*?<span>.*?">(.*?)</b>.*?data-id="(.*?)"', re.DOTALL).findall(bloque)
 
-    for qlty, lang, url, server in matches:
-        if not url or not server: continue
+    for qlty, lang, url, srv, id in matches:
+        if not srv: continue
 
-        if '>recomendado<' in server: continue
-        elif server == 'alternativo': continue
+        if '>recomendado<' in srv: continue
+        elif '>servidor gratuito<' in srv: continue
+
+        elif srv == 'alternativo': continue
 
         ses += 1
 
-        server = server.lower().strip()
+        srv = srv.lower().strip()
 
         if '/ul.' in url: continue
         elif '/1fichier.' in url: continue
@@ -1726,16 +1798,27 @@ def findvideos(item):
 
         lang = lang.capitalize()
 
-        server = servertools.corregir_servidor(server)
+        server = servertools.corregir_servidor(srv)
 
         other = 'D'
 
         if not server == 'directo':
-            if server == 'various': other = servertools.corregir_other(url)
+            if '/redirect.php?id=' in url:
+                other = other + ' ' + srv.capitalize()
+
+            elif server == 'various': other = servertools.corregir_other(url)
             elif server == 'zures': other = servertools.corregir_zures(url)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url,
-                              language = lang, quality = qlty, other = other.capitalize() ))
+        if '/redirect.php?id=' in url:
+            url = ''
+            id = id
+        else: id = ''
+
+        if not url:
+           if not id: continue
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url, id = id,
+                              language = lang, quality = qlty, quality_num = puntuar_calidad(qlty), other = other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:
@@ -1756,16 +1839,20 @@ def play(item):
         data = do_downloadpage(host + 'ajax.php', post=post)
 
         url = scrapertools.find_single_match(data, "src='([^']+)")
+        if not url: url = scrapertools.find_single_match(data, '"goto":"(.*?)"')
+
         url = url.replace('\\/', '/')
 
         if url:
-            data = do_downloadpage(url)
+            if item.other.startswith('D '): url_play = url
+            else:
+                data = do_downloadpage(url)
 
-            url_play = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
-            if not url_play: url_play = scrapertools.find_single_match(data, "<iframe src='(.*?)'")
+                url_play = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
+                if not url_play: url_play = scrapertools.find_single_match(data, "<iframe src='(.*?)'")
 
-            if not url_play: url_play = scrapertools.find_single_match(data, 'var url = "(.*?)"')
-            if not url_play: url_play = scrapertools.find_single_match(data, "var url = '(.*?)'")
+                if not url_play: url_play = scrapertools.find_single_match(data, 'var url = "(.*?)"')
+                if not url_play: url_play = scrapertools.find_single_match(data, "var url = '(.*?)'")
 
     else:
         url_play = item.url
@@ -1898,7 +1985,7 @@ def clean_title(title, url):
     title = title.replace('\\u00f1', 'ñ').replace('\\u00bf', '¿').replace('\\u00a1', '¡').replace('\\u00ba', 'º')
     title = title.replace('\\u00eda', 'a').replace('\\u00f3n', 'o').replace('\\u00fal', 'u').replace('\\u00e0', 'a')
 
-    title = title.replace('\\u2019', "'")
+    title = title.replace('\\u2019', "'").replace('\\u00e3o', 'o').replace('\\u010c', 'c').replace('\\u00c9', 'v').replace('\\u00da', 't').replace('\\u0113', 'i').replace('\\u014d', 'v').replace('\\u00d4', '').replace('\\u0130', '').replace('\\u00e8', ' ')
 
     title = title.replace('\\u00c0', "A").replace('\\u010c0', "C").replace('\\u00c5l', "Islas Al")
 
@@ -1917,52 +2004,70 @@ def clean_title(title, url):
     return title
 
 
-def show_current_domain(item):
+def show_currents_domains(item):
     logger.info()
 
-    current_domain = ''
+    domains = []
+
+    avisar = False
 
     try:
         data = httptools.downloadpage('https://entrarplaydede.com/').data
 
-        current_domain = scrapertools.find_single_match(data, '>Dirección actual:.*?<a href="(.*?)"')
-        if not current_domain: current_domain = scrapertools.find_single_match(data, '>Dirección actual:.*?">(.*?)</a>').strip()
+        bloque = scrapertools.find_single_match(data, '<main>(.*?)</section>')
 
-        if current_domain:
-            current_domain = current_domain.lower()
+        currents_domains = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?</a>')
+        if not currents_domains: currents_domains = scrapertools.find_multiple_matches(bloque, 'data-url="(.*?)".*?</a>')
 
-            if not 'playdede' in current_domain: current_domain = ''
+        if currents_domains:
+            for current_domain in currents_domains:
+                if current_domain:
+                    current_domain = current_domain.lower().strip()
 
-        if current_domain:
-            if not 'https' in current_domain: current_domain  = 'https://' + current_domain
-            if not current_domain.endswith('/'): current_domain = current_domain + '/'
+                    if not 'playdede.' in current_domain: continue
+
+                    if not 'https' in current_domain: current_domain  = 'https://' + current_domain
+                    if not current_domain.endswith('/'): current_domain = current_domain + '/'
+
+                    domains.append(current_domain)
+
+                    if not current_domain in str(dominios): avisar = True
     except:
         pass
 
-    if not current_domain:
+    if not domains:
         platformtools.dialog_notification(config.__addon_name + ' - PlayDede', '[B][COLOR red]No se pudo comprobar[/B][/COLOR]')
         return
 
-    domain = config.get_setting('dominio', 'playdede', default='')
-    if not domain: domain = host
+    if avisar:
+        if config.get_setting('developer_mode', default=False):
+            platformtools.dialog_notification(config.__addon_name + ' Playdede', '[COLOR cyan][B]Nuevos Dominios[/B][/COLOR]')
 
-    if domain == current_domain:
-        platformtools.dialog_ok(config.__addon_name + ' - PlayDede', '[COLOR gold][B]El dominio/host del canal es correcto.[/B]', '[COLOR cyan][B]' + current_domain + '[/B][/COLOR]')
-        return
+    dominio = config.get_setting('dominio', 'playdede', default=dominios[0])
+    num_dominio = dominios.index(dominio) if dominio in dominios else 0
+
+    ret = platformtools.dialog_select('Playdede Dominios Actuales', dominios, preselect=num_dominio)
+    if ret == -1: return False
+
+    if dominios[ret] in str(ant_hosts):
+        platformtools.dialog_ok(config.__addon_name + ' PlayDede', '[COLOR red][B]Dominio Obsoleto.[/B][/COLOR]', '[COLOR cyan][B]' + dominios[ret] + ' [/B][/COLOR]')
+        return False
+
+    if dominio == dominios[ret]:
+        return False
 
     procesar = True
-    if domain == host: procesar = False
+    if dominios[ret] == host: procesar = False
 
-    if platformtools.dialog_yesno(config.__addon_name + ' - Nuevo Dominio PlayDede', '¿ [COLOR red][B]Nuevo Dominio[/B][/COLOR], Desea cambiarlo ?', 'Memorizado:  [COLOR yellow][B]' + domain + '[/B][/COLOR]', 'Actual..........:  [COLOR cyan][B]' + current_domain + '[/B][/COLOR]'):
-        if procesar:
-            logout(item)
+    if procesar:
+        logout(item)
 
-        config.set_setting('dominio', current_domain, 'playdede')
+        config.set_setting('dominio', dominios[ret], 'playdede')
 
         if procesar:
             login(item)
 
-        platformtools.dialog_ok(config.__addon_name + ' - Playdede', '[COLOR yellow][B]Dominio Actual Memorizado, pero aún NO guardado.[/B][/COLOR]', 'Por favor,  [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.')
+        platformtools.dialog_ok(config.__addon_name + ' - Playdede' + '  ' + dominios[ret], '[COLOR yellow][B]Dominio Memorizado, pero aún NO guardado.[/B][/COLOR]', 'Por favor,  [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.')
 
 
 def show_help_usuario(item):

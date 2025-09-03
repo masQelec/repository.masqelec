@@ -13,5 +13,5 @@
 
   "clusters": ["temporary", "anime", "vos"],
 
-  "notes": "Películas y Series."
+  "notes": "Películas y Series. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

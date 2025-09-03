@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 import re
 
 from platformcode import logger, config, platformtools
@@ -78,14 +77,16 @@ def calidades(item):
 
     bloque = scrapertools.find_single_match(data, '>Calidad<(.*?)</select>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<option value="(.*?)">(.*?)</option>')
+    matches = scrapertools.find_multiple_matches(bloque, '<option value="(.*?)".*?>(.*?)</option>')
 
     for qlty, title in matches:
+        if title == 'Todos': continue
+
         url = host + 'peliculas?query=&quality=' + qlty + '&genre=&year='
 
-        itemlist.append(item.clone( action='list_all', title=title, url=url, text_color='deepskyblue' ))
+        itemlist.append(item.clone( action='list_all', title=title, url=url, text_color='moccasin' ))
 
-    return itemlist
+    return sorted(itemlist, key=lambda it: it.title)
 
 
 def generos(item):
@@ -96,9 +97,11 @@ def generos(item):
 
     bloque = scrapertools.find_single_match(data, '>Género<(.*?)</select>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<option value="(.*?)">(.*?)</option>')
+    matches = scrapertools.find_multiple_matches(bloque, '<option value="(.*?)".*?>(.*?)</option>')
 
     for gen, title in matches:
+        if title == 'Todos': continue
+
         url = host + 'peliculas?query=&quality=&genre=' + gen + '&year='
 
         itemlist.append(item.clone( title=title, url = url, action='list_all', text_color='deepskyblue'))

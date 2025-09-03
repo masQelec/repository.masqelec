@@ -747,7 +747,9 @@ def submnu_uso(item):
 
     itemlist.append(item.clone( action='show_help_bloqueos', title= ' - ¿ Qué hacer si su Operadora [COLOR yellowgreen][B]Bloquea[/B][/COLOR] algún Canal ?', thumbnail=config.get_thumb('roadblock') ))
 
-    itemlist.append(item.clone( action='show_server_report', title= ' - Como [COLOR cyan][B]Reportar[/B][/COLOR] posible Fallo en la Reproducción de Servidores', thumbnail=config.get_thumb('megaphone') ))
+    itemlist.append(item.clone( action='show_infos_play', title= ' - [COLOR fuchsia][B]Play[/COLOR] [COLOR salmon]Cuestiones Preliminares[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
+
+    itemlist.append(item.clone( action='show_report', title= ' - [COLOR red][B]Reportar un Problema[/B][/COLOR] en la Ejecución de Balandro', _uso = True, thumbnail=config.get_thumb('telegram') ))
 
     itemlist.append(item.clone( channel='actions', action = 'open_settings', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] Preferencias', thumbnail=config.get_thumb('settings') ))
 
@@ -1118,6 +1120,8 @@ def submnu_domains(item):
 
     itemlist.append(item.clone( channel='actions', action='manto_domains', title= '    - Quitar los Dominios en los canales [COLOR darkorange][B](que los Tengan)[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
+    itemlist.append(item.clone( action='submnu_cuentas', title= ' - [COLOR dodgerblue][B]Gestión Canales con Cuenta[/B][/COLOR]', thumbnail=config.get_thumb('support') ))
+
     itemlist.append(item.clone( channel='actions', action = 'open_settings', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] preferencias (categoría [COLOR gold][B]Dominios[/B][/COLOR])', thumbnail=config.get_thumb('settings') ))
 
     return itemlist
@@ -1168,9 +1172,9 @@ def submnu_cuentas(item):
 
         itemlist.append(item.clone( action='show_help_playdede_bloqueo', title= ' - [COLOR aquamarine][B]Aviso[/COLOR] [COLOR yellowgreen][B]Bloqueo[/B][/COLOR] Operadoras', thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
 
-        itemlist.append(item.clone( channel='playdede', action='show_current_domain', title= ' - [COLOR darkgoldenrod][B]Dominio Actual[COLOR dodgerblue] entrarplaydede.com[/B][/COLOR]', thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
+        itemlist.append(item.clone( channel='playdede', action='show_currents_domains', title= ' - [COLOR darkgoldenrod][B]Dominios Actuales[COLOR dodgerblue] entrarplaydede.com[/B][/COLOR]', thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
 
-        itemlist.append(item.clone( channel='domains', action='last_domain_playdede', title= ' - [COLOR goldenrod][B]Asociar[/B][/COLOR] dominio actual [COLOR dodgerblue][B]privacidad.me/@playdede[/B][/COLOR]', thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
+        itemlist.append(item.clone( channel='domains', action='last_domain_playdede', title= ' - [COLOR goldenrod][B]Asociar[/B][/COLOR] dominio vigente [COLOR dodgerblue][B]privacidad.me/@playdede[/B][/COLOR]', thumbnail=config.get_thumb('playdede', 'thumb', 'channels') ))
 
         cfg_user_channel = 'channel_playdede_playdede_username'
         cfg_pass_channel = 'channel_playdede_playdede_password'
@@ -1269,10 +1273,13 @@ def submnu_play(item):
 
     itemlist.append(item.clone( action='channels_with_crypto', title= '    - Qué canales requieren [COLOR darksalmon][B]Descifrar Enlaces[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
-    if config.get_setting('developer_mode', default=False):
-        itemlist.append(item.clone( action='', title= '[B][I]PLAY CANALES CON UN ÚNICO SERVIDOR:[/I][/B]', folder=False, text_color='orchid' ))
+    itemlist.append(item.clone( action='', title= '[B][I]PLAY CANALES CON ENLACES STREAMIN Y TORRENT:[/I][/B]', folder=False, text_color='orchid' ))
 
-        itemlist.append(item.clone( action='show_channels_list', title= '    - Qué [COLOR gold][B]Canales[/COLOR] tienen [COLOR orchid]Solo un servidor[/B][/COLOR]', onlyone = True, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='show_channels_list', title= '    - Qué [COLOR gold][B]Canales[/COLOR] tienen enlaces [COLOR magenta]Streamin y Torrent[/B][/COLOR]', streaminytorrent = True, thumbnail=config.get_thumb('stack') ))
+
+    itemlist.append(item.clone( action='', title= '[B][I]PLAY CANALES CON UN ÚNICO SERVIDOR:[/I][/B]', folder=False, text_color='orchid' ))
+
+    itemlist.append(item.clone( action='show_channels_list', title= '    - Qué [COLOR gold][B]Canales[/COLOR] tienen [COLOR fuchsia]Solo un servidor[/B][/COLOR]', onlyone = True, thumbnail=config.get_thumb('stack') ))
 
     itemlist.append(item.clone( channel='actions', action = 'open_settings', title= '[COLOR chocolate][B]Ajustes[/B][/COLOR] preferencias (categoría [COLOR fuchsia][B]Play[/B][/COLOR])', thumbnail=config.get_thumb('settings') ))
 
@@ -1867,7 +1874,7 @@ def submnu_clean(item):
 
     itemlist.append(item.clone( action='', title='[B]LIMPIEZAS:[/B]', folder=False, text_color='olive', thumbnail=config.get_thumb('quote') ))
 
-    itemlist.append(item.clone( action='show_help_clean', title= ' - [COLOR green][B]Información[/B][/COLOR] Limpiezas', thumbnail=config.get_thumb('news'), text_color='olive' ))
+    itemlist.append(item.clone( action='show_help_clean', title= ' - [COLOR green][B]Información[/B][/COLOR] Limpiezas', _help = True, thumbnail=config.get_thumb('news'), text_color='olive' ))
 
     itemlist.append(item.clone( channel='submnuteam', action='submnu_center', title=' - [B]Limpieza [COLOR pink]Media Center[/COLOR][/B]', helper = True, thumbnail=config.get_thumb('mediacenter'), text_color='olive' ))
     itemlist.append(item.clone( channel='submnuteam', action='submnu_addons', title=' - [B]Limpieza [COLOR yellowgreen]Add-Ons[/COLOR][/B]', helper = True, thumbnail=config.get_thumb('kodiaddons'), text_color='olive' ))
@@ -2313,7 +2320,8 @@ def show_help_register(item):
     if presentar:
         datos = channeltools.get_channel_parameters('hdfull')
         if datos['active']:
-            txt += '      [COLOR yellow][B]HdFull  [/COLOR][COLOR cyan]dominioshdfull.com[/B][/COLOR]'
+            txt += '      [COLOR yellow][B]HdFull  [/COLOR][COLOR cyan]dominioshdfull.com[/B][/COLOR][CR]'
+            txt += '      [COLOR yellow][B]HdFull  [/COLOR][COLOR gold]X [/COLOR] [COLOR cyan]x.com/hdfulloficial[/COLOR][/B]'
 
     presentar = True
 
@@ -2325,7 +2333,7 @@ def show_help_register(item):
         if datos['active']:
             txt += '[CR]      [COLOR yellow][B]PlayDede  [/COLOR][COLOR cyan]privacidad.me/@playdede[/B][/COLOR][CR]'
             txt += '      [COLOR yellow][B]PlayDede  [/COLOR][COLOR cyan]entrarplaydede.com[/COLOR][/B][CR]'
-            txt += '      [COLOR yellow][B]PlayDede  [/COLOR][COLOR gold]X [/COLOR] [COLOR cyan]x.com/playdedesocial[/COLOR][/B]'
+            txt += '      [COLOR yellow][B]PlayDede  [/COLOR][COLOR gold]X [/COLOR] [COLOR cyan]x.com/webplaydede[/COLOR][/B]'
 
     txt += '[CR][CR]*) Los datos de [B][COLOR gold]Usuario y/ó Contraseña[/COLOR][/B] No pueden ser Solo Números..'
     txt += '[CR]     Imprescindible tomar buena Nota de vuestro [B][COLOR gold]Usuario y Contraseña[/COLOR][/B] para la web.'
@@ -2432,6 +2440,10 @@ def show_help_gnula24h(item):
     item.notice = 'gnula24h'
     show_help_canales(item)
 
+def show_help_hdcinema(item):
+    item.notice = 'hdcinema'
+    show_help_canales(item)
+
 def show_help_hdfull(item):
     item.notice = 'hdfull'
     show_help_canales(item)
@@ -2450,10 +2462,6 @@ def show_help_jkanime(item):
 
 def show_help_latanime(item):
     item.notice = 'latanime'
-    show_help_canales(item)
-
-def show_help_masnovelas(item):
-    item.notice = 'masnovelas'
     show_help_canales(item)
 
 def show_help_megaserie(item):
@@ -2528,6 +2536,14 @@ def show_help_subtorrents(item):
     item.notice = 'subtorrents'
     show_help_canales(item)
 
+def show_help_todocine(item):
+    item.notice = 'todocine'
+    show_help_canales(item)
+
+def show_help_tubepelis(item):
+    item.notice = 'tubepelis'
+    show_help_canales(item)
+
 def show_help_yaskeorg(item):
     item.notice = 'yaskeorg'
     show_help_canales(item)
@@ -2595,8 +2611,8 @@ def show_help_canales(item):
 
         elif item.notice == 'playdede':
            txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un Navegador de Internet a[/COLOR] [B][COLOR goldenrod]privacidad.me/@playdede[/COLOR][/B][CR]'
-           txt += '[COLOR yellow]  También puede acceder a su[/COLOR][COLOR gold][B] Telegram[/B] [B][COLOR greenyellow]entrarplaydede,com[/COLOR][/B][CR]'
-           txt += '[COLOR yellow]  ó bien acceder a su [/COLOR][COLOR gold][B]X [/COLOR] [B][COLOR greenyellow] x.com/playdedesocial[/COLOR][/B][CR]'
+           txt += '[COLOR yellow]  También puede acceder a [B][COLOR cyan]entrarplaydede,com[/COLOR][/B][CR]'
+           txt += '[COLOR yellow]  ó bien acceder a su [/COLOR][COLOR gold][B]X [/COLOR] [B][COLOR greenyellow] x.com/webplaydede[/COLOR][/B][CR]'
 
     elif item.notice == 'animeojl':
         if config.get_setting('channel_animejl_proxies', default=''):
@@ -2701,6 +2717,12 @@ def show_help_canales(item):
 
         txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
 
+    elif item.notice == 'hdcinema':
+        if config.get_setting('channel_hdcinema_proxies', default=''):
+	        txt += '[CR][B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
+
+        txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
+
     elif item.notice == 'henaojara':
         if config.get_setting('channel_henaojara_proxies', default=''):
 	        txt += '[CR][B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
@@ -2721,12 +2743,6 @@ def show_help_canales(item):
 
     elif item.notice == 'latanime':
         if config.get_setting('channel_latanime_proxies', default=''):
-	        txt += '[CR][B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
-
-        txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
-
-    elif item.notice == 'masnovelas':
-        if config.get_setting('channel_masnovelas_proxies', default=''):
 	        txt += '[CR][B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
 
         txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
@@ -3093,7 +3109,7 @@ def show_help_youtube(item):
 def show_server_report(item):
     logger.info()
 
-    txt = '*) Algunos Servidores ([B][COLOR cyan]Filelions, Hexupload, Streamwish, Vidhidepro, Vidspeed[/B][/COLOR])[CR]'
+    txt = '*) Algunos Servidores ([B][COLOR cyan]Filelions, Hexupload, Streamwish, VidGuard, Vidhidepro, Vidspeed[/B][/COLOR])[CR]'
     txt += '    En ciertas ocasiones, [B][COLOR yellowgreen]NO Responden correctamente a la Primera Solicitud de Play[/B][/COLOR],[CR]'
     txt += '    [B][COLOR goldenrod]y Hay que Re-Intentarlo de Nuevo[/B][/COLOR], si persistiera el error, deberá Reportarlo.[CR][CR]'
 
@@ -3897,12 +3913,12 @@ def show_play_parameters(item):
 
     txt += '[CR][CR][COLOR fuchsia][B] - ORDENAR POR CALIDAD:[/B][/COLOR]'
 
-    tex_qlty = 'Orden de la Web'
+    tex_qlty = 'Orden Web'
 
-    if config.get_setting('servers_sort_quality') == 1: tex_qlty = 'Calidad Descendente'
-    elif config.get_setting('servers_sort_quality') == 2: tex_qlty = 'Calidad Ascendente'
+    if config.get_setting('servers_sort_quality') == 1: tex_qlty = 'Calidad Alta'
+    elif config.get_setting('servers_sort_quality') == 2: tex_qlty = 'Calidad Baja'
 
-    txt += '[CR]    -  En cada idioma ordenar los enlaces según ' +  '[COLOR yellow][B] ' + tex_qlty + '[/B][/COLOR]'
+    txt += '[CR]    -  En cada idioma ordenar los enlaces por ' +  '[COLOR yellow][B] ' + tex_qlty + '[/B][/COLOR]'
 
     if config.get_setting('servers_preferred', default='') or config.get_setting('servers_unfavored', default='') or config.get_setting('servers_discarded', default=''):
         txt += '[CR][CR][COLOR fuchsia][B] - FILTRAR SERVIDORES:[/B][/COLOR]'
@@ -4650,9 +4666,13 @@ def proxies_show_vias(item):
 def show_help_clean(item):
     logger.info()
 
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Analizando Limpiezas[/B][/COLOR]' % color_exec)
+
     txt = '[COLOR moccasin][B]Análisis efectuado de la situación actual de su Instalación y Ejecución.[/B][/COLOR][CR][CR]'
 
-    txt += '[COLOR yellowgreen][B]Para Procesar, dentro del [COLOR goldenrod][B]Add-On[/B][/COLOR], dirijase a [COLOR chartreuse][B]Ayuda[/B][/COLOR] [COLOR olivedrab][B]Limpiezas[/B][/COLOR][CR]'
+    if not item._help:
+        txt += '[COLOR darkgoldenrod][B]Para Procesar, dentro del [COLOR tan][B]Menú del Add-On[/B][/COLOR], [B]dirijase a la [COLOR chartreuse][B]Ayuda[/B][/COLOR][B] opción [/B][/COLOR][COLOR olivedrab][B]Limpiezas[/B][/COLOR][CR][CR]'
+
     txt += '[COLOR cyan][B]Durante el proceso de cada una de las [/COLOR][COLOR yellow]Opciones[/COLOR][COLOR cyan], podrá Confirmar previamente cada [/COLOR][COLOR red]Eliminación[/B][/COLOR]'
 
     txt += '[CR][CR][COLOR powderblue][B]Media Center:[/B][/COLOR][CR]'
@@ -4683,12 +4703,12 @@ def show_help_clean(item):
 
         if matches == 0: existe = False
 
-    if existe: txt += 'Fichero [COLOR yellow][B]favourites.xml[/B][/COLOR][CR]'
+    if existe: txt += '  Fichero [COLOR yellow][B]favourites.xml[/B][/COLOR][CR]'
 
     file = 'playercorefactory.xml'
     file = path + file
     existe = filetools.exists(file)
-    if existe: txt += 'Fichero [COLOR yellow][B]playercorefactory.xml[/B][/COLOR][CR]'
+    if existe: txt += '  Fichero [COLOR yellow][B]playercorefactory.xml[/B][/COLOR][CR]'
 
     presentar = False
 
@@ -4700,12 +4720,12 @@ def show_help_clean(item):
 
     if caches: presentar = True
 
-    if presentar: txt += 'Archivos en la [COLOR yellow][B]Caché[/B][/COLOR][CR]'
+    if presentar: txt += '  Archivos en la [COLOR yellow][B]Caché[/B][/COLOR][CR]'
 
     path_thumbs = translatePath(os.path.join('special://home/userdata/Thumbnails', ''))
     existe_thumbs = filetools.exists(path_thumbs)
 
-    if existe_thumbs: txt += 'Archivos en [COLOR yellow][B]Thumbnails[/B][/COLOR][CR]'
+    if existe_thumbs: txt += '  Archivos en [COLOR yellow][B]Thumbnails[/B][/COLOR][CR]'
 
     presentar = False
 
@@ -4727,32 +4747,32 @@ def show_help_clean(item):
     if presentar:
         txt += '[CR][CR][COLOR powderblue][B]Add-Ons:[/B][/COLOR][CR]'
 
-        if packages:  txt += 'Archivos en [COLOR yellow][B]Packages[/B][/COLOR][CR]'
+        if packages:  txt += '  Archivos en [COLOR yellow][B]Packages[/B][/COLOR][CR]'
 
-        if temps: txt += 'Archivos en [COLOR yellow][B]Temp[/B][/COLOR][CR]'
+        if temps: txt += '  Archivos en [COLOR yellow][B]Temp[/B][/COLOR][CR]'
 
 
     txt += '[CR][CR][COLOR powderblue][B]Sistema:[/B][/COLOR][CR]'
 
     path = os.path.join(config.get_runtime_path(), 'last_fix.json')
     existe = filetools.exists(path)
-    if existe: txt += 'Fichero [COLOR yellow][B]last_fix.json[/B][/COLOR][CR]'
+    if existe: txt += '  Fichero [COLOR yellow][B]last_fix.json[/B][/COLOR][CR]'
 
     path = os.path.join(config.get_data_path(), 'Lista-proxies.txt')
     existe = filetools.exists(path)
-    if existe: txt += 'Fichero [COLOR yellow][B]Lista-Proxies.txt[/B][/COLOR][CR]'
+    if existe: txt += '  Fichero [COLOR yellow][B]Lista-Proxies.txt[/B][/COLOR][CR]'
 
     path = os.path.join(config.get_data_path(), 'cookies.dat')
     existe = filetools.exists(path)
-    if existe: txt += 'Fichero [COLOR yellow][B]cookies.dat[/B][/COLOR][CR]'
+    if existe: txt += '  Fichero [COLOR yellow][B]cookies.dat[/B][/COLOR][CR]'
 
     path = os.path.join(config.get_data_path(), 'cache')
     existe = filetools.exists(path)
-    if existe: txt += 'Carpeta [COLOR yellow][B]Caché[/B][/COLOR][CR]'
+    if existe: txt += '  Carpeta [COLOR yellow][B]Caché[/B][/COLOR][CR]'
 
     path = filetools.join(config.get_data_path(), 'tracking_dbs')
     existe = filetools.exists(path)
-    if existe: txt += 'Contenido [COLOR wheat][B]Preferidos[/B][/COLOR][CR]'
+    if existe: txt += '  Contenido [COLOR wheat][B]Preferidos[/B][/COLOR][CR]'
 
     downloadpath = config.get_setting('downloadpath', default='')
 
@@ -4760,15 +4780,15 @@ def show_help_clean(item):
     else: path = filetools.join(config.get_data_path(), 'downloads')
 
     existe = filetools.exists(path)
-    if existe: txt += 'Contenido [COLOR seagreen][B]Descargas[/B][/COLOR][CR]'
+    if existe: txt += '  Contenido [COLOR seagreen][B]Descargas[/B][/COLOR][CR]'
 
     path = filetools.join(config.get_data_path(), 'tmdb.sqlite-journal')
     existe = filetools.exists(path)
-    if existe: txt += 'Fichero [COLOR yellow][B]tmdb.sqlite-journal[/B][/COLOR][CR]'
+    if existe: txt += '  Fichero [COLOR yellow][B]tmdb.sqlite-journal[/B][/COLOR][CR]'
 
     path = filetools.join(config.get_data_path(), 'tmdb.sqlite')
     existe = filetools.exists(path)
-    if existe: txt += 'Fichero [COLOR yellow][B]tmdb.sqlite[/B][/COLOR][CR]'
+    if existe: txt += '  Fichero [COLOR yellow][B]tmdb.sqlite[/B][/COLOR][CR]'
 
     presentar = False
 
@@ -4779,9 +4799,9 @@ def show_help_clean(item):
     if presentar:
         txt += '[CR][CR][COLOR powderblue][B]Logs:[/B][/COLOR][CR]'
 
-        if os.path.exists(os.path.join(config.get_data_path(), 'servers_todo.log')): txt += 'Fichero [COLOR yellow][B]servers_todo.log[/B][/COLOR][CR]'
-        if os.path.exists(os.path.join(config.get_data_path(), 'qualities_todo.log')): txt += 'Fichero [COLOR yellow][B]qualities_todo.log[/B][/COLOR][CR]'
-        if os.path.exists(os.path.join(config.get_data_path(), 'proxies.log')): txt += 'Fichero [COLOR yellow][B]proxies.log[/B][/COLOR][CR]'
+        if os.path.exists(os.path.join(config.get_data_path(), 'servers_todo.log')): txt += '  Fichero [COLOR yellow][B]servers_todo.log[/B][/COLOR][CR]'
+        if os.path.exists(os.path.join(config.get_data_path(), 'qualities_todo.log')): txt += '  Fichero [COLOR yellow][B]qualities_todo.log[/B][/COLOR][CR]'
+        if os.path.exists(os.path.join(config.get_data_path(), 'proxies.log')): txt += '  Fichero [COLOR yellow][B]proxies.log[/B][/COLOR][CR]'
 
     presentar = False
 
@@ -4796,13 +4816,13 @@ def show_help_clean(item):
     if presentar:
         txt += '[CR][CR][COLOR powderblue][B]Temporales:[/B][/COLOR][CR]'
 
-        if os.path.exists(os.path.join(config.get_data_path(), 'info_channels.csv')): txt += 'Fichero [COLOR yellow][B]info_channels.csv[/B][/COLOR][CR]'
-        if os.path.exists(os.path.join(config.get_data_path(), 'temp.torrent')): txt += 'Fichero [COLOR yellow][B]temp.torrent[/B][/COLOR][CR]'
-        if os.path.exists(os.path.join(config.get_data_path(), 'm3u8hls.m3u8')): txt += 'Fichero [COLOR yellow][B]m3u8hls.m3u8[/B][/COLOR][CR]'
-        if os.path.exists(os.path.join(config.get_data_path(), 'blenditall.m3u8')): txt += 'Fichero [COLOR yellow][B]blenditall.m3u8[/B][/COLOR][CR]'
-        if os.path.exists(os.path.join(config.get_data_path(), 'test_logs')): txt += 'Fichero [COLOR yellow][B]test_logs[/B][/COLOR][CR]'
-        if os.path.exists(os.path.join(config.get_data_path(), 'temp_updates.zip')): txt += 'Archivo [COLOR yellow][B]temp_updates.zip[/B][/COLOR][CR]'
-        if os.path.exists(os.path.join(config.get_data_path(), 'tempfile_mkdtemp')): txt += 'Archivo [COLOR yellow][B]tempfile_mkdtemp[/B][/COLOR][CR]'
+        if os.path.exists(os.path.join(config.get_data_path(), 'info_channels.csv')): txt += '  Fichero [COLOR yellow][B]info_channels.csv[/B][/COLOR][CR]'
+        if os.path.exists(os.path.join(config.get_data_path(), 'temp.torrent')): txt += '  Fichero [COLOR yellow][B]temp.torrent[/B][/COLOR][CR]'
+        if os.path.exists(os.path.join(config.get_data_path(), 'm3u8hls.m3u8')): txt += '  Fichero [COLOR yellow][B]m3u8hls.m3u8[/B][/COLOR][CR]'
+        if os.path.exists(os.path.join(config.get_data_path(), 'blenditall.m3u8')): txt += '  Fichero [COLOR yellow][B]blenditall.m3u8[/B][/COLOR][CR]'
+        if os.path.exists(os.path.join(config.get_data_path(), 'test_logs')): txt += '  Fichero [COLOR yellow][B]test_logs[/B][/COLOR][CR]'
+        if os.path.exists(os.path.join(config.get_data_path(), 'temp_updates.zip')): txt += '  Archivo [COLOR yellow][B]temp_updates.zip[/B][/COLOR][CR]'
+        if os.path.exists(os.path.join(config.get_data_path(), 'tempfile_mkdtemp')): txt += '  Archivo [COLOR yellow][B]tempfile_mkdtemp[/B][/COLOR][CR]'
 
     txt = txt.replace('[CR][CR][CR]', '[CR][CR]')
 
@@ -4929,7 +4949,10 @@ def show_report(item):
     if not loglevel >= 2:
         config.set_setting('debug', 2)
 
-    platformtools.dialog_ok(config.__addon_name + ' - Reportes', '[COLOR yellow]Por favor, reproduzca el [B]Problema y Regrese[/B] a esta sección.[/COLOR]', 'para obtener [COLOR cyan][B]una Copia del Fichero LOG[/B][/COLOR] de su Media Center y poder [COLOR goldenrod][B]Remitirnoslo[/B][/COLOR] a la mayor brevedad posible.')
+    if item._uso:
+        platformtools.dialog_ok(config.__addon_name + ' - Reportes', 'Por favor, reproduzca el [COLOR yellow][B]Problema y Dirijase[/B][/COLOR] a la [CR][COLOR chartreuse][B]Ayuda [/COLOR][COLOR pink]Media Center[/B][/COLOR]', 'para obtener [COLOR cyan][B]una Copia del Fichero LOG[/B][/COLOR] [CR]y poder [COLOR goldenrod][B]Remitirnoslo[/B][/COLOR] a la mayor brevedad posible.')
+    else:
+        platformtools.dialog_ok(config.__addon_name + ' - Reportes', 'Por favor, reproduzca el [COLOR yellow][B]Problema y Regrese[/B][/COLOR] a esta sección.', 'para obtener [COLOR cyan][B]una Copia del Fichero LOG[/B][/COLOR] [CR]y poder [COLOR goldenrod][B]Remitirnoslo[/B][/COLOR] a la mayor brevedad posible.')
 
 
 def show_log(item):
@@ -5177,8 +5200,12 @@ def show_help_adults(item):
     txt = ''
 
     if config.get_setting('adults_password', default=''):
-        txt += '[COLOR yellow][B]Tiene informado un PIN control Parental[/B][/COLOR][CR]'
-        txt += '[COLOR gold][B]Solo deberá informarlo una ÚNICA vez hasta que Abandone el Menú Principal del Add-On[/B][/COLOR][CR][CR]'
+        txt += '[COLOR yellow][B]Tiene informado un PIN control Parental[/B][/COLOR][CR][CR]'
+        txt += '[COLOR tan][B]Solo deberá informarlo una ÚNICA vez hasta que Abandone el Menú Principal del Add-On[/B][/COLOR][CR][CR]'
+
+        txt += '[COLOR darkgoldenrod][B]Si Olvidó el PIN Parental[/B][/COLOR]:[CR]'
+        txt += '[COLOR darkcyan][B]  Deberá presentar Foto de la Pantalla de Autorizaciòn en nuestro Grupo de Telegram[/B][/COLOR][CR]'
+        txt += _telegram + '[CR][CR]'
 
     else: txt += '[COLOR red][B]NO Tiene informado un PIN control Parental[/B][/COLOR][CR][CR]'
 
@@ -5189,7 +5216,8 @@ def show_help_adults(item):
     txt += '[CR]*) [COLOR yellowgreen][B]Pero no se puede garantizar con total seguridad,'
     txt += '[CR]    que todo el material de este tipo se filtre correctamente en determinadas ocasiones.[/B][/COLOR][CR]'
 
-    txt += '[CR]*) También puede desactivar esta opción en los Ajustes, [COLOR cyan][B]categorías[/COLOR] [COLOR yellow]Menú y Parental[/B][/COLOR]'
+    if config.get_setting('adults_password', default=''):
+        txt += '[CR]*) Puede [COLOR red][B]Anular el PIN[/B][/COLOR] en los [COLOR chocolate][B]Ajustes[/B][/COLOR], [COLOR cyan][B]categoría[/COLOR] [COLOR yellow]Parental[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Información Control Parental', txt)
 
@@ -5227,7 +5255,7 @@ def show_help_domains(item):
 	            txt += '[CR]  [B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
  
             txt += '[CR][COLOR chocolate][B]Para conocer los Dominios Vigentes:[/COLOR][/B][CR]'
-            txt += '  Acceda a través de un Navegador de Internet a [B][COLOR greenyellow]dominioshdfull.com[/COLOR][/B]'
+            txt += '  Acceda a través de un Navegador de Internet a [B][COLOR greenyellow]dominioshdfull.com  ó  x.com/hdfulloficial[/COLOR][/B]'
 
             txt += '  [CR][CR]Dispone de varios Dominios en [B][COLOR yellowgreen]Configurar dominio a usar[/B][/COLOR] que son [B][COLOR goldenrod]Clones[/COLOR][/B]:[CR]'
             txt += '   [B][COLOR yellow]Puede Asociar Cualquiera[/COLOR][/B] de ellos,[CR]'
@@ -5240,7 +5268,7 @@ def show_help_domains(item):
             txt += '[CR][COLOR chocolate][B]Para conocer el Dominio Vigente:[/COLOR][/B][CR]'
             txt += '  Acceda a través de un Navegador de Internet a [B][COLOR greenyellow]privacidad.me/@playdede[/COLOR][/B][CR]'
             txt += '  también puede acceder a [B][COLOR greenyellow] entrarplaydede.com[/COLOR][/B][CR]'
-            txt += '  ó bien acceda a su X [B][COLOR greenyellow] x.com/playdedesocial[/COLOR][/B][CR][CR]'
+            txt += '  ó bien acceda a su X [B][COLOR greenyellow] x.com/webplaydede[/COLOR][/B][CR][CR]'
 
         else:
             if config.get_setting('channel_' + item.category.lower() + '_proxies', default=''):
@@ -5661,6 +5689,16 @@ def show_help_parameters_search(item):
         if config.get_setting('mnu_adultos', default=True): txt += '[CR]   - Los canales de [B][COLOR orange]Adultos[/COLOR][/B]'
 
     txt += '[CR][CR] - [COLOR goldenrod][B]Procesos[/COLOR][/B]:'
+
+    lang = 'Español'
+    if str(config.get_setting('tmdb_langs')) == '1': lang = 'Latino'
+    elif str(config.get_setting('tmdb_langs')) == '2': lang = 'Inglès'
+    elif str(config.get_setting('tmdb_langs')) == '3': lang = 'Italiano'
+    elif str(config.get_setting('tmdb_langs')) == '4': lang = 'Portugués'
+    elif str(config.get_setting('tmdb_langs')) == '5': lang = 'Francés'
+    elif str(config.get_setting('tmdb_langs')) == '6': lang = 'Aleman'
+
+    txt += '[CR]   - Idioma de búsqueda en TMDB: [COLOR coral][B]' + lang + '[/COLOR][/B]'
 
     txt += '[CR]   - Cuantos Resultados se previsualizarán por canal (por defecto 2): [COLOR coral][B]' + str(config.get_setting('search_limit_by_channel', default=2)) + '[/COLOR][/B]'
 

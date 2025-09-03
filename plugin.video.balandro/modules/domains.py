@@ -42,8 +42,9 @@ dominioshdfull = [
          'https://hdfull.today/',
          'https://hd-full.biz/',
          'https://hdfull.sbs/',
-
          'https://hdfull.help/',
+         'https://hdfull.love/',
+
          'https://hdfull.cv/',
          'https://hdfull.monster/',
          'https://hdfull.cfd/',
@@ -84,7 +85,9 @@ ant_hosts_hdfull = [
 
 
 dominiosplaydede = [
-         'https://www11.playdede.link/'
+         'https://www12.playdede.link/',
+         'https://playdede.club/',
+         'https://playdede.in/'
          ]
 
 color_alert = config.get_setting('notification_alert_color', default='red')
@@ -1264,7 +1267,7 @@ def latest_domains_hdfull(item):
     platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando dominios[/B][/COLOR]' % color_exec)
 
     # ~ web para saber el ultimo dominio vigente
-    # ~ web 0)-https://dominioshdfull.com/
+    # ~ web 0)-https://dominioshdfull.com/  1)-X https://x.com/hdfulloficial
 
     last_domain = ''
     latest_domain = ''
@@ -1328,7 +1331,7 @@ def last_domain_hdfull(item):
     platformtools.dialog_notification(config.__addon_name + ' - HdFull', '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
 
     # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
-    # ~ webs  0)-https://dominioshdfull.com/  1)-https://new.hdfull.one/
+    # ~ webs  0)-https://dominioshdfull.com/  1)-https://new.hdfull.one/  2)-X https://x.com/hdfulloficial
 
     last_domain = ''
     latest_domain = ''
@@ -1464,7 +1467,7 @@ def operative_domains_hdfull(item):
     platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
 
     # ~ web para comprobar todos los dominios operativos
-    # ~ web  0)-https://dominioshdfull.com/
+    # ~ web  0)-https://dominioshdfull.com/  1)-X https://x.com/hdfulloficial
 
     last_domain = ''
 
@@ -2301,27 +2304,42 @@ def last_domain_playdede(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
-    platformtools.dialog_notification(config.__addon_name + ' - PlayDede', '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
+    platformtools.dialog_notification(config.__addon_name + ' - PlayDede', '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
 
     # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
-    # ~ webs  0)-https://privacidad.me/@playdede  1)-https://entrarplaydede.com  2)-X https://x.com/playdedesocial
+    # ~ webs  0)-https://privacidad.me/@playdede  1)-https://entrarplaydede.com  2)-X https://x.com/webplaydede
 
     last_domain = ''
     latest_domain = ''
 
+    hay_domain = True
+
+    if not domain:
+        hay_domain = False
+        domain = dominiosplaydede[0]
+
     try:
         data = httptools.downloadpage('https://privacidad.me/@playdede/').data
 
-        last_domain = scrapertools.find_single_match(data, '>Dirección actual:(.*?)</a>').strip()
+        bloque = scrapertools.find_single_match(data, '<strong>ENTRARPLAYDEDE.COM<(.*?)<script>')
 
-        if last_domain:
-            last_domain = last_domain.lower()
+        operative_domains = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
 
-            if not 'playdede' in last_domain: last_domain = ''
+        for operative_domain in operative_domains:
+            operative_domain = operative_domain.lower().strip()
 
-        if last_domain:
-            if not 'https' in last_domain: last_domain  = 'https://' + last_domain
-            if not last_domain.endswith('/'): last_domain = last_domain + '/'
+            if not 'playdede.' in operative_domain: continue
+
+            if not 'https' in operative_domain: operative_domain = 'https://' + operative_domain
+            if not operative_domain.endswith('/'): operative_domain = operative_domain + '/'
+
+            last_domain = operative_domain
+
+            if operative_domain in str(dominiosplaydede):
+                if domain == operative_domain:
+                    break
+
+                continue
     except:
         pass
 
@@ -2329,8 +2347,23 @@ def last_domain_playdede(item):
         platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
 
         xbmc.sleep(1000)
-        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para conocer el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]privacidad.me/@playdede[/B][/COLOR] ó [B][COLOR greenyellow]entrarplaydede.com[/COLOR][/B] ó [B][COLOR greenyellow]x.com/playdedesocial[/COLOR][/B]')
+        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para conocer el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]privacidad.me/@playdede[/B][/COLOR] ó [B][COLOR greenyellow]entrarplaydede.com[/COLOR][/B] ó [B][COLOR limegreen]x.com/webplaydede[/COLOR][/B]')
         return
+
+    if not hay_domain:
+        dominio = config.get_setting('dominio', 'playdede', default=dominiosplaydede[0])
+        num_dominio = dominiosplaydede.index(dominio) if dominio in str(dominiosplaydede) else 0
+        ret = platformtools.dialog_select('Dominio a usar PlayDede', dominiosplaydede, preselect=num_dominio)
+        if ret == -1: return False
+
+        if dominio == dominiosplaydede[ret]:
+            return False
+
+        config.set_setting('dominio', dominiosplaydede[ret], 'playdede')
+
+        domain = dominiosplaydede[ret]
+
+        last_domain = domain
 
     host_channel = ''
     config.set_setting('user_test_channel', 'host_channel')
@@ -2355,9 +2388,6 @@ def last_domain_playdede(item):
 
             domain = last_domain
 
-    if last_domain:
-        if not last_domain.endswith('/'): last_domain = last_domain + '/'
-
     if host_channel:
         if last_domain:
             if last_domain in host_channel:
@@ -2368,10 +2398,7 @@ def last_domain_playdede(item):
     if domain == last_domain:
         if last_domain in str(dominiosplaydede):
             if item.host_canal:
-                if item.host_canal == last_domain:
-                    platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
-                else:
-                    platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
+                platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
                 return
 
     if localize:
@@ -2396,6 +2423,10 @@ def last_domain_playdede(item):
         nom_dom = 'Sin información'
         txt_dom = 'Aún No hay ningún Dominio memorizado.'
 
+    if last_domain == domain:
+        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El dominio vigente es correcto.', '[COLOR cyan][B]' + localize + '[/B][/COLOR]')
+        return
+
     if platformtools.dialog_yesno(config.__addon_name + ' - ' + name, '¿ [COLOR red] ' + txt_dom + ' [/COLOR] Desea cambiarlo  ?', 'Memorizado:  [COLOR yellow][B]' + nom_dom + '[/B][/COLOR]', 'Vigente:           [COLOR cyan][B]' + last_domain + '[/B][/COLOR]'):
         config.set_setting('dominio', last_domain, 'playdede')
 
@@ -2407,7 +2438,7 @@ def last_domain_playdede(item):
 def operative_domains_playdede(item):
     logger.info()
 
-    domain = ''
+    domain = config.get_setting('dominio', 'playdede', default='')
 
     channel_json = 'playdede.json'
     filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
@@ -2430,31 +2461,62 @@ def operative_domains_playdede(item):
         platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
         return
 
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominio[/B][/COLOR]' % color_exec)
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
 
     # ~ web para comprobar todos los dominios operativos
-    # ~ webs  0)-https://privacidad.me/@playdede  1)-https://entrarplaydede.com  2)-X https://x.com/playdedesocial
+    # ~ webs  0)-https://privacidad.me/@playdede  1)-https://entrarplaydede.com  2)-X https://x.com/webplaydede
 
     sel_domain = ''
 
+    hay_domain = True
+
+    if not domain:
+        hay_domain = False
+        domain = dominiosplaydede[0]
+
     try:
-       data = httptools.downloadpage('https://privacidad.me/@playdede/').data
+        data = httptools.downloadpage('https://privacidad.me/@playdede/').data
 
-       sel_domain = scrapertools.find_single_match(data, '>Dirección actual:(.*?)</a>').strip()
+        bloque = scrapertools.find_single_match(data, '<strong>ENTRARPLAYDEDE.COM<(.*?)<script>')
 
-       if sel_domain:
-           sel_domain = sel_domain.lower()
-           if not 'playdede' in sel_domain: sel_domain = ''
+        operative_domains = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
 
-       if sel_domain:
-           if not 'https' in sel_domain: sel_domain = 'https://' + sel_domain
-           if not sel_domain.endswith('/'): sel_domain = sel_domain + '/'
+        for operative_domain in operative_domains:
+            operative_domain = operative_domain.lower().strip()
+
+            if not 'playdede.' in operative_domain: continue
+
+            if not 'https' in operative_domain: operative_domain = 'https://' + operative_domain
+            if not operative_domain.endswith('/'): operative_domain = operative_domain + '/'
+
+            sel_domain = operative_domain
+
+            if operative_domain in str(dominiosplaydede):
+                if domain == operative_domain:
+                    break
+
+                continue
     except:
        pass
 
     if not sel_domain:
         platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Error Acceso Dominio Operativo[/B][/COLOR]' % color_alert)
         return
+
+    if not hay_domain:
+        dominio = config.get_setting('dominio', 'playdede', default=dominiosplaydede[0])
+        num_dominio = dominiosplaydede.index(dominio) if dominio in str(dominiosplaydede) else 0
+        ret = platformtools.dialog_select('Dominio a usar PlayDede', dominiosplaydede, preselect=num_dominio)
+        if ret == -1: return False
+
+        if dominio == dominiosplaydede[ret]:
+            return False
+
+        config.set_setting('dominio', dominiosplaydede[ret], 'playdede')
+
+        domain = dominiosplaydede[ret]
+
+        sel_domain = domain
 
     host_channel = ''
     config.set_setting('user_test_channel', 'host_channel')
@@ -2482,9 +2544,6 @@ def operative_domains_playdede(item):
     if not domain:
         platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Sin Dominios Operativos[/B][/COLOR]' % color_alert)
         return
-
-    if sel_domain:
-        if not sel_domain.endswith('/'): sel_domain = sel_domain + '/'
 
     if host_channel:
         if sel_domain:

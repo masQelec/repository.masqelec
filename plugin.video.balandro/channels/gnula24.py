@@ -72,7 +72,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
     timeout = None
     if host in url:
-        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
+        timeout = config.get_setting('channels_repeat', default=30)
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
@@ -80,7 +80,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
         if hay_proxies:
             data = httptools.downloadpage_proxy('gnula24', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
         else:
-            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
         if not data:
             if not '/?s=' in url:
@@ -91,7 +91,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                 if hay_proxies:
                     data = httptools.downloadpage_proxy('gnula24', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
-                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         if not url.startswith(host):
@@ -100,7 +100,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
             if hay_proxies:
                 data = httptools.downloadpage_proxy('gnula24', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
             else:
-                data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     if '<title>Just a moment...</title>' in data:
         if not '/?s=' in url:
@@ -265,7 +265,8 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '<h1(.*?)</h2>')
+    if '>Añadido recientemente<' in data: bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>ÚLTIMOS EPISODIOS EMITIDOS<')
+    else: bloque = scrapertools.find_single_match(data, '<h1(.*?)</h2>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
@@ -316,34 +317,50 @@ def last_epis(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '<h1(.*?)</h2>')
+    if '>Añadido recientemente<' in data: bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>ÚLTIMOS EPISODIOS EMITIDOS<')
+    else: bloque = scrapertools.find_single_match(data, '<h1(.*?)</h2>')
 
-    matches = scrapertools.find_multiple_matches(bloque, 'data-ids=(.*?)</article>')
+    matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="([^"]+)"')
 
         title = scrapertools.find_single_match(match, '<span class="serie">(.*?)</span>').strip()
+        if not title: title = scrapertools.find_single_match(match, ' alt="(.*?)"')
 
         if not url or not title: continue
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         temp_epis = scrapertools.find_single_match(match, '<span class="b">(.*?)</span>')
+        if not temp_epis: temp_epis = scrapertools.find_single_match(match, 'class="local-link">.*?<span>(.*?)/')
 
         if not temp_epis: continue
 
-        season = scrapertools.find_single_match(temp_epis, '(.*?)x')
-        episode = scrapertools.find_single_match(temp_epis, '.*?x(.*?)$')
+        temp_epis = temp_epis.strip()
+
+        season = scrapertools.find_single_match(temp_epis, 'T(.*?)E').strip()
+        if not season: season = 1
+
+        episode = scrapertools.find_single_match(temp_epis, 'E(.*?)$').strip()
+        if not episode: episode = 1
 
         title = title.replace('&#8217;', '')
 
         title = title.replace('( ' + str(season) + ' x ' + str(episode) + ' )', '').strip()
 
+        temp_epis = temp_epis.replace('T', '[COLOR tan]Temp. [/COLOR]')
+        temp_epis = temp_epis.replace('E', '[COLOR goldenrod]Epis. [/COLOR]')
+
         titulo = temp_epis + '  ' + title
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, contentSerieName=title,
-                                   contentType='episode', contentSeason=season, contentEpisodeNumber=episode ))
+        SerieName = title
+
+        if ": " in SerieName: SerieName = SerieName.split(": ")[0]
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb,
+                                    contentSerieName=SerieName, contentType='episode', contentSeason=season, contentEpisodeNumber=episode,
+                                    infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -367,16 +384,6 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
-    data_id = scrapertools.find_single_match(data, 'var id.*?=(.*?);').strip()
-
-    if not data_id:
-        return itemlist
-
-    post = {'action': 'seasons', 'id': data_id}
-    headers = {'Referer': item.url}
-
-    data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers)
-
     seasons = scrapertools.find_multiple_matches(data, "<span class='title'>(.*?)<i>")
 
     for title in seasons:
@@ -388,13 +395,14 @@ def temporadas(item):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
             item.page = 0
-            item.data_id = data_id
+            item.url = item.url
             item.contentType = 'season'
             item.contentSeason = tempo
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, data_id = data_id, contentType = 'season', contentSeason = tempo, text_color='tan' ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, url = item.url,
+                                    contentType = 'season', contentSeason = tempo, text_color='tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -408,16 +416,11 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    post = {'action': 'seasons', 'id': item.data_id}
-    headers = {'Referer': item.url}
+    data = do_downloadpage(item.url)
 
-    data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers)
-    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+    bloque = scrapertools.find_single_match(data, "<div class='se-q'>.*?<span class='title'>Temporada " + str(item.contentSeason) + "(.*?)</div></div></div></div>")
 
-    bloque = scrapertools.find_single_match(data, "<div class='se-q'>.*?<span class='title'>" + str(item.title) + "(.*?)</div></div>")
-    if not bloque: bloque = scrapertools.find_single_match(data, "<div class='se-q'>.*?<span class='title'>Temporada " + str(item.contentSeason) + "(.*?)</div></div>")
-
-    patron = "<div class='imagen'.*?data-id='(.*?)'.*?src='(.*?)'.*?<div class='numerando'(.*?)</div>.*?<a href='(.*?)'>(.*?)</a>.*?</span>(.*?)</div></li>"
+    patron = "<div class='imagen'.*?src='(.*?)'.*?<div class='numerando'>(.*?)</div>.*?<a href='(.*?)'.*?" + 'class="local-link">' + "(.*?)</a>.*?</span>(.*?)</div></li>"
 
     episodes = scrapertools.find_multiple_matches(bloque, patron)
 
@@ -466,7 +469,7 @@ def episodios(item):
                     item.perpage = sum_parts
                 else: item.perpage = 50
 
-    for data_id, thumb, temp_epis, url, title, idiomas in episodes[item.page * item.perpage:]:
+    for thumb, temp_epis, url, title, idiomas in episodes[item.page * item.perpage:]:
         langs = []
         if '<img title="Español"' in idiomas: langs.append('Esp')
         if '<img title="Latino"' in idiomas: langs.append('Lat')
@@ -490,12 +493,6 @@ def episodios(item):
             itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", page = item.page + 1, perpage = item.perpage, text_color='coral' ))
 
     return itemlist
-
-
-def puntuar_calidad(txt):
-    orden = ['360P', '480P', '720P', '1080P']
-    if txt not in orden: return 0
-    else: return orden.index(txt) + 1
 
 
 def findvideos(item):
@@ -542,9 +539,14 @@ def findvideos(item):
            if not config.get_setting('developer_mode', default=False): continue
 
         if not servidor == 'directo':
+            if servidor == 'luluvid':
+                servidor = 'various'
+                other = 'Lulustream'
+
             if not servidor == 'various': other = ''
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, dpost = dpost, dnume = dnume, language = IDIOMAS.get(lang, lang), other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, dpost = dpost, dnume = dnume,
+                              language = IDIOMAS.get(lang, lang), other = other ))
 
     # enlaces
     matches = scrapertools.find_multiple_matches(data, "<tr id='link-'(.*?)</tr>")
@@ -569,7 +571,8 @@ def findvideos(item):
 
             lang = scrapertools.find_single_match(match, " src='.*?/flags/(.*?).png'")
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = IDIOMAS.get(lang, lang), quality = qlty ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url,
+                                  language = IDIOMAS.get(lang, lang), quality = qlty ))
 
     if not itemlist:
         if not ses == 0:
@@ -586,12 +589,19 @@ def play(item):
     url = item.url
 
     if not url:
-        post = {'action': 'doo_player_ajax', 'post': item.dpost, 'nume': item.dnume, 'type': 'movie'}
+        post = {'action': 'doo_player_ajax', 'post': item.dpost, 'nume': item.dnume, 'type': 'tv'}
+
         headers = {"Referer": item.url}
 
         data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers)
 
+        if 'The server is temporarily busy' in data:
+            return 'Servidor [COLOR fuchsia]Saturado[/COLOR]'
+
         url = scrapertools.find_single_match(data, "src='(.*?)'")
+        if not url: url = scrapertools.find_single_match(data, '"embed_url":.*?"(.*?)"')
+
+        if url: url = url.replace('\\/', '/')
 
     if url:
         servidor = servertools.get_server_from_url(url)

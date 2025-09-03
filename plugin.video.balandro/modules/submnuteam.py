@@ -2406,6 +2406,7 @@ def resumen_canales(item):
     registers = 0
     dominios = 0
     currents = 0
+    streaminytorrent = 0
     onlyones = 0
     nosearchables = 0
     status_access = 0
@@ -2498,6 +2499,7 @@ def resumen_canales(item):
         if 'register' in ch['clusters']: registers += 1
         if 'dominios' in ch['notes'].lower(): dominios += 1
         if 'current' in ch['clusters']: currents += 1
+        if 'Canal con enlaces Streaming y Torrent.' in ch['notes']: streaminytorrent +=1
         if 'onlyone' in ch['clusters']: onlyones += 1
         if 'suggested' in ch['clusters']: suggesteds += 1
 
@@ -2748,7 +2750,9 @@ def resumen_canales(item):
     if not currents == 0:
         txt += '     ' + str(currents) + ' [COLOR goldenrod]Gestión Dominio Vigente[/COLOR][CR]'
 
-    if not onlyones == 0: txt += '     ' + str(onlyones) + ' [COLOR fuchsia]Un Único Servidor[/COLOR][CR]'
+    if not streaminytorrent == 0: txt += '     ' + str(streaminytorrent) + ' [COLOR magenta]Con enlaces Streamin y Torrent[/COLOR][CR]'
+
+    if not onlyones == 0: txt += '     ' + str(onlyones) + ' [COLOR fuchsia]Con un Único Servidor[/COLOR][CR]'
 
     if not nosearchables == 0: txt += '     ' + str(nosearchables) + ' [COLOR aquamarine]No Actuan en Búsquedas[/COLOR][CR]'
 
@@ -2873,7 +2877,7 @@ def resumen_canales(item):
         txt += '[CR]      ' + str(bus_pelis) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
 
     if config.get_setting('mnu_series', default=True):
-        txt += '    ' + str(bus_series) + ' [COLOR hotpink]Series[/COLOR][CR]'
+        txt += '      ' + str(bus_series) + ' [COLOR hotpink]Series[/COLOR][CR]'
 
     if config.get_setting('mnu_documentales', default=True):
         txt += '[CR]      ' + str(bus_tematica_documentales) + ' [COLOR cyan]Documentales[/COLOR][CR]'
@@ -2971,7 +2975,7 @@ def resumen_servidores(item):
 
     aditionals = 0
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-         aditionals = 100  # ~ 44 Various  y  56 Zures
+         aditionals = 99  # ~ 44 Various  y  55 Zures
 
     pending = 0
 
@@ -3043,7 +3047,7 @@ def resumen_servidores(item):
             txt += '      Versión' + tex_mr + '[CR]'
 
             txt += '        ' + str(alternatives) + '  [COLOR green]Vías alternativas[/COLOR][CR]'
-            txt += '      ' + str(aditionals) + '  [COLOR powderblue]Vías Adicionales[/COLOR][CR]'
+            txt += '        ' + str(aditionals) + '  [COLOR powderblue]Vías Adicionales[/COLOR][CR]'
 
         cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
 
@@ -3143,6 +3147,7 @@ def show_help_alternativas(item):
         txt += '   [COLOR yellow]Doodstream[/COLOR][CR]'
         txt += '   [COLOR yellow]Flashx[/COLOR][CR]'
         txt += '   [COLOR yellow]Gamovideo[/COLOR][CR]'
+        txt += '   [COLOR yellow]Fastplay[/COLOR][CR]'
         txt += '   [COLOR yellow]Gofile[/COLOR][CR]'
         txt += '   [COLOR yellow]MegaUp[/COLOR][CR]'
         txt += '   [COLOR yellow]Mixdrop[/COLOR][CR]'
@@ -3250,7 +3255,6 @@ def show_help_adicionales(item):
         txt += '   [COLOR yellow]Dembed[/COLOR][CR]'
         txt += '   [COLOR yellow]Downace[/COLOR][CR]'
         txt += '   [COLOR yellow]Fastdrive[/COLOR][CR]'
-        txt += '   [COLOR yellow]Fastplay[/COLOR][CR]'
         txt += '   [COLOR yellow]Filegram[/COLOR][CR]'
         txt += '   [COLOR yellow]Gostream[/COLOR][CR]'
         txt += '   [COLOR yellow]Letsupload[/COLOR][CR]'

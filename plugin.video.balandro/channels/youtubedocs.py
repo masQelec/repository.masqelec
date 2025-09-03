@@ -22,8 +22,6 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = 'Dmax', action = 'list_tubes', url = host + 'watch?v=4mx89Gc-elY&list=PLXUXqAIy6K4-IAeAQp4PcP8xJHzfJu_jL'))
 
-    itemlist.append(item.clone( title = 'Documanía Historia', action = 'list_tubes', url = host + 'watch?v=fANdEzBMlWs&list=UUv7ZxMpxzixEAi5mR_eDqHw'))
-
     itemlist.append(item.clone( title = 'Documental Z', action = 'list_tubes', url = host + 'watch?v=WX-FJ25QILI&list=UULFV5OEc-nA4Ge5tOLUPWosaQ'))
 
     itemlist.append(item.clone( title = 'Documentales Gratuitos', action = 'list_tubes', url = host + 'watch?v=wwsftALV284&list=UULF259MSTQbJjxYGzUM0SvYGA'))
@@ -33,6 +31,8 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Dw', action = 'list_tubes', url = host + 'watch?v=KQa4APEXnsQ&list=UULFQ1GpKa15ulyoQuxz7H4rng'))
 
     itemlist.append(item.clone( title = 'Explora Planet', action = 'list_tubes', url = host + 'watch?v=YfaCxrEaz9E&list=UULFwRvBitYM27PF-Yz2LSfABA'))
+
+    itemlist.append(item.clone( title = 'Gran Misterio', action = 'list_tubes', url = host + 'watch?v=8fz92RfijrA&list=PL64vL0ABVyDhWJPIWUfrjopSaR-TUqmoF'))
 
     itemlist.append(item.clone( title = 'Historias Vivas', action = 'list_tubes', url = host + 'watch?v=F7EJdtHtF2c&list=UULPAx8AK17j6BKqdQefiHWGag'))
 

@@ -505,6 +505,8 @@ def findvideos(item):
 
                 url = url.replace('/player.cuevana.ac/f/', '/waaw.to/watch_video.php?v=').replace('/player.cuevana3.one/f/', '/waaw.to/watch_video.php?v=')
 
+                if url.startswith('https://cvid.lat/'): url = url.replace('/cvid.lat/', '/waaw.to/')
+
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
 
@@ -522,6 +524,8 @@ def findvideos(item):
         if not embed: continue
 
         embed = embed.replace('/player.cuevana.ac/f/', '/waaw.to/watch_video.php?v=').replace('/player.cuevana3.one/f/', '/waaw.to/watch_video.php?v=')
+
+        if embed.startswith('https://cvid.lat/'): embed = embed.replace('/cvid.lat/', '/waaw.to/')
 
         servidor = servertools.get_server_from_url(embed)
         servidor = servertools.corregir_servidor(servidor)
