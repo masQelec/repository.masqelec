@@ -27,7 +27,7 @@ ant_hosts = ['https://wwa3.cuevana3.vip', 'https://wlw.cuevana3.vip', 'https://w
              'https://me3.cuevana3.vip', 'https://me4.cuevana3.vip', 'https://mia.cuevana3.vip',
              'https://max.cuevana3.vip', 'https://zx1.cuevana3.vip', 'https://zz.cuevana3.vip',
              'https://gx.cuevana3.vip', 'https://tv.cuevana3.vip', 'https://tv8.cuevana3.vip',
-             'https://b1.cuevana3.vip']
+             'https://b1.cuevana3.vip', 'https://sw.cuevana3.vip']
 
 
 domain = config.get_setting('dominio', 'cuevana3pro', default='')

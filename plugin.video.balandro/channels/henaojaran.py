@@ -112,10 +112,23 @@ def list_all(item):
 
         title = title.replace('#8217;', "'")
 
-        nro_season = ''
-        if 'Temporada' in title:
-            nro_season = scrapertools.find_single_match(title, 'Temporada (.*?) ').strip()
-            if nro_season: nro_season = ' T' + nro_season
+        season = 1
+
+        if 'Temporada' in title or 'Season' in title:
+            if '2nd' in title: season = 2
+            elif '3rd' in title: season = 3
+            elif '4th' in title: season = 4
+            elif '5th' in title: season = 5
+            elif '6th' in title: season = 6
+            elif '7th' in title: season = 7
+            elif '8th' in title: season = 8
+            elif '9th' in title: season = 9
+            else:
+               season = scrapertools.find_single_match(title, 'Temporada (.*?) ').strip()
+               if not season: season = scrapertools.find_single_match(title, 'Season(.*?)Capítulo').strip()
+               if not season: season = scrapertools.find_single_match(title, 'Season(.*?)$').strip()
+
+               if not season: season = 1
 
         title = title.replace('#8217;', "'")
 
@@ -137,10 +150,8 @@ def list_all(item):
 
             title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
-            titulo = title + nro_season
-
-            itemlist.append(item.clone( action = 'episodios', url= url, title=titulo, thumbnail=thumb, fmt_sufijo=sufijo,
-                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
+            itemlist.append(item.clone( action = 'episodios', url= url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+                                        contentType = 'tvshow', contentSerieName = SerieName, contentSeason = season, infoLabels={'year': '-'} ))
 
         if tipo == 'movie':
             if item.search_type != 'all':
@@ -209,6 +220,24 @@ def list_last(item):
         tipo = 'movie' if epis == '0' else 'tvshow'
 
         if tipo == 'tvshow':
+            season = 1
+
+            if 'Temporada' in title or 'Season' in title:
+                if '2nd' in title: season = 2
+                elif '3rd' in title: season = 3
+                elif '4th' in title: season = 4
+                elif '5th' in title: season = 5
+                elif '6th' in title: season = 6
+                elif '7th' in title: season = 7
+                elif '8th' in title: season = 8
+                elif '9th' in title: season = 9
+                else:
+                   season = scrapertools.find_single_match(title, 'Temporada (.*?) ').strip()
+                   if not season: season = scrapertools.find_single_match(title, 'Season(.*?)Capítulo').strip()
+                   if not season: season = scrapertools.find_single_match(title, 'Season(.*?)$').strip()
+
+                   if not season: season = 1
+
             temp = scrapertools.find_single_match(url, '/season/.*?hd-(.*?)/')
 
             title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
@@ -217,8 +246,10 @@ def list_last(item):
                 title = 'Season ' + str(temp) + ' ' + title
                 title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
+                season = temp
+
             itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
-                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
+                                        contentType = 'tvshow', contentSerieName = SerieName, contentSeason = season, infoLabels={'year': year} ))
 
         if tipo == 'movie':
             PeliName = re.sub(r"Sub |Español|Latino|Castellano|HD|Temporada \d+|\(\d{4}\)", "", title).strip()
@@ -554,7 +585,8 @@ def play(item):
     elif '/pelispng.' in url: url = ''
     elif '/pelistop.' in url: url = ''
     elif '/descargas/' in url: url = ''
-
+    elif '/rpmplayer.' in url: url = ''
+	
     if '/go.php?v=' in url:
           url = scrapertools.find_single_match(url, 'v=(.*?)$')
 

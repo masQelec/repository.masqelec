@@ -353,8 +353,9 @@
 		<setting id="ch_playdede_media_center1" type="action" label=" Aviso [COLOR violet][B]Ubicación[/B][/COLOR] Media Center" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_playdede_media_center)"/>
 		<setting id="ch_playdede_bloqueo1" type="action" label=" Aviso [COLOR yellowgreen][B]Bloqueo[/B][/COLOR] Operadoras" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_playdede_bloqueo)"/>
 		<setting id="ch_playdede_test1" type="action" label=" [COLOR yellow][B]Test[/B][/COLOR] Canal" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_playdede)"/>
-        <setting id="last_domain_playdede" type="action" label=" [COLOR goldenrod][B]Comprobar[/B][/COLOR] el Último Dominio Vigente [COLOR dodgerblue][B]privacidad.me/@playdede[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=last_domain_playdede)"/>
-		<setting id="ch_playdede_dominio" type="action" label=" [COLOR darkorange][B]Informar ó Modificar[/B][/COLOR] el dominio" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_playdede)"/>
+        <setting id="operative_domains_playdede" type="action" label=" [COLOR mediumaquamarine][B]Dominios Operativos Vigentes [COLOR dodgerblue] entrarplaydede.com[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=playdede&action=show_currents_domains)"/>
+        <setting id="last_domain_playdede" type="action" label=" [COLOR goldenrod][B]Comprobar[/B][/COLOR] el Último Dominio Vigente [COLOR dodgerblue][B]privacidad.me/@playdede[/B][/COLOR]" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=last_domain_playdede)"/>
+		<setting id="ch_playdede_dominio" type="action" label=" [COLOR darkorange][B]Informar ó Modificar[/B][/COLOR] el dominio" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_playdede)"/>
 
         <setting id="opc_poseidonhd2" type="action" label="[COLOR gold]PoseidonHd2[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_poseidonhd2)"/>
 
@@ -398,11 +399,12 @@
 		<setting id="ch_playdede_media_center2" type="action" label=" Aviso [COLOR violet][B]Ubicación[/B][/COLOR] Media Center" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_playdede_media_center)"/>
 		<setting id="ch_playdede_bloqueo2" type="action" label=" Aviso [COLOR yellowgreen][B]Bloqueo[/B][/COLOR] Operadoras" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_playdede_bloqueo)"/>
 		<setting id="ch_playdede_test2" type="action" label=" [COLOR yellow][B]Test[/B][/COLOR] Canal" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_playdede)"/>
-        <setting id="last_domain2_playdede" type="action" label=" [COLOR goldenrod][B]Asociar[/B][/COLOR] el Último Dominio Vigente [COLOR dodgerblue][B] privacidad.me/@playdede[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=last_domain_playdede)"/>
-        <setting id="show_credenciales_playdede" type="action" label=" Test [COLOR cyan][B]Login[/B][/COLOR] Credenciales" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuctext&action=_credenciales_playdede)"/>
-        <setting id="del_credenciales_playdede" type="action" label=" [COLOR red][B]Eliminar[/B][/COLOR] Credenciales" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=del_datos_playdede)"/>
-		<setting id="channel_playdede_playdede_username" type="text" label=" [COLOR cyan][B]PlayDede Credencial Usuario[/B][/COLOR]" enable="eq(-8,false)" visible="eq(-8,true)" default=""/>
-		<setting id="channel_playdede_playdede_password" type="text" label=" [COLOR cyan][B]PlayDede Credencial Contraseña[/B][/COLOR]" option="hidden" enable="eq(-9,false)" visible="eq(-9,true)" default=""/>
+        <setting id="operative_domains2_playdede" type="action" label=" [COLOR mediumaquamarine][B]Dominios Operativos Vigentes [COLOR dodgerblue] entrarplaydede.com[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=playdede&action=show_currents_domains)"/>
+        <setting id="last_domain2_playdede" type="action" label=" [COLOR goldenrod][B]Asociar[/B][/COLOR] el Último Dominio Vigente [COLOR dodgerblue][B] privacidad.me/@playdede[/B][/COLOR]" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=last_domain_playdede)"/>
+        <setting id="show_credenciales_playdede" type="action" label=" Test [COLOR cyan][B]Login[/B][/COLOR] Credenciales" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuctext&action=_credenciales_playdede)"/>
+        <setting id="del_credenciales_playdede" type="action" label=" [COLOR red][B]Eliminar[/B][/COLOR] Credenciales" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=del_datos_playdede)"/>
+		<setting id="channel_playdede_playdede_username" type="text" label=" [COLOR cyan][B]PlayDede Credencial Usuario[/B][/COLOR]" enable="eq(-9,false)" visible="eq(-8,true)" default=""/>
+		<setting id="channel_playdede_playdede_password" type="text" label=" [COLOR cyan][B]PlayDede Credencial Contraseña[/B][/COLOR]" option="hidden" enable="eq(-9,false)" visible="eq(-10,true)" default=""/>
     </category>
 
     <category label="Play">
@@ -464,7 +466,7 @@
         <setting label="Ordenar por Calidad:" type="lsep"/>
 
         <setting id="pcal_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="servers_sort_quality" type="enum" label="En cada Idioma ordenar los enlaces según" values="Orden de la Web|Calidad Desc|Calidad Asc" default="0" visible="eq(-1,true)"/>
+        <setting id="servers_sort_quality" type="enum" label="En cada Idioma ordenar los enlaces por" values="Orden Web|Calidad Alta|Calidad Baja" default="0" visible="eq(-1,true)"/>
 
         <setting label="Filtrar Servidores:" type="lsep"/>
 
@@ -917,10 +919,15 @@
         <setting label="Obtención Información Películas/Series en TheMovieDB:" type="lsep"/>
 
         <setting id="tmdb_opc" type="bool" label="Opciones" default="false"/>
+        <setting id="tmdb_threads" type="labelenum" label="Número de Búsquedas Simultáneas (puede causar Inestabilidad)" values="5|10|15|20|25|30" default="20" visible="eq(-1,true)"/>
+        <setting id="tmdb_plus_info" type="bool" label="Localizar información Extendida (Duración, Actores, etc.) Aumenta el tiempo de búsqueda" default="false" visible="eq(-2,true)"/>
+
+        <setting label="Proceso:" type="lsep"/>
+
+        <setting id="tmdb_pro" type="bool" label="Opciones" default="false"/>
         <setting id="tmdb_disabled" type="bool" label="[COLOR goldenrod][B]Desactivar[/B][/COLOR] Accesos en las Listas a TMDB" default="false" visible="eq(-1,true)"/>
-        <setting id="tmdb_langs" type="enum" label="[COLOR yellow][B]Idioma[/B][/COLOR] de búsqueda en TMDB" values="Español|Latino|Inglés|Italiano|Portugués|Francés|Alemán" default="0" visible="eq(-2,true)"/>
-        <setting id="tmdb_threads" type="labelenum" label="Número de Búsquedas Simultáneas (puede causar Inestabilidad)" values="5|10|15|20|25|30" default="20" visible="eq(-3,true)"/>
-        <setting id="tmdb_plus_info" type="bool" label="Localizar información Extendida (Duración, Actores, etc.) Aumenta el tiempo de búsqueda" default="false" visible="eq(-4,true)"/>
+        <setting id="tmdb_langs" type="enum" label="[COLOR yellow][B]Idioma[/B][/COLOR] de búsqueda en TMDB" values=
+        "Español|Latino|Inglés|Italiano|Portugués|Francés|Aleman" default="0" visible="eq(-2,true)"/>
     </category>
 
     <category label="Sistema">

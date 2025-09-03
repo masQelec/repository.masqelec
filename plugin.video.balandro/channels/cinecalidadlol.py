@@ -344,6 +344,8 @@ def list_all(item):
 
         if url.startswith('/?post_id='): continue
 
+        elif not 'http' in url: continue
+
         elif '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url or '/netflix/o/' in url or '/product/' in url or '.ggpickaff.' in url:
               _promos += 1
               continue
@@ -366,7 +368,7 @@ def list_all(item):
             year = scrapertools.find_single_match(match, '</p>.*?<p>(.*?)</p>')
             if not year: year ='-'
 
-        title = title.replace('&#8211;', '').replace('&#8217;', '').replace('&#038;', '&')
+        title = title.replace('&#8211;', '').replace('&#8217;', '').replace('&#038;', '&').replace('&amp;', '&')
 
         tipo = 'tvshow' if '/ver-serie/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
@@ -641,8 +643,10 @@ def findvideos(item):
 
                 if servidor == 'various': other = srv.capitalize()
 
+                quality_num = puntuar_calidad(qlty)
+
                 itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                      quality = qlty, language = language, other = other ))
+                                      quality = qlty, quality_num = quality_num, language = language, other = other ))
 
         else:
 
@@ -690,8 +694,10 @@ def findvideos(item):
 
                 if servidor == 'various': other = srv.capitalize()
 
+                quality_num = puntuar_calidad(qlty)
+
                 itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                      quality = qlty, language = language, other = other ))
+                                      quality = qlty, quality_num = quality_num, language = language, other = other ))
 
     if '>DESCARGAR<' in data:
         bloque = scrapertools.find_single_match(data, '>DESCARGAR<(.*?)</ul>')
@@ -750,8 +756,10 @@ def findvideos(item):
                 other = 'D'
                 url = item.url.replace('?ref=es', '') + url
 
+            quality_num = puntuar_calidad(qlty)
+
             itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                  quality = qlty, language = lang, other = other ))
+                                  quality = qlty, quality_num = quality_num, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -759,6 +767,14 @@ def findvideos(item):
             return
 
     return itemlist
+
+
+def puntuar_calidad(txt):
+    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', 'HD', 'WEBRip 1080p', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
+
+    txt = txt.strip()
+    if txt not in orden: return 0
+    else: return orden.index(txt) + 1
 
 
 def play(item):

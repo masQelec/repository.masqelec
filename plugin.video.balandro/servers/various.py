@@ -3,17 +3,23 @@
 import sys
 
 if sys.version_info[0] >= 3:
+    PY3 = True
+
     import xbmcvfs
     translatePath = xbmcvfs.translatePath
 else:
+    PY3 = False
+
     import xbmc
     translatePath = xbmc.translatePath
 
 
-import os, xbmc, time
+import os, re, xbmc, time
 
 from platformcode import config, logger, platformtools
 from core import filetools, httptools, scrapertools
+
+from lib import jsunpack
 
 
 espera = config.get_setting('servers_waiting', default=6)
@@ -66,6 +72,8 @@ def get_video_url(page_url, url_referer=''):
 
     elif 'dropload' in page_url:
           txt_server = 'Dropload'
+
+          page_url = page_url.replace('/dropload.tv/', '/dropload.io/')
 
           page_url = page_url.replace('/embed-', '/')
 
@@ -145,7 +153,7 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('//yadi.ru', '/yadi.sk/').replace('//yadi.com', '/yadi.sk/').replace('//yadi.disk', '/yadi.sk/')
 
-    elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url or 'sfastwish' in page_url or 'doodporn' in page_url or 'flaswish' in page_url or 'obeywish' in page_url or 'cdnwish' in page_url or 'asnwish' in page_url or 'flastwish' in page_url or 'jodwish' in page_url or 'swhoi' in page_url or 'fsdcmo' in page_url or 'swdyu' in page_url or 'wishonly' in page_url or 'playerwish' in page_url or 'hlswish' in page_url or 'wish' in page_url or 'iplayerhls' in page_url or 'hlsflast' in page_url or 'ghbrisk' in page_url or 'cybervynx' in page_url or 'streamhg' in page_url or 'hlsflex' in page_url or 'dhcplay' in page_url or 'stbhg' in page_url or 'gradehgplus' in page_url:
+    elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url or 'sfastwish' in page_url or 'doodporn' in page_url or 'flaswish' in page_url or 'obeywish' in page_url or 'cdnwish' in page_url or 'asnwish' in page_url or 'flastwish' in page_url or 'jodwish' in page_url or 'swhoi' in page_url or 'fsdcmo' in page_url or 'swdyu' in page_url or 'wishonly' in page_url or 'playerwish' in page_url or 'hlswish' in page_url or 'wish' in page_url or 'iplayerhls' in page_url or 'hlsflast' in page_url or 'ghbrisk' in page_url or 'cybervynx' in page_url or 'streamhg' in page_url or 'hlsflex' in page_url or 'dhcplay' in page_url or 'stbhg' in page_url or 'gradehgplus' in page_url or 'tryzendm' in page_url or 'hglink' in page_url or 'hailindihg' in page_url or 'guxhag' in page_url or 'habetar' in page_url or 'yuguaab' in page_url  or 'xenolyzb' in page_url or 'hgplaycdn' in page_url or 'davioad' in page_url or 'haxloppd' in page_url or 'dumbalag' in page_url or 'kravaxxa' in page_url:
           txt_server = 'Streamwish'
 
           page_url = page_url.replace('/streamwish.com/', '/streamwish.to/').replace('/streamwish.top/', '/streamwish.to/').replace('/streamwish.site/', '/streamwish.to/').replace('/strwish.xyz/', '/streamwish.to/').replace('/strwish.com/', '/streamwish.to/').replace('/embedwish.com/', '/streamwish.to/').replace('/wishembed.pro/', '/streamwish.to/')
@@ -158,14 +166,18 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('/cybervynx.com/', '/streamwish.to/').replace('/streamhg.com/', '/streamwish.to/').replace('/hlsflex.com/', '/streamwish.to/').replace('/swiftplayers.com/', '/streamwish.to/')
 
-          page_url = page_url.replace('/stbhg.click/', '/streamwish.to/').replace('/dhcplay.com/', '/streamwish.to/').replace('/gradehgplus/', '/streamwish.to/')
+          page_url = page_url.replace('/stbhg.click/', '/streamwish.to/').replace('/dhcplay.com/', '/streamwish.to/').replace('/gradehgplus.com/', '/streamwish.to/').replace('/tryzendm.com/', '/streamwish.to/').replace('/hglink.to/', '/streamwish.to/').replace('/xenolyzb.com/', '/streamwish.to/').replace('/hgplaycdn.com/', '/streamwish.to/')
+
+          page_url = page_url.replace('/davioad.com/', '/streamwish.to/').replace('/haxloppd.com/', '/streamwish.to/')
+
+          page_url = page_url.replace('/dumbalag.com/', '/streamwish.to/').replace('/kravaxxa.com/', '/streamwish.to/')
 
     elif 'desiupload' in page_url:
           txt_server = 'Desiupload'
 
           page_url = page_url.replace('/desiupload.to/', '/desiupload.co/').replace('/desiupload.in/', '/desiupload.co/')
 
-    elif 'filelions' in page_url or 'azipcdn' in page_url or 'alions' in page_url or 'dlions' in page_url or 'mlions' in page_url or 'fviplions' in page_url or 'javlion' in page_url or 'fdewsdc' in page_url or 'peytonepre' in page_url or 'ryderjet' in page_url or 'smoothpre' in page_url or 'movearnpre' in page_url or 'seraphinap' in page_url or 'seraphinapl' in page_url:
+    elif 'filelions' in page_url or 'azipcdn' in page_url or 'alions' in page_url or 'dlions' in page_url or 'mlions' in page_url or 'fviplions' in page_url or 'javlion' in page_url or 'fdewsdc' in page_url or 'peytonepre' in page_url or 'ryderjet' in page_url or 'smoothpre' in page_url or 'movearnpre' in page_url or 'seraphinap' in page_url or 'seraphinapl' in page_url or 'mivalyo' in page_url or 'taylorplayer' in page_url or 'videoland' in page_url:
           txt_server = 'Filelions'
 
           page_url = page_url.replace('/embed/', '/')
@@ -176,6 +188,7 @@ def get_video_url(page_url, url_referer=''):
           page_url = page_url.replace('/javlion.xyz/', '/filelions.to/').replace('/fdewsdc.sbs/', '/filelions.to/')
           page_url = page_url.replace('/peytonepre.com/', '/filelions.to/').replace('/ryderjet.com/', '/filelions.to/').replace('/smoothpre.com/', '/filelions.to/').replace('/movearnpre.com/', '/filelions.to/')
           page_url = page_url.replace('/seraphinap.com/', '/filelions.to/').replace('/seraphinapl.com/', '/filelions.to/')
+          page_url = page_url.replace('/mivalyo.com/', '/filelions.to/').replace('/taylorplayer.com/', '/filelions.to/').replace('/videoland.sbs/', '/filelions.to/')
 
     elif 'youdbox' in page_url or 'yodbox' in page_url or 'youdboox' in page_url: 
           txt_server = 'Youdbox'
@@ -203,12 +216,13 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('/vidguard.to/', '/vgembed.com/').replace('/vgfplay.com/', '/vgembed.com/').replace('/vgfplay.xyz/', '/vgembed.com/').replace('/vgplayer.xyz/', '/vgembed.com/').replace('/v6embed.xyz/', '/vgembed.com/').replace('/vembed.net/', '/vgembed.com/').replace('/vembed.org/', '/vgembed.com/').replace('/vid-guard.com/', '/vgembed.com/').replace('/embedv.net/', '/vgembed.com/').replace('/bembed.net/', '/vgembed.com/')
 
-    elif 'lulustream' in page_url or 'luluvdo' in page_url or 'streamhihi' in page_url or 'luluvdoo' in page_url or 'lulu' in page_url or 'ponmi' in page_url:
+    elif 'lulustream' in page_url or 'luluvdo' in page_url or 'streamhihi' in page_url or 'luluvdoo' in page_url or 'lulu' in page_url or 'ponmi' in page_url or 'd00ds.site' in page_url:
           txt_server = 'Lulustream'
 
           page_url = page_url.replace('/luluvdo.com/', '/lulustream.com/')
           page_url = page_url.replace('/streamhihi.com/', '/lulustream.com/').replace('/luluvdoo/', '/lulustream.com/')
           page_url = page_url.replace('/lulu.st/', '/lulustream.com/').replace('/ponmi.sbs/', '/lulustream.com/')
+          page_url = page_url.replace('/d00ds.site/', '/lulustream.com/')
 
     elif 'turboviplay' in page_url or 'emturbovid' in page_url or 'tuborstb' in page_url:
           txt_server = 'Turboviplay'
@@ -248,6 +262,7 @@ def get_video_url(page_url, url_referer=''):
           page_url = page_url.replace('/vidhideplus.com/v/', '/vidhidepro.com/s/').replace('/vidhideplus.com/f/', '/vidhidepro.com/s/')
           page_url = page_url.replace('/vidhide.fun/v/', '/vidhidepro.com/s/').replace('/vidhide.fun/f/', '/vidhidepro.com/s/')
           page_url = page_url.replace('/vidhidehub.com/v/', '/vidhidepro.com/s/').replace('/vidhidehub.com/f/', '/vidhidepro.com/s/')
+          page_url = page_url.replace('/vidhidefast.com/v/', '/vidhidepro.com/s/').replace('/vidhidefast.com/f/', '/vidhidepro.com/s/')
 
           page_url = page_url.replace('/stblion.xyz/v/', '/vidhidepro.com/s/').replace('/stblion.xyz/f/', '/vidhidepro.com/s/')
 
@@ -257,14 +272,34 @@ def get_video_url(page_url, url_referer=''):
 
     elif txt_server == 'Unknow': return 'Desconocido'
 
+    # ~ FILELIONS
+    if txt_server == 'Filelions':
+        # ~ 22/8/2025  FILELIONS pq falla ResolveUrl
+        page_url.replace('/filelions.to/', '/vidhidepre.com/')
+
+    # ~ STREAMWISH
+    elif txt_server == 'Streamwish':
+        videos = wish(page_url)
+
+        if videos:
+            if 'non_exist' in str(videos):
+                return 'Archivo inexistente ó eliminado'
+
+            # ~ 10/4/2025  STREAMWISH pq falla ResolveUrl
+            video_urls = videos
+            return video_urls
+
     # ~ VIDHIDEPRO
-    if txt_server == 'Vidhidepro':
+    elif txt_server == 'Vidhidepro':
         if config.get_setting('servers_time', default=True):
             platformtools.dialog_notification('Accediendo a', '[COLOR cyan][B]' + txt_server + '[/B][/COLOR]')
 
-        url = widhide(ini_page_url)
+        url = vidhide(page_url)
 
         if url:
+            if 'non_exist' in str(url):
+                return 'Archivo inexistente ó eliminado'
+
             # ~ 27/4/2025  VIDHIDE pq ya No existe en ResolveUrl
             video_urls.append(['m3u8', url])
             return video_urls
@@ -283,18 +318,6 @@ def get_video_url(page_url, url_referer=''):
 
         import resolveurl
 
-        # ~ STREAMWISH
-        if txt_server == 'Streamwish':
-            if not "|Referer=" in ini_page_url: 
-                ini_page_url = ini_page_url + "|Referer=" + ini_page_url
-                page_url = ini_page_url
-
-        # ~ FILELIONS
-        if txt_server == 'Filelions':
-            if not "|Referer=" in ini_page_url: 
-                ini_page_url = ini_page_url + "|Referer=" + ini_page_url
-                page_url = ini_page_url
-
         if "|Referer=" in page_url: page_url = page_url.replace("|Referer=", '$$')
 
         resuelto = resolveurl.resolve(page_url)
@@ -302,6 +325,7 @@ def get_video_url(page_url, url_referer=''):
         if resuelto:
             if '.zip' in resuelto or '.rar' in resuelto: return "El archivo está en formato comprimido"
             elif '.m3u8' in resuelto: video_urls.append(['m3u8', resuelto])
+            elif '.m3u' in resuelto: video_urls.append(['m3u', resuelto])
             elif '.mp4' in resuelto: video_urls.append(['mp4', resuelto])
             else: video_urls.append(['', resuelto])
             return video_urls
@@ -319,23 +343,13 @@ def get_video_url(page_url, url_referer=''):
         import traceback
         logger.error(traceback.format_exc())
 
-        if txt_server == 'Streamwish':
-            if not "|Referer=" in ini_page_url: url = url + "|Referer=" + ini_page_url
-
-            url = wish(ini_page_url)
-
-            if url:
-                # ~ 10/4/2025  WISH pq a veces falla ResolveUrl
-                video_urls.append(['m3u8', url])
-                return video_urls
-
-        elif txt_server == 'Vidspeed':
+        if txt_server == 'Vidspeed':
              data = httptools.downloadpage(ini_page_url).data
 
              url = scrapertools.find_single_match(str(data), 'file:"(.*?)"')
 
              if url:
-                 # ~ 13/10/2023  VIDSPEED --> Directo pq a veces falla ResolveUrl
+                 # ~ 13/10/2023  VIDSPEED --> Directo pq falla ResolveUrl
                  video_urls = [[url[-4:], url]]
                  return video_urls
 
@@ -343,7 +357,7 @@ def get_video_url(page_url, url_referer=''):
              url = hexupload(ini_page_url)
 
              if url:
-                 # ~ 23/5/2025  HEXUPLOAD pq a veces falla ResolveUrl
+                 # ~ 23/5/2025  HEXUPLOAD pq falla ResolveUrl
                  video_urls.append(['mp4', url])
                  return video_urls
 
@@ -364,55 +378,30 @@ def get_video_url(page_url, url_referer=''):
         return 'Sin Respuesta ' + txt_server
 
 
-def wish(page_url):
-    from lib import jsunpack
+def hexupload(page_url):
+    id = page_url.replace('https://hexupload.net/', '')
 
+    post = {'op': 'download3', 'id': id, 'ajax': '1', 'method_free': '1', 'dataType': 'json'}
+
+    headers = {'Referer': page_url}
+
+    resp = httptools.downloadpage('https://hexload.com/download', post=post, headers=headers)
+
+    mp4 = scrapertools.find_single_match(resp.data, '"url":"(.*?)"')
+
+    return mp4
+
+
+def vidhide(page_url):
     m3u8 = ''
 
-    headers = {}
-
-    if "|Referer=" in page_url:
-        referer = scrapertools.find_single_match(page_url, '|Referer=(.*?)$')
-        headers = {'Referer': referer}
-
-    try:
-        page_url = httptools.downloadpage(page_url, headers=headers, follow_redirects=False).headers["location"]
-    except:
-        pass
-
-    data = httptools.downloadpage(page_url).data
-
-    if "Not Found" in data or "File was deleted" in data or "is no longer available" in data: return ''
-
-    try:
-        pack = scrapertools.find_single_match(data, 'p,a,c,k,e,d.*?</script>')
-        unpacked = jsunpack.unpack(pack)
-
-        m3u8 = scrapertools.find_single_match(str(unpacked), 'links=.*?"hls2":"(.*?)"')
-    except:
-        pass
-
-    return m3u8
-
-
-def widhide(page_url):
-    from lib import jsunpack
-
-    m3u8 = ''
-
-    headers = {}
-
-    if "|Referer=" in page_url:
-        referer = scrapertools.find_single_match(page_url, '|Referer=(.*?)$')
-        headers = {'Referer': referer}
-
-    resp = httptools.downloadpage(page_url, headers=headers)
+    resp = httptools.downloadpage(page_url)
 
     data = resp.data
 
-    if not resp.sucess: return ''
+    if not resp.sucess: return 'non_exist'
 
-    if "Not Found" in data or "File was deleted" in data or "is no longer available" in data: return ''
+    if "Not Found" in data or "File was deleted" in data or "is no longer available" in data: return 'non_exist'
 
     enc_data = scrapertools.find_single_match(data, "text/javascript(?:'|\")>(eval.*?)</script>")
 
@@ -426,15 +415,50 @@ def widhide(page_url):
     return m3u8
 
 
-def hexupload(page_url):
-    id = page_url.replace('https://hexupload.net/', '')
+def wish(page_url):
+    videos = []
 
-    post = {'op': 'download3', 'id': id, 'ajax': '1', 'method_free': '1', 'dataType': 'json'}
+    # ~ 7/8/2025  Cambio de Dominio pq falla ResolveUrl
+    page_url = page_url.replace('/streamwish.to/', '/yuguaab.com/')
 
-    headers = {'Referer': page_url}
+    try:
+        page_url = httptools.downloadpage(page_url, follow_redirects=False).headers["location"]
+    except:
+        pass
 
-    resp = httptools.downloadpage('https://hexload.com/download', post=post, headers=headers)
+    data = httptools.downloadpage(page_url).data
 
-    mp4 = scrapertools.find_single_match(resp.data, '"url":"(.*?)"')
+    if "Not Found" in data or "File was deleted" in data or "is no longer available" in data: return 'non_exist'
 
-    return mp4
+    try:
+        pack = scrapertools.find_single_match(data, 'p,a,c,k,e,d.*?</script>')
+        unpacked = jsunpack.unpack(pack)
+
+        m3u8 = scrapertools.find_single_match(str(unpacked), '(?:file|"hls2"):"([^"]+)"')
+
+        if "master.m3u8" in m3u8:
+            datos = httptools.downloadpage(m3u8).data
+            if PY3:
+                if isinstance(datos, bytes):
+                    datos = "".join(chr(x) for x in bytes(datos))
+
+            if datos:
+                matches_m3u8 = re.compile('#EXT-X-STREAM-INF.*?RESOLUTION=\d+x(\d*)[^\n]*\n([^\n]*)\n', re.DOTALL).findall(datos)
+
+                if matches_m3u8:
+                    for quality, url in matches_m3u8:
+                        m3u8_source = m3u8.split("/master.m3u8")[0]
+                        url = m3u8_source + url
+
+                        if 'urlsetindex-' in url: url = url.replace('urlsetindex-', 'urlset/index-')
+
+                        elif 'index-v1-a1.m3u8' in url:
+                            if not '/index-v1-a1.m3u8' in url: url = url.replace('index-v1-a1.m3u8', '/index-v1-a1.m3u8')
+
+                        videos.append(["M3u %s" % quality, url])
+        else:
+           videos.append(["m3u", m3u8])
+    except:
+        pass
+
+    return videos

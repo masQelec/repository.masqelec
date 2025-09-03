@@ -14,6 +14,8 @@ def get_video_url(page_url, url_referer=''):
         return "Archivo inexistente ó eliminado"
     elif "File Removed for Violation" in data:
         return "Archivo eliminado por infracción"
+    elif "Upload still in progress" in data:
+        return "Archivo aún No disponible"
 
     matches = scrapertools.find_multiple_matches(data, "DownloadButtonAd-startDownload gbtnSecondary.*?href='([^']+)'")
     if not matches: matches = scrapertools.find_multiple_matches(data, 'Download file.*?href="([^"]+)"')
@@ -29,6 +31,7 @@ def get_video_url(page_url, url_referer=''):
              return video_urls
 
     if len(matches) > 0:
-        video_urls.append([matches[0][-4:], matches[0]])
+        if not 'javascript:void' in matches[0]:
+            video_urls.append([matches[0][-4:], matches[0]])
 
     return video_urls

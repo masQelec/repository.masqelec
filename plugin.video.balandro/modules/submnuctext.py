@@ -784,6 +784,12 @@ def _dominios(item):
         item.channel = 'hdfull'
         hdfull.configurar_dominio(item)
 
+    elif item.from_channel == 'playdede':
+        from channels import playdede
+
+        item.channel = 'playdede'
+        playdede.configurar_dominio(item)
+
     else:
         _dominio_memorizado(item)
 
@@ -1252,6 +1258,13 @@ def _proxies(item):
 
         if config.get_setting('channel_grantorrent_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'hdcinema':
+        from channels import hdcinema
+        item.channel = 'hdcinema'
+        hdcinema.configurar_proxies(item)
+
+        if config.get_setting('channel_hdcinema_proxies') is None: refrescar = False
+
     elif item.from_channel == 'hdfull':
         from channels import hdfull
         item.channel = 'hdfull'
@@ -1300,13 +1313,6 @@ def _proxies(item):
         lilatorrent.configurar_proxies(item)
 
         if config.get_setting('channel_lilatorrent_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'masnovelas':
-        from channels import masnovelas
-        item.channel = 'masnovelas'
-        masnovelas.configurar_proxies(item)
-
-        if config.get_setting('channel_masnovelas_proxies') is None: refrescar = False
 
     elif item.from_channel == 'megaserie':
         from channels import megaserie
@@ -1560,6 +1566,13 @@ def _proxies(item):
 
         if config.get_setting('channel_subtorrents_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'todocine':
+        from channels import todocine
+        item.channel = 'todocine'
+        todocine.configurar_proxies(item)
+
+        if config.get_setting('channel_todocine_proxies') is None: refrescar = False
+
     elif item.from_channel == 'todotorrents':
         from channels import todotorrents
         item.channel = 'todotorrents'
@@ -1573,6 +1586,13 @@ def _proxies(item):
         tomadivx.configurar_proxies(item)
 
         if config.get_setting('channel_tomadivx_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'tubepelis':
+        from channels import tubepelis
+        item.channel = 'tubepelis'
+        tubepelis.configurar_proxies(item)
+
+        if config.get_setting('channel_tubepelis_proxies') is None: refrescar = False
 
     elif item.from_channel == 'ultrapelis':
         from channels import ultrapelis

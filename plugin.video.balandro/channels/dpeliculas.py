@@ -361,6 +361,8 @@ def findvideos(item):
                         url = ''
 
                     if url:
+                        if '/multiup.' in url or '/gdtvid.' in url or '/filepv.' in url or '/filemirage.' in url: continue
+
                         servidor = servertools.get_server_from_url(url)
                         servidor = servertools.corregir_servidor(servidor)
 
@@ -406,6 +408,8 @@ def findvideos(item):
                         url = ''
 
                     if url:
+                        if '/multiup.' in url or '/gdtvid.' in url or '/filepv.' in url or '/filemirage.' in url: continue
+
                         servidor = servertools.get_server_from_url(url)
                         servidor = servertools.corregir_servidor(servidor)
 
@@ -451,6 +455,8 @@ def findvideos(item):
                         url = ''
 
                     if url:
+                        if '/multiup.' in url or '/gdtvid.' in url or '/filepv.' in url or '/filemirage.' in url: continue
+
                         servidor = servertools.get_server_from_url(url)
                         servidor = servertools.corregir_servidor(servidor)
 
@@ -482,7 +488,7 @@ def play(item):
         url = scrapertools.find_single_match(data, "var url = '(.*?)'")
 
     if url:
-        if '/multiup.' in url:
+        if '/multiup.' in url or '/gdtvid.' in url or '/filepv.' in url or '/filemirage.' in url:
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)

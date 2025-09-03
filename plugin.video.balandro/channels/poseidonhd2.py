@@ -423,7 +423,8 @@ def findvideos(item):
                        else:
                            if not config.get_setting('developer_mode', default=False): continue
 
-                   itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', url = url, language = lang, quality = qlty, other = other.capitalize() ))
+                   itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', url = url,
+                                         language = lang, quality = qlty, other = other.capitalize() ))
 
     # ~ download
     matches = scrapertools.find_multiple_matches(data, '<span class="Num">#(.*?)</td></tr>')
@@ -543,7 +544,7 @@ def play(item):
     if url:
         if '/plustream.' in url:
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
-		
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

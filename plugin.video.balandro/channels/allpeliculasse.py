@@ -404,8 +404,7 @@ def findvideos(item):
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = link_other ))
 
     # ~ Descargas
-    bloque = scrapertools.find_single_match(data, '<div class="downloads-(.*?)</div> </div>')
-    if not bloque: bloque = scrapertools.find_single_match(data, '<div class="downloads-(.*?)</div></div>')
+    bloque = scrapertools.find_single_match(data, '<div class="downloads-(.*?)</div></div>')
 
     matches = scrapertools.find_multiple_matches(bloque, 'target="_blank"(.*?)</a>')
 

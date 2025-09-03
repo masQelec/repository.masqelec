@@ -10,7 +10,7 @@ from core import httptools, scrapertools, tmdb, servertools
 host = 'https://cine24h.online/'
 
 
-perpage = 33
+perpage = 30
 
 
 def item_configurar_proxies(item):
@@ -59,7 +59,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if host in url:
         if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
 
-    if '&years%5B%5D=' in url: raise_weberror = False
+    if '/release/' in url: raise_weberror = False
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
@@ -193,7 +193,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1939, -1):
-        url = host + '?s=trfilter&trfilter=1&years%5B%5D=' + str(x)
+        url = host + 'release/' + str(x)
 
         itemlist.append(item.clone( title=str(x), url=url, action='list_all', text_color = 'deepskyblue' ))
 
@@ -264,9 +264,6 @@ def list_all(item):
         if len(itemlist) >= perpage: break
 
     tmdb.set_infoLabels(itemlist)
-
-    if num_matches < perpage: return itemlist
-
     buscar_next = True
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage

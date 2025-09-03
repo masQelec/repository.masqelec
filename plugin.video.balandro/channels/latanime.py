@@ -311,8 +311,19 @@ def list_all(item):
 
             title = title.replace(' S9 ', '[COLOR tan] S9 [/COLOR]')
 
+            season = 1
+
+            if ' S2 ' in title: season = 2
+            elif ' S3 ' in title: season = 3
+            elif ' S4 ' in title: season = 4
+            elif ' S5 ' in title: season = 5
+            elif ' S6 ' in title: season = 6
+            elif ' S7 ' in title: season = 7
+            elif ' S8 ' in title: season = 8
+            elif ' S9 ' in title: season = 9
+
             itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
-                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
+                                        contentType = 'tvshow', contentSerieName = SerieName, contentSeason = season, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -357,9 +368,20 @@ def last_epis(item):
 
         titulo = titulo.replace(' S9 ', '[COLOR tan] S9 [/COLOR]')
 
+        season = 1
+
+        if ' S2 ' in title: season = 2
+        elif ' S3 ' in title: season = 3
+        elif ' S4 ' in title: season = 4
+        elif ' S5 ' in title: season = 5
+        elif ' S6 ' in title: season = 6
+        elif ' S7 ' in title: season = 7
+        elif ' S8 ' in title: season = 8
+        elif ' S9 ' in title: season = 9
+
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb,
                                     contentSerieName=SerieName, contentType='episode',
-                                    contentSeason=1, contentEpisodeNumber=epis, infoLabels={'year': '-'} ))
+                                    contentSeason=season, contentEpisodeNumber=epis, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -436,9 +458,10 @@ def episodios(item):
 
         if not epis: epis = 1
 
-        titulo = '1x' + str(epis) + ' ' + title.replace('Capitulo ' + str(epis), '').replace('capitulo ' + str(epis), '' ).strip()
+        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title.replace('Capitulo ' + str(epis), '').replace('capitulo ' + str(epis), '' ).strip()
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=titulo,
+                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
             break

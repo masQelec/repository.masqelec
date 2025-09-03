@@ -12,8 +12,10 @@ def host(host):
     try:
         data = httptools.downloadpage('https://entrarplaydede.com/').data
 
-        current_domain = scrapertools.find_single_match(data, '>Dirección actual:.*?<a href="(.*?)"')
+        current_domain = scrapertools.find_single_match(data, '>Dirección actual:.*?<a href="(.*?)".*?</a>').strip()
         if not current_domain: current_domain = scrapertools.find_single_match(data, '>Dirección actual:.*?">(.*?)</a>').strip()
+
+        if not current_domain: current_domain = scrapertools.find_single_match(data, 'Dirección activa<.*?<a href="(.*?)".*?</a>').strip()
 
         if current_domain:
             current_domain = current_domain.lower()

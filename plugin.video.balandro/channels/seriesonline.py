@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.veronline.cfd/'
+host = 'https://www.veronline.blog/'
 
 
 def item_configurar_proxies(item):
@@ -44,7 +44,7 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www.veronline.bar/', 'https://www.veronline.cx/']
+    ant_hosts = ['https://www.veronline.bar/', 'https://www.veronline.cx/', 'https://www.veronline.cfd/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)

@@ -35,7 +35,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
-    itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + 'latest-updates/' ))
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + 'latest-updates/', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'most-popular/' ))
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'top-rated/' ))
@@ -56,7 +56,7 @@ def canales(item):
 
     bloque = scrapertools.find_single_match(data, '<h1>(.*?)>Recommended<')
 
-    matches = re.compile('<div class="th".*?href="(.*?)".*?title="(.*?)".*?src="(.*?)"', re.DOTALL).findall(bloque)
+    matches = re.compile('<div class="th.*?href="(.*?)".*?title="(.*?)".*?src="(.*?)"', re.DOTALL).findall(bloque)
 
     for url, title, thumb in matches:
          itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, tipo = 'canales', text_color='violet' ))
@@ -81,7 +81,7 @@ def categorias(item):
 
     bloque = scrapertools.find_single_match(data, '<h1>(.*?)>Recommended<')
 
-    matches = re.compile('<div class="th".*?href="(.*?)".*?title="(.*?)".*?src="(.*?)"', re.DOTALL).findall(bloque)
+    matches = re.compile('<div class="th.*?href="(.*?)".*?title="(.*?)".*?src="(.*?)"', re.DOTALL).findall(bloque)
 
     for url, title, thumb in matches:
          itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='moccasin' ))
@@ -98,7 +98,7 @@ def pornstars(item):
 
     bloque = scrapertools.find_single_match(data, '<h1>(.*?)>Recommended<')
 
-    matches = re.compile('<div class="th".*?href="(.*?)".*?title="(.*?)".*?src="(.*?)"', re.DOTALL).findall(bloque)
+    matches = re.compile('<div class="th.*?href="(.*?)".*?title="(.*?)".*?src="(.*?)"', re.DOTALL).findall(bloque)
 
     for url, title, thumb in matches:
          itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, tipo = 'pornstars', text_color='orange' ))

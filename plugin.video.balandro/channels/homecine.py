@@ -639,7 +639,6 @@ def findvideos(item):
                                   language = IDIOMAS.get(lang, lang) ))
 
     # ~ Descargas No se tratan
-
     if not itemlist:
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
@@ -656,8 +655,6 @@ def play(item):
     url = item.url
 
     url = url.replace('&#038;', '&')
-
-    logger.info("check-00-play: %s" % url)
 
     data = do_downloadpage(url, headers={'Referer': item.ref}, raise_weberror=False)
 

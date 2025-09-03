@@ -971,6 +971,24 @@ def do_search(item, tecleado):
             if nro == 1:
                 text_cab = '[COLOR darkcyan][B]- Buscado:[/COLOR] '
 
+                if item.search_type == 'movie':
+                    text_cab = '[COLOR darkcyan][B]- Buscado [/COLOR][COLOR deepskyblue]Película: [/COLOR]'
+                elif item.search_type == 'tvshow':
+                    text_cab = '[COLOR darkcyan][B]- Buscado [/COLOR][COLOR hotpink]Serie: [/COLOR]'
+                elif item.search_type == 'all':
+                    if item.extra == '+18':
+                        text_cab = '[COLOR darkcyan][B]- Buscado [/COLOR][COLOR orange]Vídeo: [/COLOR]'
+                    elif item.search_special == 'anime':
+                        text_cab = '[COLOR darkcyan][B]- Buscado [/COLOR][COLOR springgreen]Anime: [/COLOR]'
+                    elif item.search_special == 'dorama':
+                        text_cab = '[COLOR darkcyan][B]- Buscado [/COLOR][COLOR firebrick]Dorama: [/COLOR]'
+                    elif item.search_special == 'torrent':
+                        text_cab = '[COLOR darkcyan][B]- Buscado [/COLOR][COLOR blue]Torrent[/COLOR] [COLOR yellow]Película y/ó Serie: [/COLOR]'
+                    else:
+                        text_cab = '[COLOR darkcyan][B]- Buscado [/COLOR][COLOR yellow]Película y/ó Serie: [/COLOR]'
+                elif item.search_type == 'documentary':
+                    text_cab = '[COLOR darkcyan][B]- Buscado [/COLOR][COLOR cyan]Documental: [/COLOR]'
+
                 mem_from_channel = item.from_channel
 
                 if item.similar:

@@ -11,19 +11,99 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://pelicinehd.com/'
 
 
+def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_hdcinema_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = '[B]Configurar proxies a usar[/B] ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    if not headers: headers = {'Referer': host}
+    if host in url:
+        if not headers: headers = {'Referer': host}
 
     if '/release/' in url: raise_weberror = False
 
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    hay_proxies = False
+    if config.get_setting('channel_hdcinema_proxies', default=''): hay_proxies = True
+
+    timeout = None
+    if host in url:
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
+
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+    else:
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('hdcinema', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+        if not data:
+            if not '/?s=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('HdCinema', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('hdcinema', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+    if '<title>Just a moment...</title>' in data:
+        if not 'buscar?p=1&q=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
 
     return data
+
+
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
+                                from_channel='hdcinema', folder=False, text_color='chartreuse' ))
+
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_hdcinema', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('hdcinema') ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
 
 
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -36,6 +116,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -50,6 +132,8 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -70,6 +154,7 @@ def generos(item):
     data = do_downloadpage(host)
 
     bloque = scrapertools.find_single_match(data, '>GENEROS<(.*?)</ul>')
+    if not bloque: bloque = scrapertools.find_single_match(data, '>GENERO<(.*?)</ul>')
 
     matches = scrapertools.find_multiple_matches(bloque, 'href="(.*?)".*?>(.*?)</a>')
 
@@ -98,11 +183,11 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    if not item.page: item.page = 1
-
     data = do_downloadpage(item.url)
 
     bloque = scrapertools.find_single_match(data, '<h1(.*?)CARTELERA')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<h1(.*?)Unete a nuestro canal de TeleGram<')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<h1(.*?)<p class="copy">©')
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
@@ -123,9 +208,10 @@ def list_all(item):
         if '/release/' in item.url: year = scrapertools.find_single_match(item.url, "/release/(.*?)/")
 
         langs = []
-        if 'espana.png' in match: langs.append('Esp')
-        if 'MEXICO.png' in match: langs.append('Lat')
-        if 'ingles.png' in match: langs.append('Vose')
+        if 'espana.png' in match.lower(): langs.append('Esp')
+        if 'mexico.png' in match.lower(): langs.append('Lat')
+        if 'ingles.png' in match.lower(): langs.append('Vose')
+        if 'japon.png' in match.lower(): langs.append('Jap')
 
         title = title.replace('&#038;', '&')
 		
@@ -282,7 +368,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'mexico': 'Lat', 'latíno': 'Lat', 'latíno': 'Lat', 'espana': 'Esp', 'castellano': 'Esp', 'ingles': 'Vo', 'subtitulado': 'Vose'}
+    IDIOMAS = {'mexico': 'Lat', 'latino': 'Lat', 'latíno': 'Lat', 'espana': 'Esp', 'castellano': 'Esp', 'ingles': 'Vo',  'inglés': 'Vo', 'subtitulado': 'Vose', 'japonés sub': 'Jap', 'japones sub': 'Jap'}
 
     data = do_downloadpage(item.url)
 
@@ -296,8 +382,17 @@ def findvideos(item):
         ses += 1
 
         lng = scrapertools.find_single_match(srv, ".*?-(.*?)</span>").lower().strip()
+        if ' hd' in lng: lng = lng.replace(' hd', '').strip()
+        if ' cam' in lng: lng = lng.replace(' cam', '').strip()
 
         srv = scrapertools.find_single_match(srv, "(.*?)-").lower().strip()
+
+        servidor = servertools.corregir_servidor(srv)
+
+        if servertools.is_server_available(servidor):
+            if not servertools.is_server_enabled(servidor): continue
+        else:
+            if not config.get_setting('developer_mode', default=False): continue
 
         links = scrapertools.find_multiple_matches(data, '<div id="options-' + opt + '".*?<iframe.*?src="(.*?)".*?</iframe>')
 
@@ -307,7 +402,7 @@ def findvideos(item):
             url = link.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
             url = link.replace('amp;#038;', '&').replace('#038;', '&').replace('amp;', '&')
 
-            itemlist.append(Item(channel = item.channel, action = 'play', server=srv, title = '', url=url,
+            itemlist.append(Item(channel = item.channel, action = 'play', server=servidor, title = '', url=url,
                                  language=IDIOMAS.get(lng, lng) ))
 
     if not itemlist:
@@ -335,6 +430,8 @@ def play(item):
     if new_url:
         if new_url == 'null': return itemlist
 
+        if '/Mivalyo.com/' in new_url: new_url = new_url.replace('/Mivalyo.com/', '/mivalyo.com/')
+
         url = new_url
 
     if url:
@@ -347,7 +444,7 @@ def play(item):
 
         else:
            if 'http' in servidor:
-               if 'tubeload' in url or 'mvidoo' in url or 'rutube' in url or 'filemoon' in url or 'moonplayer' in url or 'streamhub' in url or 'uploadever' in url or 'videowood' in url or 'yandex' in url or 'yadi.' in url or 'fastupload' in url or 'dropload' in url or 'streamwish' in url or 'krakenfiles' in url or 'hexupload' in url or 'hexload' in url or 'desiupload' in url or 'filelions' in url or 'youdbox' in url or 'yodbox' in url or 'wish' in url or 'azipcdn' in url or 'awish' in url or 'dwish' in url or 'mwish' in url or 'swish' in url or 'lulustream' in url or 'luluvdo' in url or 'lion' in url or 'alions' in url or 'dlions' in url or 'mlions' in url or 'turboviplay' in url or 'emturbovid' in url or 'tuborstb' in url or 'streamvid' in url or 'upload.do' in url or 'uploaddo' in url or 'file-upload' in url or 'wishfast' in url or 'doodporn' in url or 'vidello' in url or 'vidroba' in url or 'vidspeed' in url or 'sfastwish' in url or 'fviplions' in url or 'moonmov' in url or 'flaswish' in url or 'vkspeed' in url or 'vkspeed7' in url or 'obeywish' in url or 'twitch' in url or 'vidhide' in url or 'hxfile' in url or 'drop' in url or 'embedv' in url or 'vgplayer' in url or 'userload' in url or 'uploadraja' in url or 'cdnwish' in url or 'goodstream' in url or 'asnwish' in url  or 'flastwish' in url or 'jodwish' in url or 'fmoonembed' in url or 'embedmoon' in url or 'moonjscdn' in url or 'rumble' in url or 'bembed' in url or 'javlion' in url or 'streamruby' in url or 'sruby' in url or 'rubystream' in url or 'stmruby' in url or 'rubystm' in url or 'rubyvid' in url or 'swhoi'in url or 'listeamed' in url or 'go-streamer.net' in url or 'fsdcmo' in url or 'fdewsdc' in url or 'peytonepre' in url or 'ryderjet' in url or 'smoothpre' in url or 'movearnpre' in url or 'seraphinap' in url or 'seraphinapl' in url or 'qiwi' in url or 'swdyu' in url or 'streamhihi' in url or 'luluvdoo' in url or 'lulu' in url or 'ponmi' in url or 'wishonly' in url or 'streamsilk' in url or 'playerwish' in url or 'hlswish' in url or 'iplayerhls' in url or 'hlsflast' in url or 'ghbrisk' in url or 'cybervynx' in url or 'streamhg ' in url or 'stbhg' in url or 'dhcplay' in url or 'wish' in url or 'stblion' in url or 'terabox' in url or 'dhtpre' in url or 'dramacool' in url or 'l1afav' in url or 'hlsflex' in url or 'swiftplayers' in url or 'gradehgplus' in url: servidor = 'various'
+               if 'tubeload' in url or 'mvidoo' in url or 'rutube' in url or 'filemoon' in url or 'moonplayer' in url or 'streamhub' in url or 'uploadever' in url or 'videowood' in url or 'yandex' in url or 'yadi.' in url or 'fastupload' in url or 'dropload' in url or 'streamwish' in url or 'krakenfiles' in url or 'hexupload' in url or 'hexload' in url or 'desiupload' in url or 'filelions' in url or 'youdbox' in url or 'yodbox' in url or 'wish' in url or 'azipcdn' in url or 'awish' in url or 'dwish' in url or 'mwish' in url or 'swish' in url or 'lulustream' in url or 'luluvdo' in url or 'lion' in url or 'alions' in url or 'dlions' in url or 'mlions' in url or 'turboviplay' in url or 'emturbovid' in url or 'tuborstb' in url or 'streamvid' in url or 'upload.do' in url or 'uploaddo' in url or 'file-upload' in url or 'wishfast' in url or 'doodporn' in url or 'vidello' in url or 'vidroba' in url or 'vidspeed' in url or 'sfastwish' in url or 'fviplions' in url or 'moonmov' in url or 'flaswish' in url or 'vkspeed' in url or 'vkspeed7' in url or 'obeywish' in url or 'twitch' in url or 'vidhide' in url or 'hxfile' in url or 'drop' in url or 'embedv' in url or 'vgplayer' in url or 'userload' in url or 'uploadraja' in url or 'cdnwish' in url or 'goodstream' in url or 'asnwish' in url  or 'flastwish' in url or 'jodwish' in url or 'fmoonembed' in url or 'embedmoon' in url or 'moonjscdn' in url or 'rumble' in url or 'bembed' in url or 'javlion' in url or 'streamruby' in url or 'sruby' in url or 'rubystream' in url or 'stmruby' in url or 'rubystm' in url or 'rubyvid' in url or 'swhoi'in url or 'listeamed' in url or 'go-streamer.net' in url or 'fsdcmo' in url or 'fdewsdc' in url or 'peytonepre' in url or 'ryderjet' in url or 'smoothpre' in url or 'movearnpre' in url or 'seraphinap' in url or 'seraphinapl' in url or 'qiwi' in url or 'swdyu' in url or 'streamhihi' in url or 'luluvdoo' in url or 'lulu' in url or 'ponmi' in url or 'wishonly' in url or 'streamsilk' in url or 'playerwish' in url or 'hlswish' in url or 'iplayerhls' in url or 'hlsflast' in url or 'ghbrisk' in url or 'cybervynx' in url or 'streamhg ' in url or 'stbhg' in url or 'dhcplay' in url or 'wish' in url or 'stblion' in url or 'terabox' in url or 'dhtpre' in url or 'dramacool' in url or 'l1afav' in url or 'hlsflex' in url or 'swiftplayers' in url or 'gradehgplus' in url or 'hailindihg' in url or 'guxhag' in url or 'habetar' in url or 'yuguaab' in url or 'mivalyo' in url or 'taylorplayer' in url or 'xenolyzb' in url or 'hgplaycdn' in url: servidor = 'various'
 
                elif 'allviid' in url or 'cloudfile' in url or 'cloudmail' in url or 'dailyuploads' in url or 'darkibox' in url or 'dembed' in url or 'downace' in url or 'fastdrive' in url or 'fastplay' in url or 'filegram' in url or 'gostream' in url or 'letsupload' in url or 'liivideo' in url or 'myupload' in url or 'neohd' in url or 'oneupload' in url or 'pandafiles' in url or 'rovideo' in url or 'send' in url or 'streamable' in url or 'streamdav' in url or 'streamgzzz' in url or 'streamoupload' in url or 'turbovid' in url or 'tusfiles' in url or 'uploadba' in url or 'uploadflix' in url or 'uploadhub' in url or 'uploady' in url or 'veev' in url or 'doods' in url or 'veoh' in url or 'vidbob' in url or 'vidlook' in url or 'vidmx' in url or 'vido.' in url or 'vidpro' in url or 'vidstore' in url or 'vipss' in url or 'vkprime' in url or 'worlduploads' in url or 'ztreamhub' in url or 'amdahost' in url or 'updown' in url or 'videa' in url or 'asianplay' in url or 'swiftload' in url or 'udrop' in url or 'vidtube' in url or 'bigwarp' in url or 'bgwp' in url or 'wecima': servidor = 'zures'
 

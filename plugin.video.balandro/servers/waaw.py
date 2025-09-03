@@ -1,8 +1,21 @@
 # -*- coding: utf-8 -*-
 
-import xbmc, time
+import sys
 
-from core import httptools, scrapertools
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
+if PY3:
+    import xbmcvfs
+    translatePath = xbmcvfs.translatePath
+else:
+    import xbmc
+    translatePath = xbmc.translatePath
+
+
+import os, xbmc, time
+
+from core import filetools, httptools, scrapertools
 from platformcode import config, logger, platformtools
 
 
@@ -14,8 +27,7 @@ el_srv += ('ResolveUrl[/B][/COLOR]')
 
 
 def import_libs(module):
-    import os, sys, xbmcaddon
-    from core import filetools
+    import xbmcaddon
 
     path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
     addon_xml = filetools.read(filetools.join(path, "addon.xml"))
@@ -42,7 +54,9 @@ def get_video_url(page_url, url_referer=''):
     video_urls = []
 
     if '/watch_video.php?v=/watch_video.php?v=/player/embed_player.php?vid=' in page_url: page_url = page_url.replace('/watch_video.php?v=/watch_video.php?v=/player/embed_player.php?vid=', '/watch_video.php?v=')
+
     elif '/watch_video.php?v=/player/embed_player.php?vid=' in page_url: page_url = page_url.replace('/watch_video.php?v=/player/embed_player.php?vid=', '/watch_video.php?v=')
+
     elif '/watch_video.php?v=/watch_video.php?v=' in page_url: page_url = page_url.replace('/watch_video.php?v=/watch_video.php?v=', '/watch_video.php?v=')
 
     page_url = page_url.replace('&amp;', '&').replace('&autoplay=no/', '').replace('&autoplay=no', '').replace('&autoplay=yes/', '').replace('&autoplay=yes', '')
@@ -63,6 +77,7 @@ def get_video_url(page_url, url_referer=''):
         page_url = ini_page_url
 
         page_url = page_url.replace('watch_video.php?v=', 'f/')
+ 
         resuelto = resolveurl.resolve(page_url)
 
         if resuelto:

@@ -547,7 +547,7 @@ def findvideos(item):
 
         embed = scrapertools.find_single_match(data1, '"embed_url":"(.*?)"')
 
-        if not embed: return itemlist
+        if not embed: continue
 
         embed = embed.replace('\\/', '/')
 

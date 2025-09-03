@@ -177,6 +177,9 @@ def findvideos(item):
     for url in matches:
         ses += 1
 
+        if '/powvideo.' in url: continue
+        elif '/streamplay.' in url or '/stre4mplay.' in url: continue
+
         url = url.replace('/Smoothpre.', '/smoothpre.')
 
         servidor = servertools.get_server_from_url(url)

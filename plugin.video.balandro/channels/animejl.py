@@ -372,14 +372,24 @@ def episodios(item):
                 else: item.perpage = 50
 
     for epis, url, thumb in matches[item.page * item.perpage:]:
+        season = 1
+
+        if '-temporada-' in item.url or '-season-' in item.url:
+            season = scrapertools.find_single_match(item.url, '-season-(.*?)-').strip()
+            if not season : season = scrapertools.find_single_match(item.url, '-temporada-(.*?)$').strip()
+
+            if not season: season = 1
+
         url = "%s/%s" % (item.url, url)
 
         title = 'Episodio %s' % epis
 
-        if item.contentSerieName: titulo = '1x' + str(epis) + ' ' + title.replace('Episodio ' + str(epis), '').strip() + ' ' + item.contentSerieName
+        if item.contentSerieName:
+            titulo = str(season) + 'x' + str(epis) + ' ' + title.replace('Episodio ' + str(epis), '').strip() + ' ' + item.contentSerieName
         else: titulo = item.title
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
+                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
             if hay_proximo:

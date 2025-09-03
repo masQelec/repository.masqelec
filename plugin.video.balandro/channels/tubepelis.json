@@ -1,0 +1,17 @@
+{
+  "id": "tubepelis",
+  "name": "TubePelis",
+  "thumbnail": "tubepelis.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["lat"],
+
+  "clusters": ["adults", "news", "rankings", "kids"],
+
+  "notes": "Películas por géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+}

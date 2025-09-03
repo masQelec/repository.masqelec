@@ -10,7 +10,7 @@ from core import httptools, scrapertools, servertools, tmdb
 # ~ 19/6/25  Las Pelis NO se tratan porque hay pocas y SIN enlaces válidos
 
 
-host = 'https://ennovelas.net/'
+host = 'https://enpantallas.one/'
 
 
 perpage = 25
@@ -18,12 +18,20 @@ perpage = 25
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://ennovelas.app/', 'https://ts.ennovelas.net/']
+    ant_hosts = ['https://ennovelas.app/', 'https://ts.ennovelas.net/', 'https://ennovelas.net/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
     data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    if not data:
+        if not 'search.php?keywords=' in url:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('NetNovelas', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+            timeout = config.get_setting('channels_repeat', default=30)
+
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     return data
 
@@ -57,16 +65,33 @@ def paises(item):
     text_color = 'hotpink'
 
     itemlist.append(item.clone( title = 'América', action = 'list_all', url = host + 'category.php?cat=Novelas-Americanas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Australia', action = 'list_all', url = host + 'category.php?cat=novelas-australianas', text_color=text_color ))
     itemlist.append(item.clone( title = 'Argentina', action = 'list_all', url = host + 'category.php?cat=Novelas-Argentinas', text_color=text_color ))
     itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'category.php?cat=Novelas-brasilenas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Canada', action = 'list_all', url = host + 'category.php?cat=Novelas-Canadienses', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Chile', action = 'list_all', url = host + 'category.php?cat=Novelas-Chileanas', text_color=text_color ))
     itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'category.php?cat=Novelas-Colombianas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Corea', action = 'list_all', url = host + 'category.php?cat=Novelas-Coreanas', text_color=text_color ))
     itemlist.append(item.clone( title = 'España', action = 'list_all', url = host + 'category.php?cat=Novelas-Espanolas', lang = 'Esp', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Finlandia', action = 'list_all', url = host + 'category.php?cat=Novelas-Finlandesas', text_color=text_color ))
     itemlist.append(item.clone( title = 'Francia', action = 'list_all', url = host + 'category.php?cat=novelas-francesiano', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Holanda', action = 'list_all', url = host + 'category.php?cat=Novelas-Holandes', text_color=text_color ))
+    itemlist.append(item.clone( title = 'India', action = 'list_all', url = host + 'category.php?cat=Novelas-Indias', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Italia', action = 'list_all', url = host + 'category.php?cat=Novelas-Italianas', text_color=text_color ))
     itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'category.php?cat=Novelas-Mexicanas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Noruega', action = 'list_all', url = host + 'category.php?cat=Novela-Noruegos', text_color=text_color ))
     itemlist.append(item.clone( title = 'Perú', action = 'list_all', url = host + 'category.php?cat=Novelas-Peruanas', text_color=text_color ))
     itemlist.append(item.clone( title = 'Polonia', action = 'list_all', url = host + 'category.php?cat=novelas-polacas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Portugal', action = 'list_all', url = host + 'category.php?cat=Novelas-portuguesas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Reino Unido', action = 'list_all', url = host + 'category.php?cat=Novelas-del-Reino-Unido', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Sudafrica', action = 'list_all', url = host + 'category.php?cat=Novelas-de-Sudafrica', text_color=text_color ))
     itemlist.append(item.clone( title = 'Suecia', action = 'list_all', url = host + 'category.php?cat=Novelas-suecas', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Tuquía', action = 'list_all', url = host + 'category.php?cat=series-turcas', text_color=text_color ))
+
+    itemlist.append(item.clone( title = 'Tuquía', action = 'list_all', url = host + 'category.php?cat=Series-y-Novelas-Turcas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Tuquía (Vose)', action = 'list_all', url = host + 'category.php?cat=Series-Turcas-en-Espanol-Subtitulado', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Tuquía (Esp)', action = 'list_all', url = host + 'category.php?cat=Series-Turcas-en-Espanol-Audio', text_color=text_color ))
+
+    itemlist.append(item.clone( title = 'Venezuela', action = 'list_all', url = host + 'category.php?cat=novelas-venezolanas', text_color=text_color ))
 
     return itemlist
 
@@ -78,6 +103,7 @@ def list_all(item):
     if not item.page: item.page = 0
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = scrapertools.find_multiple_matches(data, '<div class="thumbnail">(.*?)</li>')
 
@@ -184,9 +210,11 @@ def temporadas(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = re.compile('<button class="tablinks.*?' + "'Season(.*?)'" + '.*?">Temporada(.*?)</button>', re.DOTALL).findall(data)
+    bloque = scrapertools.find_single_match(data, '>Temporadas y episodios<(.*?)</div></div>')
 
+    matches = re.compile('<button class="tablinks.*?' + "'Season(.*?)'" + '.*?">Temporada(.*?)</button>', re.DOTALL).findall(bloque)
 
     for id_season, numtempo in matches:
         numtempo = numtempo.strip()
@@ -210,7 +238,8 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title=title, id_season=id_season, page=0, contentType='season', contentSeason=numtempo, text_color='tan' ))
+        itemlist.append(item.clone( action = 'episodios', title=title, id_season=id_season, page=0,
+                                    contentType='season', contentSeason=numtempo, text_color='tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -379,7 +408,10 @@ def play(item):
     if url.startswith("https://sb"):
         return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
 
-    if '.p2pstream.' in url: url = ''
+    elif '/argtesa.' in url:
+         return 'Servidor [COLOR tan]No soportado[/COLOR]'
+
+    elif '.p2pstream.' in url: url = ''
 
     if '/player.php?h=' in url:
         data = do_downloadpage(url)
@@ -405,7 +437,7 @@ def play(item):
 def search(item, texto):
     logger.info()
     try:
-       item.url = host + 'search.php?keywords=' + texto.replace(" ", "+")
+       item.url = host + 'search.php?keywords=' + texto.replace(" ", "+") + '&video-id='
        return list_all(item)
     except:
         import sys

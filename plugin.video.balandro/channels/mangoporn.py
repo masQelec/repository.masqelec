@@ -11,12 +11,6 @@ host = 'https://mangoporn.co/'
 
 
 def do_downloadpage(url, post=None, headers=None):
-    # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://mangoporn.net/']
-
-    for ant in ant_hosts:
-        url = url.replace(ant, host)
-
     raise_weberror = True
     if '/year/' in url: raise_weberror = False
 

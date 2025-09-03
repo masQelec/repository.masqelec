@@ -195,6 +195,10 @@ def findvideos(item):
 
             if '/Smoothpre.' in url:
                 url = url.replace('/Smoothpre.', '/smoothpre.')
+            elif '/Mivalyo.' in url:
+                url = url.replace('/Mivalyo.', '/mivalyo.')
+            else:
+                url = url.replace('/hgbazooka.com/', '/streamwish.to/')
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)

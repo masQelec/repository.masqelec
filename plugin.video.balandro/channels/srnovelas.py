@@ -239,6 +239,10 @@ def last_epis(item):
             SerieName = scrapertools.find_single_match(match, '<h2>(.*?)Capitulo')
             SerieName = SerieName.replace('Final', '').strip()
 
+        SerieName = SerieName.replace(' vix', '').replace (' ViX', '').replace (' televisa', '').strip()
+
+        SerieName = SerieName.capitalize()
+
         season = 1
 
         epis = scrapertools.find_single_match(match, '<h2>.*?Capitulo(.*?)</h2>')
@@ -286,7 +290,9 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#8211;', "").replace('&#8220;', "").replace('&#8221;', "").strip()
+        title = title.replace(' vix', '').replace (' ViX', '').replace (' televisa', '').strip()
+
+        title = title.replace('&#8211;', "").replace('&#8220;', "").replace('&#8221;', "")
         title = title.replace('&#8216;', "").replace('&#8217;', "").strip()
         title = title.replace('&amp;', '&')
 
@@ -358,9 +364,11 @@ def temporadas(item):
         return itemlist
 
     for title in seasons:
-        tempo = title.strip()
+        title = title.replace(' vix', '').replace (' ViX', '').replace (' televisa', '').strip()
 
-        title = 'Temporada ' + title.strip()
+        tempo = title
+
+        title = 'Temporada ' + title
 
         if len(seasons) == 1:
             if config.get_setting('channels_seasons', default=True):
@@ -717,9 +725,21 @@ def list_search(item):
 
         if not url or not title: continue
 
+        title = title.replace(' vix', '').replace (' ViX', '').replace (' televisa', '').strip()
+
+        title = title.replace('&#8211;', "").replace('&#8220;', "").replace('&#8221;', "")
+        title = title.replace('&#8216;', "").replace('&#8217;', "").strip()
+        title = title.replace('&amp;', '&')
+
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
 
         name = scrapertools.find_single_match(article, ' alt="(.*?)"')
+
+        name = name.replace(' vix', '').replace (' ViX', '').replace (' televisa', '').strip()
+
+        name = name.replace('&#8211;', "").replace('&#8220;', "").replace('&#8221;', "")
+        name = name.replace('&#8216;', "").replace('&#8217;', "").strip()
+        name = name.replace('&amp;', '&')
 
         SerieName = name
 

@@ -371,6 +371,8 @@ def with_proxies(item):
             platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales con proxies a Configurar[/B][/COLOR]' % color_adver)
         return
 
+    i = 0
+
     for ch in ch_list:
         if not 'proxies' in ch['notes'].lower(): continue
 
@@ -395,6 +397,8 @@ def with_proxies(item):
                 if not config.get_setting(cfg_proxies_channel, default=''): continue
 
         info = ''
+
+        i =+ 1
 
         if ch['status'] == 1: info += '[B][COLOR wheat][I]Preferido [/I][/B][/COLOR]'
         elif ch['status'] == -1: info += '[B][COLOR %s][I]Desactivado [/I][/B][/COLOR]' % color_list_inactive
@@ -447,6 +451,13 @@ def with_proxies(item):
         opciones_channels.append(platformtools.listitem_to_select('[COLOR yellow]' + channel_name + '[/COLOR]', info, channel_thumb))
 
         canales_proxies.append((ch['name'], info, ch['notes']))
+
+    if i == 0:
+        if item.memo_proxies:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales con proxies memorizados[/B][/COLOR]' % color_adver)
+        else:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales con proxies a Configurar[/B][/COLOR]' % color_adver)
+        return
 
     ret = platformtools.dialog_select(cabecera, opciones_channels, useDetails=True)
 
@@ -1393,6 +1404,8 @@ def show_channels_list(item):
             if not 'crypto' in ch['clusters']: continue
         elif item.onlyone:
             if not 'onlyone' in ch['clusters']: continue
+        elif item.streaminytorrent:
+            if not 'Canal con enlaces Streaming y Torrent.' in ch['notes']: continue
 
         cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
 
@@ -1530,6 +1543,8 @@ def show_channels_list(item):
         elif item.notices == True: cabecera = 'Canales con [COLOR yellow]Aviso CloudFlare Protection[/COLOR]'
         elif item.cryptos == True: cabecera = 'Canales que requieren [COLOR yellow]Descifrar Enlaces[/COLOR]'
         elif item.onlyone == True: cabecera = 'Canales con [COLOR yellow]Un Único Servidor[/COLOR]'
+        elif item.streaminytorrent == True: cabecera = 'Canales con enlaces [COLOR yellow]Streamin Y Torrent[/COLOR]'
+
         else: cabecera = 'Canales [COLOR yellow]Disponibles[/COLOR] (segun sus Ajustes)'
 
     ret = platformtools.dialog_select(cabecera, opciones_channels, useDetails=True)
@@ -1634,6 +1649,12 @@ def search_new_proxies(canal_0, canal_1, canal_2, item):
     return False
 
 def tests_channels(canal_0, canal_1, canal_2):
+    if 'Puede requerir el uso de proxies en función del país/operadora desde el que se accede' in canal_2:
+        if 'Proxies' in canal_1:
+            canal_2 = canal_2.replace('Puede requerir el uso de proxies en función del país/operadora desde el que se accede', '[COLOR red][B]Puede requerir el uso de proxies en función del país/operadora desde el que se accede[/B][/COLOR]')
+        else:
+            canal_2 = canal_2.replace('Puede requerir el uso de proxies en función del país/operadora desde el que se accede', '[COLOR indianred][B]Puede requerir el uso de proxies en función del país/operadora desde el que se accede[/B][/COLOR]')
+
     if platformtools.dialog_yesno(canal_0 + '[COLOR yellow] Test Canal[/COLOR]', '[COLOR cyan][B]¿ Desea Efectuar el Test Web del Canal ?[/B][/COLOR]', canal_1, canal_2):
         from modules import tester
 

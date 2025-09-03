@@ -262,10 +262,10 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
-        _temp = scrapertools.find_single_match(item.url, '(.*?)/temporada/')
-        _epis = scrapertools.find_single_match(item.url, '/episodio/(.*?)$')
+        _temp = scrapertools.find_single_match(item.url, '(.*?)/temporada')
+        _epis = scrapertools.find_single_match(item.url, '/episodio-(.*?)$')
 
-        url = _temp + '/temporada/' + str(season) + '/episodio/' + _epis
+        url = _temp + '/temporada-' + str(season) + '/episodio-' + _epis
 
         itemlist.append(item.clone( action = 'episodios', url = url, title = title, page = 0,
                                     contentType = 'season', contentSeason = season, text_color = 'tan' ))
@@ -278,6 +278,11 @@ def temporadas(item):
 def episodios(item):
     logger.info()
     itemlist = []
+
+    if not host in item.url:
+        if config.get_setting('developer_mode', default=False):
+            platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]JoinClub [COLOR yellow]Ver Estructura[/B][/COLOR]')
+        return itemlist
 
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
@@ -337,17 +342,32 @@ def episodios(item):
     for match in matches[item.page * item.perpage:]:
         title = scrapertools.find_single_match(match, '<span class="epname">(.*?)</span>')
 
+        if not title: continue
+
         url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
-        if not url or not title: continue
+        _url = False
+
+        if not url:
+            if len(matches) == 1:
+                url = scrapertools.find_single_match(data, 'var playlist_lang =.*?"latino":"(.*?)"')
+                if not url: url = scrapertools.find_single_match(data, 'var playlist_lang =.*?"espanola":"(.*?)"')
+                if not url: url = scrapertools.find_single_match(data, 'var playlist_lang =.*?"subtitle":"(.*?)"')
+
+                if url: _url = True
+
+            if not url: continue
 
         epis = scrapertools.find_single_match(match, 'data-episode="(.*?)"')
 
+        if not epis: epis = 1
+			
         title = title.replace('Episodio ', '[COLOR goldenrod]Epis. [/COLOR]').replace('episodio ','[COLOR goldenrod]Epis. [/COLOR]')
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'") + ' ' + title
 
-        url = host[:-1] + url
+        if _url: url = item.url
+        else: url = host[:-1] + url
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
 

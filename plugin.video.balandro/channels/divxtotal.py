@@ -181,7 +181,7 @@ def calidades(item):
     itemlist = []
 
     itemlist.append(item.clone( title = 'En DVDR', action = 'list_all', url = host + 'peliculas-dvdr/', search_type = 'movie', text_color = 'moccasin' ))
-    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'peliculas-hd-5/', search_type = 'movie', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'peliculas-hd/', search_type = 'movie', text_color = 'moccasin' ))
     itemlist.append(item.clone( title = 'En 3D', action = 'list_all', url = host + 'peliculas-3-d/', search_type = 'movie', text_color = 'moccasin' ))
 
     return itemlist
@@ -202,6 +202,8 @@ def generos(item):
 
         if config.get_setting('descartar_anime', default=False):
             if title == 'Anime': continue
+
+        if url.startswith('?'): url = host[:-1] + url
 
         itemlist.append(item.clone( action='list_all', title=title, url=url, text_color = 'deepskyblue' ))
 

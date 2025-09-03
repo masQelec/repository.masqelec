@@ -49,10 +49,6 @@
         "url": "https://fastdrive.io/\\1"
       },
       {
-        "pattern": "(https://fastplay.)(?:sx|cc|to)/([0-9a-zA-Z]+)",
-        "url": "https://fastplay.sx/\\2"
-      },
-      {
         "pattern": "https://filegram.to/([0-9a-zA-Z]+)",
         "url": "https://filegram.to/\\1"
       },

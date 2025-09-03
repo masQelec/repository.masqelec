@@ -126,6 +126,23 @@ def last_epis(item):
 
         if not url or not title: continue
 
+        season = 1
+
+        if 'Season' in title:
+            if '2nd' in title: season = 2
+            elif '3rd' in title: season = 3
+            elif '4th' in title: season = 4
+            elif '5th' in title: season = 5
+            elif '6th' in title: season = 6
+            elif '7th' in title: season = 7
+            elif '8th' in title: season = 8
+            elif '9th' in title: season = 9
+            else:
+               season = scrapertools.find_single_match(title, 'Season(.*?)Capítulo').strip()
+               if not season : season = scrapertools.find_single_match(title, 'Season(.*?)$').strip()
+
+               if not season: season = 1
+
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
         SerieName = corregir_SerieName(title)
@@ -141,7 +158,7 @@ def last_epis(item):
         if url:
             itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail=thumb, page = 0,
                                         contentSerieName = SerieName, contentType = 'episode',
-                                        contentSeason = 1, contentEpisodeNumber=epis, infoLabels={'year':'-'} ))
+                                        contentSeason = season, contentEpisodeNumber=epis, infoLabels={'year':'-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -214,15 +231,34 @@ def episodios(item):
 
         title = title.strip()
 
+        season = 1
+
+        if 'Season' in title:
+            if '2nd' in title: season = 2
+            elif '3rd' in title: season = 3
+            elif '4th' in title: season = 4
+            elif '5th' in title: season = 5
+            elif '6th' in title: season = 6
+            elif '7th' in title: season = 7
+            elif '8th' in title: season = 8
+            elif '9th' in title: season = 9
+            else:
+               season = scrapertools.find_single_match(title, 'Season(.*?)Capítulo').strip()
+               if not season : season = scrapertools.find_single_match(title, 'Season(.*?)$').strip()
+
+               if not season: season = 1
+
+        title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]')
+
         epis = scrapertools.find_single_match(title, 'Capítulo(.*?)$').strip()
         if not epis: epis = scrapertools.find_single_match(title, 'Capitulo(.*?)$').strip()
 
         if not epis: epis = i
 
-        titulo = '1x' + str(epis) + ' ' + title.replace('Capítulo ' + str(epis), '').replace('Capitulo ' + str(epis), '').strip()
+        titulo = str(season) + 'x' + str(epis) + ' ' + title.replace('Capítulo ' + str(epis), '').replace('Capitulo ' + str(epis), '').strip()
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
-                                    contentType = 'episode', contentSeason = 1, contentEpisodeNumber = epis ))
+                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
             break

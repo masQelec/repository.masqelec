@@ -1,0 +1,17 @@
+{
+  "id": "estrenosanime",
+  "name": "EstrenosAnime",
+  "thumbnail": "estrenosanime.jpg",
+
+  "active": true,
+
+  "searchable": false,
+  "search_types": ["tvshow"],
+
+  "categories": ["tvshow"],
+  "language": ["lat", "vose", "vo"],
+
+  "clusters": ["anime"],
+
+  "notes": "Web dedicada exclusivamente al anime"
+}

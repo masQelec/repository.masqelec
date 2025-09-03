@@ -250,6 +250,7 @@ def generos(item):
         'animacion': 'Animación',
         'aventura': 'Aventura',
         'biografia': 'Biografía',
+        'belica': 'Bélica',
         'ciencia-ficcion': 'Ciencia ficción',
         'comedia': 'Comedia',
         'crimen': 'Crimen',
@@ -262,14 +263,19 @@ def generos(item):
         'historia': 'Historia',
         'misterio': 'Misterio',
         'musica': 'Música',
+        'pelicula-de-tv': 'Película Tv',
         'romance': 'Romance',
         'suspense': 'Suspense',
         'terror': 'Terror',
         'western': 'Western'
         }
 
-    for opc in sorted(opciones):
-        itemlist.append(item.clone( title = opciones[opc], url = host + 'categoria/' + opc + '/', action ='list_all', text_color = 'deepskyblue' ))
+    for opc in opciones:
+        url = host + 'categoria/' + opc + '/'
+
+        if opciones[opc] == 'Terror': url = url.replace('categoria', 'category')
+
+        itemlist.append(item.clone( title = opciones[opc], url = url, action ='list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -280,21 +286,16 @@ def calidades(item):
 
     data = do_downloadpage(host + 'peliculas/')
 
-    bloque = scrapertools.find_single_match(data, '<label for="quality"(.*?)</select>')
+    bloque = scrapertools.find_single_match(data, '<div id="bloque_cat">(.*?)</div>')
 
-    matches = re.compile('<option value="(.*?)".*?>(.*?)</option>', re.DOTALL).findall(bloque)
+    matches = re.compile('href="(.*?)".*?<button.*?">(.*?)</button>', re.DOTALL).findall(bloque)
 
-    for value, title in matches:
-        if not value: continue
-
-        value = value.strip()
+    for url, title in matches:
         title = title.strip()
-
-        url = host + 'tag/' + value.replace(' ', '-').lower() + '/'
 
         itemlist.append(item.clone( title=title, url=url, action='list_all', text_color='moccasin' ))
 
-    return itemlist
+    return sorted(itemlist, key=lambda it: it.title)
 
 
 def list_all(item):

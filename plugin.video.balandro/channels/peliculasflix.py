@@ -47,7 +47,8 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
-    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Por tema', action = 'temas', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por productora', action = 'productoras', text_color = 'moccasin' ))
 
@@ -94,7 +95,7 @@ def generos(item):
     return sorted(itemlist, key=(lambda x: x.title))
 
 
-def categorias(item):
+def temas(item):
     logger.info()
     itemlist = []
 
@@ -137,7 +138,7 @@ def categorias(item):
 
            elif title == 'aventura': title = 'Aventura'
 
-           itemlist.append(item.clone( title = title, label_id = label['_id'], url = host, action = 'list_all', text_color = 'moccasin' ))
+           itemlist.append(item.clone( title = title, label_id = label['_id'], action = 'list_all', text_color = 'yellowgreen' ))
     except:
        return itemlist
 
@@ -179,7 +180,7 @@ def productoras(item):
 
            if title == 'tvN': title = 'Tvn'
 
-           itemlist.append(item.clone( title = title, net_slug = network['slug'], url = host, action = 'list_all', text_color = 'tan' ))
+           itemlist.append(item.clone( title = title, net_slug = network['slug'], action = 'list_all', text_color = 'tan' ))
     except:
        return itemlist
 
@@ -193,9 +194,9 @@ def idiomas(item):
     languages = get_idiomas()
 
     for lang in languages:
-        itemlist.append(item.clone( title = lang['name'], code_flix = lang['code_flix'], url = host, action = 'list_all', text_color = 'moccasin' ))
+        itemlist.append(item.clone( title = lang['name'], code_flix = lang['code_flix'], action = 'list_all', text_color = 'moccasin' ))
 
-    return itemlist
+    return sorted(itemlist, key=(lambda x: x.title))
 
 
 def list_all(item):
@@ -294,6 +295,8 @@ def findvideos(item):
     if not videos: return itemlist
 
     for video in videos:
+        if str(video) == "{'server': None}": continue
+
         ses += 1
 
         lang = get_lang(video['lang'])

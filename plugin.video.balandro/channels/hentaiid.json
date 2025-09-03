@@ -9,7 +9,7 @@
   "search_types": ["movie"],
 
   "categories": ["movie", "adults"],
-  "language": ["vo"],
+  "language": ["vose", "vo"],
 
   "clusters": ["adults"],
 
