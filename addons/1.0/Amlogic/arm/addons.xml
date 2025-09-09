@@ -414,7 +414,7 @@
 
 <addon id="repository.masQelec"
 		name="masQelec Add-ons"
-		version="21.1"
+		version="21.2"
 		provider-name="masQelec">
 	<extension point="xbmc.addon.repository"
 		name="masQelec Add-ons">
@@ -527,7 +527,7 @@ initial release
 
 <addon id="service.cloud.masqelec"
        name="Cloud masQelec"
-       version="2.0.1"
+       version="2.1.0"
        provider-name="Cloud masQelec">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>

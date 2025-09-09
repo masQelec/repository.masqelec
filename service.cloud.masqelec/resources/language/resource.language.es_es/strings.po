@@ -60,3 +60,42 @@ msgctxt "#30033"
 msgid "Update the PVR"
 msgstr "Actualizar el gestor de canales"
 
+msgctxt "#30040"
+msgid "Library settings"
+msgstr "Ajustes biblioteca"
+
+msgctxt "#30041"
+msgid "Update library at startup"
+msgstr "Actualizar biblioteca al iniciar"
+
+msgctxt "#30042"
+msgid "Update interval (hours)"
+msgstr "Intervalo de actualización (horas)"
+
+msgctxt "#30043"
+msgid "Clean library"
+msgstr "Limpiar biblioteca"
+
+msgctxt "#30044"
+msgid "Clean interval (hours)"
+msgstr "Intervalo de limpieza (horas)"
+
+msgctxt "#30060"
+msgid "PVR settings"
+msgstr "Ajustes de PVR"
+
+msgctxt "#30061"
+msgid "Update PVR channels"
+msgstr "Actualizar canales PVR"
+
+msgctxt "#30062"
+msgid "Update interval (hours)"
+msgstr "Intervalo de actualización (horas)"
+
+msgctxt "#30063"
+msgid "Disable other PVR clients"
+msgstr "Deshabilitar otros clientes PVR"
+
+msgctxt "#30064"
+msgid "Disable conflicting service add-ons (service.*)"
+msgstr "Deshabilitar servicios conflictivos (service.*)"

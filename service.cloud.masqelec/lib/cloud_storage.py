@@ -1,99 +1,145 @@
+# -*- coding: utf-8 -*-
+"""
+cloud_storage.py — Descarga/descifrado atómico de rclone.conf + verificación de servicios
+
+Cambios:
+- NO se comparan contenidos: siempre se descarga y reemplaza rclone.conf (atómico, 0600).
+- No se detienen/arrancan servicios sólo por reemplazar el conf.
+- Tras escribir, se verifica estado de servicios y se activan si hiciera falta.
+- Unidades .service se actualizan desde remoto; daemon-reload sólo si cambian.
+- Limpieza de temporales.
+"""
+
 import os
 import base64
 import urllib.request
 import urllib.error
 import subprocess
 import traceback
-import io
-import difflib # <-- Nueva importación
+import time
+import stat
+import shutil
 
-from . import utils
+from lib import log_utils
+from lib import utils
 
-# ------------------------------
-# CIFRADO FEISTEL
-# ------------------------------
+# ==============================
+# Config red
+# ==============================
+NET_TIMEOUT = 30
+NET_RETRIES = 2
+UA = "masQelec/1.0 (+Kodi)"
+
+tmp_dir = "/tmp"
+
+def _net_open(url: str, timeout: int = NET_TIMEOUT):
+    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    last_err = None
+    for attempt in range(NET_RETRIES + 1):
+        try:
+            return urllib.request.urlopen(req, timeout=timeout)
+        except urllib.error.URLError as e:
+            last_err = e
+            log_utils.write_log(f"[net] intento {attempt+1}/{NET_RETRIES+1} falló para {url}: {getattr(e, 'reason', e)}", "ERROR")
+            time.sleep(2)
+    raise last_err
+
+def _cleanup_path(p: str):
+    try:
+        if not p:
+            return
+        if os.path.isdir(p):
+            shutil.rmtree(p, ignore_errors=True)
+        elif os.path.exists(p):
+            os.remove(p)
+    except Exception:
+        pass
+
+# ==============================
+# CIFRADO FEISTEL (idéntico a tu script)
+# ==============================
 def feistel_round(left: bytes, right: bytes, key: bytes):
-    """
-    Realiza una ronda del cifrado Feistel.
-    Recibe la mitad izquierda y derecha, más una clave de ronda.
-    Retorna la nueva mitad izquierda y derecha.
-    """
+    """Ronda Feistel: (L, R) -> (R, L XOR F(R)) con F(R)=R XOR key cíclica."""
     f_result = bytearray(b ^ key[i % len(key)] for i, b in enumerate(right))
     return right, bytearray(l ^ fr for l, fr in zip(left, f_result))
 
-def feistel_cipher(data: bytes, key: bytes, rounds: int = 8):
+def decrypt(data_b64: str, key: bytes, rounds: int = 8):
     """
-    Implementación de un cifrado Feistel simple.
-    """
-    if len(data) % 2 != 0:
-        data += b'\x00'
-    
-    left, right = data[:len(data)//2], data[len(data)//2:]
-    for _ in range(rounds):
-        left, right = feistel_round(left, right, key)
-        
-    return left + right
-
-def decrypt(data: str, key: bytes, rounds: int = 8):
-    """
-    Desencripta datos en base64 usando Feistel.
+    Descifra EXACTAMENTE como tu script:
+    - sin padding especial
+    - sin forzar rondas pares
+    - para descifrar: empezar con (R, L) y aplicar las mismas rondas
     """
     try:
-        decoded_data = base64.b64decode(data)
-        utils.write_log(f"Datos decodificados (longitud): {len(decoded_data)} bytes")
-        
+        if not key:
+            raise ValueError("La clave de descifrado está vacía")
+        decoded_data = base64.b64decode(data_b64)
+
         left, right = decoded_data[:len(decoded_data)//2], decoded_data[len(decoded_data)//2:]
         for _ in range(rounds):
             right, left = feistel_round(right, left, key)
-            
+
         decrypted_data = left + right
-        utils.write_log(f"Datos desencriptados (longitud): {len(decrypted_data)} bytes")
         return decrypted_data
-        
     except Exception as e:
-        utils.write_log(f"Error al desencriptar los datos: {e}\n{traceback.format_exc()}", level="ERROR")
+        log_utils.write_log(f"Error al desencriptar los datos: {e}\n{traceback.format_exc()}", "ERROR")
         return None
 
-# ------------------------------
-# DESCARGA Y DESENCRIPTADO
-# ------------------------------
+# ==============================
+# DESCARGA
+# ==============================
 def get_key_from_authorized_keys(filename="/storage/.ssh/authorized_keys"):
     """
-    Obtiene la clave desde authorized_keys y la limpia.
+    Obtiene la 'clave' desde authorized_keys.
+    Se usa TODO el archivo como clave binaria, igual que tu script.
     """
     if not os.path.exists(filename):
-        utils.write_log(f"El archivo '{filename}' no existe. Abortando.", level="ERROR")
+        log_utils.write_log(f"El archivo '{filename}' no existe. Abortando.", "ERROR")
         raise FileNotFoundError(f"El archivo '{filename}' no existe.")
     with open(filename, "rb") as file:
         key = file.read()
-        utils.write_log(f"Clave para descifrado leída con éxito.")
+        if not key:
+            raise ValueError("La clave leída está vacía")
+        log_utils.write_log("Clave para descifrado leída con éxito.")
         return key
 
-def download_and_decrypt_to_memory(url: str, key: bytes):
-    """
-    Descarga un archivo cifrado, lo desencripta y devuelve su contenido en memoria.
-    """
+def download_to_file(url: str, dst_path: str) -> bool:
+    """Descarga un recurso a un fichero local (dst_path)."""
     try:
-        utils.write_log(f"Descargando archivo cifrado desde: {url}")
-        with urllib.request.urlopen(url) as response:
-            encrypted_text = response.read().decode("utf-8")
-            decrypted_data = decrypt(encrypted_text, key)
-            return decrypted_data
+        log_utils.write_log(f"Descargando: {url} -> {dst_path}")
+        with _net_open(url) as resp, open(dst_path, "wb") as f:
+            shutil.copyfileobj(resp, f, length=256*1024)
+        return os.path.exists(dst_path) and os.path.getsize(dst_path) > 0
     except Exception as e:
-        utils.write_log(f"Error al descargar o desencriptar desde la URL '{url}': {e}\n{traceback.format_exc()}", level="ERROR")
-    return None
+        log_utils.write_log(f"Error descargando '{url}': {e}\n{traceback.format_exc()}", "ERROR")
+        return False
 
-def download_file_to_memory(url: str):
-    """
-    Descarga un archivo y devuelve su contenido en memoria.
-    """
+def decrypt_file_to_file(src_path: str, key: bytes, dst_path: str, rounds: int = 8) -> bool:
+    """Lee texto base64, descifra (como tu script) y escribe binario en dst_path."""
     try:
-        utils.write_log(f"Descargando archivo desde: {url}")
-        with urllib.request.urlopen(url) as response:
-            return response.read()
+        with open(src_path, "r", encoding="utf-8", errors="replace") as f:
+            encrypted_text = f.read()
+        decrypted = decrypt(encrypted_text, key, rounds=rounds)
+        if decrypted is None:
+            return False
+        with open(dst_path, "wb") as out:
+            out.write(decrypted)
+            out.flush()
+            os.fsync(out.fileno())
+        return True
     except Exception as e:
-        utils.write_log(f"Error al descargar desde la URL '{url}': {e}\n{traceback.format_exc()}", level="ERROR")
-    return None
+        log_utils.write_log(f"Error desencriptando {src_path}: {e}\n{traceback.format_exc()}", "ERROR")
+        return False
+
+# ==============================
+# SYSTEMD HELPERS
+# ==============================
+def _has_systemctl() -> bool:
+    from shutil import which
+    return which("systemctl") is not None
+
+def _service_name(unit: str) -> str:
+    return unit[:-8] if unit.endswith(".service") else unit
 
 def handle_service_file(service_name: str, base_url: str, systemd_dir: str):
     """
@@ -102,132 +148,158 @@ def handle_service_file(service_name: str, base_url: str, systemd_dir: str):
     """
     dest = os.path.join(systemd_dir, service_name)
     url = f"{base_url}{service_name}"
-    
-    remote_content = download_file_to_memory(url)
-    if not remote_content:
-        utils.write_log(f"No se pudo descargar el archivo de servicio '{service_name}'. Saltando.", level="WARNING")
-        return False
-        
-    changes_made = False
-    
-    if os.path.exists(dest):
-        with open(dest, "rb") as f:
-            local_content = f.read()
-            
-        if local_content != remote_content:
-            utils.write_log(f"El archivo '{service_name}' local es diferente a la versión remota. Reemplazando.")
+
+    # Descargar a tmp y comparar normalizando EOL
+    tmp_path = os.path.join(tmp_dir, f".{service_name}.tmp")
+    changed = False
+    try:
+        ok = download_to_file(url, tmp_path)
+        if not ok:
+            log_utils.write_log(f"No se pudo descargar '{service_name}'. Saltando.", "WARNING")
+            return False
+
+        with open(tmp_path, "rb") as tf:
+            remote_content = tf.read().replace(b"\r\n", b"\n")
+
+        if os.path.exists(dest):
+            with open(dest, "rb") as lf:
+                local_content = lf.read().replace(b"\r\n", b"\n")
+            if local_content != remote_content:
+                log_utils.write_log(f"El archivo '{service_name}' local difiere. Reemplazando.")
+                with open(dest, "wb") as f:
+                    f.write(remote_content)
+                    f.flush()
+                    os.fsync(f.fileno())
+                changed = True
+            else:
+                log_utils.write_log(f"'{service_name}' coincide con la versión remota. Verificando estado service…")
+                if _has_systemctl():
+                    name = _service_name(service_name)
+                    try:
+                        subprocess.run(['systemctl', 'is-active', name], check=True,
+                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        log_utils.write_log(f"El servicio '{name}' está activo.")
+                    except subprocess.CalledProcessError:
+                        log_utils.write_log(f"El servicio '{name}' no está activo. Habilitando e iniciando…")
+                        subprocess.call(["systemctl", "enable", "--now", name])
+                else:
+                    log_utils.write_log("systemctl no disponible; no se puede verificar/iniciar servicios.", "WARNING")
+        else:
+            log_utils.write_log(f"Archivo '{service_name}' no encontrado. Creándolo con la versión remota.")
+            os.makedirs(systemd_dir, exist_ok=True)
             with open(dest, "wb") as f:
                 f.write(remote_content)
-            changes_made = True
-        else:
-            utils.write_log(f"El archivo '{service_name}' local es idéntico a la versión remota. Verificando estado.")
-            try:
-                subprocess.run(['systemctl', 'is-active', service_name.replace(".service", "")], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                utils.write_log(f"El servicio '{service_name.replace('.service', '')}' está activo. No se requiere acción.")
-            except subprocess.CalledProcessError:
-                utils.write_log(f"El servicio '{service_name.replace('.service', '')}' no está activo. Reiniciando.")
-                name = service_name.replace(".service", "")
-                subprocess.call(["systemctl", "enable", name])
-                subprocess.call(["systemctl", "start", name])
-    else:
-        utils.write_log(f"Archivo '{service_name}' no encontrado. Creándolo con la versión remota.")
-        with open(dest, "wb") as f:
-            f.write(remote_content)
-        changes_made = True
-        
-    return changes_made
+                f.flush()
+                os.fsync(f.fileno())
+            changed = True
+    finally:
+        _cleanup_path(tmp_path)
 
-# ------------------------------
-# ALMACENAMIENTO EN LA NUBE
-# ------------------------------
+    return changed
 
+def _ensure_services_active(services):
+    """Verifica y activa servicios si no están activos; no los detiene."""
+    if not _has_systemctl():
+        log_utils.write_log("systemctl no disponible; no puedo verificar/activar servicios.", "WARNING")
+        return
+    for unit in services:
+        name = _service_name(unit)
+        try:
+            subprocess.run(['systemctl', 'is-active', name], check=True,
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            log_utils.write_log(f"Servicio '{name}' activo.")
+        except subprocess.CalledProcessError:
+            log_utils.write_log(f"Servicio '{name}' inactivo. Habilitando e iniciando…")
+            subprocess.call(["systemctl", "enable", "--now", name])
+
+# ==============================
+# CLOUD STORAGE (fase bloqueante)
+# ==============================
 def start_cloud_storage():
     """
-    Descarga la configuración cifrada de rclone, la desencripta
-    y recarga los servicios de rclone para montar el almacenamiento en la nube.
+    Flujo:
+      1) Descargar rclone.conf.enc a tmp.
+      2) Desencriptar a tmp exactamente como el script de cifrado.
+      3) Normalizar EOL y reemplazar SIEMPRE /storage/.config/rclone/rclone.conf (atómico, 0600).
+      4) Actualizar unidades .service desde remoto; systemctl daemon-reload sólo si cambiaron.
+      5) Verificar servicios rclone/zerotier y activarlos si no están activos.
     """
+    enc_tmp = os.path.join(tmp_dir, ".rclone.conf.enc.tmp")
+    dec_tmp = os.path.join(tmp_dir, ".rclone.conf.dec.tmp")
+
     try:
         key = get_key_from_authorized_keys()
-        
-        # 1. Descargar y desencriptar rclone.conf
+
         rclone_conf_path = "/storage/.config/rclone/rclone.conf"
-        file_url = "https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/rclone.conf.enc"
-        
-        decrypted_content = download_and_decrypt_to_memory(file_url, key)
-        if not decrypted_content:
-            utils.write_log("No se pudo descargar o desencriptar rclone.conf.", level="ERROR")
+        rclone_dir = os.path.dirname(rclone_conf_path)
+        enc_url = "https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/rclone.conf.enc"
+
+        # 1) Descargar cifrado -> tmp
+        if not download_to_file(enc_url, enc_tmp):
+            log_utils.write_log("No se pudo descargar rclone.conf.enc.", "ERROR")
             return
 
-        # Normalizar los finales de línea antes de la comparación
-        normalized_remote_content = decrypted_content.replace(b'\r\n', b'\n')
-        
-        changes_needed = False
-        if os.path.exists(rclone_conf_path):
-            with open(rclone_conf_path, "rb") as f:
-                local_content = f.read()
+        # 2) Desencriptar -> tmp
+        if not decrypt_file_to_file(enc_tmp, key, dec_tmp, rounds=8):
+            log_utils.write_log("Falló el desencriptado de rclone.conf.", "ERROR")
+            return
 
-            normalized_local_content = local_content.replace(b'\r\n', b'\n')
+        # 3) Normalizar EOL y reemplazar SIEMPRE (atómico, 0600)
+        with open(dec_tmp, "rb") as f:
+            remote_raw = f.read()
+        remote_norm = remote_raw.replace(b"\r\n", b"\n")
 
-            if normalized_local_content == normalized_remote_content:
-                utils.write_log("rclone.conf local es idéntico a la versión remota. No se requiere actualización.")
-            else:
-                utils.write_log("rclone.conf local es diferente. Reemplazando con la versión remota...")
-                # --- Lógica para mostrar las diferencias ---
-                local_lines = normalized_local_content.decode('utf-8').splitlines()
-                remote_lines = normalized_remote_content.decode('utf-8').splitlines()
-                
-                diff = difflib.unified_diff(
-                    local_lines,
-                    remote_lines,
-                    fromfile='local_rclone.conf',
-                    tofile='remote_rclone.conf',
-                    lineterm=''
-                )
+        os.makedirs(rclone_dir, exist_ok=True)
+        tmp_out = rclone_conf_path + ".tmp"
+        with open(tmp_out, "wb") as f:
+            f.write(remote_norm)
+            f.flush()
+            os.fsync(f.fileno())
+        try:
+            os.replace(tmp_out, rclone_conf_path)
+        finally:
+            try:
+                if os.path.exists(tmp_out):
+                    os.remove(tmp_out)
+            except Exception:
+                pass
+        try:
+            os.chmod(rclone_conf_path, stat.S_IRUSR | stat.S_IWUSR)  # 0600
+        except Exception:
+            pass
 
-                utils.write_log("--- Inicio de las diferencias ---")
-                for line in diff:
-                    utils.write_log(f"{line}")
-                utils.write_log("--- Fin de las diferencias ---")
-                
-                changes_needed = True
-        else:
-            utils.write_log("rclone.conf no encontrado localmente. Creando archivo...")
-            changes_needed = True
+        log_utils.write_log("rclone.conf actualizado (reemplazo directo) correctamente.")
 
-        # Escribir solo si se necesitan cambios
-        if changes_needed:
-            with open(rclone_conf_path, "wb") as f:
-                f.write(decrypted_content)
-                # --- NUEVA LÍNEA CLAVE ---
-                os.fsync(f.fileno()) 
-            utils.write_log("rclone.conf actualizado con éxito.")
-
-        # 2. Manejar archivos de servicio
+        # 4) Unidades de systemd
         services = [
             "rclone_tvshows_1.service",
             "rclone_tvshows_2.service",
             "rclone_videos_1.service",
             "rclone_videos_2.service",
-            "rclone_collection.service"
+            "zerotier.service",
         ]
-        
         systemd_dir = "/storage/.config/system.d/"
-        if not os.path.exists(systemd_dir):
-            os.makedirs(systemd_dir)
-            utils.write_log(f"Directorio creado: {systemd_dir}")
+        os.makedirs(systemd_dir, exist_ok=True)
 
         daemon_needs_reload = False
         for service in services:
             if handle_service_file(service, "https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/", systemd_dir):
                 daemon_needs_reload = True
-        
-        # 3. Recargar daemon si se realizaron cambios en los archivos de servicio
-        if daemon_needs_reload:
-            utils.write_log("Se detectaron cambios en los archivos de servicio. Recargando daemon de systemd...")
+
+        if daemon_needs_reload and _has_systemctl():
+            log_utils.write_log("Cambios en unidades detectados. Recargando daemon de systemd…")
             subprocess.call(["systemctl", "daemon-reload"])
-        
-        utils.write_log("Almacenamiento en la nube configurado exitosamente.")
+
+        # 5) Asegurar que los servicios estén activos
+        _ensure_services_active(services)
+
+        log_utils.write_log("Almacenamiento en la nube configurado/verificado exitosamente.")
+
     except FileNotFoundError as e:
-        utils.write_log(f"Error: {e}. Asegúrese de que la clave de cifrado existe.", level="ERROR")
+        log_utils.write_log(f"Error: {e}. Asegúrese de que la clave de cifrado existe.", "ERROR")
     except Exception as e:
-        utils.write_log(f"Error en start_cloud_storage: {e}\n{traceback.format_exc()}", level="ERROR")
+        log_utils.write_log(f"Error en start_cloud_storage: {e}\n{traceback.format_exc()}", "ERROR")
+    finally:
+        # 🧹 Limpieza de temporales
+        _cleanup_path(enc_tmp)
+        _cleanup_path(dec_tmp)

@@ -1,58 +1,147 @@
-import urllib.request
-import urllib.error
+# -*- coding: utf-8 -*-
+"""
+jsonrpc_utils.py — JSON-RPC interno (sin webserver)
+Todas las llamadas se hacen con xbmc.executeJSONRPC y parsing robusto.
+"""
+
 import json
-import traceback
 import time
-from . import utils
+import traceback
 
-# URL de la API de Kodi
-KODI_API_URL = "http://127.0.0.1:8080/jsonrpc"
+import xbmc
 
-def json_rpc_call(method, params=None, retries=5, timeout=5):
-    """Realiza una llamada a la API JSON-RPC de Kodi con lógica de reintento."""
-    headers = {'Content-Type': 'application/json'}
-    data = {'jsonrpc': '2.0', 'method': method, 'id': 1}
-    if params:
-        data['params'] = params
-    
-    data_encoded = json.dumps(data).encode('utf-8')
-    
-    for i in range(retries):
+from lib import log_utils
+
+_JSONRPC_VERSION = "2.0"
+
+def _exec(payload, retries=2, sleep_s=0.3):
+    """
+    Ejecuta una llamada JSON-RPC interna con reintentos.
+    Devuelve el dict parseado o lanza excepción si hay error.
+    """
+    last_err = None
+    req = json.dumps(payload)
+
+    for attempt in range(retries + 1):
         try:
-            req = urllib.request.Request(KODI_API_URL, data=data_encoded, headers=headers)
-            with urllib.request.urlopen(req, timeout=10) as response:
-                return json.loads(response.read().decode('utf-8'))
-        except urllib.error.URLError as e:
-            if i < retries - 1:
-                utils.write_log(f"Error en la llamada JSON-RPC: {e}. Reintentando en {timeout} segundos...", level="ERROR")
-                time.sleep(timeout)
-            else:
-                utils.write_log(f"Error en la llamada JSON-RPC: {e}", level="ERROR")
-                utils.write_log(traceback.format_exc(), level="ERROR")
-                return None
-        except Exception as e:
-            utils.write_log(f"Error inesperado en la llamada JSON-RPC: {e}", level="ERROR")
-            utils.write_log(traceback.format_exc(), level="ERROR")
-            return None
+            raw = xbmc.executeJSONRPC(req)
+            if not raw:
+                raise RuntimeError("Respuesta vacía de executeJSONRPC")
 
-def notify_kodi(title, message):
-    """Envía una notificación a Kodi."""
-    params = {
-        "title": title,
-        "message": message
-    }
-    json_rpc_call("GUI.ShowNotification", params)
+            try:
+                data = json.loads(raw)
+            except Exception as e:
+                raise RuntimeError(f"JSON inválido devuelto por executeJSONRPC: {e}\nRAW={raw!r}")
+
+            # Si JSON-RPC reporta error, lanzamos excepción
+            if data.get("error"):
+                err = data["error"]
+                raise RuntimeError(f"JSON-RPC error: code={err.get('code')} msg={err.get('message')} data={err.get('data')}")
+
+            return data
+
+        except Exception as e:
+            last_err = e
+            if attempt < retries:
+                time.sleep(sleep_s * (attempt + 1))
+
+    msg = f"Fallo JSON-RPC tras reintentos: {last_err}\n{traceback.format_exc()}"
+    log_utils.write_log(msg, level="ERROR")
+    raise RuntimeError(msg)
+
+
+def jsonrpc_call(method, params=None):
+    """
+    Llamada genérica. Devuelve:
+      - el valor de 'result' si existe,
+      - 'OK' si no hay 'result' pero tampoco error.
+    """
+    payload = {"jsonrpc": _JSONRPC_VERSION, "method": method, "id": 1}
+    if params is not None:
+        payload["params"] = params
+
+    data = _exec(payload)
+    return data.get("result", "OK")
+
+
+# ------------------------------
+# Helpers específicos
+# ------------------------------
 
 def get_setting(setting_id):
-    """Obtiene el valor de una configuración de Kodi."""
-    params = {"setting": setting_id}
-    response = json_rpc_call("Settings.GetSettingValue", params)
-    if response and 'result' in response:
-        return response['result']['value']
-    return None
+    """
+    Devuelve el valor del ajuste Kodi: Settings.GetSettingValue
+    """
+    try:
+        res = jsonrpc_call("Settings.GetSettingValue", {"setting": setting_id})
+        return res.get("value") if isinstance(res, dict) else None
+    except Exception as e:
+        log_utils.write_log(f"[JSON-RPC] GetSettingValue({setting_id}) falló: {e}", level="ERROR")
+        return None
+
 
 def set_setting(setting_id, value):
-    """Establece el valor de una configuración de Kodi."""
-    params = {"setting": setting_id, "value": value}
-    response = json_rpc_call("Settings.SetSettingValue", params)
-    return response and 'result' in response and response['result'] == 'OK'
+    """
+    Ajusta un setting: True si la llamada no arrojó error (independiente de 'OK').
+    """
+    try:
+        _ = jsonrpc_call("Settings.SetSettingValue", {"setting": setting_id, "value": value})
+        return True
+    except Exception as e:
+        log_utils.write_log(f"[JSON-RPC] SetSettingValue({setting_id}) falló: {e}", level="ERROR")
+        return False
+
+
+def set_addon_enabled(addon_id, enabled):
+    """
+    Habilita/deshabilita addon por JSON-RPC: True si no hubo error.
+    """
+    try:
+        _ = jsonrpc_call("Addons.SetAddonEnabled", {"addonid": addon_id, "enabled": enabled})
+        return True
+    except Exception as e:
+        log_utils.write_log(f"[JSON-RPC] SetAddonEnabled({addon_id},{enabled}) falló: {e}", level="ERROR")
+        return False
+
+
+def ping():
+    """
+    Comprueba disponibilidad de JSON-RPC interno.
+    """
+    try:
+        res = jsonrpc_call("JSONRPC.Ping")
+        # Respuesta típica: "pong"
+        return (isinstance(res, str) and res.lower() == "pong") or (isinstance(res, dict) and res.get("ping") == "pong")
+    except Exception:
+        return False
+
+
+def get_kodi_version():
+    """
+    Obtiene la versión de Kodi (name, major, minor, revision, tag).
+    Devuelve un dict o None en error.
+    """
+    try:
+        res = jsonrpc_call("Application.GetProperties", {"properties": ["version", "name"]})
+        if not res or "version" not in res:
+            log_utils.write_log("[JSON-RPC] No se pudo obtener la versión de Kodi", level="ERROR")
+            return None
+
+        version_info = res["version"]
+        name = res.get("name", "Kodi")
+        major = version_info.get("major")
+        minor = version_info.get("minor")
+        revision = version_info.get("revision")
+        tag = version_info.get("tag")
+
+        info = {
+            "name": name,
+            "major": major,
+            "minor": minor,
+            "revision": revision,
+            "tag": tag,
+        }
+        return info
+    except Exception as e:
+        log_utils.write_log(f"[JSON-RPC] get_kodi_version falló: {e}", level="ERROR")
+        return None

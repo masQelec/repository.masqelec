@@ -59,3 +59,43 @@ msgstr ""
 msgctxt "#30033"
 msgid "Update the PVR"
 msgstr ""
+
+msgctxt "#30040"
+msgid "Library settings"
+msgstr ""
+
+msgctxt "#30041"
+msgid "Update library at startup"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Update interval (hours)"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Clean library"
+msgstr ""
+
+msgctxt "#30044"
+msgid "Clean interval (hours)"
+msgstr ""
+
+msgctxt "#30060"
+msgid "PVR settings"
+msgstr ""
+
+msgctxt "#30061"
+msgid "Update PVR channels"
+msgstr ""
+
+msgctxt "#30062"
+msgid "Update interval (hours)"
+msgstr ""
+
+msgctxt "#30063"
+msgid "Disable other PVR clients"
+msgstr ""
+
+msgctxt "#30064"
+msgid "Disable conflicting service add-ons (service.*)"
+msgstr ""
