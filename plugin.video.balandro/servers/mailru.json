@@ -16,8 +16,16 @@
         "url": "https://my.mail.ru/video/embed/\\1"
       },
       {
+        "pattern": "my.mail.ru/(?:videos|video)/meta/(?!mail|inbox)([A-z0-9\\-]+)",
+        "url": "https://my.mail.ru/video/meta//\\1"
+      },
+      {
         "pattern": "mail.ru/(?:videos|video)/embed/(?!mail|inbox)([A-z0-9\\-]+)",
         "url": "https://mail.ru/video/embed/\\1"
+      },
+      {
+        "pattern": "mail.ru/(?:videos|video)/meta/(?!mail|inbox)([A-z0-9\\-]+)",
+        "url": "https://mail.ru/video/meta/\\1"
       }
     ]
   }

@@ -128,8 +128,7 @@ def pornstars(item):
         next_url = scrapertools.find_single_match(data, 'class="active">.*?<a href="(.*?)"')
 
         if next_url:
-            itemlist.append(item.clone( title = 'Siguientes ...', action = 'pornstars', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
-                                        text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', action = 'pornstars', url = next_url if next_url.startswith('http') else host[:-1] + next_url, text_color = 'coral' ))
 
     return itemlist
 

@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://cv5w.gnula.cc/'
+host = 'https://wc3v.gnula.cc/'
 
 
 # ~ por si viene de enlaces guardados
@@ -16,7 +16,7 @@ ant_hosts = ['https://ww3.gnula2h.cc/', 'https://www11.gnula.cc/', 'https://w-ww
              'https://wv5n.gnula.cc/', 'https://wv5h.gnula.cc/', 'https://wv5l.gnula.cc/',
              'https://w-v5n.gnula.cc/', 'https://wv-5n.gnula.cc/', 'https://kv5n.gnula.cc/',
              'https://wv5c.gnula.cc/', 'https://w5nl.gnula.cc/', 'https://w5nv.gnula.cc/',
-             'https://w5cv.gnula.cc/']
+             'https://w5cv.gnula.cc/', 'https://cv5w.gnula.cc/']
 
 
 domain = config.get_setting('dominio', 'gnula24h', default='')
@@ -478,6 +478,13 @@ def episodios(item):
         epis = scrapertools.find_single_match(temp_epis, ".*?-(.*?)$").strip()
 
         titulo = str(item.contentSeason) + 'x' + epis + ' ' + title
+
+        if 'episodie' in titulo.lower() or 'episodio' in titulo.lower() or 'capítulo' in titulo.lower() or 'capitulo' in titulo.lower():
+            titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, languages = ', '.join(langs),
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))

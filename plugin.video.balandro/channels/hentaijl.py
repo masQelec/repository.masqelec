@@ -180,6 +180,8 @@ def findvideos(item):
         if '/powvideo.' in url: continue
         elif '/streamplay.' in url or '/stre4mplay.' in url: continue
 
+        elif '/anime.' in url: continue
+
         url = url.replace('/Smoothpre.', '/smoothpre.')
 
         servidor = servertools.get_server_from_url(url)

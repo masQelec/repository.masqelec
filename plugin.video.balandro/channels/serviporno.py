@@ -129,12 +129,11 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
-    patron  = '(?s)<div class="wrap-box-escena">.*?'
-    patron += '<div class="box-escena">.*?'
-    patron += '<a href="([^"]+)".*?'
-    patron += 'src="([^"]+.jpg)".*?'
-    patron += '<h4><a href="[^"]+">([^<]+)</a></h4>.*?'
-    patron += '<div class="duracion">([^"]+) min</div>'
+    patron  = '<div class="wrap-box-escena.*?'
+    patron += '<a\s+href="([^"]+)".*?'
+    patron += '"([^"]+.jpg)".*?'
+    patron += 'alt="([^"]+)".*?'
+    patron += '<div class="duracion">([^"]+) min<'
 
     matches = re.compile(patron,re.DOTALL).findall(data)
 

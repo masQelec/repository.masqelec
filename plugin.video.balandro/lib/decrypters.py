@@ -249,6 +249,7 @@ def sorted_urls(url, url_base64, host_torrent):
 
     sortened_domains = {
             'acortalink.me': ['linkser=uggcf%3A%2F%2Flrfgbeerag.arg', "TTTOzBmk\s*=\s*'(.*?)'", 14, 8, False],
+            'acortalink.net': ['linkser=uggcf%3A%2F%2Flrfgbeerag.arg', "TTTOzBmk\s*=\s*'(.*?)'", 14, 8, False],
             'acortaenlace.com': ['linkser=uggcf%3A%2F%2Fzntargcryvf.pbz', "TTTOzBmk\s*=\s*'(.*?)'", 14, 8, False],
             'acorta-enlace.com': ['linkser=ngbzgg.pbz', "TTTOzBmk\s*=\s*'(.*?)'", 14, 8, False],
             'short-link.one': ['linkser=uggcf%3A%2F%2Fpvargbeerag.pb', "TTTOzBmk\s*=\s*'(.*?)'", 14, 8, False],

@@ -368,8 +368,16 @@ def manto_proxies(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales de este tipo[/B][/COLOR]' % color_adver)
         return
 
+    if not config.get_setting('channels_proxies_memorized', default=''):
+        platformtools.dialog_notification(config.__addon_name + ' [COLOR red][B]Proxies[/B][/COLOR]', '[B][COLOR cyan]Nada que Limpiar[/B][/COLOR]')
+        return
+
+    i = 0
+
     if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar los Proxies memorizados en Todos los canales que los tengan?[/B][/COLOR]'):
        for ch in ch_list:
+           platformtools.dialog_notification(config.__addon_name, '[B][COLOR gold]Analizando Canales[/B][/COLOR]')
+
            if not 'proxies' in ch['notes'].lower(): continue
 
            # por NAME anteriores a 2.0
@@ -394,12 +402,19 @@ def manto_proxies(item):
                    if not config.get_setting(cfg_proxytools_provider, default=''):
                        continue
 
+           i += 1
+
            if config.get_setting(cfg_proxies_channel, default=''): config.set_setting(cfg_proxies_channel, '')
            if config.get_setting(cfg_proxytools_max_channel, default=''): config.set_setting(cfg_proxytools_max_channel, '')
            if config.get_setting(cfg_proxytools_provider, default=''): config.set_setting(cfg_proxytools_provider, '')
 
        config.set_setting('channels_proxies_memorized', '')
 
+       if item.clean:
+           if i == 0:
+               platformtools.dialog_notification(config.__addon_name + ' [COLOR red][B]Proxies[/B][/COLOR]', '[B][COLOR cyan]Nada que Limpiar[/B][/COLOR]')
+               return
+			   
        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Proxies eliminados[/B][/COLOR]' % color_infor)
 
 
@@ -462,11 +477,6 @@ def manto_params(item):
         config.set_setting('channel_pelisplushdnz_dominio', '')
 
         config.set_setting('channel_pgratishd_dominio', '')
-
-        config.set_setting('channel_playdede_dominio', '')
-        config.set_setting('channel_playdede_playdede_login', False)
-        config.set_setting('channel_playdede_playdede_password', '')
-        config.set_setting('channel_playdede_playdede_username', '')
 
         config.set_setting('channel_poseidonhd2_dominio', '')
 
@@ -551,7 +561,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '139.0.7258.139')  # ~ 20/8/25
+        config.set_setting('chrome_last_version', '141.0.7390.123')  # ~ 22/10/25
 
         config.set_setting('debug', '0')
 
@@ -1624,10 +1634,6 @@ def opciones_pgratishd(item):
     item.from_channel = 'pgratishd'
     opciones_domains_common(item)
 
-def opciones_playdede(item):
-    item.from_channel = 'playdede'
-    opciones_domains_common(item)
-
 def opciones_poseidonhd2(item):
     item.from_channel = 'poseidonhd2'
     opciones_domains_common(item)
@@ -1790,8 +1796,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'pgratishd': domains.manto_domain_pgratishd(item)
 
-            elif item.from_channel == 'playdede': domains.manto_domain_playdede(item)
-
             elif item.from_channel == 'poseidonhd2': domains.manto_domain_poseidonhd2(item)
 
             elif item.from_channel == 'series24': domains.manto_domain_series24(item)
@@ -1886,8 +1890,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'pgratishd': domains.test_domain_pgratishd(item)
 
-            elif item.from_channel == 'playdede': domains.test_domain_playdede(item)
-
             elif item.from_channel == 'poseidonhd2': domains.test_domain_poseidonhd2(item)
 
             elif item.from_channel == 'series24': domains.test_domain_series24(item)
@@ -1937,8 +1939,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'pelisforte': helper.show_help_pelisforte(item)
 
             elif item.from_channel == 'pgratishd': helper.show_help_(pgratishditem)
-
-            elif item.from_channel == 'playdede': helper.show_help_playdede(item)
 
             elif item.from_channel == 'seriespapayato': helper.show_help_seriespapayato(item)
 

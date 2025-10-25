@@ -13,5 +13,5 @@
 
   "clusters": ["adults", "dorama", "anime", "years", "countries", "languages", "vos"],
 
-  "notes": "Películas por géneros y año. Series por Géneros."
+  "notes": "Películas por géneros. Series por Géneros."
 }

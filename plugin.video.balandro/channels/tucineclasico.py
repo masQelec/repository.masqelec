@@ -22,12 +22,14 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone ( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/?get=movies' ))
+    itemlist.append(item.clone ( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/' ))
 
-    itemlist.append(item.clone ( title = 'Más vistas', action = 'list_all', url = host + 'tendencias/?get=movies' ))
-    itemlist.append(item.clone ( title = 'Más valoradas', action = 'list_all', url = host + '22-2/?get=movies' ))
+    itemlist.append(item.clone ( title = 'Más vistas', action = 'list_all', url = host + 'tendencias/' ))
+    itemlist.append(item.clone ( title = 'Más valoradas', action = 'list_all', url = host + '22-2/' ))
 
-    itemlist.append(item.clone ( title = 'Subtitulado', action = 'list_all', url = host + 'genero/version-original-subtitulada/?get=movies', text_color = 'moccasin' ))
+    itemlist.append(item.clone ( title = 'Siglo XXI', action = 'list_all', url = host + 'genero/clasicos-del-siglo-xxi/', group = 'XXI' ))
+
+    itemlist.append(item.clone ( title = 'Subtituladas', action = 'list_all', url = host + 'genero/version-original-subtitulada/', group = 'VOS', text_color = 'moccasin' ))
 
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone ( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -46,6 +48,7 @@ def generos(item):
     matches = scrapertools.find_multiple_matches(bloque, '<a href="([^"]+)"[^>]*>([^<]+)')
     for url, title in matches:
         if 'genero/version-original-subtitulada' in url: continue
+        elif 'genero/clasicos-del-siglo-xxi/' in url: continue
 
         itemlist.append(item.clone( action='list_all', title=title, url=url, text_color = 'deepskyblue' ))
 
@@ -64,8 +67,8 @@ def anios(item):
     for url, title in matches:
         itemlist.append(item.clone( action='list_all', title=title, url=url, text_color = 'deepskyblue' ))
 
-    for ano in range(1948, 1921, -1):
-        itemlist.append(item.clone( action = 'list_all', title = str(ano), url = host + 'lanzamiento/' + str(ano) + '/', text_color = 'deepskyblue' ))
+    for anyo in range(1948, 1921, -1):
+        itemlist.append(item.clone( action = 'list_all', title = str(anyo), url = host + 'lanzamiento/' + str(anyo) + '/', text_color = 'deepskyblue' ))
 
     return sorted(itemlist, key = lambda it: it.title, reverse=True)
 
@@ -85,6 +88,9 @@ def list_all(item):
     elif '/lanzamiento/' in item.url:
         if '>Mas Populares</h2>' in data: data = data.split('>Mas Populares</h2>')[0] # descartar mas populares
 
+    elif item.group:
+        if '>Mas Populares</h2>' in data: data = data.split('>Mas Populares</h2>')[0] # descartar mas populares
+
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
 
     num_matches = len(matches)
@@ -96,7 +102,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#8230;', '')
+        title = title.replace('&#8230;', '').replace('&#038;', '&')
 
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
         year = scrapertools.find_single_match(article, '<span>(\d{4})</span>')
@@ -199,9 +205,14 @@ def list_search(item):
 
     for article in matches[item.page * perpage:]:
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
-        thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
+
         title = scrapertools.find_single_match(article, ' alt="([^"]+)"')
+
         if not url or not title: continue
+
+        title = title.replace('&#8230;', '').replace('&#038;', '&')
+
+        thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
 
         year = scrapertools.find_single_match(article, '<span class="year">(\d+)</span>')
         if not year: year = scrapertools.find_single_match(article, '<span>(\d{4})</span>')
@@ -215,7 +226,8 @@ def list_search(item):
         if 'img/flags/mx.png' in article: langs.append('Lat')
         if 'img/flags/en.png' in article: langs.append('Vose')
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages = ', '.join(langs), contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot} ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages = ', '.join(langs),
+                                    contentType='movie', contentTitle=title, infoLabels={'year': year, 'plot': plot} ))
 
         if len(itemlist) >= perpage: break
 

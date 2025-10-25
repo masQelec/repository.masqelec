@@ -4,9 +4,11 @@ import sys
 
 if sys.version_info[0] < 3:
     import urlparse
+
     PY3 = False
 else:
     import urllib.parse as urlparse
+
     PY3 = True
 
 
@@ -56,15 +58,17 @@ def categorias(item):
 
         if title == 'Navegación': continue
 
+        url = url.replace('>Indice</a></li>', '').replace('>TODO</a></li>', '').strip()
+
         patron = 'data-toggle="dropdown">%s.*?<b(.*?)</ul>' % title
 
         bloque = scrapertools.find_single_match(data, patron)
 
         subcats = scrapertools.find_multiple_matches(bloque, '<li><a href=".*?>(.*?)</a>')
 
-        url = host[:-1] + url
+        url =  host[:-1] + url
 
-        itemlist.append(item.clone( action='subcategorias', title = title, url = host + url, subcats = subcats, plot=', '.join(subcats), text_color='cyan' ))
+        itemlist.append(item.clone( action='subcategorias', title = title, url = url, subcats = subcats, plot=', '.join(subcats), text_color='cyan' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -74,12 +78,18 @@ def subcategorias(item):
     itemlist = []
 
     if item.subcats:
-        itemlist.append(item.clone( action='list_all', title='Todo ' + item.title, url=item.url ))
+        titulo = item.title.replace('[COLOR cyan]','').replace('[/COLOR]','').strip()
+
+        url = host + 'categoria/' + titulo + '/'
+
+        itemlist.append(item.clone( action='list_all', title=titulo, url = url, text_color='cyan' ))
 
     for subcat in item.subcats:
         if subcat == 'TODO': continue
 
-        itemlist.append(item.clone( action = 'list_all', title = subcat, url = host + 'resultados.php?genero=&buscar=' + subcat.replace(' ', '+') ))
+        url = host + 'resultados.php?genero=&buscar=' + subcat.replace(' ', '+')
+
+        itemlist.append(item.clone( action = 'list_all', title = subcat, url = url, text_color='dodgerblue' ))
 
     return itemlist
 
@@ -103,6 +113,7 @@ def list_all(item):
 
         if 'player.php' not in url:
             titulo = '%s [COLOR gray](%s)[/COLOR]' % (title, year)
+
             itemlist.append(item.clone( action='list_all', url = url, title = titulo, thumbnail=thumb, infoLabels={"year": year, "plot": plot} ))
         else:
             itemlist.append(item.clone( action='findvideos', url= host + url, title = title, thumbnail = thumb,
@@ -134,22 +145,25 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(bloque, 'file:\s*"([^"]+).*?label:\s*"([^"]+)"')
 
-    ses = 0
+    i = 0
 
     for _url, qlty in matches:
-        ses += 1
+        i += 1
 
         url = httptools.get_url_headers(urlparse.urljoin(host, _url))
 
         for _url_sub, lng in subs:
             url_sub = urlparse.urljoin(host, urlparse.quote(_url_sub))
 
-            lng = 'Sub ' + lng
+            if lng == 'Español': lng = 'Vose'
+            elif lng == 'Inglés': lng = 'Vos'
+            else: lng = 'Sub ' + lng
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server='directo', title = '', url=url, ref=item.url, language=lng, quality=qlty, subtitle=url_sub ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server='directo', title = '', url=url,
+                                  ref=item.url, language=lng, quality=qlty, subtitle=url_sub ))
 
     if not itemlist:
-        if not ses == 0:
+        if not i == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
 

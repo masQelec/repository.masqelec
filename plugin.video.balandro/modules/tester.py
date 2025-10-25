@@ -129,29 +129,24 @@ timeout = config.get_setting('httptools_timeout', default=15)
 espera = config.get_setting('servers_waiting', default=6)
 
 dominioshdfull = [
-         'https://hdfull.blog/',
          'https://hdfull.today/',
-         'https://hd-full.biz/',
-         'https://hdfull.sbs/',
          'https://hdfull.help/',
          'https://hdfull.love/',
+         'https://hd-full.biz/',
 
+         'https://www2.hdfull.one/',
          'https://hdfull.cv/',
          'https://hdfull.monster/',
          'https://hdfull.cfd/',
          'https://hdfull.tel/',
          'https://hdfull.buzz/',
+         'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
 
          'https://new.hdfull.one/'
          ]
 
-dominiosplaydede = [
-         'https://www12.playdede.link/',
-         'https://playdede.club/',
-         'https://playdede.in/'
-         ]
 
 channels_poe = [
         ['gdrive', 'https://drive.google.com/drive/']
@@ -577,9 +572,13 @@ def test_channel(channel_name):
             elif channel_id == 'homecine': txt_clons = 'PelisPediaIs, SeriesMetroN'
 
             elif channel_id == 'elitetorrent': txt_clons = 'EliteTorrentNz'
+            elif channel_id == 'entrepeliculasyseries': txt_clons = 'PelisGratisHd'
+
             elif channel_id == 'gnula24': txt_clons = 'Gnula24h, Series24, SeriesPlus'
 
             elif channel_id == 'joinclub': txt_clons = 'VerSeries'
+            elif channel_id == 'mundodonghua': txt_clons = 'MundoDonghua'
+            elif channel_id == 'serieskao': txt_clons = 'PelisPlusHdNz'
 
             elif channel_id == 'veronline': txt_clons = 'OnlineTv, SeriesEs, SeriesOnline, Star, VerFlix'
 
@@ -597,17 +596,22 @@ def test_channel(channel_name):
             elif channel_id == 'dpeliculas': txt_clones = 'DeTodo'
             elif channel_id == 'elitedivx': txt_clones = 'DonTorrents'
             elif channel_id == 'elitetorrentnz': txt_clones = 'EliteTorrent'
+            elif channel_id == 'entrepeliculasyseries': txt_clones = 'PelisGratisHd'
             elif channel_id == 'gnula24h': txt_clones = 'Gnula24'
             elif channel_id == 'joinclub': txt_clones = 'VerSeries'
             elif channel_id == 'lilatorrent': txt_clones = 'DonTorrents'
             elif channel_id == 'mejortorrentapp': txt_clones = 'DonTorrents'
+            elif channel_id == 'mundodonghuaxyz': txt_clones = 'MundoDonghua'
             elif channel_id == 'naranjatorrent': txt_clones = 'DonTorrents'
             elif channel_id == 'onlinetv': txt_clones = 'VerOnline'
+            elif channel_id == 'pelisgratishd': txt_clones = 'EntrePeliculasySeries'
             elif channel_id == 'pelispediais': txt_clones = 'HomeCine'
+            elif channel_id == 'pelisplushdnz': txt_clones = 'SeriesKao'
             elif channel_id == 'reinventorrent': txt_clones = 'DonTorrents'
             elif channel_id == 'rojotorrent': txt_clones = 'DonTorrents'
             elif channel_id == 'series24': txt_clones = 'Gnula24'
             elif channel_id == 'serieses': txt_clones = 'VerOnline'
+            elif channel_id == 'serieskao': txt_clones = 'PelisPlusHdNz'
             elif channel_id == 'seriesmetron': txt_clones = 'HomeCine'
             elif channel_id == 'seriesonline': txt_clones = 'VerOnline'
             elif channel_id == 'star': txt_clones = 'VerOnline'
@@ -847,34 +851,6 @@ def test_channel(channel_name):
                         if not host.endswith('/'): host = host + '/'
                   except:
                      host = dominioshdfull[0]
-
-              elif channel_id == 'playdede':
-                  if not host: host = dominiosplaydede[0]
-
-                  try:
-                      data_dom = httptools.downloadpage('https://privacidad.me/@playdede/').data
-
-                      bloque = scrapertools.find_single_match(data_dom, '<strong>ENTRARPLAYDEDE.COM<(.*?)<script>')
-
-                      operative_domains = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
-
-                      if not operative_domains: host = dominiosplaydede[0]
-                      else:
-                         for operative_domain in operative_domains:
-                             operative_domain = operative_domain.lower().strip()
-
-                             if not 'playdede.' in operative_domain: continue
-
-                             if not 'https' in operative_domain: operative_domain = 'https://' + operative_domain
-                             if not operative_domain.endswith('/'): operative_domain = operative_domain + '/'
-
-                             if operative_domain in str(dominiosplaydede):
-                                 if host == operative_domain:
-                                     break
-
-                                 host = operative_domain
-                  except:
-                      host = dominiosplaydede[0]
 
           if not host:
               part_py = 'def mainlist'
@@ -1461,7 +1437,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                 txt += '[CR]nuevo: [COLOR springgreen][B]' + new_web + '[/B][/COLOR]'
 
-                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'xxx/' or new_web == host + 'adult/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or (host + 'portal002') in new_web or (host + 'fvh56') in new_web or (host + 'es/inicio') in new_web or (host + 'pro') in new_web or '/es' in new_web or (host + '?') in new_web:
+                if new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'xxx/' or new_web == host + 'adult/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'login' or new_web == host + 'home/' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or (host + 'portal') in new_web or (host + 'portal002') in new_web or (host + 'fvh56') in new_web or (host + 'es/inicio') in new_web or (host + 'pro') in new_web or '/es' in new_web or '/hub' in new_web or (host + '?') in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 
@@ -1575,7 +1551,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                         txt += "[CR]comprobar: [COLOR limegreen][B]Podría estar Correcto ó quizás ser un Nuevo Dominio (verificar la Web vía internet)[/B][/COLOR]"
 
-                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'xxx/' or new_web == host + 'adult/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or (host + 'portal002') in new_web or (host + 'fvh56') in new_web or host + 'es/inicio' in new_web or (host + 'pro') in new_web or '/es' in new_web or (host + '?') in new_web:
+                elif new_web == host + 'inicio/' or new_web == host + 'principal/' or new_web == host + 'principal-b/' or new_web == host + 'xxx/' or new_web == host + 'adult/' or new_web == host + 'nino' or new_web == host + '/es/' or new_web == host + '/login' or new_web == host + 'login' or new_web == host + 'home/' or new_web == host + 'home' or new_web == '/home' or new_web == host + 'novelas02' or new_web == host + 'zerotwo' or new_web == '/zerotwo' or new_web == host + 'bocchi' or new_web == '/bocchi' or new_web == host + 'inicio' or new_web == host + 'hdpa' or new_web == host + 'novelaturca/' or (host + 'tv') in new_web or (host + 'hg') in new_web or (host + 'novelas') in new_web or (host + 'ennovelas') in new_web or (host + 'ennovelass') in new_web or (host + 'portal') in new_web or (host + 'portal002') in new_web or (host + 'fvh56') in new_web or host + 'es/inicio' in new_web or (host + 'pro') in new_web or '/es' in new_web or '/hub' in new_web or (host + '?') in new_web:
                     if 'Diagnosis:' in txt:
                         if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR]'
 

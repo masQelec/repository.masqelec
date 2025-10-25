@@ -5,6 +5,7 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
+
 import re, xbmcgui
 
 from platformcode import config, logger, platformtools, dynamic
@@ -650,11 +651,12 @@ def mainlist_pelis(item):
         itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'peliculas?orderBy=score', slug = 'peliculas',
                                     nro_pagina = 1, order = '?orderBy=score', search_type = 'movie' ))
 
+        itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', slug = 'peliculas', nro_pagina = 1, search_type = 'movie' ))
+        itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', slug = 'peliculas', nro_pagina = 1, search_type = 'movie' ))
+
         itemlist.append(item.clone( title = 'Por género', action = 'generos', slug = 'peliculas', nro_pagina = 1, search_type = 'movie' ))
         itemlist.append(item.clone( title = 'Por año', action = 'anios', slug = 'peliculas', nro_pagina = 1, search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', slug = 'peliculas', nro_pagina = 1, search_type = 'movie' ))
-        itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', slug = 'peliculas', nro_pagina = 1, search_type = 'movie' ))
         itemlist.append(item.clone( title = 'Por país', action = 'paises', slug = 'peliculas', nro_pagina = 1, search_type = 'movie' ))
 
     return itemlist
@@ -701,11 +703,12 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = 'Por plataforma', action= 'plataformas', slug = 'series', nro_pagina = 1, search_type='tvshow', text_color = 'moccasin' ))
 
+        itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
+
         itemlist.append(item.clone( title = 'Por género', action = 'generos', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
         itemlist.append(item.clone( title = 'Por año', action = 'anios', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
-        itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
         itemlist.append(item.clone( title = 'Por país', action = 'paises', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
 
     return itemlist
@@ -742,11 +745,12 @@ def mainlist_animes(item):
 
         itemlist.append(item.clone( title = 'Por plataforma', action= 'plataformas', group = 'anime', slug = 'animes', nro_pagina = 1, search_type='tvshow', text_color = 'moccasin' ))
 
+        itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', group = 'anime', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', group = 'anime', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
+
         itemlist.append(item.clone( title = 'Por género', action = 'generos', group = 'anime', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
         itemlist.append(item.clone( title = 'Por año', action = 'anios', group = 'anime', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', group = 'anime', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
-        itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', group = 'anime', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
         itemlist.append(item.clone( title = 'Por país', action = 'paises', group = 'anime', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
 
     return itemlist
@@ -1499,6 +1503,9 @@ def temporadas(item):
     for tempo in matches:
         title = 'Temporada ' + tempo
 
+        if tempo == '0' or '- Especiales' in title:
+            if config.get_setting('channels_especiales', default=True): continue
+
         if len(matches) == 1:
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
@@ -1601,6 +1608,10 @@ def episodios(item):
         season = int(s_e.split("x")[0])
         episode = s_e.split("x")[1]
 
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
         title = str(season) + 'x' + str(episode) + ' ' + titulo
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
@@ -1618,7 +1629,7 @@ def episodios(item):
 
 
 def puntuar_calidad(txt):
-    orden = ['CAM', 'cam', 'DVDRIP', 'dvdrip', 'HD720', 'hd720', 'HD1080', 'hd1080', '4K', '4k']
+    orden = ['CAM', 'cam', 'TS', 'ts', 'DVDSCR', 'dvdscr', 'DVDRIP', 'dvdrip', 'HDTV', 'hdtv', 'RHDTV', 'rhdtv', 'HD720', 'hd720', 'HD1080', 'hd1080', '4K', '4k']
     if txt not in orden: return 0
 
     else: return orden.index(txt) + 1

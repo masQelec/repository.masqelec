@@ -73,6 +73,13 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
+    itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='tan' ))
+
+    itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', search_type = 'person',
+                                plot = 'Indicar el nombre y/ó apellido/s del intérprete.'))
+    itemlist.append(item.clone( title = ' - Buscar dirección ...', action = 'search', search_type = 'person',
+                                plot = 'Indicars el nombre y/ó apellido/s del director.'))
+
     return itemlist
 
 

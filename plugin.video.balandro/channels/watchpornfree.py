@@ -57,12 +57,23 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Parodias', action = 'list_all', url = host + 'category/parodies/', text_color = 'pink' ))
 
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host, text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'pelis', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Por canal', action = 'categorias', url = host, group = 'estudios' ))
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host, group = 'categorias'))
 
     itemlist.append(item.clone( title = 'Por año', action = 'anios', url = host))
+
+    return itemlist
+
+
+def pelis(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'Películas catálogo', action = 'list_all', url = host ))
+    itemlist.append(item.clone( title = 'Películas más vistas', action = 'list_all', url = host + '?v_sortby=views' ))
+    itemlist.append(item.clone( title = 'Películas más valoradas', action = 'list_all', url = host + '?r_sortby=highest_rated' ))
 
     return itemlist
 
@@ -117,13 +128,15 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
-    patron = '<article class="TPost B">.*?<a href="(.*?)">.*?data-lazy-src="(.*?)".*?<div class="Title">(.*?)</div>'
+    patron = '<article.*?<a href="(.*?)".*?src="(.*?)".*?<div class="Title">(.*?)</div>.*?</article>'
 
     matches = re.compile(patron,re.DOTALL).findall(data)
 
     num_matches = len(matches)
 
     for url, thumb, title in matches[item.page * perpage:]:
+        title = title.replace('&amp;', '').strip()
+
         itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
 
         if len(itemlist) >= perpage: break

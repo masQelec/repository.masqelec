@@ -42,11 +42,11 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Especiales', action = 'list_all', url = host + '/directorio?type[]=3', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Ova', action = 'list_all', url = host + '/directorio?type[]=2', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + '/directorio?type[]=2', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'TV series', action = 'list_all', url = host + '/directorio?type[]=0&status=2', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + '/directorio?type[]=1', search_type = 'movie', text_color = 'deepskyblue' ))
-
-    itemlist.append(item.clone( title = 'Tv', action = 'list_all', url = host + '/directorio?type[]=0&status=2', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos',  search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
@@ -251,7 +251,14 @@ def episodios(item):
         url =  host + '/ver/' + '%s-%s' % (info[1], epi)
 
         if item.contentSerieName:
-            titulo = str(item.contentSeason) + 'x' + str(epi) + ' ' + item.contentSerieName
+            num_season = item.contentSeason
+
+            try:
+                num_season = int(item.contentSeason)
+            except:
+                num_season = 1
+
+            titulo = str(num_season) + 'x' + str(epi) + ' ' + item.contentSerieName
             season = item.contentSeason
         else:
             titulo = item.title

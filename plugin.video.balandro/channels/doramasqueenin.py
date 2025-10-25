@@ -1,10 +1,13 @@
 ﻿# -*- coding: utf-8 -*-
 
-import re
+import re, base64
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
+
+
+# ~ 17/10/25 las Pelis no se tratan solo hay 6
 
 
 host = 'https://doramasqueen.in/'
@@ -27,7 +30,7 @@ def mainlist_series(item):
     itemlist.append(item.clone ( title = 'Buscar dorama ...', action = 'search', search_type = 'tvshow', text_color = 'firebrick' ))
 
     itemlist.append(item.clone ( title = 'Catálogo', action = 'list_all', url = host + 'temporadas/?status=&type=&order=update', search_type = 'tvshow' ))
-
+                                                                                        
     itemlist.append(item.clone ( title = 'Últimos episodios', action = 'list_all', url = host , group = 'last', search_type = 'tvshow', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
@@ -72,7 +75,7 @@ def paises(item):
     for value, title in matches:
         url = host + 'temporadas/?country[]=' + value + '&status=&type=&order='
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color = 'moccasin' ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color = 'firebrick' ))
 
     return itemlist
 
@@ -122,7 +125,7 @@ def alfabetico(item):
 
         url = host + 'a-z-dorama-list/?show=' + letra.lower()
 
-        itemlist.append(item.clone( title = letra, action = 'list_all', url = url, text_color='firebrick' ))
+        itemlist.append(item.clone( title = letra, action = 'list_all', url = url, text_color = 'firebrick' ))
 
     return itemlist
 
@@ -174,16 +177,19 @@ def list_all(item):
 
             if '-capitulo-' in url:
                 itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentSerieName=SerieName,
-                                            contentType = 'episode', contentSeason = season, contentEpisodeNumber=episode, infoLabels={'year': year} ))
+                                            contentType = 'episode', contentSeason=season, contentEpisodeNumber=episode, infoLabels={'year': year} ))
             else:
                 itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
-                                            contentSerieName=SerieName, contentType='tvshow', infoLabels={'year': year} ))
+                                            contentSerieName=SerieName, contentType='tvshow', contentSeason=season, infoLabels={'year': year} ))
 
         else:
             title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
+            season = scrapertools.find_single_match(url, '-season-(.*?)-')
+            if not season: season = 1
+
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
-                                        contentSerieName=SerieName, contentType='tvshow', infoLabels={'year': year} ))
+                                        contentSerieName=SerieName, contentType='tvshow', contentSeason=season, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -218,7 +224,6 @@ def temporadas(item):
 
     item.page = 0
     item.contentType = 'season'
-    item.contentSeason = 1
     itemlist = episodios(item)
     return itemlist
 
@@ -346,6 +351,19 @@ def findvideos(item):
 
             if url.startswith("//"): url = 'https:' + url
 
+            if '<div><div style=' in url:
+                new_url = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
+
+                if new_url:
+                    if new_url.startswith("//"): new_url = 'https:' + new_url
+
+                    if '/iframely.' in new_url:
+                        data1 = do_downloadpage(new_url)
+
+                        new_url = scrapertools.find_single_match(data1, '<meta name="canonical" content="(.*?)"')
+
+                        if new_url: url = new_url
+
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
 
@@ -363,9 +381,11 @@ def findvideos(item):
             if servidor == 'directo':
                 if not 'http' in url: continue
 
-                if not config.get_setting('developer_mode', default=False): continue
-                other = url.split("/")[2]
-                other = other.replace('https:', '').strip()
+                if '/fkplayer.' in url: other = 'Fkplayer'
+                else:
+                    if not config.get_setting('developer_mode', default=False): continue
+                    other = url.split("/")[2]
+                    other = other.replace('https:', '').replace('.com', '').replace('.xyz', '').strip()
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vose', other = other ))
 
@@ -376,6 +396,46 @@ def findvideos(item):
 
     return itemlist
 
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    servidor = item.server
+
+    if '/fkplayer.' in url:
+        _token = scrapertools.find_single_match(url, "/e/(.*?)$")
+
+        if _token:
+            headers = {'Referer': url}
+            post = {'token': _token}
+
+            data = do_downloadpage('https://fkplayer.xyz/api/decoding', post=post, headers=headers)
+
+            link = scrapertools.find_single_match(data, '"link":"(.*?)"')
+
+            if not link: return itemlist
+
+            new_url = base64.b64decode(link).decode("utf-8")
+
+            if new_url:
+                servidor = servertools.get_server_from_url(new_url)
+                servidor = servertools.corregir_servidor(servidor)
+
+                url = new_url
+
+    if url:
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
+
+        itemlist.append(item.clone(url = url, server = servidor))
+
+    return itemlist
 
 def search(item, texto):
     logger.info()

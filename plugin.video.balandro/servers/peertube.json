@@ -26,6 +26,10 @@
       {
         "pattern": "peertube.uno/videos/(?:watch|embed)/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})",
         "url": "\\1/videos/watch/\\2"
+      },
+      {
+        "pattern": "peertube.uno/videos/(?:watch|embed)/([A-z0-9-]+)",
+        "url": "https://peertube.uno/videos/watch/\\1"
       }
     ]
   }

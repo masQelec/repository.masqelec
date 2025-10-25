@@ -314,7 +314,7 @@ def list_all(item):
         if '/Mexico.png' in article: langs.append('Lat')
         if '/United-States-Minor-Outlying.png' in article: langs.append('Vose')
 
-        tipo = 'tvshow' if '/series/' in url else 'movie'
+        tipo = 'tvshow' if '/series/' in url or '/episodes/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'movie':

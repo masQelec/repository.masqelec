@@ -17,7 +17,7 @@ def mainlist(item):
 
     itemlist.append(item.clone( action='show_help', title='[COLOR green][B]Información [COLOR violet]TMDB[/B][/COLOR]', folder=False, thumbnail=config.get_thumb('news') ))
 
-    itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Personas[/COLOR]:[/B]', text_color='yellowgreen', plot = '' ))
+    itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Personas[/COLOR]:[/B]', text_color='yellowgreen' ))
 
     itemlist.append(item.clone( action='personas', search_type='cast', title=' - Buscar [COLOR aquamarine]intérprete[/COLOR] ...', thumbnail=config.get_thumb('search'), plot = 'Indicar el nombre de un actor o una actriz para listar todas las películas y series en las que ha intervenido.' ))
 
@@ -25,7 +25,7 @@ def mainlist(item):
 
     itemlist.append(item.clone( action='listado_personas', search_type='person', extra = 'popular', title=' - [COLOR limegreen]Más populares[/COLOR]', thumbnail=config.get_thumb('search'), plot = 'Lista de las personas más populares' ))
 
-    itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Listas[/COLOR]:[/B]', text_color='yellowgreen', plot = '' ))
+    itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Listas[/COLOR]:[/B]', text_color='yellowgreen' ))
 
     if not config.get_setting('mnu_simple', default=False):
         if config.get_setting('mnu_pelis', default=True):
@@ -41,7 +41,7 @@ def mainlist(item):
        if item.search_type == 'movie': presentar = False
 
     if presentar:
-        itemlist.append(item.clone( title = '[B]Películas:[/B]', action = '', text_color='deepskyblue', plot = '' ))
+        itemlist.append(item.clone( title = '[B]Películas:[/B]', action = '', text_color='deepskyblue' ))
 
         if config.get_setting('search_extra_trailers', default=False):
             itemlist.append(item.clone( channel='trailers', action='search', title=' - Buscar en [COLOR darkgoldenrod]Tráilers[/COLOR] ...', thumbnail=config.get_thumb('trailers'), plot = 'Indicar el título de una película para buscar su tráiler' ))
@@ -63,7 +63,7 @@ def mainlist(item):
        if item.search_type == 'tvshow': presentar = False
 
     if presentar:
-        itemlist.append(item.clone( title = '[B]Series:[/B]', action = '', text_color='hotpink', plot = '' ))
+        itemlist.append(item.clone( title = '[B]Series:[/B]', action = '', text_color='hotpink' ))
 
         itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'on_the_air', title='   - En emisión' ))
         itemlist.append(item.clone( action='listado', search_type='tvshow', extra = 'popular', title='   - Más populares', thumbnail=config.get_thumb('besttvshows') ))
@@ -109,19 +109,24 @@ def show_help(item):
 
     txt += '[CR][COLOR goldenrod][B]INFORMACIÓN TMDB:[/B][/COLOR][CR]'
 
-    txt += 'En este apartado se pueden hacer consultas a la web [COLOR gold][B]The Movie Database[/B][/COLOR] (TMDB), un proyecto comunitario que ofrece información de películas, series y personas.'
+    txt += 'En este apartado se pueden hacer consultas a la web [COLOR gold][B]The Movie Database[/B][/COLOR] (TMDB),'
 
-    txt += '[CR]Se puede buscar la [COLOR moccasin][B]filmografía[/B][/COLOR] de una persona y ver las películas/series dónde ha participado.'
+    txt += '[CR]un proyecto comunitario que ofrece información de [COLOR lightyellow][B]Películas, Series y Personas[/B][/COLOR].'
 
-    txt += '[CR]'
-    txt += '[CR]También se pueden ver distintas [COLOR yellow][B]Listas[/B][/COLOR] de películas y/ó series según varios conceptos (más populares, más valoradas, por géneros, etc.)'
+    txt += '[CR][CR]Se puede buscar la [COLOR moccasin][B]Filmografía[/B][/COLOR] de una Persona y ver las [COLOR lightyellow][B]Películas/Series[/B][/COLOR] dónde ha participado.'
 
-    txt += '[CR]'
-    txt += '[CR]Al seleccionar una película/serie [COLOR chartreuse][B]se iniciará su búsqueda en los canales[/B][/COLOR] y se mostrarán los resultados encontrados.'
-    txt += ' Hay que tener en cuenta que habrá películas/series que no tendrán enlaces en ninguno de los canales.'
+    txt += '[CR][CR]También se pueden ver distintas [COLOR yellow][B]Listas[/B][/COLOR] de [COLOR lightyellow][B]Películas y/ó Series[/B][/COLOR] según varios conceptos (más populares, más valoradas, por géneros, etc.)'
 
-    txt += '[CR]'
-    txt += '[CR]Si al buscar por persona [COLOR violet][B]se obtiene una sola coincidencia[/B][/COLOR] de películas, se listan directamente sus películas y series (Ej: Stanley Kubrick).'
+    txt += '[CR][CR][COLOR goldenrod][B]RESULTADOS:[/B][/COLOR][CR]'
+
+    txt += 'Al seleccionar una [COLOR lightyellow][B]Película/Serie[/COLOR] [COLOR chartreuse]se Iniciará su Búsqueda en los Canales[/B][/COLOR]'
+
+    txt += '[CR]y se mostrarán los resultados encontrados.'
+
+    txt += '[CR][CR][COLOR fuchsia][B]Hay que tener en cuenta que habrá [COLOR lightyellow]Películas/Series[COLOR fuchsia] que no tendrán enlaces en ninguno de los canales.[/B][/COLOR]'
+
+    txt += '[CR][CR]Si al buscar por Persona se obtiene [COLOR violet][B]Una sola Coincidencia[/B][/COLOR] de Películas, se listan directamente sus Películas y Series (Ej: Stanley Kubrick).'
+
     txt += ' Si hubierna varios resultados se muestra una [COLOR yellowgreen][B]Lista de Personas[/B][/COLOR] para seleccionar la que corresponda (Ej: Kubrick).'
 
     platformtools.dialog_textviewer('Información búsquedas y listas en TMDB', txt)

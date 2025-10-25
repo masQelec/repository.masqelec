@@ -429,6 +429,14 @@
         "url": "https://streamwish.to/f/\\1"
       },
       {
+        "pattern": "https://hgbazooka.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://cavanhabg.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
         "pattern": "https://(?:wish.(.*))/(?:e/|f/|d/)([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },
@@ -518,6 +526,18 @@
       },
       {
         "pattern": "https://videoland.sbs/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://bingezove.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://dinisglows.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://dingtezuni.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
         "url": "https://filelions.to/f/\\1"
       },
       {

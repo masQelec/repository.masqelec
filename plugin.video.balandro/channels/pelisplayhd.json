@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["years", "docs", "kids", "vos"],
+  "clusters": ["years", "stars", "directors", "docs", "kids", "vos"],
 
   "notes": "Películas por géneros y Series por Géneros."
 }

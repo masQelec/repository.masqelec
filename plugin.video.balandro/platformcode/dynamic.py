@@ -4,7 +4,7 @@ from core import httptools, scrapertools
 from platformcode import config, logger
 
 
-def host(host):
+def host(host, dominios):
     logger.info()
 
     current_domain = ''
@@ -12,19 +12,24 @@ def host(host):
     try:
         data = httptools.downloadpage('https://entrarplaydede.com/').data
 
-        current_domain = scrapertools.find_single_match(data, '>Dirección actual:.*?<a href="(.*?)".*?</a>').strip()
-        if not current_domain: current_domain = scrapertools.find_single_match(data, '>Dirección actual:.*?">(.*?)</a>').strip()
+        bloque = scrapertools.find_single_match(data, '<main>(.*?)</section>')
 
-        if not current_domain: current_domain = scrapertools.find_single_match(data, 'Dirección activa<.*?<a href="(.*?)".*?</a>').strip()
+        currents_domains = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?</a>')
+        if not currents_domains: currents_domains = scrapertools.find_multiple_matches(bloque, 'data-url="(.*?)".*?</a>')
 
-        if current_domain:
-            current_domain = current_domain.lower()
+        if currents_domains:
+            for current_domain in currents_domains:
+                if current_domain:
+                    current_domain = current_domain.lower().strip()
 
-            if not 'playdede' in current_domain: current_domain = ''
+                    if not 'playdede.' in current_domain: continue
 
-        if current_domain:
-            if not 'https' in current_domain: current_domain  = 'https://' + current_domain
-            if not current_domain.endswith('/'): current_domain = current_domain + '/'
+                    if not 'https' in current_domain: current_domain  = 'https://' + current_domain
+                    if not current_domain.endswith('/'): current_domain = current_domain + '/'
+
+                    if current_domain in str(dominios): return host
+
+                    break
     except:
         pass
 

@@ -8,10 +8,10 @@ if sys.version_info[0] >= 3: PY3 = True
 
 import re
 
-from lib import jsunpack
-
 from core import httptools, scrapertools
 from platformcode import logger
+
+from lib import jsunpack
 
 
 def get_video_url(page_url, url_referer=''):
@@ -60,6 +60,8 @@ def get_video_url(page_url, url_referer=''):
         m3u8_source = scrapertools.find_single_match(unpacked, '\{(?:file|"hls\d+"|src):"([^"]+)"')
 
         if "master.m3u8" in m3u8_source:
+            if not 'http' in m3u8_source: m3u8_source = 'https:/' + m3u8_source
+
             datos = httptools.downloadpage(m3u8_source).data
 
             if PY3:
@@ -68,12 +70,28 @@ def get_video_url(page_url, url_referer=''):
 
             if datos:
                 matches_m3u8 = re.compile('#EXT-X-STREAM-INF.*?RESOLUTION=\d+x(\d*)[^\n]*\n([^\n]*)\n', re.DOTALL).findall(datos)
-                for quality, url in matches_m3u8:
-                    url = m3u8_source
-                    video_urls.append([quality, 'm3u8', url])
 
+                for quality, url in matches_m3u8:
+                    m3u8_source = m3u8.split("/master.m3u8")[0]
+                    url = m3u8_source + url
+
+                    if 'urlsetindex-' in url: url = url.replace('urlsetindex-', 'urlset/index-')
+
+                    elif 'index-v1-a1.m3u8' in url:
+                        if not '/index-v1-a1.m3u8' in url: url = url.replace('index-v1-a1.m3u8', '/index-v1-a1.m3u8')
+
+                    video_urls.append([quality, 'M3u', url])
+
+            if not video_urls:
+                m3u8_source = scrapertools.find_single_match(unpacked, '"hls2":"(.*?)"')
+
+                if m3u8_source:
+                    video_urls.append(['m3u', m3u8_source])
         else:
-            video_urls.append(['m3u8', m3u8_source])
+            m3u8_source = scrapertools.find_single_match(unpacked, '"hls2":"(.*?)"')
+
+            if m3u8_source:
+                video_urls.append(['m3u', m3u8_source])
 
     except Exception:
         pass

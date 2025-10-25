@@ -251,37 +251,37 @@ def episodios(item):
         if config.get_setting('channels_charges', default=True):
             item.perpage = sum_parts
             if sum_parts >= 100:
-                platformtools.dialog_notification('Yaske', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                platformtools.dialog_notification('OsjoNosu', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
-                platformtools.dialog_notification('Yaske', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                platformtools.dialog_notification('OsjoNosu', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
         else:
             item.perpage = sum_parts
 
             if sum_parts >= 1000:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('Yaske', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    platformtools.dialog_notification('OsjoNosu', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
                     item.perpage = 500
 
             elif sum_parts >= 500:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('Yaske', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    platformtools.dialog_notification('OsjoNosu', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
                     item.perpage = 250
 
             elif sum_parts >= 250:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]125[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('Yaske', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
+                    platformtools.dialog_notification('OsjoNosu', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
                     item.perpage = 125
 
             elif sum_parts >= 125:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]75[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('Yaske', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
+                    platformtools.dialog_notification('OsjoNosu', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
                     item.perpage = 75
 
             elif sum_parts > 50:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
-                    platformtools.dialog_notification('Yaske', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    platformtools.dialog_notification('OsjoNosu', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
                     item.perpage = sum_parts
                 else: item.perpage = 50
 
@@ -298,6 +298,9 @@ def episodios(item):
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
 
         titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        if 'Epis.' in titulo:
+            titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
 
         thumb = scrapertools.find_single_match(match, "<img src='(.*?)'")
 
@@ -349,6 +352,10 @@ def findvideos(item):
 
         url = url.replace('\\/', '/')
 
+        if '/vmi597113.' in url: continue
+
+        elif 'osjonosu.osjonosu.' in url: continue
+
         if not host in url:
             if not '/player.osjonosu.' in url: url = ''
 
@@ -373,7 +380,7 @@ def play(item):
     new_url = get_video_url(url)
 
     if new_url:
-        if new_url == 'error': return '[COLOR red]Archivo inexistente ó eliminado[/COLOR]'
+        if new_url == 'error': return '[COLOR red]Archivo Inexistente ó eliminado[/COLOR]'
 
         itemlist = new_url
 
@@ -390,7 +397,7 @@ def get_video_url(url):
 
     if not resp.sucess: return "error"
 
-    if "Video not found" in data or "Not Found" in data or "File was deleted" in data or "is no longer available" in data:return "error" 
+    if "Video not found" in data or "Not Found" in data or "File was deleted" in data or "is no longer available" in data: return "error" 
 
     try:
         url = scrapertools.find_single_match(data, "\{\s*file:\s*'([^']+)'")

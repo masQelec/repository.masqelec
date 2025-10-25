@@ -88,13 +88,15 @@ def do_downloadpage(url, post=None, headers=None):
 def mainlist(item):
     return mainlist_pelis(item)
 
+
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
     itemlist.append(item.clone ( title = 'Búsquedas:', action = '', folder=False, text_color='plum' ))
     itemlist.append(item.clone ( title = ' - Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
-    itemlist.append(item.clone ( title = ' - [COLOR salmon]Buscar persona ...[/COLOR] ([COLOR springgreen]dirección[/COLOR], [COLOR aquamarine]intérprete[/COLOR])', action = 'search', grupo = 'agrupa', search_type = 'person' ))
+
+    itemlist.append(item.clone ( title = ' - Buscar persona ... [COLOR aquamarine]dirección ó intérprete[/COLOR]', action = 'search', grupo = 'agrupa', search_type = 'person', text_color = 'salmon' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host_opts ))
 
@@ -113,14 +115,17 @@ def mainlist_pelis(item):
                                 post = {'start': 0, 'length': perpage, 'metodo': 'ObtenerListaTotal', 'searchPanes[a5][0]': 'VO', 'search[value]': '', 'searchPanes[a3][0]': '', 'searchPanes[a4][0]': '', 'searchPanes[a6][0]': ''},
                                 ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Por época', action = 'epocas', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
+    itemlist.append(item.clone( title = 'Por año', action = 'anios' ))
+
+    itemlist.append(item.clone( title = 'Por época', action = 'epocas' ))
     itemlist.append(item.clone( title = 'Por escritor', action = 'escritores' ))
 
-    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por país', action = 'paises' ))
 
-    itemlist.append(item.clone( title = 'Por persona ([COLOR springgreen]dirección[/COLOR], [COLOR aquamarine]intérprete[/COLOR]) (A-Z)', action = 'alfabetico' ))
+    itemlist.append(item.clone( title = 'Personas', action = 'directores', letra = 'Todos', text_color = 'salmon' ))
+
+    itemlist.append(item.clone( title = '[COLOR salmon]Por persona[/COLOR] (A-Z)', action = 'alfabetico' ))
 
     return itemlist
 
@@ -188,6 +193,23 @@ def generos(item):
     return sorted(itemlist,key=lambda x: x.title)
 
 
+def anios(item):
+    logger.info()
+    itemlist = []
+
+    from datetime import datetime
+    current_year = int(datetime.today().year)
+
+    for x in range(current_year, 1894, -1):
+        any = str(x)
+
+        post = {'start': 0, 'length': perpage, 'metodo': 'ObtenerListaTotal', 'searchPanes[a5][0]': '', 'search[value]': '', 'searchPanes[a3][0]': '', 'searchPanes[a4][0]': any, 'searchPanes[a6][0]': ''}
+
+        itemlist.append(item.clone( title = any, action = 'list_all', url = host_opts, any = any, post = post, text_color = 'deepskyblue' ))
+
+    return itemlist
+
+
 def epocas(item):
     logger.info()
     itemlist = []
@@ -213,24 +235,7 @@ def escritores(item):
 
         post = {'start': 0, 'length': perpage, 'metodo': 'ObtenerListaTotal', 'searchPanes[a5][0]': writer, 'search[value]': '', 'searchPanes[a3][0]': '', 'searchPanes[a4][0]': '', 'searchPanes[a6][0]': ''}
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = host_opts, pane = writer, post = post, text_color='tan' ))
-
-    return itemlist
-
-
-def anios(item):
-    logger.info()
-    itemlist = []
-
-    from datetime import datetime
-    current_year = int(datetime.today().year)
-
-    for x in range(current_year, 1894, -1):
-        any = str(x)
-
-        post = {'start': 0, 'length': perpage, 'metodo': 'ObtenerListaTotal', 'searchPanes[a5][0]': '', 'search[value]': '', 'searchPanes[a3][0]': '', 'searchPanes[a4][0]': any, 'searchPanes[a6][0]': ''}
-
-        itemlist.append(item.clone( title = any, action = 'list_all', url = host_opts, any = any, post = post, text_color = 'deepskyblue' ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = host_opts, pane = writer, post = post, text_color = 'tan' ))
 
     return itemlist
 
@@ -272,7 +277,7 @@ def paises(item):
 
         post = {'start': 0, 'length': perpage, 'metodo': 'ObtenerListaTotal', 'searchPanes[a5][0]': '', 'search[value]': '', 'searchPanes[a3][0]': '', 'searchPanes[a4][0]': '', 'searchPanes[a6][0]': country}
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = host_opts, country = country, post = post, text_color='moccasin' ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = host_opts, country = country, post = post, text_color = 'moccasin' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -281,10 +286,8 @@ def alfabetico(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone (action = "directores", title = 'Todos los directores/intérpretes', letra = 'Todos', text_color='salmon' ))
-
     for letra in string.ascii_uppercase:
-        itemlist.append(item.clone (action = "directores", title = letra, letra = letra, text_color='salmon' ))
+        itemlist.append(item.clone (action = "directores", title = letra, letra = letra, text_color = 'salmon' ))
 
     return itemlist
 
@@ -326,7 +329,7 @@ def directores(item):
             directors.append([value, title])
 
     paginacion = 100000
-    if item.letra == 'Todos': paginacion = 999
+    if item.letra == 'Todos': paginacion = 500
 
     num_matches = len(directors)
 
@@ -337,7 +340,7 @@ def directores(item):
 
         post = {'start': 0, 'length': perpage, 'metodo': 'ObtenerListaTotal', 'searchPanes[a3][0]': director, 'search[value]': '', 'searchPanes[a4][0]': '', 'searchPanes[a5][0]': '', 'searchPanes[a6][0]': ''}
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = host_opts, director = director, post = post, text_color='moccasin' ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = host_opts, director = director, post = post, text_color = 'salmon' ))
 
         if len(itemlist) >= paginacion: break
 
@@ -373,7 +376,7 @@ def list_all(item):
     else:
        post = item.post
 
-    # ~ Menu Principal addon opcion Generos
+    # ~ Menu Principal Generos
     if item.zoo_genre:
         pane = item.zoo_genre
         post = {'start': start, 'length': perpage, 'metodo': 'ObtenerListaTotal', 'searchPanes[a5][0]': pane, 'search[value]': '', 'searchPanes[a3][0]': '', 'searchPanes[a4][0]': '', 'searchPanes[a6][0]': ''}
@@ -405,7 +408,8 @@ def list_all(item):
 
             plot = elem.get('a100', '')
 
-            itemlist.append(item.clone( action='findvideos', _id=_id, title=titulo, thumbnail=thumb, contentType='movie', contentTitle=title, contentTitleAlt = title_alt, infoLabels={'year': year, 'plot': plot} ))
+            itemlist.append(item.clone( action='findvideos', _id=_id, title=titulo, thumbnail=thumb,
+                                        contentType='movie', contentTitle=title, contentTitleAlt = title_alt, infoLabels={'year': year, 'plot': plot} ))
     except:
         return itemlist
 

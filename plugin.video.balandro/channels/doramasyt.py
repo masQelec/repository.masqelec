@@ -141,6 +141,8 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'emision', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( action='list_all', title='Novelas', url = host + 'doramas?categoria=serie-turcas', search_type = 'tvshow', text_color='limegreen' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
@@ -243,7 +245,8 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '</h2>(.*?)>DoramasYT')
+    bloque = scrapertools.find_single_match(data, '</h1>(.*?)>DoramasYT')
+    if not bloque: bloque = scrapertools.find_single_match(data, '</h2>(.*?)>DoramasYT')
 
     matches = re.compile('ficha_efecto">(.*?)</li>').findall(bloque)
 
@@ -260,13 +263,17 @@ def list_all(item):
         elif 'castellano' in title.lower(): lang = 'Esp'
         else: lang = 'Vose'
 
-        title = re.sub(r'Audio|Latino|Castellano|\((.*?)\)', '', title)
+        title = title.replace('Ver ', '').replace(' online - Pelicula en ', '').replace(' online - Dorama en ', '').replace(' online - Live Action en ', '').replace(' online - Dorama estreno 2025 en ', '').replace(' online - Serie Turcas en ', '').replace(' HD', '').strip()
+
+        title = title.replace(' Live Action', '').strip()
+
+        title = re.sub(r'Audio|Latino|Castellano|latino|español|\((.*?)\)', '', title)
         title = re.sub(r'\s:', ':', title)
 
         title = title.replace('&#039;', '')
 
         if '>Pelicula' in match: tipo = 'movie'
-        elif '>Dorama<' in match: tipo = 'tvshow'
+        elif '>Dorama' in match: tipo = 'tvshow'
         else: tipo = item.search_type
 
         sufijo = '' if item.search_type != 'all' else tipo

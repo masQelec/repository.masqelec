@@ -114,8 +114,11 @@ def list_all(item):
         titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
 
         if item.group == 'last':
-            if '-temporada-' in url: season = scrapertools.find_single_match(url, '-temporada-(.*?)/')
-            if not season: season = 1
+            season = 1
+
+            if '-temporada-' in url:
+                season = scrapertools.find_single_match(url, '-temporada-(.*?)/')
+                if not season: season = 1
 
             epis = scrapertools.find_single_match(url, '-capitulo-(.*?)/')
             if not epis: epis = scrapertools.find_single_match(url, '-capitulo-(.*?)-')
@@ -163,14 +166,22 @@ def temporadas(item):
     item.contentType = 'season'
 
     season = 1
-    if '-temporada-' in item.url: season = scrapertools.find_single_match(item.url, '-temporada-(.*?)/')
+
+    if '-temporada-' in item.url:
+        season = scrapertools.find_single_match(item.url, '-temporada-(.*?)/')
+
+        if not season: season = 1
+    elif '-season-' in item.url:
+        season = scrapertools.find_single_match(item.url, '-season-(.*?)/')
+
+        if not season: season = 1
 
     item.contentSeason = season
 
     item.ref = item.url
 
     name_ser = item.contentSerieName.lower()
-    name_ser = name_ser.replace(' ', '-').replace("'", '')
+    name_ser = name_ser.replace(' ', '-').replace("'", '').replace(".", '').replace(",", '')
 
     item.url = host + 'season/' + name_ser + '-' + str(season) + '/'
 
@@ -266,6 +277,11 @@ def episodios(item):
         titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + titulo
+
+        if 'Sub Espanol' in title or 'sub espanol' in title:
+            titulo = titulo.replace('Sub Espanol', '').replace('sub espanol', '').strip()
+
+            titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb, orden = orden,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))

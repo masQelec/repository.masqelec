@@ -48,7 +48,10 @@ def get_video_url(page_url, url_referer=''):
 
     resp = httptools.downloadpage(page_url)
 
-    if 'restringido por el propietario' in resp.data:
+    if resp.code == 404:
+        return "Archivo inexistente ó eliminado"
+
+    elif 'restringido por el propietario' in resp.data:
         return 'Archivo restringido por el propietario'
 
     data = jsontools.load(resp.data)
@@ -106,6 +109,7 @@ def get_video_url(page_url, url_referer=''):
 
         return video_urls
 
+    stream_url = ''
     subtitle = ''
 
     try:
@@ -114,19 +118,18 @@ def get_video_url(page_url, url_referer=''):
     except:
         pass
 
-    stream_url = data['qualities']['auto'][0]['url']
-
-    data_m3u8 = httptools.downloadpage(stream_url).data
-
-    matches = scrapertools.find_multiple_matches(data_m3u8, 'NAME="([^"]+)",PROGRESSIVE-URI="([^"]+)"')
-
     try:
-        for calidad, url in sorted(matches, key=lambda x: int(x[0])):
-            calidad = calidad.replace('@60','')
-            url = httptools.get_url_headers(url)
-            video_urls.append(["%sp  mp4" % calidad, url, 0, subtitle])
+        stream_url = data['qualities']['auto'][0]['url']
     except:
         pass
+
+    if stream_url:
+        if subtitle:
+            video_urls.append(['m3u8', stream_url, 0, subtitle])
+        else:
+            video_urls.append(['m3u8', stream_url, 0])
+
+        return video_urls[::-1]
 
     if not video_urls:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):

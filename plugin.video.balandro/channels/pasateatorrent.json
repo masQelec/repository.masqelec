@@ -13,5 +13,5 @@
 
   "clusters": ["onlyone", "torrents", "kids", "docs", "3d", "4k"],
 
-  "notes": "Canal con enlaces Torrent exclusivamente. Películas por géneros."
+  "notes": "Canal con enlaces Torrent exclusivamente. Películas por géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

@@ -63,7 +63,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'movies/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Cine clásico', action = 'list_all', url = host + 'genre/cine-clasico/', search_type = 'movie', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Clásicas', action = 'list_all', url = host + 'genre/cine-clasico/', search_type = 'movie', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'imdb/', group = 'imdb', search_type = 'movie' ))
 
@@ -89,10 +89,10 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'imdb/', group = 'imdb', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por plataforma', action= 'plataformas', search_type = 'tvshow', text_color = 'moccasin' ))
-
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por plataforma', action= 'plataformas', search_type = 'tvshow', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico', search_type = 'tvshow' ))
 
@@ -401,7 +401,14 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title.replace(str(item.contentSeason) + 'x' + str(epis),'')
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail=thumb, contentType = 'episode', contentEpisodeNumber = epis ))
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        if 'Epis.' in titulo: titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail=thumb,
+                                    contentType = 'episode', contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -435,7 +442,10 @@ def findvideos(item):
 
         if not link: continue
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server='directo', title = '', link = link, quality = qlty, language = IDIOMAS.get(lang, lang), age='Torrent' ))
+        quality_num = puntuar_calidad(qlty)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server='directo', title = '', link = link,
+                              quality = qlty, quality_num = quality_num, language = IDIOMAS.get(lang, lang), age='Torrent' ))
 
     if not itemlist:
         if not ses == 0:
@@ -443,6 +453,12 @@ def findvideos(item):
             return
 
     return itemlist
+
+
+def puntuar_calidad(txt):
+    orden = ['480p', '720p', '1080p', 'WEB-DL', 'HDRip', 'HDTV 720p', 'HDTV 1080p', 'HDTV', '1080p', 'BluRayRip', 'BluRay 720p', 'BluRay 1080p', '2160p', '4K UHDRip', '4k', '4K']
+    if txt not in orden: return 0
+    else: return orden.index(txt) + 1
 
 
 def play(item):

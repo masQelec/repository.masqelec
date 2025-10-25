@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://yts.mx/'
+host = 'https://en.yts-official.mx/'
 
 
 url_browser = host + "browse-movies"
@@ -31,55 +31,20 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = url_browser, search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Tendencias', action = 'list_all', url = host + 'trending-movies', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Actualizadas', action = 'list_all', url = url_browser + '/?order_by=featured', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = url_browser + '/0/all/all/0/featured/0/all', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = url_browser + '/0/all/all/0/rating/0/all', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = url_browser + '/?order_by=likes', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = url_browser + '/?order_by=rating', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = url_browser + '/?quality=2160p', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
     return itemlist
-
-
-def idiomas(item):
-    logger.info()
-    itemlist = []
-
-    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = url_browser + '/0/all/all/0/latest/0/es', lang='Esp', search_type = 'movie', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'En inglés', action = 'list_all', url = url_browser + '/0/all/all/0/latest/0/en', lang='Ing', search_type = 'movie', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Versión original (subtitulada)', action = 'list_all', url = url_browser + '/0/all/all/0/latest/0/foreign', lang='Vos', search_type = 'movie', text_color='moccasin' ))
-
-    return itemlist
-
-
-def paises(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(url_browser)
-
-    bloque = scrapertools.find_single_match(data,'<select name="language">(.*?)</select>')
-
-    matches = scrapertools.find_multiple_matches(bloque,'<option value="(.*?)">(.*?)</option>')
-
-    for idio, tit in matches:
-        if 'Todos' in tit: continue
-
-        url = url_browser + '/0/all/all/0/latest/0/' + idio
-
-        lang = ''
-        if tit == 'Spanish': lang= 'Esp'
-        elif tit == 'Extranjero': lang= 'Vos'
-        elif tit == 'Inglés': lang= 'Ing'
-
-        itemlist.append(item.clone( title = tit.capitalize(), url = url, action = 'list_all', lang=lang, text_color = 'moccasin' ))
-
-    return sorted(itemlist, key=lambda it: it.title)
 
 
 def calidades(item):
@@ -93,14 +58,11 @@ def calidades(item):
     matches = scrapertools.find_multiple_matches(bloque,'<option value="(.*?)">(.*?)</option>')
 
     for qltys, tit in matches:
-        if qltys == 'all': continue
+        if tit == 'All': continue
 
-        url = url_browser + '/0/' + qltys + '/all/0/latest/0/all'
+        url = url_browser + '/?quality=' + qltys
 
         itemlist.append(item.clone( title = tit, url = url, action = 'list_all', text_color = 'moccasin' ))
-
-    if itemlist:
-        itemlist.append(item.clone( action = 'list_all', title = '480p', url = url_browser + '/0/480p/all/0/latest/0/all', text_color = 'moccasin' ))
 
     return sorted(itemlist, key=lambda it: it.title)
 
@@ -116,9 +78,9 @@ def generos(item):
     matches = scrapertools.find_multiple_matches(bloque,'<option value="(.*?)">(.*?)</option>')
 
     for genre, tit in matches:
-        if tit == 'Todos': continue
+        if tit == 'All': continue
 
-        url = url_browser + '/0/all/' + genre + '/0/latest/0/all'
+        url = url_browser + '/?genre=' + genre
 
         itemlist.append(item.clone( title = tit, url = url, action = 'list_all', text_color = 'deepskyblue' ))
 
@@ -138,7 +100,7 @@ def anios(item):
     for anyos in matches:
         if anyos == '0': continue
 
-        url = url_browser + '/0/all/all/0/latest/' + anyos + '/all'
+        url = url_browser + '/?year=' + anyos
 
         itemlist.append(item.clone( title = anyos, url = url, action = 'list_all', text_color = 'deepskyblue' ))
 
@@ -170,15 +132,18 @@ def list_all(item):
         year = scrapertools.find_single_match(match, '<div class="browse-movie-year">(.*?)$')
         if not year: tear = '-'
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+        url = host[:-1] + url
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                                    contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, 'class="current">.*?a href="(.*?)"')
+        next_page = scrapertools.find_single_match(data, 'class="current">.*?href="(.*?)"')
 
         if next_page:
-            if '?page=' in next_page:
+            if '?page=' in next_page or '&page=' in next_page:
                 next_page = host[:-1] + next_page
 
                 itemlist.append(item.clone( title='Siguientes ...', action='list_all', url=next_page, text_color='coral' ))
@@ -193,27 +158,38 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = re.compile('<div class="modal-torrent">(.*?)</span></a>', re.DOTALL).findall(data)
+    matches = re.compile('<div class="modal-torrent">(.*?)</a></div>', re.DOTALL).findall(data)
 
     ses = 0
 
     for match in matches:
-        ses += 1
+        links = scrapertools.find_multiple_matches(match,'href="(.*?)"')
 
-        url = scrapertools.find_single_match(match, '<a data-torrent-id=".*?href="(.*?)"')
+        for link in links:
+            ses += 1
 
-        url = url.replace('&amp;', '&').strip()
+            url = link
 
-        if url:
-            qlty = scrapertools.find_single_match(match, 'id="modal-quality-.*?<span>(.*?)</span>')
+            url = url.replace('&amp;', '&').strip()
 
-            lang = 'Vo'
+            if url:
+                qlty = scrapertools.find_single_match(match, 'id="modal-quality-.*?<span>(.*?)</span>')
 
-            if item.lang: lang = item.lang
+                lang = 'Vo'
 
-            peso = scrapertools.find_single_match(match, '<p>Tamaño del archivo</p><p class="quality-size">(.*?)</p>')
+                if item.lang: lang = item.lang
 
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = lang, quality = qlty, other = peso ))
+                peso = scrapertools.find_single_match(match, '<p>File size</p>.*?<p class="quality-size">(.*?)</p>')
+
+                quality_num = puntuar_calidad(qlty)
+
+                age = ''
+                if 'magnet:' in url: age ='Magnet'
+
+                if url.startswith("/"): url = host[:-1] + url
+
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent',
+                                      language = lang, quality = qlty, quality_num = quality_num, other = peso, age = age ))
 
     if not itemlist:
         if not ses == 0:
@@ -223,10 +199,16 @@ def findvideos(item):
     return itemlist
 
 
+def puntuar_calidad(txt):
+    orden = ['480p', '720p', '1080p', 'x.265', '3d', '3D', '2160p']
+    if txt not in orden: return 0
+    else: return orden.index(txt) + 1
+
+
 def search(item, texto):
     logger.info()
     try:
-        item.url = url_browser + '/' + texto.replace(" ", "+") + '/all/all/0/latest/0/all'
+        item.url = url_browser + '/?keyword=' + texto.replace(" ", "+")
         return list_all(item)
     except:
         import sys

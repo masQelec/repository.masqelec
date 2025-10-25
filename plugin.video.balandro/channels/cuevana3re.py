@@ -34,6 +34,9 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title='Animes', action = 'mainlist_series', text_color='springgreen' ))
+
     return itemlist
 
 
@@ -340,6 +343,8 @@ def findvideos(item):
 
         ses += 1
 
+        other = ''
+
         url = url.replace('\\/', '/')
 
         if '/1fichier.' in url: continue
@@ -352,10 +357,11 @@ def findvideos(item):
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        other = ''
+        if '/vimeos.' in url:
+            servidor = 'zures'
+            other = 'Vimeos'
 
-        if servidor == 'various':
-            other = servertools.corregir_other(url)
+        if servidor == 'various': other = servertools.corregir_other(url)
 
         lang = clean_title(lang).capitalize()
 

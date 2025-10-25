@@ -2,6 +2,7 @@
 
 from core import httptools, scrapertools
 from platformcode import logger, platformtools
+
 from lib import jsunpack
 
 
@@ -14,7 +15,7 @@ def get_video_url(page_url, url_referer=''):
 
     data = httptools.downloadpage(page_url).data
 
-    if '"title">File Not Found</div>' in data or 'player_blank.jpg' in data or 'assets/images/image-404.png' in data:
+    if '"title">File Not Found</div>' in data or 'File was deleted' in data or 'player_blank.jpg' in data or 'assets/images/image-404.png' in data:
         return  "Archivo inexistente ó eliminado"
     elif '_msg">File was locked by administrator</div>' in data:
         return  "El archivo está bloqueado"

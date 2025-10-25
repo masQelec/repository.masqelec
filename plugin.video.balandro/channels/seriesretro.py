@@ -520,6 +520,13 @@ def episodios(item):
 
         titulo = '%sx%s %s' % (season, episode, title)
 
+        if 'episodie' in titulo.lower() or 'episodio' in titulo.lower() or 'capítulo' in titulo.lower() or 'capitulo' in titulo.lower():
+            titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
 
         if len(itemlist) >= item.perpage:
@@ -562,24 +569,29 @@ def findvideos(item):
 
         if not servidor or not url: continue
 
-        link_other = ''
+        other = ''
 
         if servidor == 'lamovie': servidor = 'clipwatching'
 
         elif 'opción' in servidor:
-            link_other = servidor
+            other = servidor
             servidor = 'directo'
         elif servidor == 'anavids':
-            link_other = servidor
+            other = servidor
             servidor = 'directo'
         elif servidor == 'analu':
-            link_other = servidor
+            other = servidor
             servidor = 'directo'
         elif servidor == 'utorrent':
-            link_other = 'torrent'
+            other = 'torrent'
             servidor = 'directo'
 
-        if servidor == 'various': link_other = servertools.corregir_other(srv)
+        elif '/vimeos.' in url:
+            other = 'Vimeos'
+            servidor = 'zures'
+
+        if servidor == 'various': other = servertools.corregir_other(srv)
+        elif servidor == 'zures': other = servertools.corregir_zures(url)
 
         if url.endswith('.torrent'): servidor = 'torrent'
         elif 'magnet:?' in url: servidor = 'torrent'
@@ -587,19 +599,23 @@ def findvideos(item):
         qlty = scrapertools.find_single_match(idio_qlty, '.*?-(.*?)$').strip()
 
         lang = scrapertools.find_single_match(idio_qlty, '(.*?)-').strip()
+
         if 'Latino/Ingles' in lang: lang = 'Lat'
         elif 'Castellano/Ingles' in lang: lang = 'Esp'
-
         elif 'Castellano' in lang: lang = 'Esp'
         elif 'Latino' in lang: lang = 'Lat'
         elif 'Subtitulado' in lang: lang = 'Vose'
         elif 'Version Original' in lang: lang = 'VO'
         else: lang = '?'
 
+        if 'Subtítulos Latino - ' in qlty:
+            qlty = qlty.replace('Subtítulos Latino - ', '').strip()
+            lang = 'Vose'
+
         quality_num = puntuar_calidad(qlty)
 
         itemlist.append(Item( channel = item.channel, action = 'play', url=url, server=servidor, title = '',
-                              quality = qlty, quality_num = quality_num, language = lang, other = link_other ))
+                              quality = qlty, quality_num = quality_num, language = lang, other = other.capitalize() ))
 
     # ~ Descargas
     matches = scrapertools.find_multiple_matches(data, '<span class="Num">(.*?)</tr>')
@@ -612,10 +628,19 @@ def findvideos(item):
 
         if not servidor: continue
 
-        if servidor == 'lamovie': servidor = 'clipwatching'
+        other = 'D'
 
+        if servidor == 'lamovie': servidor = 'clipwatching'
         elif servidor == 'utorrent': servidor = 'torrent'
-        else: servidor = servertools.corregir_servidor(servidor)
+		
+        elif '/vimeos.' in url:
+            other = 'Vimeos'
+            servidor = 'zures'
+
+        else:
+            if servidor == 'various': other = servertools.corregir_other(url)
+            elif servidor == 'zures': other = servertools.corregir_zures(url)
+            else: servidor = servertools.corregir_servidor(servidor)
 
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
@@ -625,16 +650,18 @@ def findvideos(item):
         qlty = scrapertools.find_single_match(match, '<!-- <td>.*?<td><span>(.*?)</span>')
 
         lang = scrapertools.find_single_match(match, '<!-- <td><span>(.*?)</span>')
+
         if 'Latino/Ingles' in lang: lang = 'Lat'
         elif 'Castellano/Ingles' in lang: lang = 'Esp'
-
         elif 'Castellano' in lang: lang = 'Esp'
         elif 'Latino' in lang: lang = 'Lat'
         elif 'Subtitulado' in lang: lang = 'Vose'
         elif 'Version Original' in lang: lang = 'VO'
         else: lang = '?'
 
-        other = 'D'
+        if 'Subtítulos Latino - ' in qlty:
+            qlty = qlty.replace('Subtítulos Latino - ', '').strip()
+            lang = 'Vose'
 
         quality_num = puntuar_calidad(qlty)
 
@@ -650,7 +677,7 @@ def findvideos(item):
 
 
 def puntuar_calidad(txt):
-    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'Full HD', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', 'HD', 'WEBRip 1080p', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
+    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'Full HD', 'HD', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', 'HD', 'WEBRip 1080p', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
 

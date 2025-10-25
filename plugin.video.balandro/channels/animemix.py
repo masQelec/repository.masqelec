@@ -122,16 +122,20 @@ def temporadas(item):
     item.page = 0
     item.contentType = 'season'
 
-    item.contentSeason = 1
+    season = scrapertools.find_single_match(item.url, '-season-(.*?)/')
 
-    if '2nd' in item.title: item.contentSeason = 2
-    if '3rd' in item.title: item.contentSeason = 3
-    if '4th' in item.title: item.contentSeason = 4
-    if '5th' in item.title: item.contentSeason = 5
-    if '6th' in item.title: item.contentSeason = 6
-    if '7th' in item.title: item.contentSeason = 7
-    if '8th' in item.title: item.contentSeason = 8
-    if '9th' in item.title: item.contentSeason = 9
+    if season: item.contentSeason = season
+    else:
+        item.contentSeason = 1
+
+        if '2nd' in item.title: item.contentSeason = 2
+        elif '3rd' in item.title: item.contentSeason = 3
+        elif '4th' in item.title: item.contentSeason = 4
+        elif '5th' in item.title: item.contentSeason = 5
+        elif '6th' in item.title: item.contentSeason = 6
+        elif '7th' in item.title: item.contentSeason = 7
+        elif '8th' in item.title: item.contentSeason = 8
+        elif '9th' in item.title: item.contentSeason = 9
 
     itemlist = episodios(item)
 
@@ -207,6 +211,8 @@ def episodios(item):
         title = title.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
         titulo = '%sx%s %s' % (str(item.contentSeason), str(epis), title)
+
+        titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
 
         if url:
             itemlist.append(item.clone( action='findvideos', url = url, title = titulo,

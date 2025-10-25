@@ -241,6 +241,12 @@ def episodios(item):
 
         titulo = str(season) + 'x' + str(epis) + ' ' + title.strip()
 
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        if 'Epis.' in titulo: titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
         itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail=thumb, url = url,
                                     contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
@@ -260,7 +266,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'Latino': 'Lat', 'LAT': 'Lat', 'LA': 'Lat', 'Castellano': 'Esp', 'ESP': 'Esp', 'ES': 'Esp', 'Subtitulado': 'Vose', 'SUB': 'Vose'}
+    IDIOMAS = {'Latino': 'Lat', 'LAT': 'Lat', 'LA': 'Lat', 'Castellano': 'Esp', 'Español': 'Esp', 'ESP': 'Esp', 'ES': 'Esp', 'Subtitulado': 'Vose', 'SUB': 'Vose'}
 
     data = do_downloadpage(item.url)
 
@@ -325,6 +331,7 @@ def findvideos(item):
 
         if 'Latino' in match: lng = 'Lat'
         elif 'Castellano' in match: lng = 'Esp'
+        elif 'Español' in match: lng = 'Esp'
         elif 'Subtitulado' in match: lng = 'Vose'
 
         datad = do_downloadpage(link)

@@ -610,7 +610,7 @@ def list_search(item):
     matches = scrapertools.find_multiple_matches(bloque, "<a href='(.*?)'.*?" + 'class="text-decoration-none">(.*?)</a>.*?<span class="badge badge-primary float-right">(.*?)</span>')
 
     for url, title, type in matches:
-        if not url: continue
+        if not url or not title: continue
 
         if type == 'Peliculas': pass 
         elif type == 'Series': pass

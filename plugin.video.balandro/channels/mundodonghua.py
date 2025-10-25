@@ -91,7 +91,9 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_mundodonghua', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('zonaleros') ))
+    itemlist.append(Item( channel='helper', action='show_help_mundodonghua', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('mundodonghua') ))
+
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cuales son sus Clones[/B]', thumbnail=config.get_thumb('mundodonghua'), text_color='turquoise' ))
 
     platformtools.itemlist_refresh()
 
@@ -462,9 +464,8 @@ def play(item):
         if item.ref: data = do_downloadpage(url, headers={'Referer': item.ref})
         else: data = do_downloadpage(url)
 
-        if not data: return itemlist
-
-        if '404 Not Found' in data: return itemlist
+        if not data or '404 Not Found' in data:
+            return 'Archivo [COLOR red]Inaccesible[/COLOR]'
 
         vid = scrapertools.find_single_match(data, '"url":"(.*?)"')
 

@@ -4,12 +4,18 @@ import re
 
 from core import httptools, scrapertools
 from platformcode import logger
+
 from lib import jsunpack
 
 
 def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
     video_urls = []
+
+    if not '/embed-' in page_url:
+        page_url = page_url.replace('/www.mp4upload.com/', '/www.mp4upload.com/embed-')
+
+        if not '.html' in page_url: page_url = page_url + '.html'
 
     data = httptools.downloadpage(page_url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)

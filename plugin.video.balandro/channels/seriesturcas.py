@@ -7,13 +7,19 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://fhd.seriesturcastv.to/'
+host = 'https://tbg.seriesturcastv.to/'
 
 
 perpage = 30
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://fhd.seriesturcastv.to/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if '/ano/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data

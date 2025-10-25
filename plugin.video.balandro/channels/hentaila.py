@@ -7,7 +7,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools
 
 
-host = 'https://www5.hentaila.com/'
+host = 'https://hentaila.com/'
+
+
+def do_downloadpage(url, post=None, headers=None):
+    data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    return data
 
 
 def mainlist(item):
@@ -27,16 +33,17 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color='orange' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'directorio' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'catalogo' ))
 
-    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + 'directorio?filter=recent', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + 'catalogo?order=latest_released', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'directorio?filter=popular' ))
+    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'catalogo?order=popular' ))
+    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'catalogo?order=score' ))
 
-    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'directorio?status[1]=on' ))
-    itemlist.append(item.clone( title = 'Finalizados', action = 'list_all', url = host + 'directorio?status[2]=on' ))
+    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'catalogo?status=emision' ))
+    itemlist.append(item.clone( title = 'Finalizados', action = 'list_all', url = host + 'catalogo?status=finalizado' ))
 
-    itemlist.append(item.clone( title = 'Sin censura', action = 'list_all', url = host + 'directorio?uncensored=on', text_color = 'tan' ))
+    itemlist.append(item.clone( title = 'Sin censura', action = 'list_all', url = host + 'catalogo?uncensored=', text_color = 'tan' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
 
@@ -47,52 +54,61 @@ def categorias(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(host + 'directorio').data
-    data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
+    matches = []
 
-    bloque = scrapertools.find_single_match(data, '>Generos<(.*?)</section>')
+    data = httptools.downloadpage(host + 'catalogo').data
+    data = re.sub(r"\n|\r|\t|\s{2}", "", data)
 
-    matches = re.compile('<a href="(.*?)".*?class.*?>(.*?)</a>', re.DOTALL).findall(bloque)
+    bloque = scrapertools.find_single_match(str(data), 'genresIdsMap:(.*?)filters:')
 
-    for genre, title in matches:
-        url = host[:-1] + genre
+    cats = scrapertools.find_multiple_matches(bloque, 'id:.*?name:"(.*?)",.*?slug:"(.*?)"')
 
-        itemlist.append(item.clone( action = 'list_all', url = url, title = title, text_color='moccasin' ))
+    if cats:
+        for name, slug in cats:
+            matches.append(('?genre={}'.format(slug), name))
 
-    return sorted(itemlist, key=lambda i: i.title)
+        for url, title in matches:
+            url = '{}catalogo{}'.format(host, url)
+
+            itemlist.append(item.clone( action = 'list_all', url = url, title = title, text_color='moccasin' ))
+
+    return sorted(itemlist, key=lambda x: x.title)
 
 
 def list_all(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|\s{2}", "", data)
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
 
     for match in matches:
-        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
-        title = scrapertools.find_single_match(match, '<h2 class="h-title">(.*?)</h2>')
+        title = scrapertools.find_single_match(match, '<h3 class=".*?">(.*?)</h3>')
         if not title: title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
         if not url or not title: continue
 
-        thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
-
-        thumb = host[:-1] + thumb
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         url = host[:-1] + url
 
-        itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
+        itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb,
+                                   contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     if itemlist:
-        if '"Page navigation"' in data:
-            next_page = scrapertools.find_single_match(data, '<span class="btn rnd npd send-btn">.*?href="(.*?)"')
+        if '</span><!--]--><!--]--><!--[!--><!--[!--><a class=' in data:
+            datap = str(data).replace('</span><!--]--><!--]--><!--[!--><!--[!--><a class=', 'next_url=').strip()
+
+            next_page = scrapertools.find_single_match(str(datap), 'next_url=.*?href="(.*?)"')
 
             if next_page:
-                if '?p=' in next_page or '&p=' in next_page:
+                next_page = next_page.replace('&amp;', '&').strip()
+
+                if '?page=' in next_page or '&page=' in next_page:
                      next_page = host[:-1] + next_page
 
                      itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color = 'coral' ))
@@ -104,7 +120,7 @@ def episodios(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|\s{2}", "", data)
 
     bloque = scrapertools.find_single_match(data, '>Episodios<(.*?)</section>')
@@ -112,19 +128,20 @@ def episodios(item):
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(str(bloque))
 
     for match in matches:
-        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
         url = host[:-1] + url
 
-        title = scrapertools.find_single_match(match, '<h2 class="h-title">(.*?)</h2>')
+        title = scrapertools.find_single_match(match, '<span class="sr-only">(.*?)</span>')
 
-        thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
+        title = title.replace('Ver ', '').strip()
 
-        thumb = host[:-1] + thumb
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         titulo = title.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
+                                    contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     return itemlist
 
@@ -140,21 +157,19 @@ def findvideos(item):
 
         config.set_setting('ses_pin', True)
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}', "", data)
 
     lang = 'Vose'
 
     bloque = scrapertools.find_single_match(data, 'var videos =(.*?)</script>')
 
-    matches = re.compile('".*?","(.*?)"', re.DOTALL).findall(str(bloque))
+    matches = re.compile('server:.*?"(.*?)".*?url:.*?"(.*?)"', re.DOTALL).findall(str(data))
 
     ses = 0
 
-    for url in matches:
+    for srv, url in matches:
         ses += 1
-
-        url = url.replace('\\/', '/')
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -178,33 +193,13 @@ def findvideos(item):
     return itemlist
 
 
-def list_search(item):
-    logger.info()
-    itemlist = []
-
-    data = httptools.downloadpage(item.url, post = {'value': item.texto} ).data
-    data = re.sub(r'\n|\r|\t|\s{2}', "", data)
-
-    results = scrapertools.find_multiple_matches(str(data), '"id":"(.*?)".*?"title":"(.*?)".*?"slug":"(.*?)"')
-
-    for id, title, slug in results:
-        thumb = host[:-1] + '/uploads/portadas/' + id + '.jpg'
-
-        url = host[:-1] + '/hentai-' + slug
-
-        itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
-
-    return itemlist
-
-
 def search(item, texto):
     logger.info()
     try:
         config.set_setting('search_last_video', texto)
 
-        item.url =  host + 'api/search'
-        item.texto = texto.replace(" ", "+")
-        return list_search(item)
+        item.url =  host + 'catalogo?search=' + texto.replace(" ", "+")
+        return list_all(item)
     except:
         import sys
         for line in sys.exc_info():

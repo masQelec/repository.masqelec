@@ -1,0 +1,335 @@
+[COLOR chartreuse][B]Indice Mensajes Fijados:[/B][/COLOR]
+
+  [COLOR chartreuse][B]01[/B][/COLOR]  [COLOR yellow]COMUNICADO BALANDRO TEAM[/COLOR]
+  [COLOR chartreuse][B]02[/B][/COLOR]  [COLOR yellow]COMUNICADO OFICIAL BALANDRO[/COLOR]
+  [COLOR chartreuse][B]03[/B][/COLOR]  [COLOR yellow]OPCIONES TELEGRAM BALANDRO ASESOR[/COLOR]
+  [COLOR chartreuse][B]04[/B][/COLOR]  [COLOR yellow]INSTALACION BALANDRO[/COLOR]
+  [COLOR chartreuse][B]05[/B][/COLOR]  [COLOR yellow]DESCARGA E INSTALACION DEL ADDON DE VIDEO BALANDRO[/COLOR]
+  [COLOR chartreuse][B]06[/B][/COLOR]  [COLOR yellow]BALANDRO REPRODUCCIONES[/COLOR]
+  [COLOR chartreuse][B]07[/B][/COLOR]  [COLOR yellow]GRUPO TELEGRAM BALANDRO ASESOR[/COLOR]
+  [COLOR chartreuse][B]08[/B][/COLOR]  [COLOR yellow]QUITAR LOS PROXIES DE UN CANAL[/COLOR]
+  [COLOR chartreuse][B]09[/B][/COLOR]  [COLOR yellow]GESTION DE PROXIES[/COLOR]
+  [COLOR chartreuse][B]10[/B][/COLOR]  [COLOR yellow]SI APARECIERA LA VENTANA DE ERROR INESPERADO[/COLOR]
+  [COLOR chartreuse][B]11[/B][/COLOR]  [COLOR yellow]INSTALACION DE ADDONS EXTERNOS[/COLOR]
+  [COLOR chartreuse][B]12[/B][/COLOR]  [COLOR yellow]IDIOMAS (AUDIOS)[/COLOR]
+  [COLOR chartreuse][B]13[/B][/COLOR]  [COLOR yellow]ULTIMA VERSION DE BALANDRO[/COLOR]
+  [COLOR chartreuse][B]14[/B][/COLOR]  [COLOR yellow]ACCESO A LOS MENSAJES FIJADOS DESDE EL FORO[/COLOR]
+  [COLOR chartreuse][B]15[/B][/COLOR]  [COLOR yellow]COMUNICADO HISTORIAL DE TELEGRAM[/COLOR]
+
+[COLOR chartreuse][B]Mensaje Fijado 01[/COLOR]  [COLOR yellow]COMUNICADO BALANDRO TEAM[/B][/COLOR]
+
+Son ya más de 7 años desde la salida de este addon.
+Desde [COLOR gold]Enero/2021[/COLOR] hemos solicitado incorporaciones, al equipo de desarrollo del addon
+[COLOR cyan]Balandro Team[/COLOR]
+por distintas vías, y nuestros intentos han sido infructuosos hasta el momento.
+
+Motivos:
+  1)  Desconocen la Programación
+  2)  Desconocen el lenguaje Python
+  3)  No disponen de Tiempo para ello
+  4)  No estan Interesados de forma altruista
+  5)  Solo intervienen en ayudas Puntuales
+
+Situación:
+  Por ello nos va a ser del todo imposible, acometer el mantenimiento del addon
+  como ha sido hasta ahora, a no ser que, realmente vengan
+  [COLOR gold]Nuevas Incorporaciones[/COLOR] a [COLOR cyan]Balandro Team[/COLOR] con un compromiso y complicidad total.
+
+  El principal miembro de [COLOR cyan]Balandro Team[/COLOR] y responsable del mantenimiento del addon,
+  ya ha superado una edad sexagenaria, y también ya se agotó de ello.
+
+  Tan solo vamos a efectuar los [COLOR gold]Minimos[/COLOR] cambios en Canales y Servidores,
+  que no vayan sufriendo un cambio radical de estructura,
+  no abordaremos ni [COLOR gold]Nuevos[/COLOR] Canales/Servidores, ni [COLOR gold]Mejoras[/COLOR] en el addon,
+  reservandonos el derecho incluso de [COLOR gold]Desactivar[/COLOR] lo que nos de un quebradero de cabeza.
+
+  Somos conscientes, que con el paso del tiempo, el addon vaya sufriendo una degradación
+  y deje de cumplir vuestras expectativas sobre el, pero tambien debeís tener presente,
+  que nosotros también tenemos nuestras vidas y existe más vida fuera del Media center Kodi.
+
+Además:
+  No vamos a Consentir, [COLOR red]Des-calificaciones y Faltas de Respeto[/COLOR],
+  sobre cualquier Administrador de [COLOR gold]Balandro Asesor[/COLOR],
+  pueden no gustaros las contestaciones que se os dan,
+  pero jamás hubo ningún ataque personal, tan solo se contestó con
+  [COLOR cyan]Rotundidad y Claridad[/COLOR],
+  y eso a veces no es de vuestro agrado, pues lo sentimos, pero esto es lo que hay,
+  y si se volviese a suceder, procederemos incluso al [COLOR red]Cierre[/COLOR] de [COLOR gold]Balandro Asesor[/COLOR].
+
+[COLOR chartreuse][B]Mensaje Fijado 02[/COLOR]  [COLOR yellow]COMUNICADO OFICIAL BALANDRO[/B][/COLOR]
+
+Licencia [COLOR cyan]GNU GPL v3[/COLOR]  [COLOR dodgerblue]https://www.gnu.org/licenses/gpl-faq.html[/COLOR]
+  
+El software de libre disposición implica que los usuarios tienen las cuatro libertades esenciales:
+  A)  Ejecutar el programa ó módulo
+  B)  Estudiar y modificar el código fuente del programa ó módulo
+  C)  Redistribuir copias exactas del programa ó módulo
+  D)  Distribuir versiones modificadas del programa ó módulo
+
+01) Año [COLOR gold]2018[/COLOR], nació Balandro, bautizado como AlfaLite.
+       Fué desarrollado por miembros de [COLOR gold]Balandro[/COLOR]
+       que pertenecíamos al equipo de desarrollo de [COLOR gold]Alfa[/COLOR],
+       pero surgieron desaveniencias y nos separamos para formar [COLOR cyan]Balandro Team[/COLOR].
+02) En [COLOR gold]Febero/2021[/COLOR], se publicó una versión de Balandro, con todo su código open source.
+03) Desde [COLOR gold]Marzo/2021[/COLOR] a [COLOR gold]Septiembre/2021[/COLOR],
+       se han publicado versiones ya totalmente compatibles con Kodi 19 Matrix
+04) [COLOR gold]30/9/2021[/COLOR] se publicó la versión de Balandro 2.1.0
+05) Tanto Balandro como Alfa en sus créditos, indican el uso de esa licencia.
+06) Además en los créditos de Balandro,
+       dejamos totalmente aclarado que es un MOD derivado de
+       [COLOR gold]Pelisalacarta y Alfa[/COLOR].
+07) En consecuencia es obvio,
+       que existirán un número considerable de instrucciones parejas, similiares e incluso idénticas.
+08) No entendemos a qué obedece el hecho de que en nuestra última versión del
+       [COLOR gold]30/9/2021[/COLOR] se desatase esa situación,
+       a no ser que exista una intencionalidad de desprestigiar,
+       desligitimar ó vendeta hacia Balandro.
+09) De ahí, a atreverse a asegurar que no Flotamos sin [COLOR gold]Alfa[/COLOR], hay un abismo.
+       Que [COLOR gold]Alfa[/COLOR] nos aplauda, se lo agradecemos pues indica el reconocimiento a nuestra labor.
+       Que nos den palmaditas en la espalda, la verdad no hace falta
+       y menos cuando realmente pretenden ser puñaladas.
+       Y por último, respecto a que piensen que otros por menos fueron quemados en la hoguera,
+       dos puntualizaciones:
+       La primera deberíais saber que la época de la Inquisión ya pasó, os convendría evolucionar,
+       y La segunda, tened cuidado con jugar con Fuego,
+       porque en muchas ocasiones uno se acaba quemando también.
+10) Respecto a los grupos:
+       [COLOR gold]Kodimaniac,  Kodiadictos,  Chikiry,  FestayCristal,  Luar,  etc...[/COLOR]
+       No faltaba más, podeís hacer con vuestros Wizards, Scripts, etc... lo que os plazca, 
+       pero eso sí, sin faltar a la verdad, ó sin haber contrastado la información antes.
+       Siempre ha de existir el beneficio de la duda razonable y por supuesto,
+       no aprovechar esto para difundir infamias y calumnias sobre Balandro.
+11) Al final el Usuario,
+       lo que desea es una herramienta en sus manos que le dé lo que necesita,
+       con fluidez y sin historias.
+       Él es el que manda en su Media Center y no se le debe encorsetar ó decidir por él
+       qué addons utilizar.
+       Así que nos tomamos la libertad de deciros que invirtáis mayor tiempo en eso,
+       que en poner la lupa sobre nosotros, los usuarios os lo agradecerán.
+
+12) Post Data:
+       Nos vais a permitir la expléndida cita del Quijote
+       [COLOR cyan]ladran, pues cabalgamos[/COLOR]
+       en nuestro caso navegamos con viento a favor y a toda vela.
+
+[COLOR chartreuse][B]Mensaje Fijado 03[/COLOR]  [COLOR yellow]OPCIONES TELEGRAM BALANDRO ASESOR[/B][/COLOR]
+
+@balandro | Linktree  [COLOR dodgerblue]linktr.ee/balandro[/COLOR]
+
+[COLOR chartreuse][B]Mensaje Fijado 04[/COLOR]  [COLOR yellow]INSTALACION BALANDRO[/B][/COLOR]
+
+Compatible con:
+  Solo versiones OFICIALES de KODI
+  22.x Piers,  21.x Omega,  20.x Nexus,  19.x Matrix,  18.x Leia,  17.x Krypton
+
+Repositorios Obsoletos:
+  Los que tengaís los Repositorios de Balandro
+  [COLOR red]Versiones[B] 4.0.0,  3.0.0,  2.0.0,  1.0.5  ó  1.0.3[/B][/COLOR]
+  debereís eliminar ese repositorio antes de vuestro Kodi,
+  y abandonar vuestro Media Center, antes de proseguir.
+
+Atención:
+  Última Versión del repositorio [COLOR cyan]4.0.1[/COLOR] Balandro Repo
+
+  Desde ese Repositorio, Nueva versión del addon de vídeo,
+  La Última Versión de Balandro que haya disponible.
+
+Si ya teneís este repositorio instalado, vuestro Media Center Kodi,
+os avisará, de una [COLOR gold]Actualización Disponible[/COLOR].
+
+Si no teneís instalado este último Repositorio:
+  1) Disponible por fuente  [COLOR dodgerblue]repobal.github.io/base/[/COLOR]
+
+  2) Disponible desde nuestro Foro
+  [COLOR dodgerblue]www.mimediacenter.info/foro/[/COLOR]  Balandro
+  [COLOR gold]Repositorio Descarga e Instalación[/COLOR]
+
+Procedimiento Instalación:
+  Desde ese Balandro Repo
+  Nueva versión del addon de vídeo,
+  La Última Versión de Balandro que haya disponible.
+
+  [COLOR gold]Kodi, Sistema, Add-ons, Instalar desde un repositorio[/COLOR]
+  [COLOR cyan]Balandro Repo[/COLOR]
+  Add-ons de vídeo, [COLOR gold]Balandro[/COLOR] e Instalar
+
+  Si al instalar el addon de vídeo os diera Instalación [COLOR gold]Fallida[/COLOR],
+  abandonar vuestro Media Center Kodi e ingresar de nuevo en el,
+  porque a veces Kodi, es muy Caprichoso.
+
+Recomendación para disponer de más Servidores (vías alternativas):
+  Instalar desde la Fuente de Balandro  [COLOR dodgerblue]repobal.github.io/base/[/COLOR]
+
+  dentro de la Carpeta [COLOR gold]Scripts[/COLOR] según la versión de su Kodi
+    Sub-Carpeta [COLOR gold]kodi18[/COLOR] Hasta Kodi 18.x
+    Sub-Carpeta [COLOR gold]kodi19[/COLOR] Desde Kodi 19.x
+
+    [COLOR gold]Repo Elementum,  Repo ResolveUrl,  Plugin Video Youtube [/COLOR]
+
+[COLOR chartreuse][B]Mensaje Fijado 05[/COLOR]  [COLOR yellow]DESCARGA E INSTALACION DEL ADDON DE VIDEO BALANDRO[/B][/COLOR] 
+
+Solo si el Repositorio de Balandro está [COLOR gold]Temporalmente Caído[/COLOR]
+
+Compatible con:
+  Solo versiones OFICIALES de KODI
+  22.x Piers,  21.x Omega,  20.x Nexus,  19.x Matrix,  18.x Leia,  17.x Krypton
+
+Descarga [COLOR gold]Solo[/COLOR] disponible desde nuestro Foro:
+  [COLOR dodgerblue]www.mimediacenter.info/foro/[/COLOR]  Balandro
+  [COLOR gold]Instalar Balandro si el Repo está Temporalmente caído[/COLOR]
+  Descargar el addon de vídeo de Balandro
+
+  Actualizar lo descargado [COLOR gold]Kodi, Sistema, Add-ons, Instalar desde un archivo .zip[/COLOR]
+
+  Si al instalar el addon de vídeo os diera Instalación [COLOR gold]Fallida[/COLOR],
+  abandonar vuestro Media Center Kodi e ingresar de nuevo en el,
+  porque a veces Kodi, es muy Caprichoso.
+
+[COLOR chartreuse][B]Mensaje Fijado 06[/COLOR]  [COLOR yellow]BALANDRO REPRODUCCIONES[/B][/COLOR]
+
+Comrobación antes de reportar un posible fallo en la Reproducción de [COLOR gold]Servidores[/COLOR]:
+  Antes de reportarlo como un posible error, rogamos accedaís a traves de un navegador web,
+  a ese canal en concreto y procedaís a comprobar si esa película/serie/episodio
+  reproduce a traves del servidor en cuestión.
+
+  [COLOR cyan]Si el resultado de esta operativa ha resultado satisfactoria,
+  indicarnos toda esa información para proceder a su verficación/subsanación.[/COLOR]
+
+  Debeis comprender que este trabajo ha de ser compartido entre vosotros y nosotros,
+  porque si la carga solo recayera sobre nosotros,
+  sería imposible abordarlo por saturación/falta de tiempo.
+
+[COLOR chartreuse][B]Mensaje Fijado 07[/COLOR]  [COLOR yellow]GRUPO TELEGRAM BALANDRO ASESOR[/B][/COLOR] 
+
+Atención:
+  Este Grupo ha pasado a ser [COLOR cyan]Privado[/COLOR] desde el [COLOR gold]10/10/2024[/COLOR].
+
+  Si lo abandonaís, ya NO podreís acceder a el, en consecuencia el grupo estará cerrado para
+  [COLOR gold]Nuevas Incorporaciones[/COLOR], a partir de esa Fecha.
+
+Opción Disponible:
+  Los Miembros del Grupo, tienen la autorización para [COLOR gold]Añadir Nuevos Miembros[/COLOR].
+
+[COLOR chartreuse][B]Mensaje Fijado 08[/COLOR]  [COLOR yellow]QUITAR LOS PROXIES DE UN CANAL[/B][/COLOR]
+
+Métodos para Quitar los proxies en un canal concreto.
+
+Método 1:
+  En el Listado de Canales, pulsación sostenida sobre el [COLOR gold]Nombre[/COLOR] del canal y ahí Quitar los proxies
+
+Método 2:
+  Entrando en el Canal, si el canal dispone de la opción
+  [COLOR gold]Acciones[/COLOR] [COLOR plum](si no hay resultados)[/COLOR]
+  pulsación sostenida sobre la opción [COLOR red]Configurar proxies a usar ...[/COLOR] y ahí Quitar los proxies
+
+Método 3:
+  En la [COLOR gold]Consola[/COLOR] del Proceso de Obtención de Proxies, [COLOR gold]Cancelar[/COLOR], y ejecutar Quitar los proxies.
+
+[COLOR chartreuse][B]Mensaje Fijado 09[/COLOR]  [COLOR yellow]GESTION DE PROXIES[/B][/COLOR]
+
+Se recomienda su gestión, solo para [COLOR gold]Usuarios Avanzados[/COLOR].
+
+En el Foro:
+  [COLOR dodgerblue]www.mimediacenter.info/foro/[/COLOR]  Balandro
+  [COLOR gold]Gestión Proxies (Listas Personalizadas)[/COLOR]
+  Las listas se revisan y actualizan con cierta peridiocidad.
+  También podreís compartir vuestras Listas.
+
+  Si generaís vuestra lista personalizada, seguir la estructura de 1 proxy por línea.
+  Ver la composición en el fichero existente en el Foro,  una vez descomprimido.
+
+Para gestionar una Lista Personalizada:
+  Deberá tener opcionalmente un programa descompresor de archivos instalado en su equipo.
+
+  Si no obtiene el fichero Des-comprimido, durante el Proceso, se le solicitará
+  la ubicación de [COLOR gold]Lista-proxies.zip[/COLOR] para poder efectuar su Des-compresión
+
+  Obtendrá el fichero descomprimido [COLOR gold]Lista-proxies.txt[/COLOR]
+  en la carpeta por defecto del add-on [COLOR gold].../kodi/userdata/addon_data/plugin.video.balandro/[/COLOR]
+  opcionalmente puede ubicarlo allí, ó donde desee, mediante un explorador de archivos.
+
+Desde el Foro:
+  [COLOR dodgerblue]www.mimediacenter.info/foro/[/COLOR]  Balandro
+  [COLOR gold]Gestión Proxies (Listas Personalizadas)[/COLOR]
+  descargar desde Adjuntos [COLOR gold]Lista-proxies.zip[/COLOR]
+  y opcionalnente Descomprimirlo donde le interese.
+
+Ajustes en Balandro:
+  Active su uso en su configuración, [COLOR gold]Categoría Proxies[/COLOR], Apartado [COLOR gold]Lista Personalizada[/COLOR].
+
+Ejecución:
+  Durante el proceso de obtención de Proxies, se le solicitará, la ubicación del fichero
+  [COLOR gold]Lista-proxies.txt[/COLOR] ó [COLOR gold]Lista-proxies.zip[/COLOR]
+
+Información:
+  Esta lista tiene mayor estabilidad y una caducidad mas longeva, es cuestión de ir probando,
+  cuando no se consigan obtener proxies por el método Automático ó Habitual.
+
+[COLOR chartreuse][B]Mensaje Fijado 10[/COLOR]  [COLOR yellow]SI APARECIERA LA VENTANA DE ERROR INESPERADO[/B][/COLOR] 
+
+Compruebe:
+  Que tenga suficiente espacio Libre Disponible en su Equipo,
+  y Verifique que opera con la Última Versión de Balandro.
+
+De ser correctas la comprobaciones:
+  Puede que tenga el fichero de Ajustes [COLOR gold]CORRUPTO[/COLOR],
+  por un Corte de fluido eléctrico ó NO abandobar su Kodi por su botón de apagado.
+
+Si fuera este su caso deberá seguir estos pasos:
+  1) Des-instalar Balandro y a la pregunta [COLOR gold]Borrar su Data[/COLOR] conteste SI
+  2) Abandonar Kodi
+  3) Instalar la última versión de Balandro
+
+Atención:
+  Tenga presente que al efectuar estos pasos, [COLOR gold]PERDERÁ[/COLOR] toda su configuración personalizada.
+
+[COLOR chartreuse][B]Mensaje Fijado 11[/COLOR]  [COLOR yellow]INSTALACION ADD-ONS EXTERNOS[/B][/COLOR]
+
+Solo con versiones OFICIALES de KODI
+  22.x Piers,  21.x Omega,  20.x Nexus,  19.x Matrix,  18.x Leia,  17.x Krypton
+
+Recomendación para disponer de más Servidores (vías alternativas):
+  Instalar desde la Fuente de Balandro  [COLOR dodgerblue]repobal.github.io/base/[/COLOR]
+
+  dentro de la Carpeta [COLOR gold]Scripts[/COLOR] según la versión de su Kodi:
+    Sub-Carpeta [COLOR gold]kodi18[/COLOR] Hasta Kodi 18.x
+    Sub-Carpeta [COLOR gold]kodi19[/COLOR] Desde Kodi 19.x
+
+    [COLOR gold]Repo Elementum,  Repo ResolveUrl,  Plugin Video Youtube [/COLOR]
+
+[COLOR chartreuse][B]Mensaje Fijado 12[/COLOR]  [COLOR yellow]IDIOMAS (AUDIOS)[/B][/COLOR]
+
+Casi todos tienen idioma [COLOR gold]Castellano[/COLOR].
+Aunque no lo determina el canal habitualmente,
+sino que los Uploaders al subir los vídeos están los idiomas que ellos han decidido,
+y esto NO se conoce con exactitud, hasta el momento de presentar los Players, No Antes.
+Los estrenos en castellano, tardan mucho más tiempo en ponerlos los uploaders en las Webs.
+
+Revise sus [COLOR gold]Ajustes, categoría Play[/COLOR].
+
+[COLOR chartreuse][B]Mensaje Fijado 13[/COLOR]  [COLOR yellow]ULTIMA VERSION DE BALANDRO[/B][/COLOR] 
+
+Les recordamos que NO almacenamos [COLOR gold]NINGÚN[/COLOR] tipo de Contenido,
+tan SOLO presentamos lo que las Webs (Canales) Suministran.
+
+Última Versión  [COLOR gold]22/9/2025[/COLOR]  [COLOR cyan]4.0.21[/COLOR]
+ó acceder al Foro
+[COLOR dodgerblue]www.mimediacenter.info/foro/[/COLOR]  Balandro
+[COLOR gold]Aviso Mantenimiento del Addon (a mínimos)[/COLOR]
+
+[COLOR chartreuse][B]Mensaje Fijado 14[/COLOR]  [COLOR yellow]ACCESO A LOS MENSAJES FIJADOS DESDE EL FORO[/B][/COLOR] 
+
+[COLOR dodgerblue]www.mimediacenter.info/foro/[/COLOR]  Balandro
+[COLOR gold]Telegram Balandro Asesor Mensajes Fijados[/COLOR]
+
+[COLOR chartreuse][B]Mensaje Fijado 15[/COLOR]  [COLOR yellow]HISTORIAL DE TELEGRAM[/B][/COLOR]
+
+Nota Informativa [COLOR gold]27/9/2025[/COLOR] Hemos eliminado Todo el Historial de Chats.
+
+Normativa General:
+  Abstenerse de publicar Fotos/Vídeos excepto Emoticones 
+  En el caso de necesitar alguna Foto ó algún Vídeo,
+  respecto a la ejecución de Balandro, se os dará Aurorización explicita para ello.
+  No hacer referencia a:  Canales,  Plataformas,  Sitios Web,  Add-Ons,  etc.
+  El incumplimiento de esta Normativa Acarreará la posible [COLOR gold]Expulsión del Grupo[/COLOR].
+

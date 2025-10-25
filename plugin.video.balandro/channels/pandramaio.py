@@ -5,6 +5,7 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
+
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, jsontools, scrapertools, servertools, tmdb
@@ -58,13 +59,13 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por tema', action = 'temas', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por productora', action = 'productoras', search_type = 'movie', text_color = 'moccasin' ))
-
-    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
 
     return itemlist
 
@@ -79,13 +80,13 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, _type = 'lasts', search_type = 'tvshow', text_color = 'cyan' ))
 
+    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por tema', action = 'temas', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por productora', action = 'productoras', search_type = 'tvshow', text_color = 'moccasin' ))
-
-    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -100,13 +101,13 @@ def mainlist_doramas(item):
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, _type = 'lasts', group = 'doramas', search_type = 'tvshow', text_color = 'cyan' ))
 
+    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', group = 'doramas', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', group = 'doramas', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por tema', action = 'temas', group = 'doramas', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por productora', action = 'productoras', group = 'doramas', search_type = 'tvshow', text_color = 'moccasin' ))
-
-    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', group = 'doramas', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -570,7 +571,19 @@ def findvideos(item):
         if not servidor == 'directo':
             lng = get_lang(lang)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vose', quality = 'HD', other = other, age = lng ))
+            lang = 'Vose'
+
+            if lng == 'subtitulado': pass
+            elif lng == 'Castellano':
+                lang = 'Esp'
+                lng = ''
+            elif lng == 'Latino':
+                lang = 'Lat'
+                lng = ''
+            else: lang = 'Vo'
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                                  language = lang, quality = 'HD', other = other, age = lng ))
 
     if not itemlist:
         if not ses == 0:

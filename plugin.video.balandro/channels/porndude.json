@@ -1,0 +1,17 @@
+{
+  "id": "porndude",
+  "name": "PornDude",
+  "thumbnail": "porndude.jpg",
+
+  "active": true,
+
+  "searchable": false,
+  "search_types": ["movie"],
+
+  "categories": ["movie", "adults"],
+  "language": ["vo"],
+
+  "clusters": ["onlyone", "adults"],
+
+  "notes": "Canal con varios Sub-Canales. Vídeos en versión Original para Adultos +18."
+}

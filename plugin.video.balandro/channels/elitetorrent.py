@@ -119,10 +119,10 @@ def idiomas(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'idioma/castellano-17-1/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'idioma/espanol-latino-11-1/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Inglés', action = 'list_all', url = host + 'idioma/ingles/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'idioma/vose-3-1/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'idioma/castellano-17-1/', text_color='deepskyblue' ))
+    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'idioma/espanol-latino-11-1/', text_color='deepskyblue' ))
+    itemlist.append(item.clone( title = 'Inglés', action = 'list_all', url = host + 'idioma/ingles/', text_color='deepskyblue' ))
+    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'idioma/vose-3-1/', text_color='deepskyblue' ))
 
     return itemlist
 

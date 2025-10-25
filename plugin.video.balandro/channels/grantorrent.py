@@ -46,7 +46,7 @@ except:
    except: pass
 
 
-host = 'https://www1.grantorrent.lol/'
+host = 'https://www2.grantorrent.lol/'
 
 
 _player = host
@@ -61,7 +61,7 @@ ant_hosts = ['http://grantorrent.net/', 'https://grantorrent1.com/', 'https://gr
              'https://grantorrent.se/', 'https://grantorrent.si/', 'https://grantorrent.fi/',
              'https://grantorrent.bz/', 'https://grantorrent.zip/', 'https://www1.grantorrent.pm/',
              'https://www1.grantorrent.wf/', 'https://www2.grantorrent.wf/', 'https://www3.grantorrent.wf/',
-             'https://www4.grantorrent.wf/', 'https://grantorrent.mov/']
+             'https://www4.grantorrent.wf/', 'https://grantorrent.mov/', 'https://www1.grantorrent.lol/']
 
 
 domain = config.get_setting('dominio', 'grantorrent', default='')
@@ -348,7 +348,10 @@ def list_all(item):
 
             if qlty == 'Temporada': qlty = ''
 
-            qlty = qlty.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
+            qlty = qlty.replace('Temporada', '').strip()
+
+            if qlty == '1' or qlty == '2' or qlty == '3' or qlty == '4' or qlty == '5' or qlty == '6' or qlty == '7' or qlty == '8' or qlty == '9':
+                qlty = ''
 
             title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
 

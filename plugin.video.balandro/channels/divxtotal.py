@@ -15,7 +15,7 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www1.divxtotal.lol/'
+host = 'https://www2.divxtotal.lol/'
 
 
 # ~ por si viene de enlaces guardados
@@ -24,7 +24,7 @@ ant_hosts = ['https://www.divxtotal.re/', 'https://www.divxtotal.ac/', 'https://
              'https://www.divxtotal.pl/', 'https://www.divxtotal.wf/', 'https://www.divxtotal.win/',
              'https://www1.divxtotal.zip/', 'https://www2.divxtotal.zip/', 'https://www2.divxtotal.mov/',
              'https://www3.divxtotal.mov/', 'https://www4.divxtotal.mov/', 'https://www5.divxtotal.mov/',
-             'https://divxtotal.io/']
+             'https://divxtotal.io/', 'https://www1.divxtotal.lol/']
 
 
 domain = config.get_setting('dominio', 'divxtotal', default='')
@@ -169,7 +169,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series-6/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimas', action = 'list_all', url = host, group = 'lasts', search_type = 'tvshow', text_color='cyan' ))
 
@@ -229,7 +229,8 @@ def list_all(item):
 
     matches = scrapertools.find_multiple_matches(bloque, '<tr>(.*?)</tr>')
     if not matches:
-        if item.search_type == 'tvshow': matches = scrapertools.find_multiple_matches(bloque, '<div class="col-lg-3 col-md-3 col-md-4 col-xs-6">(.*?)</div>')
+        if item.search_type == 'tvshow':
+             matches = scrapertools.find_multiple_matches(bloque, '<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 serie-card">(.*?)</div>')
 
     if not matches:
         if item.group == 'lasts': matches = scrapertools.find_multiple_matches(bloque, '<div class="row">(.*?)</div></div>')

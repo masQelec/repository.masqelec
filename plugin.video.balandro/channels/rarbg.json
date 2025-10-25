@@ -6,12 +6,12 @@
   "active": true,
 
   "searchable": true,
-  "search_types": ["movie"],
+  "search_types": ["all", "movie", "tvshow"],
 
-  "categories": ["torrent", "movie"],
+  "categories": ["movie", "tvshow", "torrent"],
   "language": ["vo"],
 
-  "clusters": ["onlyone", "torrents", "qualityes", "years", "rankings", "kids", "docs", "4k", "3d"],
+  "clusters": ["onlyone", "torrents", "qualityes", "languages", "years", "rankings", "kids", "docs", "4k", "3d"],
 
-  "notes": "Canal con enlaces Torrent exclusivamente. Películas en Versión Original, por géneros, calidad y año. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Canal con enlaces Torrent exclusivamente. Películas en Versión Original, por géneros. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import re
+import re, base64
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -158,6 +158,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/peliculas/', search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
     return itemlist
@@ -176,6 +178,8 @@ def mainlist_series(item):
     if not config.get_setting('descartar_anime', default=False):
         itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', search_type = 'tvshow', text_color = 'springgreen' ))
 
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'Bíblicas', action = 'list_all', url = host + 'category/series-biblicas/', search_type = 'tvshow', text_color = 'moccasin' ))
 
     return itemlist
@@ -190,6 +194,43 @@ def mainlist_animes(item):
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color = 'springgreen' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/anime/', search_type = 'all' ))
+
+    return itemlist
+
+
+def generos(item):
+    logger.info()
+    itemlist = []
+
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
+    opciones = {
+        'accion': 'Acción',
+        'animacion': 'Animación',
+        'aventura': 'Aventura',
+        'ciencia-ficcion': 'Ciencia ficción',
+        'comedia': 'Comedia',
+        'crimen': 'Crimen',
+        'documental': 'Documental',
+        'drama': 'Drama',
+        'familia': 'Familia',
+        'fantasia': 'Fantasía',
+        'historia': 'Historia',
+        'misterio': 'Misterio',
+        'musica': 'Música',
+        'pelicula-de-tv': 'Película Tv',
+        'romance': 'Romance',
+        'suspense': 'Suspense',
+        'terror': 'Terror',
+        'war': 'War',
+        'western': 'Western'
+        }
+
+    for opc in opciones:
+        url = host + 'genres/' + opc + '/'
+
+        itemlist.append(item.clone( title = opciones[opc], url = url, action ='list_all', text_color = text_color ))
 
     return itemlist
 
@@ -386,9 +427,14 @@ def episodios(item):
 
         if not title: title = item.contentSerieName
 
-        title = title.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio','[COLOR goldenrod]Epis.[/COLOR]')
-
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
+
+        if 'episodie' in titulo.lower() or 'episodio' in titulo.lower() or 'capítulo' in titulo.lower() or 'capitulo' in titulo.lower():
+            titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
         url = url.replace('\\/', '/')
 
@@ -508,6 +554,8 @@ def findvideos(item):
                        other = url.split("/")[2]
                        other = other.replace('https:', '').strip()
 
+                if '.eyJs' in link: age = ''
+
                 itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes, age=age,
                                       language=lang, other=other ))
 
@@ -620,23 +668,32 @@ def play(item):
         crypto = str(item.crypto)
         bytes = str(item.bytes)
 
-        try:
-            url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
-        except:
-            url = ''
+        url = ''
+
+        if not bytes:
+            url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
+            url += '='
+            url = base64.b64decode(url).decode()
+            url = scrapertools.find_single_match(url, '"link":"(.*?)"')
 
         if not url:
-            url = decrypters.decode_decipher(crypto, bytes)
-
-        if not url:
-            if crypto.startswith("http"):
-                url = crypto.replace('\\/', '/')
+            try:
+                url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
+            except:
+                url = ''
 
             if not url:
-                return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+                url = decrypters.decode_decipher(crypto, bytes)
 
-        elif not url.startswith("http"):
-            return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+            if not url:
+                if crypto.startswith("http"):
+                    url = crypto.replace('\\/', '/')
+
+                if not url:
+                    return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+
+            elif not url.startswith("http"):
+                return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
 
     if url:
         if '/xupalace.' in url or '/uploadfox.' in url:

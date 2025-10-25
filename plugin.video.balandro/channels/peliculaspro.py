@@ -199,13 +199,15 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
-    itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone ( title = 'Catálogo', action = 'list_all', url = host + 'peliculas', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas', search_type = 'movie' ))
 
-    itemlist.append(item.clone ( title = 'Estrenos', action = 'list_all', url = host + 'category/estrenos', search_type = 'movie', text_color='cyan' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'estrenos?type=movies', search_type = 'movie', text_color='cyan' ))
 
-    itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
     return itemlist
 
@@ -219,6 +221,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_all', url = host + 'estrenos?type=series', search_type = 'tvshow', text_color = 'moccasin' ))
 
     return itemlist
 
@@ -237,6 +241,21 @@ def generos(item):
         if title == 'Estrenos': continue
 
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color = 'deepskyblue' ))
+
+    return itemlist
+
+
+def anios(item):
+    logger.info()
+    itemlist = []
+
+    from datetime import datetime
+    current_year = int(datetime.today().year)
+
+    for x in range(current_year, 1939, -1):
+        url = host + 'release/' + str(x)
+
+        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -490,6 +509,7 @@ def findvideos(item):
         elif srv == 'ver en': continue
         elif srv == 'drop': continue
         elif srv == 'bit': continue
+        elif srv == 'g2tji-my': continue
 
         idioma = IDIOMAS.get(lang, lang)
 

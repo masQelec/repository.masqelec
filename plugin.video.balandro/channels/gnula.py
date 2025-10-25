@@ -176,13 +176,13 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Por tema', action = 'temas', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por estudio', action = 'estudios', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por estudio', action = 'estudios', search_type = 'movie', text_color='moccasin' ))
+
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'movie' ))
 
     return itemlist
 
@@ -471,6 +471,10 @@ def episodios(item):
 
         titulo = str(temp) + 'x' + str(epis) + ' ' + title.replace(temp_epis, '').strip()
 
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
                                     contentType = 'episode', contentSeason=temp, contentEpisodeNumber=epis ))
 
@@ -552,6 +556,7 @@ def findvideos(item):
                  elif '/multiup.' in url: continue
                  elif '/filemirage.' in url: continue
                  elif '/filepv.' in url: continue
+                 elif '.rapidvideo.' in url: continue
 
                  servidor = servertools.get_server_from_url(url)
                  servidor = servertools.corregir_servidor(servidor)
@@ -604,6 +609,7 @@ def findvideos(item):
                 elif '/multiup.' in url: continue
                 elif '/filemirage.' in url: continue
                 elif '/filepv.' in url: continue
+                elif '.rapidvideo.' in url: continue
 
                 if not '/embed.php?id=' in url:
                     servidor = servertools.get_server_from_url(url)
@@ -674,6 +680,7 @@ def findvideos(item):
                         elif '/multiup.' in url: continue
                         elif '/filemirage.' in url: continue
                         elif '/filepv.' in url: continue
+                        elif '.rapidvideo.' in url: continue
 
                         servidor = servertools.get_server_from_url(url)
                         servidor = servertools.corregir_servidor(servidor)

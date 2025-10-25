@@ -30,7 +30,7 @@ def mainlist(item):
                                     search_type = 'tvshow', text_color=' springgreen' ))
 
     if config.get_setting('mnu_adultos', default=True):
-        itemlist.append(item.clone( title = 'Adultos', action = 'list_down', url = host + 'cat/XXX/1/', tipo='movie',
+        itemlist.append(item.clone( title = 'Adultos', action = 'list_down', url = host + 'cat/XXX/1/', tipo='movie', group = '+18',
                                     search_type = 'movie', adults='adults', text_color = 'orange' ))
 
     return itemlist
@@ -45,12 +45,16 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_down', url = host + 'cat/Movies/1/', tipo='movie', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Navidad', action = 'list_all', url = host + 'christmas-movies/1/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Navidad', action = 'list_all', url = host + 'christmas-movies/1/', search_type = 'movie', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( action ='generos', title='Por género', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
+
     itemlist.append(item.clone( action= 'idiomas', title = 'Por idioma', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
+    if config.get_setting('mnu_adultos', default=True):
+        itemlist.append(item.clone( title = 'Adultos', action = 'list_down', url = host + 'cat/XXX/1/', tipo='movie', group = '+18',
+                                    search_type = 'movie', adults='adults', text_color = 'orange' ))
 
     return itemlist
 
@@ -195,13 +199,10 @@ def list_down(item):
     matches = re.compile('</a><a href="(.*?)".*?>(.*?)</a>', re.DOTALL).findall(bloque)
 
     contentExtra = ''
-    Extra = ''
 
     thumb = item.thumb
 
-    if item.adults:
-        Extra = 'adults'
-        thumb = config.get_thumb('adults')
+    if item.adults: thumb = config.get_thumb('adults') 
 
     for url, title in matches:
         url = host[:-1] + url
@@ -224,6 +225,9 @@ def list_down(item):
 
         sufijo = '' if item.search_type != 'all' else tipo
 
+        contentExtra = ''
+        if item.group == '+18': contentExtra = 'adults'
+
         if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
@@ -231,7 +235,7 @@ def list_down(item):
             SerieName = corregir_Name(title)
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=lang, fmt_sufijo=sufijo,
-                                        contentExtra='3', Extra=Extra,
+                                        contentExtra = contentExtra, group = '+18',
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
         if tipo == 'movie':
@@ -241,7 +245,7 @@ def list_down(item):
             PeliName = corregir_Name(title)
 
             itemlist.append(item.clone( action = 'findvideos', url=url, title=title, thumbnail=thumb, languages=lang, fmt_sufijo=sufijo,
-                                        contentExtra=contentExtra, Extra=Extra,
+                                        contentExtra = contentExtra, group = '+18',
                                         contentType = 'movie', contentTitle = PeliName, infoLabels = {'year': '-'} ))
 
     if not item.adults:
@@ -262,7 +266,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    if item.Extra == 'adults':
+    if item.group == '+18':
         if not config.get_setting('ses_pin'):
             if config.get_setting('adults_password'):
                 from modules import actions

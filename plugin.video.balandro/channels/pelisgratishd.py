@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import re
+import re, base64
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -83,6 +83,8 @@ def acciones(item):
                                 from_channel='pelisgratishd', folder=False, text_color='chartreuse' ))
 
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
 
     platformtools.itemlist_refresh()
 
@@ -274,9 +276,9 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    season = scrapertools.find_single_match(data, '<div x-show="tab === ' + "'season" + str(item.contentSeason) + '(.*?)</ul> </div>')
+    bloque = scrapertools.find_single_match(data, '<div x-show="tab === ' + "'season" + str(item.contentSeason) + '(.*?)</ul></div>')
 
-    matches = scrapertools.find_multiple_matches(season, ' src="(.*?)".*?-ellipsis">(.*?)</div>.*?<p class="text-xs">(.*?)</p>.*?<a class="lka".*?href="(.*?)"')
+    matches = scrapertools.find_multiple_matches(bloque, ' src="(.*?)".*?-ellipsis">(.*?)</div>.*?<p class="text-xs">(.*?)</p>.*?<a class="lka".*?href="(.*?)"')
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
@@ -448,8 +450,12 @@ def findvideos(item):
                        other = url.split("/")[2]
                        other = other.replace('https:', '').strip()
 
+                if '.eyJs' in link: age = ''
+
                 itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes, age=age,
                                       language=lang, other=other ))
+
+            continue
 
     # ~ Otros
     options = scrapertools.find_multiple_matches(data, '<li onclick="go_to_playerVast(.*?)</li>')
@@ -560,23 +566,32 @@ def play(item):
         crypto = str(item.crypto)
         bytes = str(item.bytes)
 
-        try:
-            url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
-        except:
-            url = ''
+        url = ''
+
+        if not bytes:
+            url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
+            url += '='
+            url = base64.b64decode(url).decode()
+            url = scrapertools.find_single_match(url, '"link":"(.*?)"')
 
         if not url:
-            url = decrypters.decode_decipher(crypto, bytes)
-
-        if not url:
-            if crypto.startswith("http"):
-                url = crypto.replace('\\/', '/')
+            try:
+                url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
+            except:
+                url = ''
 
             if not url:
-                return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+                url = decrypters.decode_decipher(crypto, bytes)
 
-        elif not url.startswith("http"):
-            return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+            if not url:
+                if crypto.startswith("http"):
+                    url = crypto.replace('\\/', '/')
+
+                if not url:
+                    return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+
+            elif not url.startswith("http"):
+                return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
 
     if url:
         if '/xupalace.' in url or '/uploadfox.' in url:

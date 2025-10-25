@@ -77,6 +77,23 @@ def list_all(item):
 
         if not url or not title: continue
 
+        season = 1
+
+        if 'Season' in title:
+            if '2nd' in title: season = 2
+            elif '3rd' in title: season = 3
+            elif '4th' in title: season = 4
+            elif '5th' in title: season = 5
+            elif '6th' in title: season = 6
+            elif '7th' in title: season = 7
+            elif '8th' in title: season = 8
+            elif '9th' in title: season = 9
+            else:
+               season = scrapertools.find_single_match(title, 'Season(.*?)Capítulo').strip()
+               if not season : season = scrapertools.find_single_match(title, 'Season(.*?)$').strip()
+
+               if not season: season = 1
+
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
         SerieName = corregir_SerieName(title)
@@ -84,7 +101,7 @@ def list_all(item):
         title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, page = 0,
-                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
+                                    contentType = 'tvshow', contentSerieName = SerieName, contentSeason = season, infoLabels={'year': '-'} ))
 
         if len(itemlist) >= perpage: break
 
@@ -231,22 +248,24 @@ def episodios(item):
 
         title = title.strip()
 
-        season = 1
+        if item.contentSeason: season = item.contentSeason
+        else:
+            season = 1
 
-        if 'Season' in title:
-            if '2nd' in title: season = 2
-            elif '3rd' in title: season = 3
-            elif '4th' in title: season = 4
-            elif '5th' in title: season = 5
-            elif '6th' in title: season = 6
-            elif '7th' in title: season = 7
-            elif '8th' in title: season = 8
-            elif '9th' in title: season = 9
-            else:
-               season = scrapertools.find_single_match(title, 'Season(.*?)Capítulo').strip()
-               if not season : season = scrapertools.find_single_match(title, 'Season(.*?)$').strip()
+            if 'Season' in title:
+                if '2nd' in title: season = 2
+                elif '3rd' in title: season = 3
+                elif '4th' in title: season = 4
+                elif '5th' in title: season = 5
+                elif '6th' in title: season = 6
+                elif '7th' in title: season = 7
+                elif '8th' in title: season = 8
+                elif '9th' in title: season = 9
+                else:
+                   season = scrapertools.find_single_match(title, 'Season(.*?)Capítulo').strip()
+                   if not season : season = scrapertools.find_single_match(title, 'Season(.*?)$').strip()
 
-               if not season: season = 1
+                   if not season: season = 1
 
         title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]')
 

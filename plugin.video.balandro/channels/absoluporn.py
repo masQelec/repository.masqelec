@@ -41,6 +41,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + '/en' ))
 
+    itemlist.append(item.clone( title = 'Por etiqueta', action = 'etiquetas', url = host + '/en' ))
+
     return itemlist
 
 
@@ -50,7 +52,9 @@ def categorias(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('&nbsp;<a href="([^"]+)" class="link1b">([^"]+)</a>', re.DOTALL).findall(data)
+    bloque = scrapertools.find_single_match(data, '<div class="bloc-centre">(.*?)>Tags&nbsp;')
+
+    matches = re.compile('&nbsp;<a href="(.*?)".*?class="link1b">(.*?)</a>', re.DOTALL).findall(bloque)
 
     for url, title in matches:
         url = url.replace('..', '')
@@ -60,6 +64,30 @@ def categorias(item):
         url = host + url
 
         itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'moccasin' ))
+
+    return sorted(itemlist,key=lambda x: x.title)
+
+
+def etiquetas(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+
+    bloque = scrapertools.find_single_match(data, '<div class="bloc-centre">.*?>Tags&nbsp;(.*?)>More sites')
+
+    matches = re.compile('&nbsp;<a href="(.*?)".*?class="link1b">(.*?)</a>', re.DOTALL).findall(bloque)
+
+    for url, title in matches:
+        if title == 'All tags': continue
+
+        url = url.replace('..', '')
+
+        url = url.replace('.html', '_date.html')
+
+        url = host + url
+
+        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'pink' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 

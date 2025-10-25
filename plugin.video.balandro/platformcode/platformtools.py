@@ -586,10 +586,10 @@ def developer_mode_check_findvideos(itemlist, parent_item):
 
         # Server Various y anulados/controlados
         if apuntar:
-            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'hexload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'yadi.', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidroba', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhide', 'hxfile', 'drop', 'embedv', 'vgplayer', 'userload', 'uploadraja', 'cdnwish', 'goodstream', 'asnwish', 'flastwish', 'jodwish', 'fmoonembed', 'embedmoon', 'moonjscdn', 'rumble', 'bembed', 'javlion', 'streamruby', 'sruby', 'rubystream', 'stmruby', 'rubystm', 'rubyvid', 'swhoi', 'listeamed', 'go-streamer.net', 'fsdcmo', 'fdewsdc', 'peytonepre', 'ryderjet', 'smoothpre' , 'qiwi', 'swdyu', 'streamhihi', 'luluvdoo', 'lulu', 'ponmi', 'wishonly', 'streamsilk', 'playerwish', 'hlswish', 'iplayerhls', 'hlsflast', 'ghbrisk', 'cybervynx', 'streamhg', 'stbhg', 'dhcplay', 'wish', 'stblion', 'terabox', 'dhtpre', 'dramacool', 'l1afav', 'hlsflex', 'swiftplayers', 'movearnpre', 'seraphinap', 'seraphinapl', 'gradehgplus', 'tryzendm', 'hglink', 'hailindihg', 'guxhag', 'habetar', 'yuguaab', 'mivalyo', 'taylorplayer', 'xenolyzb', 'hgplaycdn', 'videoland', 'd00ds.site', 'davioad', 'haxloppd', 'dumbalag', 'kravaxxa']:
+            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'hexload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'yadi.', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidroba', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhide', 'hxfile', 'drop', 'embedv', 'vgplayer', 'userload', 'uploadraja', 'cdnwish', 'goodstream', 'asnwish', 'flastwish', 'jodwish', 'fmoonembed', 'embedmoon', 'moonjscdn', 'rumble', 'bembed', 'javlion', 'streamruby', 'sruby', 'rubystream', 'stmruby', 'rubystm', 'rubyvid', 'swhoi', 'listeamed', 'go-streamer.net', 'fsdcmo', 'fdewsdc', 'peytonepre', 'ryderjet', 'smoothpre' , 'qiwi', 'swdyu', 'streamhihi', 'luluvdoo', 'lulu', 'ponmi', 'wishonly', 'streamsilk', 'playerwish', 'hlswish', 'iplayerhls', 'hlsflast', 'ghbrisk', 'cybervynx', 'streamhg', 'stbhg', 'dhcplay', 'wish', 'stblion', 'terabox', 'dhtpre', 'dramacool', 'l1afav', 'hlsflex', 'swiftplayers', 'movearnpre', 'seraphinap', 'seraphinapl', 'gradehgplus', 'tryzendm', 'hglink', 'hailindihg', 'guxhag', 'habetar', 'yuguaab', 'mivalyo', 'taylorplayer', 'xenolyzb', 'hgplaycdn', 'videoland', 'bingezove', 'dinisglows', 'dingtezuni', 'd00ds.site', 'davioad', 'haxloppd', 'dumbalag', 'kravaxxa', 'hgbazooka', 'cavanhabg']:
                 apuntar = False
 
-            elif it.server in ['allviid', 'cloudfile', 'cloudmail', 'dailyuploads', 'darkibox', 'dembed', 'downace', 'fastdrive', 'filegram', 'gostream', 'letsupload', 'liivideo', 'myupload', 'neohd', 'oneupload', 'pandafiles', 'rovideo', 'send', 'streamable', 'streamdav', 'streamgzzz', 'streamoupload', 'turbovid', 'tusfiles', 'uploadba', 'uploadflix', 'uploadhub', 'uploady', 'upvid', 'veev', 'doods', 'veoh', 'vidbob', 'vidlook', 'vidmx', 'vido.', 'vidpro', 'vidstore', 'vipss', 'vkprime', 'worlduploads', 'ztreamhub' 'amdahost', 'updown', 'videa', 'asianplay', 'swiftload', 'udrop', 'vidtube',  'bigwarp', 'bgwp', 'wecima', 'asianload', 'savefiles', 'streamhls', 'vidbasci', 'streamup', 'strmup']:
+            elif it.server in ['allviid', 'cloudfile', 'cloudmail', 'dailyuploads', 'darkibox', 'dembed', 'downace', 'fastdrive', 'filegram', 'gostream', 'letsupload', 'liivideo', 'myupload', 'neohd', 'oneupload', 'pandafiles', 'rovideo', 'send', 'streamable', 'streamdav', 'streamgzzz', 'streamoupload', 'turbovid', 'tusfiles', 'uploadba', 'uploadflix', '1uploadflix', 'uploadhub', 'uploady', 'upvid', 'veev', 'doods', 'veoh', 'vidbob', 'vidlook', 'vidmx', 'vido.', 'vidpro', 'vidstore', 'vipss', 'vkprime', 'worlduploads', 'ztreamhub' 'amdahost', 'updown', 'videa', 'asianplay', 'swiftload', 'udrop', 'vidtube',  'bigwarp', 'bgwp', 'wecima', 'asianload', 'savefiles', 'streamhls', 'vidbasic', 'streamup', 'strmup', 'vimeos']:
                 apuntar = False
 
             elif it.server in ['fembed', 'fembed-hd', 'fembeder', 'divload', 'ilovefembed', 'myurlshort', 'jplayer', 'feurl', 'fembedisthebest', 'femax20', 'fcdn', 'fembad', 'pelispng', 'hlshd', 'embedsito', 'mrdhan', 'dutrag', 'fplayer', 'diasfem', 'suzihaza', 'vanfem', 'youtvgratis', 'oceanplay', 'gotovideo.kiev.ua', 'owodeuwu', 'sypl', 'fembed9hd', 'watchse', 'vcdn', 'femoload', 'cubeembed']:
@@ -869,7 +869,14 @@ def play_video(item, parent_item, autoplay=False):
                 else:
                     motivo = '[COLOR orange][B]' + motivo + '[/B][/COLOR]'
 
-                dialog_ok("No se puede Reproducir porque ...", motivo, item.url)
+                if notification_d_ok:
+                    dialog_ok("No se puede Reproducir porque ...", motivo, item.url)
+                else:
+                   if 'Archivo inexistente' in motivo:
+                       dialog_notification(config.__addon_name, '[B][COLOR fuchsia]' + 'Archivo Inexistente[/COLOR][/B]')
+                   else:
+                       dialog_ok("No se puede Reproducir porque ...", motivo, item.url)
+
         return False
 
     if len(video_urls) == 1:
@@ -915,7 +922,7 @@ def play_video(item, parent_item, autoplay=False):
             return play_torrent(mediaurl, parent_item)
 
         # ~ Para evitar ERROR: CCurlFile::Stat - Failed: Peer certificate cannot be authenticated with given CA certificates(60)
-        if item.server not in ['blenditall', 'm3u8hls', 'zembed', 'youtube']:
+        if item.server not in ['blenditall', 'm3u8hls', 'zembed', 'youtube', '']:
             if 'verifypeer=false' not in mediaurl and 'googleusercontent' not in mediaurl: 
                 mediaurl += '|' if '|' not in mediaurl else '&'
                 mediaurl += 'verifypeer=false'
