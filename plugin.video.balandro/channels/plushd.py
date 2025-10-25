@@ -283,6 +283,8 @@ def list_all(item):
 
         if not url or not title: continue
 
+        if 'PREMIUM' in title: continue
+
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
         title = title.replace('&#039;', "'")
@@ -438,6 +440,12 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
 
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        if 'Epis.' in titulo: titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
@@ -476,21 +484,27 @@ def findvideos(item):
 
         data = do_downloadpage(link)
 
-        if 'Estas saturando la red se te dará un bloqueo temporal' in str(data):
-            espera = 5
+        url = scrapertools.find_single_match(data, "(?i)Location.href = '([^']+)'")
 
-            timeout = config.get_setting('channels_repeat', default=30)
+        if not url:
+             if 'Estas saturando la red se te dará un bloqueo temporal' in str(data):
+                 espera = 5
 
-            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PlusHd [COLOR yellow][B]Saturado[/B][/COLOR]', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                 timeout = config.get_setting('channels_repeat', default=30)
 
-            time.sleep(espera)
+                 if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PlusHd [COLOR yellow][B]Saturado[/B][/COLOR]', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
 
-            data = do_downloadpage(link, timeout=timeout)
+                 time.sleep(espera)
 
-            if 'Estas saturando la red se te dará un bloqueo temporal' in str(data):
-                time.sleep(espera)
+                 data = do_downloadpage(link, timeout=timeout)
 
-                data = do_downloadpage(link, timeout=timeout)
+                 url = scrapertools.find_single_match(data, "(?i)Location.href = '([^']+)'")
+
+                 if not url:
+                     if 'Estas saturando la red se te dará un bloqueo temporal' in str(data):
+                         time.sleep(espera)
+
+                         data = do_downloadpage(link, timeout=timeout)
 
         url = scrapertools.find_single_match(data, "(?i)Location.href = '([^']+)'")
 

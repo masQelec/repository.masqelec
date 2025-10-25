@@ -91,7 +91,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'showlist/rating/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'showlist/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'showlist/rating/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Temporadas completas', action='list_all', url = host + 'cat/tv-packs-1/', search_type = 'tvshow' ))
 
@@ -118,6 +120,15 @@ def list_all(item):
 
         if not url or not title: continue
 
+        if '/search/' in item.url:
+            urlp = scrapertools.find_single_match(match, '<td class="forum_thread_post">.*?<a href="(.*?)"')
+            titp = scrapertools.find_single_match(match, '<td class="forum_thread_post">.*?title="(.*?)"')
+
+            if urlp: url = urlp
+            if titp: title = titp
+
+        if '[eztv]' in title: title = title.split("[eztv]")[0]
+
         title = title.replace('Torrent', '').strip()
 
         SerieName = title
@@ -130,7 +141,12 @@ def list_all(item):
 
         titulo = title.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]')
 
-        itemlist.append(item.clone( action='temporadas', url=url, title=titulo, contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': '-'} ))
+        if '/ep/' in url:
+            itemlist.append(item.clone( action='findvideos', url=url, title=titulo,
+                                        contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': '-'} ))
+        else:
+            itemlist.append(item.clone( action='temporadas', url=url, title=titulo,
+                                        contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': '-'} ))
 
         if len(itemlist) >= perpage: break
 

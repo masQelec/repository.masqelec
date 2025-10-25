@@ -324,13 +324,37 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile("<iframe.*?src='(.*?)'", re.DOTALL).findall(data)
-    if not matches: matches = re.compile('<iframe.*?src="(.*?)"', re.DOTALL).findall(data)
+    matches1 = re.compile("id='source-player-.*?<iframe.*?src='(.*?)'", re.DOTALL).findall(data)
+    matches2 = re.compile("id='source-player-.*?" + '<iframe.*?src="(.*?)"', re.DOTALL).findall(data)
+
+    matches3 = re.compile("id='source-player-.*?" + '<iframe.*?src="(.*?)"', re.DOTALL).findall(data)
+    matches4 = re.compile("id='source-player-.*?<iframe.*?src='(.*?)'", re.DOTALL).findall(data)
+
+    matches = matches1 + matches2 + matches3 + matches4
 
     ses = 0
 
     for url in matches:
+        if '.youtube.' in url: continue
+
         ses += 1
+
+        if 'peertubeLink' in url:
+            url = url.replace('&amp;', '&')
+
+            data1 = do_downloadpage(url)
+
+            data1 = data1.replace('\\/', '/')
+            data1 = data1.replace('\\"', '"')
+
+            data1 = data1.replace('=\\', '=').replace('\\"', '/"')
+
+            blk1 = scrapertools.find_single_match(str(data1), '"scheme":"peertube"(.*?)"player"')
+
+            new_url = scrapertools.find_single_match(str(blk1), '/peertube/(.*?)"')
+
+            if new_url:
+                url = 'https;//peertube.uno/videos/embed/' + new_url
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -338,9 +362,9 @@ def findvideos(item):
         url = servertools.normalize_url(servidor, url)
 
         if url.startswith('https://player.doramed.top/'):
-            data1 = do_downloadpage(url)
+            data2 = do_downloadpage(url)
 
-            url = scrapertools.find_single_match(str(data1), "'file':'(.*?)'")
+            url = scrapertools.find_single_match(str(data2), "'file':'(.*?)'")
 
             if url:
                 url = 'https://player.doramed.top/' + url

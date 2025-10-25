@@ -17,6 +17,7 @@ from core import httptools, scrapertools, jsontools
 
 host = "https://www.dailymotion.com/"
 
+
 # ~ Id: x24nyzt
 # ~ https://developer.dailymotion.com/tools/
 
@@ -31,7 +32,7 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', group = 'vistos' ))
 
-    itemlist.append(item.clone( title = 'Por lista', action = 'list_playlists' ))
+    itemlist.append(item.clone( title = 'Por lista', action = 'list_playlists', text_color = 'moccasin' ))
 
     return itemlist
 
@@ -56,7 +57,8 @@ def list_playlists(item):
             title = '%s [COLOR tan](%d vídeos)[/COLOR]' % (vid['name'], vid['videos_total'])
             plot = '' if not vid['description'] else scrapertools.htmlclean(vid['description'])
 
-            itemlist.append(item.clone( action='list_all', title=title, playlist_id=vid['id'], page=1, thumbnail=vid['thumbnail_480_url'], plot=plot, text_color = 'cyan' ))
+            itemlist.append(item.clone( action='list_all', title=title, playlist_id=vid['id'], page=1,
+                                        thumbnail=vid['thumbnail_480_url'], plot=plot, text_color = 'cyan' ))
 
         if itemlist:
             if data['has_more']:

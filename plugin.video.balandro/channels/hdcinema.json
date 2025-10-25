@@ -9,9 +9,9 @@
   "search_types": ["all", "movie", "tvshow"],
 
   "categories": ["movie", "tvshow"],
-  "language": ["cast", "lat", "vose"],
+  "language": ["cast", "lat", "vose", "vo"],
 
-  "clusters": ["notice", "years", "kids", "vos"],
+  "clusters": ["notice", "years", "stars", "directors", "kids", "vos"],
 
   "notes": "Películas por géneros y años. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

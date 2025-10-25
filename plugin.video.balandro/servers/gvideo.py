@@ -11,6 +11,7 @@ else:
 
     import urllib.parse as urllib
 
+
 import codecs
 
 from core import httptools, scrapertools
@@ -20,28 +21,31 @@ from platformcode import logger
 def get_video_url(page_url, url_referer=''):
     logger.info('page_url: %s'%page_url)
     video_urls = []
+
     urls = []
-    streams =[]
+    streams = []
+    headers_string = ""
 
     if 'googleusercontent' in page_url:
-        response = httptools.downloadpage(page_url, follow_redirects = False, cookies=False, headers={"Referer": page_url})
+        resp = httptools.downloadpage(page_url, follow_redirects = False, cookies=False, headers={"Referer": page_url})
 
-        if PY3 and isinstance(response.data, bytes): response.data = response.data.decode('utf-8')
+        if PY3 and isinstance(resp.data, bytes):
+            resp.data = resp.data.decode('utf-8')
 
         try:
-           url = response.headers['location']
+           url = resp.headers['location']
         except:
            return "Client has issued a malformed or illegal request"
 
-        if "set-cookie" in response.headers:
+        if "set-cookie" in resp.headers:
             try:
                 cookies = ""
-                cookie = response.headers["set-cookie"].split("HttpOnly, ")
+                cookie = resp.headers["set-cookie"].split("HttpOnly, ")
 
                 for c in cookie:
                     cookies += c.split(";", 1)[0] + "; "
 
-                data = response.data.decode('unicode-escape')
+                data = resp.data.decode('unicode-escape')
                 data = urllib.unquote_plus(urllib.unquote_plus(data))
                 headers_string = "|Cookie=" + cookies
             except:
@@ -57,34 +61,36 @@ def get_video_url(page_url, url_referer=''):
         vid = scrapertools.find_single_match(page_url, "(?s)http(?:s|)://(?:docs|drive).google.com/file/d/([^/]+)/(?:preview|edit|view)")
         if vid: page_url = 'http://docs.google.com/get_video_info?docid=' + vid
 
-        response = httptools.downloadpage(page_url, cookies=False, headers={"Referer": page_url})
+        resp = httptools.downloadpage(page_url, cookies=False, headers={"Referer": page_url})
 
-        if PY3 and isinstance(response.data, bytes): response.data = response.data.decode('utf-8')
+        if PY3 and isinstance(resp.data, bytes):
+            resp.data = resp.data.decode('utf-8')
 
-        if response.code == 429:
+        if resp.code == 429:
             return "Servidor saturado, inténtelo más tarde"
 
-        if "no+existe" in response.data:
+        if "no+existe" in resp.data:
             return "Archivo inexistente ó eliminado"
-        elif "Se+ha+excedido+el" in response.data:
+        elif "Se+ha+excedido+el" in resp.data:
             return "Excedido el número de reproducciones permitidas"
-        elif "No+tienes+permiso" in response.data:
+        elif "No+tienes+permiso" in resp.data:
             return "No tiene permiso para acceder al vídeo"
-        elif "Se ha producido un error" in response.data:
+        elif "Se ha producido un error" in resp.data:
             return "Error en el reproductor de google"
-        elif "No+se+puede+procesar+este" in response.data:
+        elif "No+se+puede+procesar+este" in resp.data:
             return "No se puede procesar el vídeo"
 
         cookies = ""
-        cookie = response.headers["set-cookie"].split("HttpOnly, ")
+        cookie = resp.headers["set-cookie"].split("HttpOnly, ")
 
         for c in cookie:
             cookies += c.split(";", 1)[0] + "; "
 
-        data = codecs.decode(response.data, 'unicode-escape')
+        data = codecs.decode(resp.data, 'unicode-escape')
         data = urllib.unquote_plus(urllib.unquote_plus(data))
 
         headers_string = "|Cookie=" + cookies
+
         url_streams = scrapertools.find_single_match(data, 'url_encoded_fmt_stream_map=(.*)')
         streams = scrapertools.find_multiple_matches(url_streams, 'itag=(\d+)&url=(.*?)(?:;.*?quality=.*?(?:,|&)|&quality=.*?(?:,|&))')
 

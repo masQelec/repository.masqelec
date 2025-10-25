@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import re
+import re, base64
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -11,12 +11,12 @@ from lib.pyberishaes import GibberishAES
 from lib import decrypters
 
 
-host = 'https://vwv.henaojara.net/'
+host = 'https://ww1.henaojara.net/'
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://wvw.henaojara.net/']
+    ant_hosts = ['https://wvw.henaojara.net/', 'https://vwv.henaojara.net/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -333,6 +333,11 @@ def episodios(item):
 
     matches = scrapertools.find_multiple_matches(str(bloque), '.*?"(.*?)".*?;')
 
+    if not matches:
+        if 'Proximamente<' in data:
+             platformtools.dialog_notification('HenaOjaraN', '[COLOR cyan][B]Proximamente[/B][/COLOR]')
+             return
+
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
 
@@ -452,8 +457,7 @@ def findvideos(item):
 
             if not srv or not encrypt: continue
 
-            if srv in ['lulustream', 'vidguard', 'vidhide', 'savefiles']: pass
-            else: continue
+            if srv == 'rpmshare': continue
 
             if srv == 'savefiles':
                 servidor = 'zures'
@@ -461,8 +465,14 @@ def findvideos(item):
 
             srv = srv.capitalize()
 
+            age = 'crypto'
+            if '.eyJs' in encrypt: age = ''
+
+            if not config.get_setting('developer_mode', default=False):
+                if age == 'crypto': continue
+
             itemlist.append(Item( channel = item.channel, action = 'play', server='directo', title = '', crypto=encrypt, bytes=d_bytes,
-                                  language=lang, other=srv, age='encrypt' ))
+                                  language=lang, other=srv, age=age ))
 
     # ~ download
     bloque = scrapertools.find_single_match(data, 'data-dwn=(.*?)>Descargar<')
@@ -493,6 +503,7 @@ def findvideos(item):
         elif 'streamsb' in url: continue
         elif 'nyuu' in url: continue
         elif '4sync' in url: continue
+        elif 'rpmplayer' in url: continue
 
         if 'netuplayer' in url or 'netu' in url or 'hqq' in url: servidor = 'waaw'
 
@@ -548,19 +559,32 @@ def play(item):
         crypto = str(item.crypto)
         bytes = str(item.bytes)
 
-        try:
-            url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
-        except:
-            url = ''
+        url = ''
+
+        if not bytes:
+            url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
+            url += '='
+            url = base64.b64decode(url).decode()
+            url = scrapertools.find_single_match(url, '"link":"(.*?)"')
 
         if not url:
-            url = decrypters.decode_decipher(crypto, bytes)
+            try:
+                url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
+            except:
+                url = ''
 
-        if not url:
-            return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+            if not url:
+                url = decrypters.decode_decipher(crypto, bytes)
 
-        elif not url.startswith("http"):
-            return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+            if not url:
+                if crypto.startswith("http"):
+                    url = crypto.replace('\\/', '/')
+
+                if not url:
+                    return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+
+            elif not url.startswith("http"):
+                return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
 
     elif '/?trdownload=' in url:
            url = httptools.downloadpage(url, follow_redirects=False, timeout=timeout).headers['location']
@@ -587,8 +611,7 @@ def play(item):
     elif '/descargas/' in url: url = ''
     elif '/rpmplayer.' in url: url = ''
 	
-    if '/go.php?v=' in url:
-          url = scrapertools.find_single_match(url, 'v=(.*?)$')
+    if '/go.php?v=' in url: url = scrapertools.find_single_match(url, 'v=(.*?)$')
 
     if url:
         if '.mystream.' in url:

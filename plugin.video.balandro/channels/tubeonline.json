@@ -1,0 +1,17 @@
+{
+  "id": "tubeonline",
+  "name": "TubeOnline",
+  "thumbnail": "tubeonline.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["adults", "languages", "kids", "docs", "vos"],
+
+  "notes": "Películas por géneros."
+}

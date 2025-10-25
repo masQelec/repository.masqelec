@@ -292,7 +292,10 @@ def last_epis(item):
 
         titulo = titulo.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
-        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
+        if 'Temp.' in titulo:
+            titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
+        else:
+            titulo = titulo.replace('Episodio', 'Epis.').replace('episodio', 'Epis.').replace('Capítulo', 'Epis.').replace('capítulo', 'Epis.')
 
         titulo = '[COLOR goldenrod]Epis. [/COLOR]' + str(epis) + ' ' + titulo.strip()
 
@@ -502,6 +505,9 @@ def corregir_SerieName(SerieName):
     elif 'español' in SerieName: SerieName = SerieName.split("español")[0]
     elif 'Castellano' in SerieName: SerieName = SerieName.split("Castellano")[0]
     elif 'castellano' in SerieName: SerieName = SerieName.split("castellano")[0]
+
+    if 'Latino' in SerieName: SerieName = SerieName.split("Latino")[0]
+    elif 'latino' in SerieName: SerieName = SerieName.split("latino")[0]
 
     if ' (Audio' in SerieName: SerieName = SerieName.split(" (Audio")[0]
 

@@ -749,8 +749,8 @@ def play(item):
         if '.playmudos.' in url_play: return itemlist
         elif '/content-na.drive.' in url_play: return itemlist
 
-        elif '/jkplayer/um?' in url_play: return itemlist
-        elif '/jkplayer/umv?' in url_play: return itemlist
+        elif '/jkplayer/um?' in url_play or '/jkplayer/umv?' in url_play:
+            return '[COLOR red]CloudFlare Protection[/COLOR]'
 
         if not url_play.startswith("http"): url_play = "https:" + url_play
 

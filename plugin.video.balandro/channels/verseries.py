@@ -210,7 +210,7 @@ def list_all(item):
 
         url = host[:-1] + url
 
-        tipo = 'tvshow' if '/series/' in item.url else 'movie'
+        tipo = 'tvshow' if '/series/' in item.url or '/temporada/' in url else 'movie'
 
         if tipo == 'movie':
             if item.search_type == "tvshow": continue

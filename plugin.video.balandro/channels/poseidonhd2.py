@@ -160,7 +160,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#x27;', "'")
+        title = title.replace('&#x27;', "'").replace('&amp;', "&")
 
         if url.startswith("/"): url = host[:-1] + url
 
@@ -225,6 +225,8 @@ def last_epis(item):
         titulo = titulo.replace(temp_epis, '').strip()
 
         title = titulo
+
+        title = title.replace('&#x27;', "'").replace('&amp;', "&")
 
         if not url or not title: continue
 
@@ -344,7 +346,11 @@ def episodios(item):
     for title, epis, thumb in matches[item.page * item.perpage:]:
         url = item.url + '/temporada/' + str(item.contentSeason) + '/episodio/' + epis
 
-        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
+        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title.replace(str(item.contentSeason) + 'x' + str(epis), '').strip()
+
+        if 'Epis.' in titulo: titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
+        titulo = titulo.replace('\\u0026', "&")
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))

@@ -141,11 +141,12 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#8217;s', "'s").replace('&#8217;', '')
+        title = title.replace('&#8217;s', "'s").replace('&#8217;', '').replace('&#8211;', '').replace('&amp;', '&').strip()
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                                    contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 

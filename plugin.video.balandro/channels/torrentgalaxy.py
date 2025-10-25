@@ -35,7 +35,7 @@ def mainlist(item):
             itemlist.append(item.clone( title = 'Animes xxx', action = 'list_all', url = host + 'get-posts/category:Anime:ncategory:XXX/', search_type = 'tvshow', text_color=' springgreen' ))
 
     if config.get_setting('mnu_adultos', default=True):
-        itemlist.append(item.clone( title = 'Adultos', action = 'mainlist_adults', text_color = 'orange' ))
+        itemlist.append(item.clone( title = 'Adultos', action = 'mainlist_adults', group = '+18', adults='adults', search_type = 'movie', text_color = 'orange' ))
 
     return itemlist
 
@@ -65,15 +65,18 @@ def mainlist_pelis(item):
 
         itemlist.append(item.clone( title = 'Colecciones', action = 'list_all', url = host + 'get-posts/keywords:Packs:category:Movies:ncategory:XXX/', search_type = 'movie', text_color='greenyellow' ))
 
-        itemlist.append(item.clone( title = 'Bollywood', action = 'list_all', url = host + 'get-posts/keywords:Bollywood:category:Movies:ncategory:XXX/', search_type = 'movie' ))
+        itemlist.append(item.clone( title = 'Bollywood', action = 'list_all', url = host + 'get-posts/keywords:Bollywood:category:Movies:ncategory:XXX/', group = '+18', search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = 'En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'get-posts/keywords:4K UHD:category:Movies/', search_type = 'movie' ))
+        itemlist.append(item.clone( title = 'En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'get-posts/keywords:4K UHD:category:Movies/', group = '+18', search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'get-posts/keywords:HD:category:Movies:ncategory:XXX/', search_type = 'movie' ))
+        itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'get-posts/keywords:HD:category:Movies:ncategory:XXX/', group = '+18', search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = 'En SD', action = 'list_all', url = host + 'get-posts/keywords:SD:category:Movies:ncategory:XXX/', search_type = 'movie' ))
+        itemlist.append(item.clone( title = 'En SD', action = 'list_all', url = host + 'get-posts/keywords:SD:category:Movies:ncategory:XXX/', group = '+18', search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = 'En TS', action = 'list_all', url = host + 'get-posts/keywords:CAMTS:category:Movies:ncategory:XXX/', search_type = 'movie' ))
+        itemlist.append(item.clone( title = 'En TS', action = 'list_all', url = host + 'get-posts/keywords:CAMTS:category:Movies:ncategory:XXX/', group = '+18', search_type = 'movie' ))
+
+        if config.get_setting('mnu_adultos', default=True):
+            itemlist.append(item.clone( title = 'Adultos', action = 'mainlist_adults', group = '+18', adults='adults', search_type = 'movie', text_color = 'orange' ))
 
     return itemlist
 
@@ -100,21 +103,24 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = ' - En SD', action = 'list_all', url = host + 'get-posts/keywords:Episodes SD:category:TV/', search_type = 'tvshow' ))
     else:
-        itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'get-posts:ncategory:XXX/', search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'get-posts:ncategory:XXX/', group = '+18', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = 'Colecciones', action = 'list_all', url = host + 'get-posts/keywords:Packs:category:TV:ncategory:XXX/', search_type = 'tvshow', text_color='greenyellow' ))
+        itemlist.append(item.clone( title = 'Colecciones', action = 'list_all', url = host + 'get-posts/keywords:Packs:category:TV:ncategory:XXX/', group = '+18', search_type = 'tvshow', text_color='greenyellow' ))
 
         if config.get_setting('mnu_animes', default=True):
             if not config.get_setting('descartar_anime', default=False):
-                itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'get-posts/category:Anime:ncategory:XXX/', search_type = 'tvshow', text_color=' springgreen' ))
+                itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'get-posts/category:Anime:ncategory:XXX/', group = '+18', search_type = 'tvshow', text_color=' springgreen' ))
 
         itemlist.append(item.clone( title = '[B]Episodios:[/B]', action = '', search_type = 'tvshow', text_color='moccasin' ))
 
-        itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'get-posts/keywords:Eps 4k UHD:category:TV:ncategory:XXX/', search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'get-posts/keywords:Eps 4k UHD:category:TV:ncategory:XXX/', group = '+18', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = ' - En HD', action = 'list_all', url = host + 'get-posts/keywords:Episodes HD:category:TV:ncategory:XXX/', search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = ' - En HD', action = 'list_all', url = host + 'get-posts/keywords:Episodes HD:category:TV:ncategory:XXX/', group = '+18', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = ' - En SD', action = 'list_all', url = host + 'get-posts/keywords:Episodes SD:category:TV:ncategory:XXX/', search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = ' - En SD', action = 'list_all', url = host + 'get-posts/keywords:Episodes SD:category:TV:ncategory:XXX/', group = '+18', search_type = 'tvshow' ))
+
+        if config.get_setting('mnu_adultos', default=True):
+            itemlist.append(item.clone( title = 'Adultos', action = 'mainlist_adults', group = '+18', adults='adults', search_type = 'tvshow', text_color = 'orange' ))
 
     return itemlist
 
@@ -125,13 +131,13 @@ def mainlist_adults(item):
 
     itemlist.append(item.clone( title = 'Adultos:', action = '', text_color = 'orange' ))
 
-    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'get-posts/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'get-posts/', group = '+18', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'get-posts/keywords:4K UHD:category:XXX/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'get-posts/keywords:4K UHD:category:XXX/', group = '+18', adults='adults', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = ' - En HD', action = 'list_all', url = host + 'get-posts/keywords:HD:category:XXX/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - En HD', action = 'list_all', url = host + 'get-posts/keywords:HD:category:XXX/', group = '+18', adults='adults', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = ' - En SD', action = 'list_all', url = host + '/get-posts/keywords:SD:category:XXX/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - En SD', action = 'list_all', url = host + '/get-posts/keywords:SD:category:XXX/', group = '+18', adults='adults', search_type = 'movie' ))
 
     return itemlist
 
@@ -166,13 +172,6 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, "src=.?'(.*?)'")
 
-        contentExtra = ''
-        Extra = ''
-
-        if '<small>XXX' in match:
-            Extra = 'adults'
-            thumb = config.get_thumb('adults')
-
         lang = scrapertools.find_single_match(match, '<!-- <img class="dim txlight".*?title="(.*?)"')
 
         if not lang: lang = 'Vo'
@@ -188,6 +187,12 @@ def list_all(item):
         tipo = 'movie' if '<small>Movie' in match or '<small>XXX' in match or '<small>TV: Sports' in match else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
 
+        contentExtra = ''
+        if item.group == '+18':
+            if item.adults: thumb = config.get_thumb('adults') 
+
+            contentExtra = 'adults'
+
         if tipo == 'tvshow':
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
@@ -198,7 +203,7 @@ def list_all(item):
             SerieName = corregir_Name(title)
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=lang, fmt_sufijo=sufijo,
-                                        contentExtra='3', Extra=Extra,
+                                        contentExtra = contentExtra, group = '+18',
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
         if tipo == 'movie':
@@ -212,7 +217,7 @@ def list_all(item):
             PeliName = corregir_Name(title)
 
             itemlist.append(item.clone( action = 'findvideos', url=url, title=title, thumbnail=thumb, languages=lang, fmt_sufijo=sufijo,
-                                        contentExtra=contentExtra, Extra=Extra,
+                                        contentExtra = contentExtra, group = '+18',
                                         contentType = 'movie', contentTitle = PeliName, infoLabels = {'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -238,7 +243,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    if item.Extra == 'adults':
+    if item.group == '+18':
         if not config.get_setting('ses_pin'):
             if config.get_setting('adults_password'):
                 from modules import actions

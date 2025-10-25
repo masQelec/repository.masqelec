@@ -5,6 +5,7 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
+
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, jsontools, servertools, tmdb
@@ -46,13 +47,13 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
+    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
 
     itemlist.append(item.clone( title = 'Por tema', action = 'temas', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por productora', action = 'productoras', text_color = 'moccasin' ))
-
-    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas' ))
 
     return itemlist
 

@@ -120,7 +120,7 @@ def episodios(item):
     matches = re.compile('<li><a href="([^"]+)".*?Capitulo (\d+)', re.DOTALL).findall(data)
 
     for url, title in matches:
-        title = title + " - " + item.title
+        title = title + ' ' + item.title
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 

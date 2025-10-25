@@ -210,6 +210,9 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title='Animes', action = 'mainlist_series', text_color='springgreen' ))
+
     return itemlist
 
 
@@ -530,6 +533,10 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + item.contentSerieName
 
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
 
@@ -566,11 +573,14 @@ def findvideos(item):
         for data_url, servidor in matches:
             ses += 1
 
+            other = ''
+
             servidor = servidor.lower().strip()
 
             if 'tubesb' in servidor: continue
             elif 'youtube' in servidor: continue
             elif 'hackplayer' in servidor: continue
+
             elif servidor == 'vip': continue
 
             if servidor == 'ok': servidor = 'okru'
@@ -582,6 +592,10 @@ def findvideos(item):
             elif servidor == 'd0o0d' or servidor == 'do0od' or servidor == 'd0000d' or servidor == 'd000d': servidor = 'doodstream'
             elif servidor == 'lamovie': servidor = 'clipwatching'
 
+            elif servidor == 'vimeos':
+               servidor = 'zures'
+               other = 'Vimeos'
+
             if servertools.is_server_available(servidor):
                 if not servertools.is_server_enabled(servidor): continue
             else:
@@ -592,7 +606,7 @@ def findvideos(item):
             quality_num = puntuar_calidad(qlty)
 
             itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', url = item.url, data_url = data_url,
-                                  quality = qlty, quality_num = quality_num, language = lang ))
+                                  quality = qlty, quality_num = quality_num, language = lang, other = other ))
 
     if '>DESCARGAR<' in data:
         bloque = scrapertools.find_single_match(data, '>DESCARGAR<(.*?)<div id="player">')
@@ -601,6 +615,8 @@ def findvideos(item):
 
         for url, servidor in matches:
             ses += 1
+
+            other = ''
 
             if url == '#':
                 ses = ses - 1
@@ -634,6 +650,10 @@ def findvideos(item):
             elif servidor == 'drive': servidor = 'gvideo'
             elif servidor == 'google drive': servidor = 'gvideo'
 
+            elif servidor == 'vimeos':
+               servidor = 'zures'
+               other = 'Vimeos'
+
             if servertools.is_server_available(servidor):
                 if not servertools.is_server_enabled(servidor): continue
             else:
@@ -652,7 +672,7 @@ def findvideos(item):
             quality_num = puntuar_calidad(qlty)
 
             itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                  quality = qlty, quality_num = quality_num, language = lang ))
+                                  quality = qlty, quality_num = quality_num, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -663,7 +683,7 @@ def findvideos(item):
 
 
 def puntuar_calidad(txt):
-    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', 'HD', 'WEBRip 1080p', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
+    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', 'REMUX 1080p', '1080', 'HD', 'WEBRip 1080p', 'WEB-DL 4k', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', 'REMUX 4k', '4K']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
 

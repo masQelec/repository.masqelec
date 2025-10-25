@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://wv5n.cinehdplus.cc/'
+host = 'https://wn3c.cinehdplus.cc/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://w-ww.gnula2h.cc/', 'https://wl3v.gnula2h.cc/', 'https://wv3l.gnula2h.cc/',
-             'https://wv7n.gnula2h.cc/', 'https://www.cinehdplus.cc/']
+             'https://wv7n.gnula2h.cc/', 'https://www.cinehdplus.cc/', ]
 
 
 domain = config.get_setting('dominio', 'seriesplus', default='')
@@ -259,8 +259,9 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        year = scrapertools.find_single_match(match, '<span class="imdb".*?</span>.*?<span>(.*?)</span>')
-        if not year: year = scrapertools.find_single_match(match, '</span> <span>(.*?)</span>')
+        year = scrapertools.find_single_match(match, '<span class="imdb".*?</span>.*?<span>(.*?)</span>').strip()
+        if not year: year = scrapertools.find_single_match(match, '</span> <span>(.*?)</span>').strip()
+        if not year: year = scrapertools.find_single_match(match, '</h3> <span>.*?,(.*?)</span>').strip()
 
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
@@ -460,6 +461,13 @@ def episodios(item):
         epis = scrapertools.find_single_match(temp_epis, ".*?-(.*?)$").strip()
 
         titulo = str(item.contentSeason) + 'x' + epis + ' ' + title
+
+        if 'episodie' in titulo.lower() or 'episodio' in titulo.lower() or 'capítulo' in titulo.lower() or 'capitulo' in titulo.lower():
+            titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, languages = ', '.join(langs),
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))

@@ -134,13 +134,13 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'movie' ))
 
     return itemlist
 
@@ -177,14 +177,32 @@ def idiomas(item):
     return itemlist
 
 
-def paises(item):
+def plataformas(item):
+    logger.info()
+    itemlist = []
+
+    text_color = 'hotpink'
+
+    itemlist.append(item.clone( title = 'Amazon prime vídeo', action = 'list_all', url = host + 'network/amazon/', text_color = text_color ))
+    itemlist.append(item.clone( title = 'Antena 3', action = 'list_all', url = host + 'network/antena-3/', text_color = text_color))
+    itemlist.append(item.clone( title = 'Channel 4', action = 'list_all', url = host + 'network/channel-4/', text_color = text_color ))
+    itemlist.append(item.clone( title = 'Disney+', action = 'list_all', url = host + 'network/amazon/', text_color = text_color ))
+    itemlist.append(item.clone( title = 'Hbo Max', action = 'list_all', url = host + 'network/hbo/', text_color = text_color ))
+    itemlist.append(item.clone( title = 'Netflix', action = 'list_all', url = host + 'network/netflix/', text_color = text_color ))
+    itemlist.append(item.clone( title = 'Telecinco', action = 'list_all', url = host + 'network/telecinco/', text_color = text_color ))
+    itemlist.append(item.clone( title = 'Telefe', action = 'list_all', url = host + 'network/telefe/', text_color = text_color ))
+
+    return itemlist
+
+
+def calidades(item):
     logger.info()
     itemlist = []
 
     data = do_downloadpage(host)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, 'por País<(.*?)por Año<')
+    bloque = scrapertools.find_single_match(data, 'por Calidad<(.*?)por País<')
 
     patron = 'href="(.*?)">(.*?)</a>'
 
@@ -221,32 +239,14 @@ def generos(item):
     return itemlist
 
 
-def plataformas(item):
-    logger.info()
-    itemlist = []
-
-    text_color = 'hotpink'
-
-    itemlist.append(item.clone( title = 'Amazon prime vídeo', action = 'list_all', url = host + 'network/amazon/', text_color = text_color ))
-    itemlist.append(item.clone( title = 'Antena 3', action = 'list_all', url = host + 'network/antena-3/', text_color = text_color))
-    itemlist.append(item.clone( title = 'Channel 4', action = 'list_all', url = host + 'network/channel-4/', text_color = text_color ))
-    itemlist.append(item.clone( title = 'Disney+', action = 'list_all', url = host + 'network/amazon/', text_color = text_color ))
-    itemlist.append(item.clone( title = 'Hbo Max', action = 'list_all', url = host + 'network/hbo/', text_color = text_color ))
-    itemlist.append(item.clone( title = 'Netflix', action = 'list_all', url = host + 'network/netflix/', text_color = text_color ))
-    itemlist.append(item.clone( title = 'Telecinco', action = 'list_all', url = host + 'network/telecinco/', text_color = text_color ))
-    itemlist.append(item.clone( title = 'Telefe', action = 'list_all', url = host + 'network/telefe/', text_color = text_color ))
-
-    return itemlist
-
-
-def calidades(item):
+def paises(item):
     logger.info()
     itemlist = []
 
     data = do_downloadpage(host)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, 'por Calidad<(.*?)por País<')
+    bloque = scrapertools.find_single_match(data, 'por País<(.*?)por Año<')
 
     patron = 'href="(.*?)">(.*?)</a>'
 
@@ -413,7 +413,15 @@ def episodios(item):
     for thumb, s_e, url, title in matches[item.page * item.perpage:]:
         episode = scrapertools.find_single_match(s_e, ".*? - (.*?)$")
 
+        title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
+
         titulo = str(item.contentSeason) + 'x' + str(episode) + ' ' + title
+
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        if 'Epis.' in titulo: titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = episode ))

@@ -170,13 +170,16 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, 'data-lazy-src"(.*?)"')
 
-        title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
+        titulo = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
 
-        title = title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Completo HD', '').replace('completo HD', '').replace('HD Completo', '').replace('Hd completo', '')
+        titulo = titulo.replace('Completo', '').replace('completo', '').replace('Online', '').strip()
 
-        title = title.replace('Completo HD', '').replace('completo HD', '').replace('Online', '').strip()
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodul', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodul', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
-        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
+        itemlist.append(item.clone( action='temporadas', url=url, title=titulo, thumbnail=thumb,
                                     contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -271,7 +274,11 @@ def episodios(item):
             epis = scrapertools.find_single_match(match, '-capitulo-(.*?)-')
             if not epis: epis = 1
 
-            itemlist.append(item.clone( action='findvideos', url = match, title = item.title,
+            titulo = item.title.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+            titulo = item.title.replace('Episodul', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodul', '[COLOR goldenrod]Epis.[/COLOR]')
+            titulo = item.title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+            itemlist.append(item.clone( action='findvideos', url = match, title = titulo,
                                         contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
 
         elif '-episodul-' in match:
@@ -280,7 +287,11 @@ def episodios(item):
             epis = scrapertools.find_single_match(match, '-episodul-(.*?)-')
             if not epis: epis = 1
 
-            itemlist.append(item.clone( action='findvideos', url = match, title = item.title,
+            titulo = item.title.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+            titulo = item.title.replace('Episodul', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodul', '[COLOR goldenrod]Epis.[/COLOR]')
+            titulo = item.title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+            itemlist.append(item.clone( action='findvideos', url = match, title = titulo,
                                         contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
 
     if item.cat:
@@ -289,7 +300,11 @@ def episodios(item):
                 epis = scrapertools.find_single_match(item.url, '-capitulo-(.*?)-')
                 if not epis: epis = 1
 
-                itemlist.append(item.clone( action='findvideos', url = item.url, title = item.title,
+                titulo = item.title.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+                titulo = item.title.replace('Episodul', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodul', '[COLOR goldenrod]Epis.[/COLOR]')
+                titulo = item.title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+                itemlist.append(item.clone( action='findvideos', url = item.url, title = titulo,
                                             contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
 
                 matches = re.compile('<li class="post-item(.*?)</li>', re.DOTALL).findall(data)
@@ -303,7 +318,11 @@ def episodios(item):
                 epis = scrapertools.find_single_match(item.url, '-episodul-(.*?)-')
                 if not epis: epis = 1
 
-                itemlist.append(item.clone( action='findvideos', url = item.url, title = item.title,
+                titulo = item.title.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+                titulo = item.title.replace('Episodul', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodul', '[COLOR goldenrod]Epis.[/COLOR]')
+                titulo = item.title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+                itemlist.append(item.clone( action='findvideos', url = item.url, title = titulo,
                                             contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
 
                 matches = re.compile('<li class="post-item(.*?)</li>', re.DOTALL).findall(data)
@@ -326,7 +345,11 @@ def episodios(item):
 
             if not epis: epis = 1
 
-            itemlist.append(item.clone( action='findvideos', url=item.url, title=item.title,
+            titulo = item.title.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+            titulo = item.title.replace('Episodul', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodul', '[COLOR goldenrod]Epis.[/COLOR]')
+            titulo = item.title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+            itemlist.append(item.clone( action='findvideos', url=item.url, title=titulo,
                                         contentType = 'episode', contentSeason = season, contentEpisodeNumber=epis ))
 
             tmdb.set_infoLabels(itemlist)
@@ -414,6 +437,10 @@ def episodios(item):
 
         if not 'capitulo' in titulo.lower():
             titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + titulo
+
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodul', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodul', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))

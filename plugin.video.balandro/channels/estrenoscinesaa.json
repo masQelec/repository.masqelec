@@ -13,5 +13,5 @@
 
   "clusters": ["suggested", "producers", "lists", "kids"],
 
-  "notes": "Películas en Castellano, por géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Películas en Castellano, por géneros. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

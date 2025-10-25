@@ -10,7 +10,7 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://seriesbiblicas.net/'
 
 
-perpage = 35
+perpage = 25
 
 
 def do_downloadpage(url, post=None, headers=None):
@@ -58,13 +58,11 @@ def mainlist_series(item):
 
     # ~ itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_ser', url = host, search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_ser', url = host + 'series' , search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimas', action = 'list_ser', url = host, search_type = 'tvshow', group = 'lasts', text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_ser', url = host, search_type = 'tvshow', group = 'recom' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_ser', url = host, search_type = 'tvshow', group = 'recom' ))
 
     itemlist.append(item.clone( title = 'Otras series', action = 'otras', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -126,9 +124,10 @@ def list_all(item):
 
         if not link or not title: continue
 
-        thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
+        thumb = scrapertools.find_single_match(match, 'data-lazy-src="(.*?)"')
 
         year = scrapertools.find_single_match(title, '<span>(\d{4})')
+
         if year:
              title = title.replace('(' + year + ')', '').strip
         else: year = '-'
@@ -165,11 +164,11 @@ def list_ser(item):
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     if item.group == 'recom':
-        bloque = scrapertools.find_single_match(data, '>SERIES RECOMENDADAS<(.*?)</script>')
+        bloque = scrapertools.find_single_match(data, 'MÁS VISTAS<(.*?)</script>')
     elif item.group == 'lasts':
         bloque = scrapertools.find_single_match(data, '>SERIES DISPONIBLES<(.*?)</script>')
     else:
-        bloque = scrapertools.find_single_match(data, '>SERIES<(.*?)>MÁS SERIES<')
+        bloque = scrapertools.find_single_match(data, '>SERIES<(.*?)>OTRAS SERIES<')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)"')
 
@@ -213,40 +212,6 @@ def list_ser(item):
             hasta = (item.page * perpage) + perpage
             if hasta < num_matches:
                 itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_ser', text_color='coral' ))
-
-    return itemlist
-
-
-def last_epis(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(item.url)
-    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-
-    bloque = scrapertools.find_single_match(data, '>CAPÍTULOS MÁS RECIENTES<(.*?)>SERIES RECOMENDADAS<')
-
-    matches = re.compile('<a href="(.*?)".*?data-lazy-src="(.*?)"', re.DOTALL).findall(bloque)
-
-    for url, thumb in matches:
-        title = url
-
-        title = url.replace('-hd-google-drive', ' ').replace('-google-drive', ' ').replace('-hd-ok-ru', ' ').replace('-ok-ru', ' ').replace('-hd', ' ').replace('-sd', ' ').strip()
-
-        title = title.replace('-recordtv-subtitulada', ' ').replace('-recordtv', ' ').strip()
-        title = title.replace('-en-espanol-2', ' ').replace('-en-espanol', ' ').replace('-portugues', ' ').replace('-audio-latino', ' ').replace('-latino', ' ').strip()
-        title = title.replace('-sub', ' ').replace('-imagentv', ' ').replace('-unife', ' ').strip()
-
-        title = title.replace(host, ' ').replace('-', ' ').replace('/', '').strip()
-
-        SerieName = title
-
-        title = title.capitalize()
-
-        itemlist.append(item.clone( action='temporadas', url=url, title=title,
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
-
-    tmdb.set_infoLabels(itemlist)
 
     return itemlist
 
@@ -414,10 +379,27 @@ def episodios(item):
             link = url
             url = ''
 
-        titulo = str(item.contentSeason) + 'x' + str(i) + ' ' + title
+        epis = i
 
+        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
+
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        epis = i
+
+        if 'Epis.' in titulo:
+            titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
+            epis = scrapertools.find_single_match(titulo, 'Epis.(.*?)HD').strip()
+            epis = epis.replace('[/COLOR]', '').strip()
+
+            if epis: titulo = titulo.replace(str(item.contentSeason) + 'x' + str(i), str(item.contentSeason) + 'x' + str(epis))
+            else: epis = i
+	
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, link = link, resto = resto,
-                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=str(i) ))
+                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
             break

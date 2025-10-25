@@ -27,13 +27,13 @@ host = 'https://la.movie/'
 # ~ 31/7/25  Los Generos NO se Incluyen en generos.py
 
 
-def do_downloadapi(type, filter, page, terms, _id, season):
+def do_downloadapi(type, filter, page, terms, _id, season, order):
     try:
-        url_filter = urlencode({'filter': '{{{filter}}}'})
+        url_filter = _urllib.urlencode({'filter':"{{{0}}}".format(filter)})
     except:
-        url_filter = urlencode({'filter': '{}'})
+        url_filter = _urllib.urlencode({'filter':"{}"})
 
-    url_terms = _urllib.quote_plus(str(terms))
+    if terms: url_terms = _urllib.quote(str(terms))
 
     if type == 'season':
         url = '{0}wp-api/v1/single/episodes/list?_id={1}&season={2}&postsPerPage=15&page={3}'.format(host, _id, season, page)
@@ -47,7 +47,11 @@ def do_downloadapi(type, filter, page, terms, _id, season):
     else:
         type = '{0}s'.format(type)
 
-        url = '{0}wp-api/v1/listing/{1}?{2}&orderBy=latest&order=desc&postType={1}&postsPerPage=20&page={3}'.format(host, type, url_filter, page)
+        url = '{0}wp-api/v1/listing/{1}?{2}&order=desc&postType={1}&postsPerPage=20&page={3}&orderBy='.format(host, type, url_filter, page)
+
+        if not order: order = 'latest'
+
+        url += order
 
     headers = {'Referer': host}
 
@@ -83,11 +87,17 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'list_filter', grp='genres', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'peliculas/', order='popular', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'peliculas/', order='rated', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'peliculas/', order='views', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por año', action = 'list_filter', grp='years', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por género', action = 'list_filter', grp='genres', group = 'movie', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por país', action = 'list_filter', grp='countries', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por año', action = 'list_filter', grp='years', group = 'movie', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Por país', action = 'list_filter', grp='countries', group = 'movie', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Por plataforma', action = 'list_filter', grp='providers', group = 'movie', search_type = 'movie', text_color='moccasin' ))
 
     return itemlist
 
@@ -103,11 +113,17 @@ def mainlist_series(item):
     if not config.get_setting('descartar_anime', default=False):
         itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'list_filter', grp='genres', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'series/', order='popular', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'series/', order='rated', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'series/', order='views', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por año', action = 'list_filter', grp='years', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por género', action = 'list_filter', grp='genres', group = 'tvshow', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por país', action = 'list_filter', grp='countries', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por año', action = 'list_filter', grp='years', group = 'tvshow', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por país', action = 'list_filter', grp='countries', group = 'tvshow', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por plataforma', action = 'list_filter', grp='providers', group = 'tvshow', search_type = 'tvshow', text_color='moccasin' ))
 
     return itemlist
 
@@ -120,18 +136,64 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'animes/', group = 'animes', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'animes/', group = 'animes', order='popular', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'animes/', group = 'animes', order='rated', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'animes/', group = 'animes', order='views', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'list_filter', grp='genres', group = 'animes', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por año', action = 'list_filter', grp='years', group = 'animes', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por país', action = 'list_filter', grp='countries', group = 'animes', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Por plataforma', action = 'list_filter', grp='providers', group = 'animes', search_type = 'tvshow', text_color='moccasin' ))
+
     return itemlist
+
+
+# ~ Si venimos de Grupos 
+def generos(item):
+    logger.info()
+
+    item.grp = 'genres'
+
+    if item.search_type == 'movie':
+        item.group = 'movie'
+    else:
+        item.group = 'tvshow'
+
+    return list_filter(item)
+
+def anios(item):
+    logger.info()
+
+    item.grp = 'years'
+
+    if item.search_type == 'movie':
+        item.group = 'movie'
+    else:
+        item.group = 'tvshow'
+
+    return list_filter(item)
+
+def paises(item):
+    logger.info()
+
+    item.grp = 'countries'
+
+    if item.search_type == 'movie':
+        item.group = 'movie'
+    else:
+        item.group = 'tvshow'
+
+    return list_filter(item)
 
 
 def list_filter(item):
     logger.info()
     itemlist = []
+
+    grp = item.grp
 
     if item.search_type == 'movie': text_color = 'deepskyblue'
     else:
@@ -144,7 +206,7 @@ def list_filter(item):
 
     if siteconfig:
         siteconfig = siteconfig.replace("\/", "/")
-        patron = '{0}:([^\n]+),'.format(item.grp)
+        patron = '{0}:([^\n]+),'.format(grp)
 
         fdata = scrapertools.find_single_match(siteconfig, patron)
 
@@ -152,18 +214,18 @@ def list_filter(item):
            data = ast.literal_eval(fdata)
 
            for filter in data:
-               sfilter = "\"{0}\": [{1}]".format(item.grp, filter)
+               sfilter = "\"{0}\":[{1}]".format(grp, filter)
 
                title = str(data[filter]['name']).replace('&amp;', '&')
 
-               any = ''
-               if item.group == 'years': any = title
+               if grp == 'providers': title = title.capitalize()
 
-               itemlist.append(item.clone ( title = title, action = "list_all", grp = sfilter, any = any, text_color = text_color ))
+               itemlist.append(item.clone ( title = title, action = "list_all", filter = sfilter, grp = grp, text_color = text_color ))
         except:
             pass
 
-    if item.grp == 'years`': return sorted(itemlist, key=lambda x: x.any, reverse=True)
+    if grp == 'years':
+        return sorted(itemlist, key=lambda x: x.title, reverse=True)
 
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -177,7 +239,10 @@ def list_all(item):
     if item.page: page = item.page
     else: page = 1
 
-    if item.grp: filter = item.grp
+    if item.grp: grp = item.grp
+    else: grp = ''
+
+    if item.filter: filter = item.filter
     else: filter = ''
 
     if item.terms: terms = item.terms
@@ -189,8 +254,11 @@ def list_all(item):
     if item.busca: busca = item.busca
     else: busca = ''
 
+    if item.order: order = item.order
+    else: order = ''
+
     if busca == 'search':
-        data = do_downloadapi('search', filter, page, terms, '', '')
+        data = do_downloadapi('search', filter, page, terms, '', '', '')
 
         if not data: return itemlist
 
@@ -205,7 +273,7 @@ def list_all(item):
 
         if group == 'animes': type = 'anime'
 
-        data = do_downloadapi(type, filter, page, terms, '', '')
+        data = do_downloadapi(type, filter, page, terms, '', '', order)
 
         if not data: return itemlist
 
@@ -312,7 +380,7 @@ def list_all(item):
         try:
             if pagination['next_page_url']:
                 itemlist.append(item.clone (action = 'list_all', title = 'Siguientes ...',
-                                            type=type, filter=filter, terms=terms, group=group, busca=busca, page = page + 1, text_color='coral'))  
+                                            type=type, grp=grp, filter=filter, terms=terms, group=group, busca=busca, order=order, page = page + 1, text_color='coral'))  
         except:
             pass
 
@@ -326,7 +394,7 @@ def temporadas(item):
     if not isinstance(item.contentSeason, int):
         _id = item._id
 
-        data = do_downloadapi('season', '', 1, '', _id, 1)
+        data = do_downloadapi('season', '', 1, '', _id, 1, '')
 
         if not data: return itemlist
 
@@ -369,7 +437,7 @@ def episodios(item):
 
     season = item.contentSeason
 
-    data = do_downloadapi('season', '', page, '', _id, season)
+    data = do_downloadapi('season', '', page, '', _id, season, '')
 
     if not data: return itemlist
 
@@ -420,7 +488,7 @@ def findvideos(item):
 
     _id = item._id
 
-    data = do_downloadapi('links', '', '', '', _id, '')
+    data = do_downloadapi('links', '', '', '', _id, '', '')
 
     if not data: return itemlist
 
@@ -439,10 +507,16 @@ def findvideos(item):
     for video in content:
         ses += 1
 
+        other = ''
+
         url = video['url']
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
+
+        if '/vimeos.' in url:
+            servidor = 'zures'
+            other = 'Vimeos'
 
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
@@ -451,7 +525,6 @@ def findvideos(item):
 
         url = servertools.normalize_url(servidor, url)
 
-        other = ''
         if servidor == 'various': other = servertools.corregir_other(url)
 
         qlty = video['quality']
@@ -472,6 +545,8 @@ def findvideos(item):
     for video in content:
         ses += 1
 
+        other = ''
+
         try:
             url = video['url']
             qlty = video['quality']
@@ -489,7 +564,10 @@ def findvideos(item):
 
         url = servertools.normalize_url(servidor, url)
 
-        other = ''
+        if '/vimeos.' in url:
+            servidor = 'zures'
+            other = 'Vimeos'
+
         if servidor == 'various': other = servertools.corregir_other(url)
 
         quality_num = puntuar_calidad(qlty)
@@ -506,7 +584,7 @@ def findvideos(item):
 
 
 def puntuar_calidad(txt):
-    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'Full HD', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', 'HD', 'WEBRip 1080p', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
+    orden = ['CAMRip', 'Dual 720p', '720', 'HDTV', 'BDRip', 'DVDRip', 'WEBRip', 'Full HD', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', 'HD', 'WEBRip 1080p', 'REMUX 1080p' , 'MicroHD 1080p', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
 
@@ -535,6 +613,9 @@ def play(item):
     itemlist = []
 
     url = item.url
+
+    if url == 'https://la.movie/embed.html?v=1':
+        return 'Contenido [COLOR goldenrod]Aún No Disponible[/COLOR]'
 
     if item.server == 'directo':
         if url == host + 'embed.html?v=1': url = ''

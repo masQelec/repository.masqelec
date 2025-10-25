@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["rankings", "lasts", "classic", "lists", "vos", "bibles"],
+  "clusters": ["rankings", "classic", "lists", "kids", "vos", "bibles"],
 
-  "notes": "Películas y Series."
+  "notes": "Películas y Series. Con temas Bíblicos."
 }

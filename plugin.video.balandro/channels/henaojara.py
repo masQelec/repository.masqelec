@@ -212,17 +212,17 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'all', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'animeonline/category/categorias/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver/category/categorias/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Últimos animes', action = 'list_last', url = host, search_type = 'tvshow', text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'animeonline/category/estrenos/', search_type = 'tvshow', text_color = 'greenyellow' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'ver/category/estrenos/?tr_post_type=2', search_type = 'tvshow', text_color = 'greenyellow' ))
 
-    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'animeonline/category/emision/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'ver/category/emision/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'animeonline/category/pelicula/', search_type = 'movie', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'ver/category/pelicula/', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'tvshow' ))
 
@@ -235,9 +235,9 @@ def idiomas(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + 'animeonline/category/categorias/espanol-castellano/', text_color = 'moccasin' ))
-    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'animeonline/category/categorias/latino/', text_color = 'moccasin' ))
-    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'animeonline/category/categorias/subtitulos/', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + 'ver/category/categorias/espanol-castellano/', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'ver/category/categorias/latino/', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'ver/category/categorias/subtitulos/', text_color = 'moccasin' ))
 
     return itemlist
 
@@ -286,14 +286,14 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('#8217;', "'")
+        title = title.replace('#8217;', "'").replace('#8211;', '')
 
         nro_season = ''
         if 'Temporada' in title:
             nro_season = scrapertools.find_single_match(title, 'Temporada (.*?) ').strip()
             if nro_season: nro_season = ' T' + nro_season
 
-        title = title.replace('#8217;', "'")
+        title = title.replace('#8217;', "'").replace('#8211;', '')
 
         year = scrapertools.find_single_match(title, '(\d{4})')
         if year: title = title.replace('(' + year + ')', '').strip()
@@ -357,7 +357,7 @@ def list_last(item):
 
         if not url or not title: continue
 
-        title = title.replace('#8217;', "'")
+        title = title.replace('#8217;', "'").replace('#8211;', '')
 
         year = scrapertools.find_single_match(match, '<span class="Year">.*?-(.*?)</span>').strip()
         if not year: year = scrapertools.find_single_match(title, '(\d{4})')
@@ -419,7 +419,7 @@ def last_epis(item):
 
         if not url or not title: continue
 
-        title = title.replace('#8217;', "'")
+        title = title.replace('#8217;', "'").replace('#8211;', '')
 
         SerieName = title
 
@@ -613,7 +613,7 @@ def episodios(item):
 
         if '</b>' in title: title = scrapertools.find_single_match(title, "</b>(.*?)$").strip()
 
-        if item.contentSerieName: titulo = '%sx%s - %s' % (str(item.contentSeason), epis, str(item.contentSerieName))
+        if item.contentSerieName: titulo = '%sx%s %s' % (str(item.contentSeason), epis, str(item.contentSerieName))
         else: titulo = item.title
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,

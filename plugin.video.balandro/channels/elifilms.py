@@ -135,6 +135,9 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
+
     return itemlist
 
 
@@ -147,6 +150,8 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = api + 'listing?page=1&post_type=movies&posts_per_page=25', _next = '&post_type=movies&posts_per_page=25', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = api + 'tops?range=month&limit=25&post_type=movies', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -164,7 +169,31 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = api + 'listing?page=1&post_type=tvshows&posts_per_page=25', _next = '&post_type=tvshows&posts_per_page=25', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = api + 'tops?range=month&limit=25&post_type=tvshows', search_type = 'tvshow' ))
+
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', search_type = 'tvshow', text_color = 'springgreen' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
+
+    return itemlist
+
+
+def mainlist_animes(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
+
+    itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', group = 'animes', search_type = 'tvshow', text_color = 'springgreen' ))
+
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = api + 'listing?page=1&post_type=animes&posts_per_page=25', _next = '&post_type=animes&posts_per_page=25', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = api + 'tops?range=month&limit=25&post_type=animes', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', group = 'animes', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por año', action = 'anios', group = 'animes', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -174,7 +203,9 @@ def generos(item):
     itemlist = []
 
     if item.search_type == 'movie': text_color = 'deepskyblue'
-    else: text_color = 'hotpink'
+    else:
+       if item.group == 'animes': text_color = 'springgreen'
+       else: text_color = 'hotpink'
 
     genres = [
        'accion',
@@ -205,9 +236,12 @@ def generos(item):
        ]
 
     for genre in genres:
-        url = api + 'listing?tax=genres&term=' + genre + '&page=1&post_type=movies,tvshows,animes&posts_per_page=25'
+        if item.search_type == 'movie': _next = '&post_type=movies&posts_per_page=25'
+        else:
+           if item.group == 'animes':  _next = '&post_type=animes&posts_per_page=25'
+           else: _next = '&post_type=tvshows&posts_per_page=25'
 
-        _next = '&post_type=movies,tvshows,animes&posts_per_page=25'
+        url = api + 'listing?tax=genres&term=' + genre + '&page=1' + _next
 
         title = genre.replace('-', ' ').capitalize()
 
@@ -220,15 +254,28 @@ def anios(item):
     logger.info()
     itemlist = []
 
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else:
+       if item.group == 'animes': text_color = 'springgreen'
+       else: text_color = 'hotpink'
+
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    for x in range(current_year, 1939, -1):
-        url = api + 'listing?tax=years&term=' + str(x) + '&page=1&post_type=movies,tvshows,animes&posts_per_page=25'
+    if item.search_type == 'movie': limit = 1939
+    else:
+       if item.group == 'animes': limit = 1989
+       else: limit = 1959
 
-        _next = '&post_type=movies,tvshows,animes&posts_per_page=25'
+    for x in range(current_year, limit, -1):
+        if item.search_type == 'movie': _next = '&post_type=movies&posts_per_page=25'
+        else:
+           if item.group == 'animes':  _next = '&post_type=animes&posts_per_page=25'
+           else: _next = '&post_type=tvshows&posts_per_page=25'
 
-        itemlist.append(item.clone( title=str(x), url=url, _next=_next, action='list_all', text_color = 'deepskyblue' ))
+        url = api + 'listing?tax=years&term=' + str(x) + '&page=1' + _next
+		
+        itemlist.append(item.clone( title=str(x), url=url, _next=_next, action='list_all', text_color = text_color ))
 
     return itemlist
 
@@ -241,8 +288,11 @@ def list_all(item):
 
     try:
        jdata = jsontools.load(data)
+
        _jdata = jdata['data']
-       _p_jdata = _jdata['posts']
+
+       if not item._next: _p_jdata = _jdata
+       else: _p_jdata = _jdata['posts']
     except:
         return itemlist
 
@@ -261,7 +311,7 @@ def list_all(item):
         if not year: year = '-'
         else: title = title.replace('(' + year + ')', '').strip()
  
-        title = title.replace('&#8211;', '').replace('&#8217;', '').replace('#038;', '')
+        title = title.replace('&#8211;', '').replace('&#8217;', '').replace('#038;', '').replace('&amp;', '&')
 
         tipo = 'movie' if "'movies'" in str(match) else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
@@ -279,10 +329,15 @@ def list_all(item):
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
 
+            if item.group == 'animes':
+                if not "'animes'" in str(match): continue
+
             itemlist.append(item.clone( action='temporadas', id=id, title=title, thumbnail=thumb, fmt_sufijo=sufijo, 
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
+
+    if not item._next: return itemlist
 
     if itemlist:
         pag_jdata = _jdata['pagination']
@@ -418,15 +473,16 @@ def episodios(item):
 
         title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
-        title = title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = "%sx%s %s" % (str(season), str(epis), title)
 
-        title = title.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
-
-        title = "%sx%s - %s" % (str(season), str(epis), title)
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
         url = api + 'player?post_id=' + id + '&_any=1'
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, contentType = 'episode', contentSeason = season, contentEpisodeNumber=epis ))
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
+                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -458,6 +514,8 @@ def findvideos(item):
     for link in matches:
         ses += 1
 
+        other = ''
+
         link = link.replace('\\/', '/')
 
         if 'sbcom' in link: continue
@@ -469,7 +527,10 @@ def findvideos(item):
         servidor = servertools.get_server_from_url(link)
         servidor = servertools.corregir_servidor(servidor)
 
-        other = ''
+        if '/vimeos.' in link:
+            servidor = 'zures'
+            other = 'Vimeos'
+
         if servidor == 'various': other = servertools.corregir_other(link)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = lang, other = other ))
@@ -482,6 +543,8 @@ def findvideos(item):
     for link in matches:
         ses += 1
 
+        other = ''
+
         link = link.replace('\\/', '/')
 
         if '1fichier' in link: continue
@@ -493,10 +556,15 @@ def findvideos(item):
         elif 'fembed' in link: continue
         elif 'fcom' in link: continue
 
+        elif '/vimeos.' in link: continue
+
         servidor = servertools.get_server_from_url(link)
         servidor = servertools.corregir_servidor(servidor)
 
-        other = ''
+        if '/vimeos.' in link:
+            servidor = 'zures'
+            other = 'Vimeos'
+
         if servidor == 'various': other = servertools.corregir_other(link)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = lang, other = other ))
@@ -528,8 +596,21 @@ def play(item):
 def search(item, texto):
     logger.info()
     try:
-        item.url = api + 'search?query=' + texto.replace(" ", "+") + ' &page=NaN&post_type=movies,tvshows,animes&posts_per_page=25'
-        item._next = '&post_type=movies,tvshows,animes&posts_per_page=25'
+        if item.search_type == 'all':
+            item.url = api + 'search?post_type=movies,tvshows,animes&query=' + texto.replace(" ", "+") + '&posts_per_page=25'
+            item._next = '&post_type=movies,tvshows,animes&posts_per_page=25'
+        else:
+            if item.search_type == 'movie':
+                item.url = api + 'search?post_type=movies&query=' + texto.replace(" ", "+") + '&posts_per_page=25'
+                item._next = '&post_type=movies&posts_per_page=25'
+            else:
+                if item.group == 'animes':
+                    item.url = api + 'search?post_type=animes&query=' + texto.replace(" ", "+") + '&posts_per_page=25'
+                    item._next = '&post_type=animes&posts_per_page=25'
+                else:
+                    item.url = api + 'search?post_type=tvshows&query=' + texto.replace(" ", "+") + '&posts_per_page=25'
+                    item._next = '&post_type=tvshows&posts_per_page=25'
+
         return list_all(item)
     except:
         import sys

@@ -1,0 +1,17 @@
+{
+  "id": "doramaexpress",
+  "name": "DoramaExpress",
+  "thumbnail": "doramaexpress.jpg",
+
+  "active": true,
+
+  "searchable": false,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": ["movie", "tvshow"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["dorama"],
+
+  "notes": "Web dedicada exclusivamente al dorama."
+}

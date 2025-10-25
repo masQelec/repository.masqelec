@@ -232,7 +232,7 @@ def list_all(item):
         if num_matches > perpage:
             hasta = (item.page * perpage) + perpage
             if hasta < num_matches:
-                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, pagina = item.pagina, action='list_all', text_color='coral' ))
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_all', text_color='coral' ))
                 buscar_next = False
 
         if buscar_next:
@@ -458,7 +458,7 @@ def findvideos(item):
                         if servidor == 'various': other = servertools.corregir_other(url)
 
                         itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                             language = 'vose', other = other ))
+                                             language = 'Vose', other = other ))
 
     if not itemlist:
         if not ses == 0:

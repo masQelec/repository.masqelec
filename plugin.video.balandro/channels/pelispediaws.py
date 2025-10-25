@@ -89,7 +89,7 @@ def generos(item):
 
     data = do_downloadpage(host)
 
-    bloque = scrapertools.find_single_match(data, '>GÉNEROS<(.*?)</ul>')
+    bloque = scrapertools.find_single_match(data, '>GENERO<(.*?)</ul>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?>(.*?)</a>')
 

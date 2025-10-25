@@ -4,9 +4,11 @@ import sys
 
 if sys.version_info[0] >= 3:
     import xbmcvfs
+
     translatePath = xbmcvfs.translatePath
 else:
     import xbmc
+
     translatePath = xbmc.translatePath
 
 

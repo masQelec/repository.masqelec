@@ -148,7 +148,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+        thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
         time = scrapertools.find_single_match(match, '<p>(.*?)</p>')
 

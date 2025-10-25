@@ -450,17 +450,17 @@ def list_all(item):
 
                 title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
-                title = title.replace(' S1 ', '[COLOR tan] S1 [/COLOR]').replace(' S2 ', '[COLOR tan] S2 [/COLOR]').replace(' S3 ', '[COLOR tan] S3 [/COLOR]').replace(' S4 ', '[COLOR tan] S4 [/COLOR]')
+                title = title.replace(' S1 ', '[COLOR tan] Temp. 1 [/COLOR]').replace(' S2 ', '[COLOR tan] Temp. 2 [/COLOR]').replace(' S3 ', '[COLOR tan] Temp. 3 [/COLOR]').replace(' S4 ', '[COLOR tan] Temp. 4 [/COLOR]')
 
-                title = title.replace(' S5 ', '[COLOR tan] S5 [/COLOR]').replace(' S6 ', '[COLOR tan] S6 [/COLOR]').replace(' S7 ', '[COLOR tan] S7 [/COLOR]').replace(' S8 ', '[COLOR tan] S8 [/COLOR]')
+                title = title.replace(' S5 ', '[COLOR tan] Temp. 5 [/COLOR]').replace(' S6 ', '[COLOR tan] Temp. 6 [/COLOR]').replace(' S7 ', '[COLOR tan] Temp. 7 [/COLOR]').replace(' S8 ', '[COLOR tan] Temp. 8 [/COLOR]')
 
-                title = title.replace(' S9 ', '[COLOR tan] S9 [/COLOR]')
+                title = title.replace(' S9 ', '[COLOR tan] Temp. 9 [/COLOR]')
 
-                title = title.replace(' T1 ', '[COLOR tan] T1 [/COLOR]').replace(' T2 ', '[COLOR tan] T2 [/COLOR]').replace(' T3 ', '[COLOR tan] T3 [/COLOR]').replace(' T4 ', '[COLOR tan] T4 [/COLOR]')
+                title = title.replace(' T1 ', '[COLOR tan] Temp. 1 [/COLOR]').replace(' T2 ', '[COLOR tan] Temp. 2 [/COLOR]').replace(' T3 ', '[COLOR tan] Temp. 3 [/COLOR]').replace(' T4 ', '[COLOR tan] Temp. 4 [/COLOR]')
 
-                title = title.replace(' T5 ', '[COLOR tan] T5 [/COLOR]').replace(' T6 ', '[COLOR tan] T6 [/COLOR]').replace(' T7 ', '[COLOR tan] T7 [/COLOR]').replace(' T8 ', '[COLOR tan] T8 [/COLOR]')
+                title = title.replace(' T5 ', '[COLOR tan] Temp. 5 [/COLOR]').replace(' T6 ', '[COLOR tan] Temp. 6 [/COLOR]').replace(' T7 ', '[COLOR tan] Temp. 7 [/COLOR]').replace(' T8 ', '[COLOR tan] Temp. 8 [/COLOR]')
 
-                title = title.replace(' T9 ', '[COLOR tan] T9 [/COLOR]')
+                title = title.replace(' T9 ', '[COLOR tan] Temp. 9 [/COLOR]')
 
                 title = title.replace('Cap ', '[COLOR goldenrod]Epis. [/COLOR]').replace('Episode ', '[COLOR goldenrod]Epis. [/COLOR]')
 
@@ -479,7 +479,8 @@ def list_all(item):
 
             SerieName = corregir_SerieName(title)
 
-            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, qualities=qlty, languages=lang, fmt_sufijo=sufijo,
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
+                                        qualities=qlty, languages=lang, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -736,7 +737,8 @@ def findvideos(item):
                     if link_other == servidor: link_other = ''
                     else: link_other = link_other
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = link_other.capitalize() ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url,
+                                      language = lang, other = link_other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:

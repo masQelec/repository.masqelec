@@ -106,20 +106,22 @@ def get_video_url(page_url, url_referer=''):
     elif 'goodstream' in page_url:
           txt_server = 'Goodstream'
 
-          if '/embed-' in page_url:
-              page_url = page_url.replace('/goodstream.uno/embed-', '/goodstream.uno/video/embed/')
-              page_url = page_url.replace('/goodstream.one/embed-', '/goodstream.uno/video/embed/')
-              page_url = page_url.replace('.html', '')
+          if not '/d/' in page_url:
+              if '/embed-' in page_url:
+                  page_url = page_url.replace('/goodstream.uno/embed-', '/goodstream.uno/video/embed/')
+                  page_url = page_url.replace('/goodstream.one/embed-', '/goodstream.uno/video/embed/')
+                  page_url = page_url.replace('.html', '')
  
-          if not '/video/embed/' in page_url:
-              page_url = page_url.replace('/goodstream.uno/', '/goodstream.uno/video/embed/')
-              page_url = page_url.replace('/goodstream.one/', '/goodstream.uno/video/embed/')
-              page_url = page_url.replace('.html', '')
+              if not '/video/embed/' in page_url:
+                  page_url = page_url.replace('/goodstream.uno/', '/goodstream.uno/video/embed/')
+                  page_url = page_url.replace('/goodstream.one/', '/goodstream.uno/video/embed/')
+                  page_url = page_url.replace('.html', '')
 
     elif 'filemoon' in page_url or 'fmoonembed' in page_url or 'embedmoon' in page_url or 'moonjscdn' in page_url or 'l1afav' in page_url:
           txt_server = 'Filemoon'
 
           page_url = page_url.replace('/filemoon.to/', '/filemoon.sx/').replace('/filemoon.in/', '/filemoon.sx/').replace('/filemoon.nl/', '/filemoon.sx/').replace('/filemoon.wf/', '/filemoon.sx/').replace('/filemoon.eu/', '/filemoon.sx/').replace('/filemoon.art/', '/filemoon.sx/').replace('/filemoon.link/', '/filemoon.sx/').replace('/filemoon.top/', '/filemoon.sx/').replace('/filemoon.lat/', '/filemoon.sx/').replace('/filemoon.org/', '/filemoon.sx/').replace('/filemoon.online/', '/filemoon.sx/')
+
           page_url = page_url.replace('/fmoonembed.pro/', '/filemoon.sx/').replace('/embedmoon.xyz/', '/filemoon.sx/').replace('/moonjscdn.info/', '/filemoon.sx/').replace('/l1afav.net/', '/filemoon.sx/')
 
     elif 'streamhub' in page_url:
@@ -153,13 +155,17 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('//yadi.ru', '/yadi.sk/').replace('//yadi.com', '/yadi.sk/').replace('//yadi.disk', '/yadi.sk/')
 
-    elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url or 'sfastwish' in page_url or 'doodporn' in page_url or 'flaswish' in page_url or 'obeywish' in page_url or 'cdnwish' in page_url or 'asnwish' in page_url or 'flastwish' in page_url or 'jodwish' in page_url or 'swhoi' in page_url or 'fsdcmo' in page_url or 'swdyu' in page_url or 'wishonly' in page_url or 'playerwish' in page_url or 'hlswish' in page_url or 'wish' in page_url or 'iplayerhls' in page_url or 'hlsflast' in page_url or 'ghbrisk' in page_url or 'cybervynx' in page_url or 'streamhg' in page_url or 'hlsflex' in page_url or 'dhcplay' in page_url or 'stbhg' in page_url or 'gradehgplus' in page_url or 'tryzendm' in page_url or 'hglink' in page_url or 'hailindihg' in page_url or 'guxhag' in page_url or 'habetar' in page_url or 'yuguaab' in page_url  or 'xenolyzb' in page_url or 'hgplaycdn' in page_url or 'davioad' in page_url or 'haxloppd' in page_url or 'dumbalag' in page_url or 'kravaxxa' in page_url:
+    elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url or 'sfastwish' in page_url or 'doodporn' in page_url or 'flaswish' in page_url or 'obeywish' in page_url or 'cdnwish' in page_url or 'asnwish' in page_url or 'flastwish' in page_url or 'jodwish' in page_url or 'swhoi' in page_url or 'fsdcmo' in page_url or 'swdyu' in page_url or 'wishonly' in page_url or 'playerwish' in page_url or 'hlswish' in page_url or 'wish' in page_url or 'iplayerhls' in page_url or 'hlsflast' in page_url or 'ghbrisk' in page_url or 'cybervynx' in page_url or 'streamhg' in page_url or 'hlsflex' in page_url or 'dhcplay' in page_url or 'stbhg' in page_url or 'gradehgplus' in page_url or 'tryzendm' in page_url or 'hglink' in page_url or 'hailindihg' in page_url or 'guxhag' in page_url or 'habetar' in page_url or 'yuguaab' in page_url  or 'xenolyzb' in page_url or 'hgplaycdn' in page_url or 'davioad' in page_url or 'haxloppd' in page_url or 'dumbalag' in page_url or 'kravaxxa' in page_url or 'hgbazooka' in page_url:
           txt_server = 'Streamwish'
 
           page_url = page_url.replace('/streamwish.com/', '/streamwish.to/').replace('/streamwish.top/', '/streamwish.to/').replace('/streamwish.site/', '/streamwish.to/').replace('/strwish.xyz/', '/streamwish.to/').replace('/strwish.com/', '/streamwish.to/').replace('/embedwish.com/', '/streamwish.to/').replace('/wishembed.pro/', '/streamwish.to/')
+
           page_url = page_url.replace('/awish.pro/', '/streamwish.to/').replace('/dwish.pro/', '/streamwish.to/').replace('/mwish.pro/', '/streamwish.to/').replace('/wishfast.top/', '/streamwish.to/').replace('/sfastwish.com/', '/streamwish.to/').replace('/doodporn.xyz/', '/streamwish.to/')
+
           page_url = page_url.replace('/flaswish.com/', '/streamwish.to/').replace('/obeywish.com/', '/streamwish.to/').replace('/cdnwish.com/', '/streamwish.to/').replace('/asnwish.com/', '/streamwish.to/').replace('/flastwish.com/', '/streamwish.to/').replace('/jodwish.com/', '/streamwish.to/')
+
           page_url = page_url.replace('/swhoi.com/', '/streamwish.to/').replace('/fsdcmo.sbs/', '/streamwish.to/').replace('/swdyu.com/', '/streamwish.to/').replace('/wishonly.site/', '/streamwish.to/').replace('/playerwish.com/', '/streamwish.to/')
+
           page_url = page_url.replace('/hlswish.com/', '/streamwish.to/').replace('/swishsrv.com/', '/streamwish.to/').replace('/streamwish.fun/', '/streamwish.to/')
 
           page_url = page_url.replace('/iplayerhls.com/', '/streamwish.to/').replace('/hlsflast.com/', '/streamwish.to/').replace('/ghbrisk.com/', '/streamwish.to/')
@@ -170,25 +176,29 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('/davioad.com/', '/streamwish.to/').replace('/haxloppd.com/', '/streamwish.to/')
 
-          page_url = page_url.replace('/dumbalag.com/', '/streamwish.to/').replace('/kravaxxa.com/', '/streamwish.to/')
+          page_url = page_url.replace('/dumbalag.com/', '/streamwish.to/').replace('/kravaxxa.com/', '/streamwish.to/').replace('/hgbazooka.com/', '/streamwish.to/').replace('/cavanhabg.com/', '/streamwish.to/')
 
     elif 'desiupload' in page_url:
           txt_server = 'Desiupload'
 
           page_url = page_url.replace('/desiupload.to/', '/desiupload.co/').replace('/desiupload.in/', '/desiupload.co/')
 
-    elif 'filelions' in page_url or 'azipcdn' in page_url or 'alions' in page_url or 'dlions' in page_url or 'mlions' in page_url or 'fviplions' in page_url or 'javlion' in page_url or 'fdewsdc' in page_url or 'peytonepre' in page_url or 'ryderjet' in page_url or 'smoothpre' in page_url or 'movearnpre' in page_url or 'seraphinap' in page_url or 'seraphinapl' in page_url or 'mivalyo' in page_url or 'taylorplayer' in page_url or 'videoland' in page_url:
+    elif 'filelions' in page_url or 'azipcdn' in page_url or 'alions' in page_url or 'dlions' in page_url or 'mlions' in page_url or 'fviplions' in page_url or 'javlion' in page_url or 'fdewsdc' in page_url or 'peytonepre' in page_url or 'ryderjet' in page_url or 'smoothpre' in page_url or 'movearnpre' in page_url or 'seraphinap' in page_url or 'seraphinapl' in page_url or 'mivalyo' in page_url or 'taylorplayer' in page_url or 'videoland' in page_url or 'bingezove' in page_url or 'dinisglows' in page_url or 'dingtezuni' in page_url:
           txt_server = 'Filelions'
 
-          page_url = page_url.replace('/embed/', '/')
-
           page_url = page_url.replace('/filelions.com/', '/filelions.to/').replace('/filelions.live/', '/filelions.to/').replace('/filelions.xyz/', '/filelions.to/').replace('/filelions.online/', '/filelions.to/').replace('/filelions.site/', '/filelions.to/').replace('/filelions.co/', '/filelions.to/').replace('/filelions.top/', '/filelions.to/')
+
           page_url = page_url.replace('/azipcdn.com/', '/filelions.to/')
+
           page_url = page_url.replace('/alions.pro/', '/filelions.to/').replace('/dlions.pro/', '/filelions.to/').replace('/mlions.pro/', '/filelions.to/').replace('/fviplions.com/', '/filelions.to/')
+
           page_url = page_url.replace('/javlion.xyz/', '/filelions.to/').replace('/fdewsdc.sbs/', '/filelions.to/')
+
           page_url = page_url.replace('/peytonepre.com/', '/filelions.to/').replace('/ryderjet.com/', '/filelions.to/').replace('/smoothpre.com/', '/filelions.to/').replace('/movearnpre.com/', '/filelions.to/')
+
           page_url = page_url.replace('/seraphinap.com/', '/filelions.to/').replace('/seraphinapl.com/', '/filelions.to/')
-          page_url = page_url.replace('/mivalyo.com/', '/filelions.to/').replace('/taylorplayer.com/', '/filelions.to/').replace('/videoland.sbs/', '/filelions.to/')
+
+          page_url = page_url.replace('/mivalyo.com/', '/filelions.to/').replace('/taylorplayer.com/', '/filelions.to/').replace('/videoland.sbs/', '/filelions.to/').replace('/bingezove.com/', '/filelions.to/').replace('/dinisglows.com/', '/filelions.to/').replace('/dingtezuni.com/', '/filelions.to/')
 
     elif 'youdbox' in page_url or 'yodbox' in page_url or 'youdboox' in page_url: 
           txt_server = 'Youdbox'
@@ -274,8 +284,10 @@ def get_video_url(page_url, url_referer=''):
 
     # ~ FILELIONS
     if txt_server == 'Filelions':
-        # ~ 22/8/2025  FILELIONS pq falla ResolveUrl
-        page_url.replace('/filelions.to/', '/vidhidepre.com/')
+        # ~ 28/8/2025  FILELIONS pq falla ResolveUrl
+        page_url = page_url.replace('/embed/', '/f/')
+
+        page_url = page_url.replace('/filelions.to/', '/taylorplayer.com/')
 
     # ~ STREAMWISH
     elif txt_server == 'Streamwish':
@@ -343,7 +355,15 @@ def get_video_url(page_url, url_referer=''):
         import traceback
         logger.error(traceback.format_exc())
 
-        if txt_server == 'Vidspeed':
+        if txt_server == 'Hexupload':
+             url = hexupload(ini_page_url)
+
+             if url:
+                 # ~ 23/5/2025  HEXUPLOAD pq falla ResolveUrl
+                 video_urls.append(['mp4', url])
+                 return video_urls
+
+        elif txt_server == 'Vidspeed':
              data = httptools.downloadpage(ini_page_url).data
 
              url = scrapertools.find_single_match(str(data), 'file:"(.*?)"')
@@ -351,14 +371,6 @@ def get_video_url(page_url, url_referer=''):
              if url:
                  # ~ 13/10/2023  VIDSPEED --> Directo pq falla ResolveUrl
                  video_urls = [[url[-4:], url]]
-                 return video_urls
-
-        elif txt_server == 'Hexupload':
-             url = hexupload(ini_page_url)
-
-             if url:
-                 # ~ 23/5/2025  HEXUPLOAD pq falla ResolveUrl
-                 video_urls.append(['mp4', url])
                  return video_urls
 
         if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
@@ -409,6 +421,23 @@ def vidhide(page_url):
         dec_data = jsunpack.unpack(enc_data)
 
         m3u8 = scrapertools.find_single_match(dec_data, '\{(?:file|src|"hls2"):"([^"]+)"')
+
+        if m3u8.endswith('.jpg'):
+            time.sleep(12)
+
+            platformtools.dialog_notification('Re-Accediendo a ' + '[COLOR cyan][B]Vidhidepro[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
+            time.sleep(int(espera))
+
+            resp = httptools.downloadpage(page_url)
+            data = resp.data
+
+            enc_data = scrapertools.find_single_match(data, "text/javascript(?:'|\")>(eval.*?)</script>")
+
+            dec_data = jsunpack.unpack(enc_data)
+
+            m3u8 = scrapertools.find_single_match(dec_data, '\{(?:file|src|"hls2"):"([^"]+)"')
+
+        if m3u8.endswith('.jpg'): return 'non_exist'
     except:
         pass
 
@@ -428,7 +457,8 @@ def wish(page_url):
 
     data = httptools.downloadpage(page_url).data
 
-    if "Not Found" in data or "File was deleted" in data or "is no longer available" in data: return 'non_exist'
+    if "Not Found" in data or "File was deleted" in data or "is no longer available" in data or "Video temporarily not available" in data:
+        return 'non_exist'
 
     try:
         pack = scrapertools.find_single_match(data, 'p,a,c,k,e,d.*?</script>')

@@ -131,7 +131,7 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<h1>(.*?)<div class="pagination')
+    bloque = scrapertools.find_single_match(data, '</h1>(.*?)<div class="pagination')
     if not bloque: bloque = scrapertools.find_single_match(data, 'id="videoSearchResult"(.*?)div class="pagination')
 
     if '/video/search?search=' in item.url:

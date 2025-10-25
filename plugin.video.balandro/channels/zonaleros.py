@@ -394,9 +394,13 @@ def episodios(item):
 
         title = title.replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
-        title = title.replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
-
         titulo = str(item.contentSeason) + 'x' + nro_epi + ' ' + title
+
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        if 'Epis.' in titulo: titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = nro_epi ))
@@ -434,9 +438,13 @@ def findvideos(item):
             link = scrapertools.find_multiple_matches(str(datar), 'video="' + srv + '".*?<iframe src="(.*?)"')
 
             if link:
+                if ' - ' in title: title = title.split(" - ")[0]
+
                 title = title.lower().strip()
 
-                if title == 'dropapk': continue
+                if not title: continue
+
+                elif title == 'dropapk': continue
                 elif title == '1fichier': continue
                 elif title == 'onedrive': continue
                 elif title == 'free' or title == 'freehd': continue
@@ -458,7 +466,8 @@ def findvideos(item):
                     if title == 'hd1' or title == 'hd2': other = title
                     else: other = srv.capitalize()
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = 'Lat', other = other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
+                                      language = 'Lat', other = other ))
 
         # ~ Downloads de Series
         block = scrapertools.find_single_match(data, '<th>DESCARGAR</th>(.*?)</table>')
@@ -466,15 +475,19 @@ def findvideos(item):
         downs = scrapertools.find_multiple_matches(block, '<tr>(.*?)</tr>')
 
         for down in downs:
+            if not 'http' in down: continue
+
             ses += 1
 
             srv = scrapertools.find_single_match(down, '<td>(.*?)</td>')
 
+            if ' - ' in srv: srv = srv.split(" - ")[0]
+
             srv = srv.lower().strip()
 
-            if not 'http' in down: continue
+            if not srv: continue
 
-            if srv == 'dropapk': continue
+            elif srv == 'dropapk': continue
             elif srv == '1fichier': continue
             elif srv == 'onedrive': continue
             elif srv == 'free' or srv == 'freehd': continue
@@ -523,9 +536,13 @@ def findvideos(item):
                 url = scrapertools.find_single_match(str(datar), ';video.*?="' + _id + '".*?src="(.*?)"')
 
                 if url:
+                    if ' - ' in srv: srv = srv.split(" - ")[0]
+
                     srv = srv.lower().strip()
 
-                    if srv == 'dropapk': continue
+                    if not srv: continue
+
+                    elif srv == 'dropapk': continue
                     elif srv == '1fichier': continue
                     elif srv == 'onedrive': continue
                     elif srv == 'free' or srv == 'freehd': continue
@@ -544,10 +561,11 @@ def findvideos(item):
 
                     other = ''
                     if servidor == 'various':
-                        if srv == 'hd1' or title == 'hd2': other = srv
+                        if srv == 'hd1' or srv == 'hd2': other = srv
                         else: other = srv.capitalize()
 
-                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, quality = qlty, language = 'Lat', other = other ))
+                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                                          quality = qlty, language = 'Lat', other = other ))
 
     # ~ Downloads de Pelis tienen recaptcha
 

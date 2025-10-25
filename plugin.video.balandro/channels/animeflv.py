@@ -289,6 +289,11 @@ def episodios(item):
 
     matches = eval(scrapertools.find_single_match(data, "var episodes = (.*?);"))
 
+    if not matches:
+        if 'Proximamente<' in data:
+             platformtools.dialog_notification('AmimeFlv', '[COLOR cyan][B]Proximamente[/B][/COLOR]')
+             return
+
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
 
@@ -350,6 +355,11 @@ def episodios(item):
                season = scrapertools.find_single_match(info[2], 'season-(.*?)-Capítulo').strip()
                if not season : season = scrapertools.find_single_match(info[2], 'season-(.*?)$').strip()
 
+               try:
+                   num_season = int(season)
+               except:
+                   season = ''
+
                if not season: season = 1
 
         url = '{}ver/{}-{}'.format(host, info[2], episode[0])
@@ -357,6 +367,10 @@ def episodios(item):
         epis = episode[0]
         
         titulo = '{}x{} Episodio {}'.format(season, str(epis), str(epis))
+
+        titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
                                     contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))

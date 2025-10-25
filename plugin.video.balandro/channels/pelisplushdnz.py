@@ -119,6 +119,8 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
+
     itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'pelisplushdnz', thumbnail=config.get_thumb('pelisplushdnz') ))
 
     platformtools.itemlist_refresh()
@@ -465,6 +467,13 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + str(episode) + ' ' + title
 
+        if 'episodie' in titulo.lower() or 'episodio' in titulo.lower() or 'capítulo' in titulo.lower() or 'capitulo' in titulo.lower():
+            titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
         if num_matches > 50:
             tab_epis.append([ord_epis, url, titulo, episode])
         else:
@@ -585,6 +594,8 @@ def findvideos(item):
                            other = url.split("/")[2]
                            other = other.replace('https:', '').strip()
 
+                    if '.eyJs' in link: age = ''
+
                     itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes, age=age,
                                           language=lang, other=other ))
 
@@ -677,22 +688,28 @@ def findvideos(item):
 
                         url = servertools.normalize_url(servidor, url)
 
-                        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url=url, language=lang, other=other ))
+                        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url=url, language=lang ))
 
                     continue
 
                 elif '/video/' in url:
                     datax = do_downloadpage(url)
 
-                    matchesx = scrapertools.find_multiple_matches(datax, "go_to_playerVast.*?'(.*?)'")
+                    matchesx = scrapertools.find_multiple_matches(datax, "go_to_playerVast.*?'(.*?)'(.*?)</span>")
 
-                    for matchx in matchesx:
+                    for matchx, restox in matchesx:
                         if '/embedsito.' in matchx: continue
                         elif '/player-cdn.' in matchx: continue
                         elif '/1fichier.' in matchx: continue
                         elif '/hydrax.' in matchx: continue
                         elif '/xupalace.' in matchx: continue
                         elif '/uploadfox.' in matchx: continue
+
+                        if 'data-lang="0"' in restox: lang = 'Lat'
+                        elif 'data-lang="1"' in restox: lang = 'Esp'
+                        elif 'data-lang="2"' in restox: lang = 'Vose'
+                        elif 'data-lang="3"' in restox: lang = 'Jap'
+                        else: lang = '?'
 
                         servidor = servertools.get_server_from_url(matchx)
                         servidor = servertools.corregir_servidor(servidor)
@@ -734,22 +751,28 @@ def findvideos(item):
 
                     url = servertools.normalize_url(servidor, url)
 
-                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url=url, language=lang, other=other ))
+                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url=url, language=lang ))
 
                 continue
 
             elif '/video/' in url:
                 datax = do_downloadpage(url)
 
-                matchesx = scrapertools.find_multiple_matches(datax, "go_to_playerVast.*?'(.*?)'")
+                matchesx = scrapertools.find_multiple_matches(datax, "go_to_playerVast.*?'(.*?)'(.*?)</span>")
 
-                for matchx in matchesx:
+                for matchx, restox in matchesx:
                     if '/embedsito.' in matchx: continue
                     elif '/player-cdn.' in matchx: continue
                     elif '/1fichier.' in matchx: continue
                     elif '/hydrax.' in matchx: continue
                     elif '/xupalace.' in matchx: continue
                     elif '/uploadfox.' in matchx: continue
+
+                    if 'data-lang="0"' in restox: lang = 'Lat'
+                    elif 'data-lang="1"' in restox: lang = 'Esp'
+                    elif 'data-lang="2"' in restox: lang = 'Vose'
+                    elif 'data-lang="3"' in restox: lang = 'Jap'
+                    else: lang = '?'
 
                     servidor = servertools.get_server_from_url(matchx)
                     servidor = servertools.corregir_servidor(servidor)
@@ -820,23 +843,32 @@ def play(item):
         crypto = str(item.crypto)
         bytes = str(item.bytes)
 
-        try:
-            url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
-        except:
-            url = ''
+        url = ''
+
+        if not bytes:
+            url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
+            url += '='
+            url = base64.b64decode(url).decode()
+            url = scrapertools.find_single_match(url, '"link":"(.*?)"')
 
         if not url:
-            url = decrypters.decode_decipher(crypto, bytes)
-
-        if not url:
-            if crypto.startswith("http"):
-                url = crypto.replace('\\/', '/')
+            try:
+                url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
+            except:
+                url = ''
 
             if not url:
-                return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+                url = decrypters.decode_decipher(crypto, bytes)
 
-        elif not url.startswith("http"):
-            return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+            if not url:
+                if crypto.startswith("http"):
+                    url = crypto.replace('\\/', '/')
+
+                if not url:
+                    return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+
+            elif not url.startswith("http"):
+                return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
 
     if url:
         if '/streamsito.com/uqlink.php?id=' in url: url = url.replace('/streamsito.com/uqlink.php?id=', '/uqload.com/embed-')

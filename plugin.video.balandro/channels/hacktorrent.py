@@ -364,8 +364,11 @@ def findvideos(item):
 
         elif 'Castellano' in lang: lang = 'Esp'
         elif 'Latino' in lang: lang = 'Lat'
+
         elif 'Subtitulado' in lang: lang = 'Vose'
         elif 'Version Original' in lang: lang = 'VO'
+
+        elif 'ingles' in lang.lower(): lang = 'Ing'
 
         link = link.replace('\\/', '/')
 

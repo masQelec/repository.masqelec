@@ -65,6 +65,7 @@ def series(item):
 
     for url, title in matches[item.page * perpage:]:
         url = host + url
+
         title = title.split("<")[0].capitalize()
 
         itemlist.append(item.clone( action='list_series', url=url, title=title, infoLabels = {'year': '-'}, text_color='moccasin' ))
@@ -134,9 +135,7 @@ def list_all(item):
 
         title = title.replace('&#8230;', '').replace('&#8211;', '')
 
-        thumb = scrapertools.find_single_match(article, 'itemprop="image".*?srcset"(.*?).jpg')
-
-        if thumb: thumb = thumb + '.jpg'
+        thumb = scrapertools.find_single_match(article, '<img width=.*?src="(.*?)"')
 
         plot = scrapertools.htmlclean(scrapertools.find_single_match(article, '<p>(.*?)</p>'))
 

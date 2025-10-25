@@ -54,7 +54,7 @@ def mainlist(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún no tiene Favoritos[/COLOR][/B]' % color_exec)
         return
 
-    itemlist.append(item.clone( action='', title='[B]FAVORITOS:[/B]', folder=False, text_color='plum' ))
+    itemlist.append(item.clone( action='', title='[B]FAVORITOS BALANDRO:[/B]', folder=False, text_color='plum' ))
 
     ses = 0
 

@@ -544,6 +544,10 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + item.contentSerieName
 
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
         thumb = thumb.replace('\\/', '/')
         thumb = thumb.replace('src=\\"', '').replace('\\"', '')
 
@@ -621,6 +625,10 @@ def findvideos(item):
             elif servidor == 'goodstream': servertools.corregir_other(servidor)
             elif servidor == 'streamwish': servertools.corregir_other(servidor)
 
+            elif servidor == 'vimeos':
+               servidor = 'zures'
+               other = 'Vimeos'
+
             if servertools.is_server_available(servidor):
                 if not servertools.is_server_enabled(servidor): continue
             else:
@@ -648,6 +656,8 @@ def findvideos(item):
 
             ses += 1
 
+            other = ''
+
             servidor = servidor.lower().strip()
 
             qlty = '1080'
@@ -674,6 +684,10 @@ def findvideos(item):
             elif servidor == 'drive': servidor = 'gvideo'
             elif servidor == 'google drive': servidor = 'gvideo'
 
+            elif servidor == 'vimeos':
+               servidor = 'zures'
+               other = 'Vimeos'
+
             if servertools.is_server_available(servidor):
                 if not servertools.is_server_enabled(servidor): continue
             else:
@@ -685,7 +699,7 @@ def findvideos(item):
             quality_num = puntuar_calidad(qlty)
 
             itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', data_url = data_url, data_lmt = data_lmt,
-                                  quality = qlty, quality_num = quality_num, language = lang ))
+                                  quality = qlty, quality_num = quality_num, language = lang, other = other ))
 
     # ~ es por las series
     if not hay_descargas:
@@ -736,7 +750,7 @@ def findvideos(item):
 
 
 def puntuar_calidad(txt):
-    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', 'HD', 'WEBRip 1080p', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
+    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', 'REMUX 1080p', '1080', 'HD', 'WEBRip 1080p', 'WEB-DL 4k', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', 'REMUX 4k', '4K']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
 

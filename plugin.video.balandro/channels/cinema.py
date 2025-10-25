@@ -197,8 +197,6 @@ def findvideos(item):
                 url = url.replace('/Smoothpre.', '/smoothpre.')
             elif '/Mivalyo.' in url:
                 url = url.replace('/Mivalyo.', '/mivalyo.')
-            else:
-                url = url.replace('/hgbazooka.com/', '/streamwish.to/')
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
@@ -206,7 +204,10 @@ def findvideos(item):
             url = servertools.normalize_url(servidor, url)
 
             other = ''
-            if servidor == 'various': other = servertools.corregir_other(url)
+
+            if not servidor == 'directo':
+                if servidor == 'various': other = servertools.corregir_other(url)
+                elif servidor == 'zures': other = servertools.corregir_zures(url)
 
             if 'Latino' in resto: lang = 'Lat'
             elif 'Sub Español' in resto: lang = 'Vose'

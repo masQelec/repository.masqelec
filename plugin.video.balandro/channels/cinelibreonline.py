@@ -10,6 +10,8 @@ from core import httptools, scrapertools, tmdb, servertools
 host = 'https://www.cinelibreonline.com/'
 
 
+# ~ 1/1/24  Los Generos NO se Incluyen en generos.py
+
 results = 14
 
 perpage = 20

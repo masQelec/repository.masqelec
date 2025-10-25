@@ -3,7 +3,7 @@
   "name": "HentaiLa",
   "thumbnail": "hentaila.jpg",
 
-  "active": false,
+  "active": true,
 
   "searchable": false,
   "search_types": ["movie"],
@@ -13,5 +13,5 @@
 
   "clusters": ["adults"],
 
-  "notes": "Web ANULADA. Vídeos de Animación en versión Original para Adultos +18"
+  "notes": "Vídeos de Animación en versión Original para Adultos +18"
 }

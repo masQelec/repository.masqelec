@@ -30,7 +30,6 @@ channels_currents = [
         'peliculaspro', 
         'pelisforte', 'pelismart', 'pelispanda', 'pelispediaws', 'pelisplushd', 'pelisplushdlat', 'pelisplushdnz',
         'pgratishd',
-        'playdede',
         'poseidonhd2',
         'series24', 'serieskao', 'seriespapayato', 'seriesplus', 'srnovelas', 'subtorrents',
         'todotorrents',
@@ -38,18 +37,18 @@ channels_currents = [
         ]
 
 dominioshdfull = [
-         'https://hdfull.blog/',
          'https://hdfull.today/',
-         'https://hd-full.biz/',
-         'https://hdfull.sbs/',
          'https://hdfull.help/',
          'https://hdfull.love/',
+         'https://hd-full.biz/',
 
+         'https://www2.hdfull.one/',
          'https://hdfull.cv/',
          'https://hdfull.monster/',
          'https://hdfull.cfd/',
          'https://hdfull.tel/',
          'https://hdfull.buzz/',
+         'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
 
@@ -57,11 +56,13 @@ dominioshdfull = [
          ]
 
 domains_cloudflare_hdfull = [
+         'https://www2.hdfull.one/',
          'https://hdfull.cv/',
          'https://hdfull.monster/',
          'https://hdfull.cfd/',
          'https://hdfull.tel/',
          'https://hdfull.buzz/',
+         'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
          'https://new.hdfull.one/'
@@ -80,15 +81,9 @@ ant_hosts_hdfull = [
          'https://hd-full.im/', 'https://hd-full.one/', 'https://hdfull.link/',
          'https://hd-full.co/', 'https://hd-full.lol/', 'https://hdfull.quest/',
          'https://hd-full.info/', 'https://hd-full.sbs/', 'https://hd-full.life/',
-         'https://hd-full.fit/', 'https://hd-full.me/', 'https://hd-full.vip/'
-         ]
+         'https://hd-full.fit/', 'https://hd-full.me/', 'https://hd-full.vip/,'
+         'https://hdfull.blog/']
 
-
-dominiosplaydede = [
-         'https://www12.playdede.link/',
-         'https://playdede.club/',
-         'https://playdede.in/'
-         ]
 
 color_alert = config.get_setting('notification_alert_color', default='red')
 color_infor = config.get_setting('notification_infor_color', default='pink')
@@ -2278,394 +2273,6 @@ def test_domain_pgratishd(item):
         platformtools.dialog_notification(config.__addon_name + ' - PGratisHd', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
-def last_domain_playdede(item):
-    logger.info()
-
-    domain = config.get_setting('dominio', 'playdede', default='')
-
-    channel_json = 'playdede.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    name = params['name']
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] ' + name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    platformtools.dialog_notification(config.__addon_name + ' - PlayDede', '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
-
-    # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
-    # ~ webs  0)-https://privacidad.me/@playdede  1)-https://entrarplaydede.com  2)-X https://x.com/webplaydede
-
-    last_domain = ''
-    latest_domain = ''
-
-    hay_domain = True
-
-    if not domain:
-        hay_domain = False
-        domain = dominiosplaydede[0]
-
-    try:
-        data = httptools.downloadpage('https://privacidad.me/@playdede/').data
-
-        bloque = scrapertools.find_single_match(data, '<strong>ENTRARPLAYDEDE.COM<(.*?)<script>')
-
-        operative_domains = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
-
-        for operative_domain in operative_domains:
-            operative_domain = operative_domain.lower().strip()
-
-            if not 'playdede.' in operative_domain: continue
-
-            if not 'https' in operative_domain: operative_domain = 'https://' + operative_domain
-            if not operative_domain.endswith('/'): operative_domain = operative_domain + '/'
-
-            last_domain = operative_domain
-
-            if operative_domain in str(dominiosplaydede):
-                if domain == operative_domain:
-                    break
-
-                continue
-    except:
-        pass
-
-    if not last_domain:
-        platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
-
-        xbmc.sleep(1000)
-        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Para conocer el Último Dominio Vigente deberá acceder a través de un navegador web a:', '[COLOR cyan][B]privacidad.me/@playdede[/B][/COLOR] ó [B][COLOR greenyellow]entrarplaydede.com[/COLOR][/B] ó [B][COLOR limegreen]x.com/webplaydede[/COLOR][/B]')
-        return
-
-    if not hay_domain:
-        dominio = config.get_setting('dominio', 'playdede', default=dominiosplaydede[0])
-        num_dominio = dominiosplaydede.index(dominio) if dominio in str(dominiosplaydede) else 0
-        ret = platformtools.dialog_select('Dominio a usar PlayDede', dominiosplaydede, preselect=num_dominio)
-        if ret == -1: return False
-
-        if dominio == dominiosplaydede[ret]:
-            return False
-
-        config.set_setting('dominio', dominiosplaydede[ret], 'playdede')
-
-        domain = dominiosplaydede[ret]
-
-        last_domain = domain
-
-    host_channel = ''
-    config.set_setting('user_test_channel', 'host_channel')
-
-    try:
-        localize = tester.test_channel('playdede')
-    except:
-        localize = ''
-
-    if config.get_setting('user_test_channel', default=''):
-        host_channel = config.get_setting('user_test_channel', default='')
-        if not host_channel.startswith('https://'): host_channel = ''
-	
-        config.set_setting('user_test_channel', '')
-
-        if host_channel:
-            if not config.get_setting('dominio', 'playdede', default=''):
-                if host_channel == item.host_canal:
-                    if item.host_canal == last_domain:
-                        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR gold][B]El dominio/host del canal es correcto.[/B]', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
-                        return
-
-            domain = last_domain
-
-    if host_channel:
-        if last_domain:
-            if last_domain in host_channel:
-                 if last_domain in str(dominiosplaydede):
-                     platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
-                     return
-
-    if domain == last_domain:
-        if last_domain in str(dominiosplaydede):
-            if item.host_canal:
-                platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
-                return
-
-    if localize:
-        if localize == domain:
-            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El dominio vigente es correcto.', '[COLOR cyan][B]' + localize + '[/B][/COLOR]')
-            return
-    else:
-        if last_domain == domain:
-            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
-            return
-
-    nom_dom = domain
-    txt_dom = 'Último Dominio memorizado incorrecto.'
-
-    if last_domain:
-        if item.host_canal:
-            if not item.host_canal == last_domain:
-                nom_dom = item.host_canal
-                txt_dom = 'Dominio/Host del canal incorrecto.'
-
-    if not domain:
-        nom_dom = 'Sin información'
-        txt_dom = 'Aún No hay ningún Dominio memorizado.'
-
-    if last_domain == domain:
-        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El dominio vigente es correcto.', '[COLOR cyan][B]' + localize + '[/B][/COLOR]')
-        return
-
-    if platformtools.dialog_yesno(config.__addon_name + ' - ' + name, '¿ [COLOR red] ' + txt_dom + ' [/COLOR] Desea cambiarlo  ?', 'Memorizado:  [COLOR yellow][B]' + nom_dom + '[/B][/COLOR]', 'Vigente:           [COLOR cyan][B]' + last_domain + '[/B][/COLOR]'):
-        config.set_setting('dominio', last_domain, 'playdede')
-
-        if not item.desde_el_canal:
-            if not item.from_action == 'mainlist':
-                platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Último dominio vigente memorizado, pero aún NO guardado.[/COLOR]', '[COLOR cyan][B]Recuerde, que para que el cambio surta efecto deberá abandonar los Ajustes de Balandro a través de su correspondiente botón --> OK[/B][/COLOR]')
-
-
-def operative_domains_playdede(item):
-    logger.info()
-
-    domain = config.get_setting('dominio', 'playdede', default='')
-
-    channel_json = 'playdede.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    name = params['name']
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] ' + name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Dominios[/B][/COLOR]' % color_exec)
-
-    # ~ web para comprobar todos los dominios operativos
-    # ~ webs  0)-https://privacidad.me/@playdede  1)-https://entrarplaydede.com  2)-X https://x.com/webplaydede
-
-    sel_domain = ''
-
-    hay_domain = True
-
-    if not domain:
-        hay_domain = False
-        domain = dominiosplaydede[0]
-
-    try:
-        data = httptools.downloadpage('https://privacidad.me/@playdede/').data
-
-        bloque = scrapertools.find_single_match(data, '<strong>ENTRARPLAYDEDE.COM<(.*?)<script>')
-
-        operative_domains = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
-
-        for operative_domain in operative_domains:
-            operative_domain = operative_domain.lower().strip()
-
-            if not 'playdede.' in operative_domain: continue
-
-            if not 'https' in operative_domain: operative_domain = 'https://' + operative_domain
-            if not operative_domain.endswith('/'): operative_domain = operative_domain + '/'
-
-            sel_domain = operative_domain
-
-            if operative_domain in str(dominiosplaydede):
-                if domain == operative_domain:
-                    break
-
-                continue
-    except:
-       pass
-
-    if not sel_domain:
-        platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Error Acceso Dominio Operativo[/B][/COLOR]' % color_alert)
-        return
-
-    if not hay_domain:
-        dominio = config.get_setting('dominio', 'playdede', default=dominiosplaydede[0])
-        num_dominio = dominiosplaydede.index(dominio) if dominio in str(dominiosplaydede) else 0
-        ret = platformtools.dialog_select('Dominio a usar PlayDede', dominiosplaydede, preselect=num_dominio)
-        if ret == -1: return False
-
-        if dominio == dominiosplaydede[ret]:
-            return False
-
-        config.set_setting('dominio', dominiosplaydede[ret], 'playdede')
-
-        domain = dominiosplaydede[ret]
-
-        sel_domain = domain
-
-    host_channel = ''
-    config.set_setting('user_test_channel', 'host_channel')
-
-    try:
-        localize = tester.test_channel('playdede')
-    except:
-        localize = ''
-
-    if config.get_setting('user_test_channel', default=''):
-        host_channel = config.get_setting('user_test_channel', default='')
-        if not host_channel.startswith('https://'): host_channel = ''
-	
-        config.set_setting('user_test_channel', '')
-
-        if host_channel:
-            if not config.get_setting('dominio', 'playdede', default=''):
-                if host_channel == item.host_canal:
-                    if item.host_canal == sel_domain:
-                        platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR gold][B]El dominio/host del canal es correcto.[/B]', '[COLOR cyan][B]' + host_channel + '[/B][/COLOR]')
-                        return
-
-            domain = sel_domain
-
-    if not domain:
-        platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Sin Dominios Operativos[/B][/COLOR]' % color_alert)
-        return
-
-    if host_channel:
-        if sel_domain:
-            if sel_domain in host_channel:
-                 platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + sel_domain + '[/B][/COLOR]')
-                 return
-
-    if domain == sel_domain:
-        if item.host_canal == sel_domain:
-            platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + sel_domain + '[/B][/COLOR]')
-            return
-
-    nom_dom = domain
-    txt_dom = 'Dominio memorizado incorrecto.'
-
-    if sel_domain:
-        if not item.host_canal == sel_domain:
-            nom_dom = item.host_canal
-            txt_dom = 'Dominio/Host del canal incorrecto.'
-
-    if not domain:
-        nom_dom = 'Sin información'
-        txt_dom = 'Aún No hay ningún Dominio memorizado.'
-
-    if domain == sel_domain:
-        if item.host_canal == sel_domain:
-            platformtools.dialog_notification(config.__addon_name + ' - ' + name, '[B][COLOR %s]Dominio correcto[/B][/COLOR]' % color_infor)
-            return
-
-    if platformtools.dialog_yesno(config.__addon_name + ' - ' + name, '¿ [COLOR red] ' + txt_dom + ' [/COLOR] Desea cambiarlo  ?', 'Memorizado:  [COLOR yellow][B]' + nom_dom + '[/B][/COLOR]', 'Encontrado:     [COLOR cyan][B]' + sel_domain + '[/B][/COLOR]'): 
-        config.set_setting('dominio', sel_domain, 'playdede')
-
-        if not item.desde_el_canal:
-            if not item.from_action == 'mainlist':
-                platformtools.dialog_ok(config.__addon_name + ' - ' + name, '[COLOR yellow]Último dominio vigente memorizado, pero aún NO guardado.[/COLOR]', '[COLOR cyan][B]Recuerde, que para que el cambio surta efecto deberá abandonar los Ajustes de Balandro a través de su correspondiente botón --> OK[/B][/COLOR]')
-
-
-def del_datos_playdede(item):
-    logger.info()
-
-    channel_json = 'playdede.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    id = params['id']
-    name = params['name']
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] ' + name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    username = config.get_setting('playdede_username', 'playdede', default='')
-    password = config.get_setting('playdede_password', 'playdede', default='')
-
-    if not username:
-        if not password:
-            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]PlayDede Sin credenciales[/B][/COLOR]' % color_exec)
-            return
-
-    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma eliminar sus credenciales de PlayDede ?[/B][/COLOR]'):
-        config.set_setting('channel_playdede_playdede_login', False)
-        config.set_setting('channel_playdede_playdede_password', '')
-        config.set_setting('channel_playdede_playdede_username', '')
-
-
-def manto_domain_playdede(item):
-    logger.info()
-
-    channel_json = 'playdede.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    id = params['id']
-    name = params['name']
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] ' + name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Playdede[/B][/COLOR]' % color_exec)
-
-    manto_domain_common(item, id, name)
-
-
-def test_domain_playdede(item):
-    logger.info()
-
-    datos = channeltools.get_channel_parameters('playdede')
-    if not datos['active']:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
-        return
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('PlayDede')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - PlayDede', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
-
 def manto_domain_poseidonhd2(item):
     logger.info()
 
@@ -3154,10 +2761,6 @@ def manto_domain_common(item, id, name):
                last_domain_hdfull(item)
                return
 
-           elif id == 'playdede':
-               last_domain_playdede(item)
-               return
-
            config.set_setting('user_test_channel', 'localize')
 
            try:
@@ -3543,16 +3146,6 @@ def manto_domain_common(item, id, name):
 
         if new_domain is None: return
         elif new_domain == 'https://': return
-
-    elif id == 'playdede':
-        config.set_setting('user_test_channel', '')
-
-        if not domain: domain = 'https://www'
-
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio PlayDede  -->  [COLOR %s]https://www?.playdede.link/[/COLOR]' % color_avis)
-
-        if new_domain is None: return
-        elif new_domain == 'https://www': return
 
     elif id == 'poseidonhd2':
         config.set_setting('user_test_channel', '')

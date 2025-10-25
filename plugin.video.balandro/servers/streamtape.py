@@ -121,7 +121,7 @@ def get_aux(page_url):
         url_data = scrapertools.find_single_match(data, """getElementById\('\w+link'\).innerHTML = "[^"]+" .* \('.+?/([^']+)'\)""")
 
     if url_data:
-        url = "https://adblockstrtech.link/" + url_data + "&stream=1" + "|User-Agent=" + httptools.get_user_agent()
+        url = "https://streamtape.com/" + url_data + "&stream=1" + "|User-Agent=" + httptools.get_user_agent()
 
         video_urls.append(['mp4', url])
 

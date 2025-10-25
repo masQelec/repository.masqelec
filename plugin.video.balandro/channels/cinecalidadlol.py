@@ -294,6 +294,8 @@ def generos(item):
         elif title == 'Destacadas': continue
         elif title == 'Series': continue
 
+        elif title == 'Películas por año': continue
+
         if config.get_setting('descartar_anime', default=False):
             if title == 'Anime': continue
 
@@ -559,6 +561,13 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
 
+        if 'episodie' in titulo.lower() or 'episodio' in titulo.lower() or 'capítulo' in titulo.lower() or 'capitulo' in titulo.lower():
+            titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
 
@@ -641,6 +650,10 @@ def findvideos(item):
 
                     else: servidor = servertools.corregir_servidor(srv)
 
+                if '/vimeos.' in url:
+                    servidor = 'zures'
+                    other = 'Vimeos'
+
                 if servidor == 'various': other = srv.capitalize()
 
                 quality_num = puntuar_calidad(qlty)
@@ -692,6 +705,10 @@ def findvideos(item):
 
                     else: servidor = servertools.corregir_servidor(srv)
 
+                if '/vimeos.' in url:
+                    servidor = 'zures'
+                    other = 'Vimeos'
+
                 if servidor == 'various': other = srv.capitalize()
 
                 quality_num = puntuar_calidad(qlty)
@@ -706,6 +723,8 @@ def findvideos(item):
 
         for url, servidor in matches:
             ses += 1
+
+            other = ''
 
             if url == '#':
                 ses = ses - 1
@@ -746,12 +765,15 @@ def findvideos(item):
             elif servidor == 'drive': servidor = 'gvideo'
             elif servidor == 'google drive': servidor = 'gvideo'
 
+            elif servidor == 'vimeos':
+               servidor = 'zures'
+               other = 'Vimeos'
+
             if servertools.is_server_available(servidor):
                 if not servertools.is_server_enabled(servidor): continue
             else:
                 if not config.get_setting('developer_mode', default=False): continue
 
-            other = ''
             if url.startswith('?download='):
                 other = 'D'
                 url = item.url.replace('?ref=es', '') + url
@@ -770,7 +792,7 @@ def findvideos(item):
 
 
 def puntuar_calidad(txt):
-    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', 'HD', 'WEBRip 1080p', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
+    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', 'REMUX 1080p', '1080', 'HD', 'WEBRip 1080p', 'WEB-DL 4k', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', 'REMUX 4k', '4K']
 
     txt = txt.strip()
     if txt not in orden: return 0

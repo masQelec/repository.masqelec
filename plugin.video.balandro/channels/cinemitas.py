@@ -427,6 +427,10 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
 
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
@@ -503,6 +507,8 @@ def findvideos(item):
                 elif '/viewsb.' in url: continue
                 elif '/www.fembed.' in url: continue
 
+                url = url.replace('E', 'e').replace('F', 'f').replace('D', 'd')
+
                 url = url.replace('/player.cuevana.ac/f/', '/waaw.to/watch_video.php?v=').replace('/player.cuevana3.one/f/', '/waaw.to/watch_video.php?v=')
 
                 if url.startswith('https://cvid.lat/'): url = url.replace('/cvid.lat/', '/waaw.to/')
@@ -522,6 +528,8 @@ def findvideos(item):
         embed = embed.replace('\\/', '/')
 
         if not embed: continue
+
+        embed = embed.replace('E', 'e').replace('F', 'f').replace('D', 'd')
 
         embed = embed.replace('/player.cuevana.ac/f/', '/waaw.to/watch_video.php?v=').replace('/player.cuevana3.one/f/', '/waaw.to/watch_video.php?v=')
 

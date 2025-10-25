@@ -65,8 +65,6 @@ def get_video_url(page_url, url_referer=''):
 
     if not data: return video_urls
 
-    logger.info("check-000-data: %s" % data)
-
     if 'File Not Found' in data:
         return 'Archivo inexistente ó eliminado'
 
@@ -92,7 +90,7 @@ def get_video_url(page_url, url_referer=''):
         url = scrapertools.find_single_match(data, "window.open\('([^']+)")
 
     if not url:
-        return 'Requiere Informar Código de Acceso al Archivo'
+        return 'CloudFlare Human Verify'
     else:
         url_strip = urllib.quote(url.rsplit('/', 1)[1])
         media_url = url.rsplit('/', 1)[0] + "/" + url_strip

@@ -69,29 +69,24 @@ if txt_status:
 
 
 dominioshdfull = [
-         'https://hdfull.blog/',
          'https://hdfull.today/',
-         'https://hd-full.biz/',
-         'https://hdfull.sbs/',
          'https://hdfull.help/',
          'https://hdfull.love/',
+         'https://hd-full.biz/',
 
+         'https://www2.hdfull.one/',
          'https://hdfull.cv/',
          'https://hdfull.monster/',
          'https://hdfull.cfd/',
          'https://hdfull.tel/',
          'https://hdfull.buzz/',
+         'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
 
          'https://new.hdfull.one/'
          ]
 
-dominiosplaydede = [
-         'https://www12.playdede.link/',
-         'https://playdede.club/',
-         'https://playdede.in/'
-         ]
 
 channels_poe = [
         ['gdrive', 'https://drive.google.com/drive/']
@@ -742,34 +737,6 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
                         if not host.endswith('/'): host = host + '/'
                   except:
                      host = dominioshdfull[0]
-
-              elif channel_id == 'playdede':
-                  if not host: host = dominiosplaydede[0]
-
-                  try:
-                      data_dom = httptools.downloadpage('https://privacidad.me/@playdede/').data
-
-                      bloque = scrapertools.find_single_match(data_dom, '<strong>ENTRARPLAYDEDE.COM<(.*?)<script>')
-
-                      operative_domains = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
-
-                      if not operative_domains: host = dominiosplaydede[0]
-                      else:
-                         for operative_domain in operative_domains:
-                             operative_domain = operative_domain.lower().strip()
-
-                             if not 'playdede.' in operative_domain: continue
-
-                             if not 'https' in operative_domain: operative_domain = 'https://' + operative_domain
-                             if not operative_domain.endswith('/'): operative_domain = operative_domain + '/'
-
-                             if operative_domain in str(dominiosplaydede):
-                                 if host == operative_domain:
-                                     break
-
-                                 host = operative_domain
-                  except:
-                      host = dominiosplaydede[0]
 
           if not host:
               part_py = 'def mainlist'

@@ -42,10 +42,10 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Especiales', action = 'list_all', url = host + 'directorio?type[]=Especial&status=&order=recent', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Donghua', action = 'list_all', url = host + 'directorio?type[]=Donghua&status=&order=recent', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Donghuas', action = 'list_all', url = host + 'directorio?type[]=Donghua&status=&order=recent', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Ona', action = 'list_all', url = host + 'directorio?type[]=Ona&status=&order=recent', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Ova', action = 'list_all', url = host + 'directorio?type[]=Ova&status=&order=recent', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Ovas', action = 'list_all', url = host + 'directorio?type[]=Ova&status=&order=recent', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Onas', action = 'list_all', url = host + 'directorio?type[]=Ona&status=&order=recent', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'directorio?type[]=Pelicula&status=&order=recent', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -347,7 +347,7 @@ def findvideos(item):
             link_other = link_other.replace('.co', '').replace('.cc', '').replace('.sh', '').replace('.to', '').replace('.tv', '').replace('.ru', '').replace('.io', '')
             link_other = link_other.replace('.eu', '').replace('.ws', '').replace('.sx', '').replace('.nz', '')
 
-            if '/s1.' in url: servidor =''
+            if '/s1.' in url: servidor = ''
 
             if servidor == 'directo': other = link_other
             else: link_other = ''
@@ -373,10 +373,14 @@ def play(item):
     if not item.server:
         data = httptools.downloadpage(item.url).data
 
-        url = scrapertools.find_single_match(data, "window.location.href.*?'(.*?)'")
+        new_url = scrapertools.find_single_match(data, "window.location.href.*?'(.*?)'")
 
-        servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
+        if new_url == 'https://goodstream.one/video/embed/': url = ''
+        else:
+           servidor = servertools.get_server_from_url(new_url)
+           servidor = servertools.corregir_servidor(servidor)
+
+           url = new_url
 
     if url:
         if 'streamium' in url: url = ''

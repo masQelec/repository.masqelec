@@ -1,0 +1,17 @@
+{
+  "id": "pelis182",
+  "name": "Pelis182",
+  "thumbnail": "pelis182.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["lat"],
+
+  "clusters": ["onlyone", "kids"],
+
+  "notes": "Películas por géneros."
+}

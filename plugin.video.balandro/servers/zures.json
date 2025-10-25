@@ -3,7 +3,7 @@
   "name": "Zures",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Allviid,  Amdahost,  Asianload,  Asianplay,  Bigwarp,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohd,  Oneupload,  Pandafiles,  Rovideo,  Savefiles,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamoupload,  Streamup,  SwiftLoad,  Turbovid,  Tusfiles,  Udrop,  Updown,  Uploadbaz,  Uploadflix,  Uploadhub,  Uploady,  Upvid,  Veev,  Veoh,  Vidbasic,  Vidbob,  Videa,  Vidlook,  Vidmx,  Vido,  Vidpro,  Vidstore,  Vidtube,  Vipss,  Vkprime,  Wecima,  Worlduploads,  Ztreamhub)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Allviid,  Amdahost,  Asianload,  Asianplay,  Bigwarp,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohd,  Oneupload,  Pandafiles,  Rovideo,  Savefiles,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamoupload,  Streamup,  SwiftLoad,  Turbovid,  Tusfiles,  Udrop,  Updown,  Uploadbaz,  Uploadflix,  Uploadhub,  Uploady,  Upvid,  Veev,  Veoh,  Vidbasic,  Vidbob,  Videa,  Vidlook,  Vidmx,  Vido,  Vidpro,  Vidstore,  Vidtube,  Vimeos,  Vipss,  Vkprime,  Wecima,  Worlduploads,  Ztreamhub)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -133,7 +133,11 @@
         "url": "https://streamgzzz.com/\\1"
       },
       {
-        "pattern": "(https://uploadflix.)(?:org|com)/([0-9a-zA-Z]+)",
+        "pattern": "(https://uploadflix.)(?:org|com|net)/([0-9a-zA-Z]+)",
+        "url": "https://uploadflix.com/\\2"
+      },
+      {
+        "pattern": "(https://1uploadflix.)(?:org|com|net)/([0-9a-zA-Z]+)",
         "url": "https://uploadflix.com/\\2"
       },
       {
@@ -233,6 +237,10 @@
         "url": "https://bigwarp.io/\\1"
       },
       {
+        "pattern": "https://bigwarp.pro/(?:d/|e/|v/|embed-)([0-9a-zA-Z]+)",
+        "url": "https://bigwarp.io/\\1"
+      },
+      {
         "pattern": "(https://vidtube.)(?:pro|cam|one)/(?:embed-|d/)([0-9a-zA-Z]+)",
         "url": "https://vidtube.one/embed-\\2.html"
       },
@@ -245,7 +253,7 @@
         "url": "https://upvid.co/\\2"
       },
       {
-        "pattern": "(https://wecima.)(?:show|movie|stream|watch|film|tube|video)/([0-9a-zA-Z]+)",
+        "pattern": "(https://wecima.)(?:show|movie|stream|watch|film|tube|video|tv)/([0-9a-zA-Z]+)",
         "url": "https://wecima.show/\\2"
       },
       {
@@ -269,12 +277,16 @@
         "url": "https://vidbasic.top/embed/\\1"
       },
       {
-        "pattern": "(https://streamup.)(?:to|wf|ws)/([0-9a-zA-Z]+)",
+        "pattern": "(https://streamup.)(?:to|wf|ws|cc)/([0-9a-zA-Z]+)",
         "url": "https://streamup.ws/\\2"
       },
       {
-        "pattern": "(https://strmup.)(?:to|wf|ws)/([0-9a-zA-Z]+)",
+        "pattern": "(https://strmup.)(?:to|wf|ws|cc)/([0-9a-zA-Z]+)",
         "url": "https://streamup.ws/\\2"
+      },
+      {
+        "pattern": "https://vimeos.net/embed-([0-9a-zA-Z]+).html",
+        "url": "https://vimeos.net/embed-\\1.html"
       }
     ]
   }

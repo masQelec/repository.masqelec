@@ -107,8 +107,8 @@ def get_video_url(page_url, url_referer=''):
     elif 'streamup' in page_url or 'strmup' in page_url:
           txt_server = 'Streamup'
 
-          page_url = page_url.replace('/streamup.to/', '/streamup.ws/').replace('/streamup.wf/', '/streamup.ws/')
-          page_url = page_url.replace('/strmup.to/', '/streamup.ws/').replace('/strmup.wf/', '/streamup.ws/')
+          page_url = page_url.replace('/streamup.to/', '/streamup.ws/').replace('/streamup.wf/', '/streamup.ws/').replace('/streamup.cc/', '/streamup.ws/')
+          page_url = page_url.replace('/strmup.to/', '/streamup.ws/').replace('/strmup.wf/', '/streamup.ws/').replace('/strmup.cc/', '/streamup.ws/')
 
           ini_page_url = page_url
 
@@ -116,7 +116,8 @@ def get_video_url(page_url, url_referer=''):
     elif 'tusfiles' in page_url: txt_server = 'Tusfiles'
     elif 'updown' in page_url: txt_server = 'Updown'
     elif 'uploadbaz' in page_url: txt_server = 'Uploadbaz'
-    elif 'uploadflix' in page_url: txt_server = 'Uploadflix'
+
+    elif 'uploadflix' in page_url or '1uploadflix' in page_url: txt_server = 'Uploadflix'
 
     elif 'uploadhub' in page_url:
           txt_server = 'Uploadhub'
@@ -144,6 +145,7 @@ def get_video_url(page_url, url_referer=''):
     elif 'vidtube' in page_url: txt_server = 'Vidtube'
     elif 'wecima' in page_url: txt_server = 'Wecima'
     elif 'vidbasic' in page_url: txt_server = 'Vidbasic'
+    elif 'vimeos' in page_url: txt_server = 'Vimeos'
 
     elif txt_server == 'Unknow': return 'Desconocido'
 
@@ -155,6 +157,14 @@ def get_video_url(page_url, url_referer=''):
 
     existe = filetools.exists(path)
     if not existe: return 'El Plugin No existe en Resolveurl'
+
+    # ~ SEND
+    if txt_server == 'Send':
+        # ~ 28/8/2025  SEND pq CloudFlare Human Verify
+        data = httptools.downloadpage(page_url).data
+
+        if '>Security verification<' in data:
+            return 'CloudFlare Human Verify'
 
     try:
         import_libs('script.module.resolveurl')
