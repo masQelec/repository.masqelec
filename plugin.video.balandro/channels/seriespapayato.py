@@ -279,12 +279,12 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.dpost = dpost
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.dpost = dpost
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, dpost = dpost,
                                     contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
@@ -404,51 +404,53 @@ def episodios(item):
 
         return itemlist
 
-    try:
-       pages = int(tot_pages)
-       if pages > 2: platformtools.dialog_notification('SeriesPapayaTo', '[COLOR blue]Cargando episodios[/COLOR]')
-    except:
-       pages = 12
+    if tot_pages:
+         try:
+             pages = int(tot_pages)
+             if pages > 2: platformtools.dialog_notification('SeriesPapayaTo', '[COLOR blue]Cargando episodios[/COLOR]')
+         except:
+             pages = 12
 
-    for i in range(pages):
-        matches = scrapertools.find_multiple_matches(data, '<li><a href="([^"]+)"[^>]*>([^<]+)')
+         for i in range(pages):
+             matches = scrapertools.find_multiple_matches(data, '<li><a href="([^"]+)"[^>]*>([^<]+)')
 
-        for url, title in matches:
-            s_e = scrapertools.find_single_match(title, '(\d+)(?:x|X)(\d+)')
+             for url, title in matches:
+                 s_e = scrapertools.find_single_match(title, '(\d+)(?:x|X)(\d+)')
 
-            if not s_e: continue
+                 if not s_e: continue
 
-            season = int(s_e[0])
-            episode = int(s_e[1])
+                 season = int(s_e[0])
+                 episode = int(s_e[1])
 
-            ord_epis = str(episode)
+                 ord_epis = str(episode)
 
-            if len(str(ord_epis)) == 1: ord_epis = '0000' + ord_epis
-            elif len(str(ord_epis)) == 2: ord_epis = '000' + ord_epis
-            elif len(str(ord_epis)) == 3: ord_epis = '00' + ord_epis
+                 if len(str(ord_epis)) == 1: ord_epis = '0000' + ord_epis
+                 elif len(str(ord_epis)) == 2: ord_epis = '000' + ord_epis
+                 elif len(str(ord_epis)) == 3: ord_epis = '00' + ord_epis
 
-            tab_epis.append([ord_epis, url, title, season, episode])
+                 tab_epis.append([ord_epis, url, title, season, episode])
 
-        if pages > 0:
-            next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="[^"]*page/(\d+)/')
+             if pages > 0:
+                 next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="[^"]*page/(\d+)/')
 
-            if next_page:
-                post = {'action': 'action_pagination_ep', 'object': item.dobject, 'season': item.contentSeason, 'page': next_page}
-                data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post=post)
-            else:
-                break
+                 if next_page:
+                     post = {'action': 'action_pagination_ep', 'object': item.dobject, 'season': item.contentSeason, 'page': next_page}
+                     data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post=post)
+                 else:
+                     break
 
-    if tab_epis:
-        tab_epis = sorted(tab_epis, key=lambda x: x[0])
+         if tab_epis:
+             tab_epis = sorted(tab_epis, key=lambda x: x[0])
 
-        for orden, url, tit, ses, epi in tab_epis:
-            tit = tit.replace('"', '').strip()
+             for orden, url, tit, ses, epi in tab_epis:
+                 tit = tit.replace('"', '').strip()
 
-            tit = tit.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
-            tit = tit.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
-            tit = tit.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+                 tit = tit.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+                 tit = tit.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+                 tit = tit.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = tit, contentType='episode', contentSeason=ses, contentEpisodeNumber=epi ))
+                 itemlist.append(item.clone( action = 'findvideos', url = url, title = tit,
+                                             contentType='episode', contentSeason=ses, contentEpisodeNumber=epi ))
 
     tmdb.set_infoLabels(itemlist)
 

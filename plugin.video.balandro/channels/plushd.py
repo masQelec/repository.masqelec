@@ -57,7 +57,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True, timeout=N
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     if not data:
-        if not 'search?buscar=' in url:
+        if not '/search/' in url:
             if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PlusHd', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
 
             timeout = config.get_setting('channels_repeat', default=30)
@@ -347,11 +347,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color='tan' ))
 
@@ -548,10 +548,31 @@ def findvideos(item):
     return itemlist
 
 
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if url:
+        if '/pelisplus' in url:
+            return 'Servidor [COLOR goldenrod]No soportado[/COLOR]'
+
+        if item.server == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
+
+        itemlist.append(item.clone(url = url, server = item.server))
+
+    return itemlist
+
+
 def search(item, texto):
     logger.info()
     try:
-       item.url = host + 'search?buscar=' + texto.replace(" ", "+")
+       item.url = host + 'search/' + texto.replace(" ", "+")
        return list_all(item)
     except:
        import sys

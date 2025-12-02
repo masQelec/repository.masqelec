@@ -737,7 +737,7 @@ def only_torrents(item):
 def channels_status(item):
     logger.info()
 
-    if item.des_rea: cabecera = 'Desactivar ó Re-activar'
+    if item.des_rea: cabecera = 'Desactivar ó Re-Activar'
     else: cabecera = 'Marcar ó Des-marcar Preferidos'
 
     filtros = {}
@@ -1277,7 +1277,15 @@ def show_servers_list(item):
             add_on = scrapertools.find_single_match(notes.lower(), 'vía:(.*?)$').strip().lower()
             if ' (' in add_on: add_on = scrapertools.find_single_match(add_on, '(.*?) ').strip().lower()
 
-            if xbmc.getCondVisibility('System.HasAddon("%s")' % add_on): exists_addon = '[COLOR tan][B] Vía Instalada [/B]'
+            if xbmc.getCondVisibility('System.HasAddon("%s")' % add_on):
+                try:
+                    cod_version = xbmcaddon.Addon(add_on).getAddonInfo("version").strip()
+                except:
+                    cod_version = ''
+
+                if not cod_version: exists_addon = '[COLOR gray][B]Desactivado[/B]'
+                else: exists_addon = '[COLOR tan][B] Vía Instalada [/B]'
+
             else: exists_addon = '[COLOR red][B] Vía No Instalada [/B]'
 
             info += exists_addon
@@ -1584,7 +1592,13 @@ def show_clients_torrent(item):
         client_id = str(client['id'])
 
         if xbmc.getCondVisibility('System.HasAddon("%s")' % client['id']):
-            if cliente_torrent.lower() in client['id']: exists_torrent = ' [COLOR yellow][B] Instalado[COLOR greenyellow] Asignado[/B]'
+            try:
+                cod_version = xbmcaddon.Addon(client_id).getAddonInfo("version").strip()
+            except:
+                cod_version = ''
+
+            if not cod_version: exists_torrent = ' [COLOR gray][B]Desactivado[/B]'
+            elif cliente_torrent.lower() in client['id']: exists_torrent = ' [COLOR yellow][B] Instalado[COLOR greenyellow] Asignado[/B]'
             else: exists_torrent = ' [COLOR yellow][B] Instalado [/B]'
         else: exists_torrent = ' [COLOR red][B] No instalado [/B]'
 

@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import sys
+import re, time
 
-if sys.version_info[0] < 3:
-    PY3 = False
+from platformcode import logger, config
+from core import httptools
 
-    import htmlentitydefs
-    from htmlentitydefs import name2codepoint as n2cp
 
-    import urllib
-    import urlparse
-else:
-    PY3 = True
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
 
+if PY3:
     unicode = str
     unichr = chr
 
@@ -20,11 +17,12 @@ else:
     from html.entities import name2codepoint as n2cp
 
     import urllib.parse as urlparse
+else:
+    import htmlentitydefs
+    from htmlentitydefs import name2codepoint as n2cp
 
-import re, time
-
-from core import httptools
-from platformcode import logger
+    import urllib
+    import urlparse
 
 
 # ~ Expresiones regulares

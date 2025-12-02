@@ -110,9 +110,11 @@ def list_all(item):
         titulo = title.replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
         if item.group == 'find':
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
+                                        contentType = 'movie', contentTitle = title, contentExtra='adults' ))
         else:
-            itemlist.append(item.clone( action = 'episodios', url = url, title = titulo, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
+            itemlist.append(item.clone( action = 'episodios', url = url, title = titulo, thumbnail = thumb,
+                                        contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<li class="page-item active">.*?href="(.*?)"')
@@ -148,7 +150,16 @@ def episodios(item):
 
         thumb = host + 'imgs/' + thumb
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
+        titulo = title + ' ' + item.contentTitle
+
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        titulo = titulo.replace('Tráiler', '[COLOR goldenrod]Epis.[/COLOR]').replace('tráiler', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
+                                    contentType = 'movie', contentTitle = title, contentExtra='adults' ))
 
     return itemlist
 

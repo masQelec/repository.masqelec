@@ -1,17 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] < 3:
-    PY3 = False
-else:
-    unicode = str
-
-    PY3 = True
-
 import traceback
 
-from platformcode import logger
+from platformcode import logger, config
 
 try:
     import json
@@ -33,6 +24,13 @@ except:
         logger.info("Usando simplejson incluido en el interprete")
 # ~ else:
     # ~ logger.info("Usando json incluido en el interprete")
+
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
+
+if PY3:
+    unicode = str
 
 
 def load(*args, **kwargs):

@@ -59,7 +59,7 @@ def list_all(item):
         url = Video['hlsPreviewUrl']
         age = Video['age']
 
-        titulo = title
+        titulo = title.capitalize()
 
         if country: titulo = titulo + ' [COLOR violet]' + str(country).capitalize() + '[/COLOR]'
 
@@ -68,7 +68,8 @@ def list_all(item):
                age = str(age).replace('[', '').replace(']', '')
                titulo = titulo + ' (edad ' + str(age) + ')'
 
-        itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb, other=titulo, contentType = 'movie', contentExtra='adults' ))
+        itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb, other=titulo,
+                                    contentType = 'movie', contentExtra='adults' ))
 
     if itemlist:
         next_page = ''
@@ -97,11 +98,34 @@ def findvideos(item):
 
         config.set_setting('ses_pin', True)
 
+    servidor = 'directo'
+
     if not item.url: return itemlist
 
-    elif '//stackvaults' in item.url: return itemlist
+    elif '//stackvaults' in item.url:
+       if not item.url.endswith('.m3u8'): return itemlist
 
-    itemlist.append(Item( channel = item.channel, action = 'play', title='', url = item.url, server = 'directo', other = item.other ))
+       servidor = ''
+
+    itemlist.append(Item( channel = item.channel, action = 'play', title='', url = item.url, server = servidor, other = item.other ))
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    video_urls = []
+
+    url = item.url
+
+    if item.server == 'directo':
+        itemlist.append(item.clone(url = url, server = item.server))
+        return itemlist
+    else:
+        video_urls.append(['m3u8', url])
+        return video_urls
 
     return itemlist
 

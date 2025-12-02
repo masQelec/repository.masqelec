@@ -404,6 +404,16 @@ def corregir_SerieName(SerieName):
     return SerieName
 
 
+def _epis(item):
+    logger.info()
+
+    item.url = host
+    item.group = 'last'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
+
+
 def search(item, texto):
     logger.info()
     try:

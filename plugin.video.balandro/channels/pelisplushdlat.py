@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww4.pelisplushd.to/'
+host = 'https://ww5.pelisplushd.to/'
 
 
 # ~ por si viene de enlaces guardados
@@ -16,7 +16,7 @@ ant_hosts = ['https://pelisplushd.lat/', 'https://www1.pelisplushd.lat/', 'https
              'https://www11.pelisplushd.to/', 'https://www15.pelisplushd.to/', 'https://www16.pelisplushd.to/',
              'https://www17.pelisplushd.to/', 'https://www18.pelisplushd.to/', 'https://www19.pelisplushd.to/',
              'https://www20.pelisplushd.to/', 'https://www23.pelisplushd.to/', 'https://www24.pelisplushd.to/',
-             'https://ww3.pelisplushd.to/']
+             'https://ww3.pelisplushd.to/','https://ww4.pelisplushd.to/' ]
              
 
 
@@ -358,12 +358,12 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.pills = ''
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.pills = ''
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         pills = tempo
         if hay_season0: pills = int(tempo) + 1
@@ -743,6 +743,24 @@ def list_search(item):
                     itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_search', text_color='coral' ))
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'peliculas/estrenos?page=1'
+    item.search_type = 'movie'
+
+    return list_all(item)
+
+
+def _lasts(item):
+    logger.info()
+
+    item.url = host + 'series/estrenos?page=1'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
 
 
 def search(item, texto):

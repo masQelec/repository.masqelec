@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True
-
-if PY3:
-    from urllib.parse import unquote
-else:
-    from urlparse import unquote
-
-
 import os, xbmc
 
 from platformcode import config, logger, platformtools
 from core import channeltools, httptools, scrapertools, filetools, jsontools
 
 from modules import tester
+
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
+
+if PY3:
+    from urllib.parse import unquote
+else:
+    from urlparse import unquote
 
 
 channels_currents = [

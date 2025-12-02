@@ -361,12 +361,12 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.pills = ''
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.pills = ''
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         pills = tempo
         if hay_season0: pills = int(tempo) + 1
@@ -575,7 +575,9 @@ def findvideos(item):
                     elif 'disable' in srv: continue
                     elif 'xupalace' in srv: continue
                     elif 'uploadfox' in srv: continue
-                    elif 'download' in srv: continue
+
+                    elif srv == 'download': continue
+                    elif srv == 'up2box': continue
 
                     servidor = servertools.corregir_servidor(srv)
 
@@ -587,12 +589,6 @@ def findvideos(item):
                     other = ''
 
                     if servidor == 'various': other = servertools.corregir_other(srv)
-
-                    if servidor == 'directo':
-                        if not config.get_setting('developer_mode', default=False): continue
-                        else:
-                           other = url.split("/")[2]
-                           other = other.replace('https:', '').strip()
 
                     if '.eyJs' in link: age = ''
 

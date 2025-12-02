@@ -226,9 +226,9 @@ def temporadas(item):
     if not ' TEMPORADA<' in data:
         if not '>TEMPORADA ' in data:
             if not '>SEASON ' in data:
-                if config.get_setting('channels_seasons', default=True):
-                    if not item.contentSerieName: item.contentSerieName = item.title
-                    platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]Sin temporadas[/COLOR]')
+                if not item.contentSerieName: item.contentSerieName = item.title
+
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]Sin temporadas[/COLOR]')
 
                 item.page = 0
                 item.contentSerieName = item.title
@@ -259,14 +259,14 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
+                item.page = 0
 
-            if not item.contentSerieName: item.contentSerieName = item.title
+                if not item.contentSerieName: item.contentSerieName = item.title
 
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         if not item.contentSerieName: item.contentSerieName = item.title
 

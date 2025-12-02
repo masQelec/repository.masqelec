@@ -574,9 +574,10 @@
         <setting label="Proceso General:" type="lsep"/>
 
         <setting id="bus_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="search_show_last" type="bool" label="Recordar Último Texto buscado" default="true" visible="eq(-1,true)"/>
-        <setting id="manto_textos" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] los Textos Memorizados" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_textos)"/>
-        <setting id="search_limit_by_channel" type="labelenum" label="Cuantos [COLOR cyan][B]Resultados[/B][/COLOR] se previsualizarán por canal" values="1|2|3|4|5|6|7|8|9|10" default="2" visible="eq(-3,true)"/>
+        <setting id="search_youtube" type="bool" label="Añadir la opción de búsquedas en [COLOR darksalmon][B]YouTube[/B][/COLOR]" default="true" visible="eq(-1,true)"/>
+        <setting id="search_show_last" type="bool" label="Recordar Último Texto buscado" default="true" visible="eq(-2,true)"/>
+        <setting id="manto_textos" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] los Textos Memorizados" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_textos)"/>
+        <setting id="search_limit_by_channel" type="labelenum" label="Cuantos [COLOR cyan][B]Resultados[/B][/COLOR] se previsualizarán por canal" values="1|2|3|4|5|6|7|8|9|10" default="2" visible="eq(-4,true)"/>
 
         <setting label="Proceso Canales:" type="lsep"/>
 
@@ -880,6 +881,11 @@
     </category>
 
     <category label="TMDB">
+        <setting label="Información Tmdb:" type="lsep"/>
+
+        <setting id="info_tmdb" type="bool" label="Opciones" default="false"/>
+        <setting id="show_tmdb" type="action" label="Información sobre sus [COLOR aqua][B]Preferencias[/B][/COLOR] Actuales" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_tmdb)"/>
+
         <setting label="Mantenimiento Caché de Tmdb:" type="lsep"/>
 
         <setting id="tmdbm_opc" type="bool" label="Opciones" default="false"/>
@@ -890,7 +896,7 @@
 
         <setting id="tmdbm_uso" type="bool" label="Opciones" default="false"/>
         <setting id="tmdb_cache" type="bool" label="Usar la Caché TMDB (Mejora las búsquedas Recurrentes)" default="true" visible="eq(-1,true)"/>
-        <setting id="tmdb_cache_expire" type="enum" label="Cuando Renovar la Caché de TMDB" values="cada 1 día|cada 7 días|cada 15 días|cada 30 días|No" default="4" visible="eq(-2,true)"/>
+        <setting id="tmdb_cache_expire" type="enum" label="Cuando Renovar la Caché de TMDB" values="cada día|cada 7 días|cada 15 días|cada 30 días|Nunca" default="4" visible="eq(-2,true)"/>
 
         <setting label="Obtención Información Películas/Series en TheMovieDB:" type="lsep"/>
 
@@ -902,8 +908,9 @@
 
         <setting id="tmdb_pro" type="bool" label="Opciones" default="false"/>
         <setting id="tmdb_disabled" type="bool" label="[COLOR goldenrod][B]Desactivar[/B][/COLOR] Accesos en las Listas a TMDB" default="false" visible="eq(-1,true)"/>
+        <setting id="sqlite_enabled" type="bool" label="[COLOR cyan][B]Activar[/B][/COLOR] Gestión Fichero [COLOR chocolate][B]Tmdb Sqlite[/B][/COLOR]" default="true" visible="eq(-2,true)"/>
         <setting id="tmdb_langs" type="enum" label="[COLOR yellow][B]Idioma[/B][/COLOR] de búsqueda en TMDB" values=
-        "Español|Latino|Inglés|Italiano|Portugués|Francés|Aleman" default="0" visible="eq(-2,true)"/>
+        "Español|Latino|Inglés|Italiano|Portugués|Francés|Aleman" default="0" visible="eq(-3,true)"/>
     </category>
 
     <category label="Sistema">

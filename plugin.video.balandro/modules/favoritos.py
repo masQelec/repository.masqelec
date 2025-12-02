@@ -1,23 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] >= 3:
-    PY3 = True
-
-    unicode = str
-    unichr = chr
-
-    import urllib.parse as urllib
-else:
-    PY3 = False
-
-    import urllib
-
-
 from platformcode import config, logger, platformtools
 from core import filetools, scrapertools
 from core.item import Item
+
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
+
+if PY3:
+    import urllib.parse as urllib
+else:
+    import urllib
 
 
 color_alert = config.get_setting('notification_alert_color', default='red')

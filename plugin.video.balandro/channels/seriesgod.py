@@ -132,7 +132,7 @@ def list_all(item):
         if not next_page: next_page = scrapertools.find_single_match(data, '<div class="navigation">.*?</span>.*?<a href="(.*?)".*?</div>')
 
         if next_page:
-            if '/page/' in next_page:
+            if '/pagina/' in next_page:
                 next_page = host[:-1] + next_page
 
                 itemlist.append(item.clone( title = 'Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
@@ -158,17 +158,17 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            url = scrapertools.find_single_match(data, '<link rel="canonical" href="(.*?)"')
+                url = scrapertools.find_single_match(data, '<link rel="canonical" href="(.*?)"')
 
-            if url:
-                if not host in url: url = host[:-1] + url
+                if url:
+                    if not host in url: url = host[:-1] + url
 
-                item.page = 0
-                item.contentType = 'season'
-                item.contentSeason = season
-                itemlist = episodios(item)
-
-            return itemlist
+                    item.url = url
+                    item.page = 0
+                    item.contentType = 'season'
+                    item.contentSeason = season
+                    itemlist = episodios(item)
+                    return itemlist
 
         if not url:
             url = scrapertools.find_single_match(data, '<link rel="canonical" href="(.*?)"')

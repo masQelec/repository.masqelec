@@ -15,7 +15,7 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www2.divxtotal.lol/'
+host = 'https://www3.divxtotal.lol/'
 
 
 # ~ por si viene de enlaces guardados
@@ -24,7 +24,7 @@ ant_hosts = ['https://www.divxtotal.re/', 'https://www.divxtotal.ac/', 'https://
              'https://www.divxtotal.pl/', 'https://www.divxtotal.wf/', 'https://www.divxtotal.win/',
              'https://www1.divxtotal.zip/', 'https://www2.divxtotal.zip/', 'https://www2.divxtotal.mov/',
              'https://www3.divxtotal.mov/', 'https://www4.divxtotal.mov/', 'https://www5.divxtotal.mov/',
-             'https://divxtotal.io/', 'https://www1.divxtotal.lol/']
+             'https://divxtotal.io/', 'https://www1.divxtotal.lol/', ]
 
 
 domain = config.get_setting('dominio', 'divxtotal', default='')
@@ -312,10 +312,10 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
@@ -497,6 +497,16 @@ def play(item):
             itemlist.append(item.clone( url = item.url, server = 'torrent' ))
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host
+    item.group = 'lasts'
+    item.search_type = 'movie'
+
+    return list_all(item)
 
 
 def search(item, texto):

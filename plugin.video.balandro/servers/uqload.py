@@ -19,6 +19,8 @@ def get_video_url(page_url, url_referer=''):
 
     if not page_url.endswith('.html'): page_url += '.html'
 
+    page_url = page_url.replace('.html/.html', '.html')
+
     data = httptools.downloadpage(page_url).data
 
     if 'File was deleted' in data:

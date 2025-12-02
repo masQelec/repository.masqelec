@@ -182,6 +182,17 @@ def descubre(item):
     return lista(item, elementos)
 
 
+def descubre_genre_anio(item):
+    logger.info()
+
+    if not item.page: item.page = 1
+
+    tipo = 'movie'
+    elementos = tmdb.get_discover_genre_anio(tipo, item.extra, item.year, item.page)
+
+    return lista(item, elementos)
+
+
 def descubre_networks(item):
     logger.info()
 

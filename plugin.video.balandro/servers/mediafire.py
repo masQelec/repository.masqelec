@@ -25,6 +25,7 @@ def get_video_url(page_url, url_referer=''):
     if not matches:
          match = scrapertools.find_single_match(str(data), 'window.location.href =' + ".*?'(.*?)'")
          if match == '/login?l=1': match = ''
+         elif match == 'error': match = ''
 
          if not match: match = scrapertools.find_single_match(str(data), 'Download file.*?href="(.*?)"')
 

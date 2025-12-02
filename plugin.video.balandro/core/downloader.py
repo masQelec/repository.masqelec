@@ -25,20 +25,18 @@ import threading
 
 from threading import Thread, Lock
 
-from core import filetools, jsontools
 from platformcode import logger, config
 
+from core import filetools, jsontools
+
+
 PY3 = False
-PY2 = False
+if config.get_setting('PY3', default=''): PY3 = True
 
-if sys.version_info[0] >= 3:
-    PY3 = True
-
+if PY3:
     from urllib.request import urlopen, Request
     from urllib.parse import unquote_plus, urlparse
 else:
-    PY2 = True
-
     from urllib2 import urlopen, Request
     from urlparse import urlparse
     from urllib import unquote_plus

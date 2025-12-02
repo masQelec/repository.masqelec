@@ -513,11 +513,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = tempo, page = 0, text_color = 'tan' ))
 
@@ -693,6 +693,8 @@ def findvideos(item):
 
             if '/saikoudane.' in url: continue
             elif '/saidochesto.' in url: continue
+            elif '/upnshare.' in url: continue
+            elif '/streamp2p.' in url: continue
 
             if url:
                 if url == 'undefined': continue
@@ -748,6 +750,26 @@ def findvideos(item):
     return itemlist
 
 
+def play(item):
+    logger.info()
+    itemlist = []
+
+    servidor = item.server
+
+    url = item.url
+
+    if url:
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
+
+        itemlist.append(item.clone(url = url, server = servidor))
+
+    return itemlist
+
+
 def corregir_SerieName(SerieName):
     logger.info()
 
@@ -795,6 +817,16 @@ def corregir_SerieName(SerieName):
     SerieName = SerieName.strip()
 
     return SerieName
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host + 'episodio/'
+    item.group = 'last_epis'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
 
 
 def search(item, texto):

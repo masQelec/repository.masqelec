@@ -154,7 +154,7 @@ def obtener_js_signature(youtube_page_data):
         if not funcname: funcname = scrapertools.find_single_match(data_js, '([A-z0-9$]+)\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\);\w+\.')
         if not funcname:
             # No se puede decodificar este vídeo
-            logger.info("check-youtube: %s" % 'Youtube signature not found')
+            logger.info("check-Youtube: %s" % 'Youtube signature not found')
             return
 
         from lib.jsinterpreter import JSInterpreter
@@ -226,13 +226,32 @@ def import_libs(module):
 
 
 def extract_videos(video_id, ini_page_url):
+    video_urls = []
+
     youtube_page_data = ''
+
+    if ini_page_url.startswith('https://www.youtube.com/watch?v='):
+        ini_page_url = ini_page_url.replace('https://www.youtube.com/watch?v=', '')
+
+        mvideo = re.match(r"^([0-9A-Za-z_-]{11})", ini_page_url)
+
+        if mvideo:
+           idvideo = mvideo.group(1)
+
+           new_page_url = "https://inv.perditum.com/api/v1/videos/%s" % idvideo
+
+           hdata = httptools.downloadpage(new_page_url).data
+
+           if hdata:
+               hvideo = scrapertools.find_single_match(hdata, '"formatStreams":.*?"url":"(.*?)"')
+
+               if hvideo:
+                   video_urls.append(['mp4', hvideo])
+                   return video_urls
 
     url =  web_yt + '/get_video_info?c=TVHTML5&cver=7.20201028&html5=1&video_id=%s&eurl=https://youtube.googleapis.com/v/%s&ssl_stream=1' % (video_id, video_id)
 
     data = httptools.downloadpage(url).data
-
-    video_urls = []
 
     if not data or "<h1>We're sorry" in data:
         if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
@@ -251,7 +270,6 @@ def extract_videos(video_id, ini_page_url):
                     video_urls.append([item['title'], item['url']])
 
             except:
-                # YouTubeExceptions: Sign in to confirm your age or private video
                 import traceback
                 logger.error(traceback.format_exc())
 
@@ -259,6 +277,12 @@ def extract_videos(video_id, ini_page_url):
 
                 if 'This video may be inappropriate for some users' in trace:
                     return 'Vídeo Restringido'
+                elif 'This video is private' in trace:
+                    return 'Vídeo Privado'
+                elif 'Sign in to confirm your age' in trace:
+                    return 'Vídeo Requiere Confirmar Edad'
+                elif 'Please sign in' in trace:
+                    return 'Requiere Logearse'
                 elif "Sign in to confirm you’re not a bot" in trace:
                     return 'Error YouTube Exception'
 
@@ -390,7 +414,6 @@ def extract_videos(video_id, ini_page_url):
                     video_urls.append([item['title'], item['url']])
 
             except:
-                # YouTubeExceptions: Sign in to confirm your age or private video
                 import traceback
                 logger.error(traceback.format_exc())
 
@@ -398,6 +421,12 @@ def extract_videos(video_id, ini_page_url):
 
                 if 'This video may be inappropriate for some users' in trace:
                     return 'Vídeo Restringido'
+                elif 'This video is private' in trace:
+                    return 'Vídeo Privado'
+                elif 'Sign in to confirm your age' in trace:
+                    return 'Vídeo Requiere Confirmar Edad'
+                elif 'Please sign in' in trace:
+                    return 'Requiere Logearse'
                 elif "Sign in to confirm you’re not a bot" in trace:
                     return 'Error YouTube Exception'
 

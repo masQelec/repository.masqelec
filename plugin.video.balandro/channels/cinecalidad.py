@@ -464,12 +464,12 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.data_serie = data_serie
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.data_serie = data_serie
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, url = item.url, page = 0, data_serie = data_serie,
                                     contentType = 'season', contentSeason = tempo, text_color='tan' ))
@@ -907,6 +907,15 @@ def play(item):
         itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'estrenos/'
+    item.search_type = 'movie'
+
+    return list_all(item)
 
 
 def search(item, texto):

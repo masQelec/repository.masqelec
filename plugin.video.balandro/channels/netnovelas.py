@@ -49,9 +49,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'videos/allseries', page = 1, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series', page = 1, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'videos/allepisodes', page = 1, search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'episodes', page = 1, search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Por país', action='paises', page = 1, search_type = 'tvshow' ))
 
@@ -66,34 +66,34 @@ def paises(item):
 
     text_color = 'hotpink'
 
-    itemlist.append(item.clone( title = 'América', action = 'list_all', url = host + 'videos/categories/Novelas-Americanas', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Australia', action = 'list_all', url = host + 'videos/categories/novelas-australianas', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Argentina', action = 'list_all', url = host + 'videos/categories/Novelas-Argentinas', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'videos/categories/Novelas-brasilenas', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Canada', action = 'list_all', url = host + 'videos/categories/Novelas-Canadienses', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Chile', action = 'list_all', url = host + 'videos/categories/Novelas-Chileanas', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'videos/categories/Novelas-Colombianas', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Corea', action = 'list_all', url = host + 'videos/categories/Novelas-Coreanas', text_color=text_color ))
-    itemlist.append(item.clone( title = 'España', action = 'list_all', url = host + 'videos/categories/Novelas-Espanolas', lang = 'Esp', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Finlandia', action = 'list_all', url = host + 'videos/categories/Novelas-Finlandesas', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Francia', action = 'list_all', url = host + 'videos/categories/novelas-francesiano', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Holanda', action = 'list_all', url = host + 'videos/categories/Novelas-Holandes', text_color=text_color ))
-    itemlist.append(item.clone( title = 'India', action = 'list_all', url = host + 'videos/categories/Novelas-Indias', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Italia', action = 'list_all', url = host + 'videos/categories/Novelas-Italianas', text_color=text_color ))
-    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'videos/categories/Novelas-Mexicanas', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Noruega', action = 'list_all', url = host + 'videos/categories/Novela-Noruegos', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Perú', action = 'list_all', url = host + 'videos/categories/Novelas-Peruanas', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Polonia', action = 'list_all', url = host + 'videos/categories/novelas-polacas', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Portugal', action = 'list_all', url = host + 'videos/categories/Novelas-portuguesas', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Reino Unido', action = 'list_all', url = host + 'videos/categories/Novelas-del-Reino-Unido', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Sudafrica', action = 'list_all', url = host + 'videos/categories/Novelas-de-Sudafrica', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Suecia', action = 'list_all', url = host + 'videos/categories/Novelas-suecas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'América', action = 'list_all', url = host + 'categories/Novelas-Americanas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Australia', action = 'list_all', url = host + 'categories/novelas-australianas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Argentina', action = 'list_all', url = host + 'categories/Novelas-Argentinas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'categories/Novelas-brasilenas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Canada', action = 'list_all', url = host + 'categories/Novelas-Canadienses', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Chile', action = 'list_all', url = host + 'categories/Novelas-Chileanas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'categories/Novelas-Colombianas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Corea', action = 'list_all', url = host + 'categories/Novelas-Coreanas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'España', action = 'list_all', url = host + 'categories/Novelas-Espanolas', lang = 'Esp', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Finlandia', action = 'list_all', url = host + 'categories/Novelas-Finlandesas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Francia', action = 'list_all', url = host + 'categories/novelas-francesiano', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Holanda', action = 'list_all', url = host + 'categories/Novelas-Holandes', text_color=text_color ))
+    itemlist.append(item.clone( title = 'India', action = 'list_all', url = host + 'categories/Novelas-Indias', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Italia', action = 'list_all', url = host + 'categories/Novelas-Italianas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'categories/Novelas-Mexicanas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Noruega', action = 'list_all', url = host + 'categories/Novela-Noruegos', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Perú', action = 'list_all', url = host + 'categories/Novelas-Peruanas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Polonia', action = 'list_all', url = host + 'categories/novelas-polacas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Portugal', action = 'list_all', url = host + 'categories/Novelas-portuguesas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Reino Unido', action = 'list_all', url = host + 'categories/Novelas-del-Reino-Unido', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Sudafrica', action = 'list_all', url = host + 'categories/Novelas-de-Sudafrica', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Suecia', action = 'list_all', url = host + 'categories/Novelas-suecas', text_color=text_color ))
 
-    itemlist.append(item.clone( title = 'Tuquía', action = 'list_all', url = host + 'videos/categories/Series-y-Novelas-Turcas', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Tuquía (Vose)', action = 'list_all', url = host + 'videos/categories/Series-Turcas-en-Espanol-Subtitulado', text_color=text_color ))
-    itemlist.append(item.clone( title = 'Tuquía (Esp)', action = 'list_all', url = host + 'videos/categories/Series-Turcas-en-Espanol-Audio', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Tuquía', action = 'list_all', url = host + 'categories/Series-y-Novelas-Turcas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Tuquía (Vose)', action = 'list_all', url = host + 'categories/Series-Turcas-en-Espanol-Subtitulado', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Tuquía (Esp)', action = 'list_all', url = host + 'categories/Series-Turcas-en-Espanol-Audio', text_color=text_color ))
 
-    itemlist.append(item.clone( title = 'Venezuela', action = 'list_all', url = host + 'videos/categories/novelas-venezolanas', text_color=text_color ))
+    itemlist.append(item.clone( title = 'Venezuela', action = 'list_all', url = host + 'categories/novelas-venezolanas', text_color=text_color ))
 
     return itemlist
 
@@ -106,7 +106,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1979, -1):
-        url = host + 'videos/years/' + str(x)
+        url = host + 'years/' + str(x)
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color='hotpink' ))
 
@@ -120,20 +120,18 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    data = data.replace('=\\', '=').replace('\\"', '"')
+    bloque = scrapertools.find_single_match(data, '</h1>(.*?)<p>©')
 
-    bloque = scrapertools.find_single_match(data, '>Browse(.*?)</body>')
-
-    matches = scrapertools.find_multiple_matches(str(bloque), '"video"(.*?),null,')
+    matches = scrapertools.find_multiple_matches(str(bloque), '<div data-slot="card-content"(.*?)content-visibility-auto">')
 
     for match in matches:
-        match = match.replace('\\/', '/')
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
-        url = scrapertools.find_single_match(match, '"videoSlug":"(.*?)"')
-
-        title = scrapertools.find_single_match(match, '"videoTitle":"(.*?)"')
+        title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
         if not url or not title: continue
+
+        url = host[:-1] + url
 
         if '/?q=' in item.url:
             if 'Capitulo' in title: pass
@@ -142,9 +140,9 @@ def list_all(item):
             elif 'capítulo' in title: pass
             else: continue
 
-        thumb = scrapertools.find_single_match(match, '"ytThumb":"(.*?)"')
+        thumb = scrapertools.find_single_match(match, 'srcSet="(.*?)"')
 
-        thumb = host + 'videoimage/' + thumb
+        thumb = host[:-1] + thumb
 
         title = title.replace('&#8211;', '').replace('&#8220;', '').replace('&#8221;', '').strip()
         title = title.replace('&#8216;', '').replace('&#8217;', '').replace('&#8230;', '').strip()
@@ -197,8 +195,6 @@ def list_all(item):
 
         title = title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
-        url = host + 'videos/' + url
-
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
                                     contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
@@ -235,13 +231,11 @@ def temporadas(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    data = data.replace('=\\', '=').replace('\\"', '"')
-
     bloque = scrapertools.find_single_match(data, '>Seasons and Episodes<(.*?)</div></div></div></div>')
 
     bloque = bloque.replace('<!-- -->', '"').replace('</span></button>', '"')
 
-    matches = re.compile('>Season "(.*?)</span>', re.DOTALL).findall(bloque)
+    matches = re.compile('>Season "(.*?)</button>', re.DOTALL).findall(bloque)
 
     for numtempo in matches:
          numtempo = numtempo.strip()
@@ -250,6 +244,8 @@ def temporadas(item):
 
          if len(matches) == 1:
              if not numtempo:
+                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]Temporadas[/COLOR]')
+
                  itemlist.append(item.clone( action = 'findvideos', url = item.url, title = item.title,
                                              contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = item.contentEpisodeNumber ))
 
@@ -258,12 +254,12 @@ def temporadas(item):
              if config.get_setting('channels_seasons', default=True):
                  platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title +  '[/COLOR]')
 
-             item.page = 0
-             item.contentType = 'season'
-             item.contentSeason = numtempo
-             item.only_one_season = True
-             itemlist = episodios(item)
-             return itemlist
+                 item.page = 0
+                 item.contentType = 'season'
+                 item.contentSeason = numtempo
+                 item.only_one_season = True
+                 itemlist = episodios(item)
+                 return itemlist
 
          itemlist.append(item.clone( action = 'episodios', title=title, page=0,
                                      contentType='season', contentSeason=numtempo, text_color='tan' ))
@@ -283,16 +279,11 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    data = data.replace('=\\', '=').replace('\\"', '"')
-
     data = data.replace('<!-- -->', '"').replace('</span></button>', '"')
 
-    if item.only_one_season:
-       bloque = scrapertools.find_single_match(str(data), '>Season "' + str(item.contentSeason) + '(.*?)</section>')
-    else:
-       bloque = scrapertools.find_single_match(str(data), '(.*?)</body>')
+    bloque = scrapertools.find_single_match(str(data), 'id="season-' + str(item.contentSeason) + '-.*?"(.*?)</section>')
 
-    matches = re.compile('<a aria-label="(.*?)".*?href="(.*?)"', re.DOTALL).findall(str(bloque))
+    matches = re.compile('aria-label="(.*?)".*?>Ep(.*?)</button>', re.DOTALL).findall(str(bloque))
 
     num_matches = len(matches)
 
@@ -341,11 +332,17 @@ def episodios(item):
                     item.perpage = sum_parts
                 else: item.perpage = 50
 
-    for title, url in matches[item.page * item.perpage:]:
-        if '/years' in url: continue
-        elif '/categories/' in url: continue
-        elif '/aboutus' in url: continue
-        elif 'Breadcrumb' in url: continue
+    for title, epis in matches[item.page * item.perpage:]:
+        epis = epis.replace('"', '').strip()
+
+        if 'Episodes for' in title:
+            title = scrapertools.find_single_match(item.url, '/episodes/(.*?)$')
+            title = title.replace('-', ' ').capitalize()
+            title = ' - ' + title
+
+        url = scrapertools.find_single_match(title, '-(.*?)$').strip()
+
+        url = url.replace(' ', '-').lower()
 
         if not item.only_one_season:
             if not str(item.contentSeason) == '1':
@@ -353,17 +350,10 @@ def episodios(item):
             else:
                 if url.endswith('-1'): continue
 
-        url = host[:-1] + url
-
-        epis = scrapertools.find_single_match(title, 'Episode(.*?)$').strip()
-        if not epis: epis = 1
-
-        if ' Capítulo' in title: title = title.split(" Capítulo")[0]
-        elif ' capítulo' in title: title = title.split(" capítulo")[0]
-        elif ' Capitulo' in title: title = title.split(" Capitulo")[0]
-        elif ' capitulo' in title: title = title.split(" capitulo")[0]
-
-        title = title.replace(item.contentSerieName, '').strip()
+        if not '-capitulo-' in url:
+            url = host + 'episodes/' + url + '-capitulo-' + str(epis)
+        else:
+            url = host + 'episodes/' + url
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title.replace(' - ', ' ').strip()
 

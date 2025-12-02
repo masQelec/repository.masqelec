@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] >= 3: PY3 = True
-else: PY3 = False
-
-
 import os, time
 
 from threading import Thread
@@ -13,6 +7,10 @@ from threading import Thread
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import channeltools, scrapertools
+
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
 
 
 fanart = os.path.join(config.get_runtime_path(), 'fanart.jpg')
@@ -170,6 +168,9 @@ def mainlist(item):
         if config.get_setting('mnu_adultos', default=True):
             itemlist.append(item.clone( action='search', title='- [B][COLOR orange]+18 Vídeo[/COLOR][/B] ...', extra = '+18', search_video = 'adult', thumbnail=config.get_thumb('adults'), text_color='yellow' ))
 
+        if config.get_setting('search_youtube', default=True):
+            itemlist.append(item.clone( channel='youtubetrailers', action='search', title= ' - [COLOR darksalmon][B]Youtube[/B][/COLOR] ...', thumbnail=config.get_thumb('youtube'), search_special = 'youtube', search_type = 'all' ))
+
     if config.get_setting('search_extra_trailers', default=False):
          itemlist.append(item.clone( channel='trailers', action='search', title= ' - [COLOR darkgoldenrod][B]Tráiler[/B][/COLOR] ...', thumbnail=config.get_thumb('trailers'), plot = 'Indicar el Título de una película para buscar su Tráiler' ))
 
@@ -221,9 +222,14 @@ def show_infos(item):
 
     itemlist.append(item.clone( channel='filters', action='no_actives', title= ' - Qué canales [COLOR goldenrod][B]Nunca[/B][/COLOR] intervendrán en las búsquedas', no_searchables = True, thumbnail=config.get_thumb('stack') ))
 
+    itemlist.append(item.clone( action='', title='[COLOR fuchsia][B]BUSCAR Reproducciones:[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
+
+    itemlist.append(item.clone( channel='helper', action='submnu_play', title=' - [B]Play [COLOR powderblue][I]Servidores[/I][/B]', text_color='fuchsia', thumbnail=config.get_thumb('bolt') ))
+
     if txt_status:
         if srv_pending:
             itemlist.append(item.clone( channel='submnuteam', action='resumen_pending', title='[COLOR fuchsia][B]Servidores[COLOR orchid] Con Incidencias[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
+
 
     return itemlist
 
@@ -978,7 +984,7 @@ def do_search(item, tecleado):
                            if not username: titulo = titulo + ' [COLOR teal]faltan [I]Credenciales Cuenta[/I]'
                            else:
                                sesion_login = config.get_setting('channel_%s_%s_login' % (ch['id'], ch['id']), default=False)
-                               if sesion_login == False: titulo = titulo + ' [COLOR teal]falta [I]Iniciar Sesion[/I]'
+                               if sesion_login == False: titulo = titulo + ' [COLOR teal]falta [I]Iniciar Sesión[/I]'
                        elif only_includes:
                            if no_channels: titulo = titulo + ' [COLOR yellow]Ignorado no está en Incluidos'
                        elif no_notices:

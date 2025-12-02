@@ -386,10 +386,13 @@ def list_webcams(item):
     jdata = jsontools.load(data)
 
     for vid in jdata["videos"]:
-        url = vid["u"]
-        title = vid["tf"]
-        time = vid["d"]
-        thumb =  vid["i"]
+        try:
+            url = vid["u"]
+            title = vid["tf"]
+            time = vid["d"]
+            thumb =  vid["i"]
+        except:
+            continue
 
         title = title.replace('&ntilde;', 'ñ')
 

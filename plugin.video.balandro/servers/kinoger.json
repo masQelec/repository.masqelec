@@ -1,0 +1,21 @@
+{
+  "id": "kinoger",
+  "name": "Kinoger",
+
+  "active": true,
+ 
+  "find_videos": {
+    "ignore_urls": [],
+    "patterns": [
+      {
+        "pattern": "https://((?:kinoger|wasuytm|ultrastream|(?:shiid4u|player)\\.upn|moflix\\.upns|xxxbold\\.upns|xfuntaxy\\.upns|amg\\.upns|cheemsvids\\.upns|88z)\\.(?:re|one|xyz|store|online|live|io))/#([A-Za-z0-9]+)",
+        "url": "https://\\1/api/v1/video?id=\\2"
+      },
+      {
+        "pattern": "https://(p.easyvidplayer.com)/#([A-z0-9]+)",
+        "url": "https://\\1/api/v1/video?id=\\2"
+      }
+    ]
+  }
+
+}

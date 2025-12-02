@@ -148,7 +148,12 @@ def addFavourite(item):
 
     if not done:
         if msg:
-            if not config.get_setting('developer_mode', default=False):
+            avisar = True
+
+            if not config.get_setting('developer_team'): avisar = False
+            elif not config.get_setting('developer_mode', default=False): avisar = False
+
+            if avisar:
                 platformtools.dialog_notification(config.__addon_name, '[B][COLOR red]No se Pudo Añadir los Enlaces[/COLOR][/B]')
             else:
                 platformtools.dialog_ok(config.__addon_name, '[B][COLOR red]No se Pudieron Añadir los Enlaces[/COLOR][/B]', msg)

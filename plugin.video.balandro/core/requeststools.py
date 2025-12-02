@@ -1,18 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] >= 3:
-    PY3 = True
-
-    import urllib3
-
-else:
-    PY3 = False
-
-    import urllib2
-
-
 import time, random
 
 from platformcode import logger, config, platformtools
@@ -20,6 +7,7 @@ from core import scrapertools
 
 
 import ssl
+
 ssl._create_default_https_context = ssl._create_unverified_context
 
 
@@ -31,12 +19,21 @@ except:
     existe_script = False
 
 
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
+
+if PY3:
+    import urllib3
+else:
+    import urllib2
+
+
 color_alert = config.get_setting('notification_alert_color', default='red')
 
 
-# ~ 22/10/25
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.78 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.123 Safari/537.36"
+# ~ 21/11/25
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.7444.176 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.7499.40 Safari/537.36"
 
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)

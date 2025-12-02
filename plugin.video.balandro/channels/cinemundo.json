@@ -1,0 +1,17 @@
+{
+  "id": "cinemundo",
+  "name": "CineMundo",
+  "thumbnail": "cinemundo.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["onlyone", "classic", "rankings", "years", "docs", "vos"],
+
+  "notes": "Películas clásicas y cine independiente."
+}

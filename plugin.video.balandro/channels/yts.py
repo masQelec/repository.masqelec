@@ -7,13 +7,18 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://en.yts-official.mx/'
-
+host = 'https://wwv.yts-official.mx/'
 
 url_browser = host + "browse-movies"
 
 
 def do_downloadpage(url, post=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://en.yts-official.mx/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     data = httptools.downloadpage(url, post=post).data
 
     return data

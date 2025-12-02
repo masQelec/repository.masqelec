@@ -1,33 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] >= 3:
-    PY2 = False
-    PY3 = True
-
-    unicode = str
-
-    from urllib.parse import quote, urlencode, urlparse
-    from urllib.response import addinfourl
-    from http.cookiejar import MozillaCookieJar, Cookie
-    from urllib.request import HTTPHandler, HTTPCookieProcessor, ProxyHandler, build_opener, Request, HTTPRedirectHandler
-
-    from urllib.error import HTTPError
-
-else:
-    PY2 = True
-    PY3 = False
-
-    from urllib import quote, urlencode, addinfourl
-    from urlparse import urlparse
-    from cookielib import MozillaCookieJar, Cookie
-    from urllib2 import HTTPHandler, HTTPCookieProcessor, ProxyHandler, build_opener, Request, HTTPRedirectHandler, HTTPError
-
-
-import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
-
 import os, re, inspect, gzip, time, random
 
 from io import BytesIO
@@ -39,6 +11,31 @@ from platformcode.config import WebErrorException
 try: from core.cloudflare import Cloudflare
 except: pass
 
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+
+
+if config.get_setting('PY3', default=''):
+    PY3 = True
+    PY2 = False
+
+    unicode = str
+
+    from urllib.parse import quote, urlencode, urlparse
+    from urllib.response import addinfourl
+    from http.cookiejar import MozillaCookieJar, Cookie
+    from urllib.request import HTTPHandler, HTTPCookieProcessor, ProxyHandler, build_opener, Request, HTTPRedirectHandler
+
+    from urllib.error import HTTPError
+else:
+    PY2 = True
+    PY3 = False
+
+    from urllib import quote, urlencode, addinfourl
+    from urlparse import urlparse
+    from cookielib import MozillaCookieJar, Cookie
+    from urllib2 import HTTPHandler, HTTPCookieProcessor, ProxyHandler, build_opener, Request, HTTPRedirectHandler, HTTPError
+
 
 __addon_name = config.__addon_name
 __version = config.get_addon_version()
@@ -49,9 +46,9 @@ cj = MozillaCookieJar()
 ficherocookies = os.path.join(config.get_data_path(), "cookies.dat")
 
 
-# ~ 22/10/25
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.78 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.123 Safari/537.36"
+# ~ 21/11/25
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.7444.176 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.7499.40 Safari/537.36"
 
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)

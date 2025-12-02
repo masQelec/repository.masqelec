@@ -126,7 +126,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'lista-episodios', group = 'last_epis', search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'En emision', action = 'list_all', url = host + 'lista-donghuas-emision', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'lista-donghuas-emision', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Finalizados', action = 'list_all', url = host + 'lista-donghuas-finalizados', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos',  search_type = 'tvshow' ))
@@ -542,6 +542,16 @@ def corregir_SerieName(SerieName):
     SerieName = SerieName.strip()
 
     return SerieName
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host + 'lista-episodios'
+    item.group = 'last_epis'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
 
 
 def search(item, texto):

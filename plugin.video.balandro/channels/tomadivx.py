@@ -555,8 +555,6 @@ def play(item):
             host_torrent = host[:-1]
             url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
 
-            url_base64 = url_base64.replace('/tomadivx.net/', '/ec1-eu-TomaDivx-compute-1.cdnbeta.in/')
-
             if url_base64.startswith('magnet:'):
                itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
 
@@ -679,6 +677,15 @@ def corregir_SerieName(SerieName):
     SerieName = SerieName.strip()
 
     return SerieName
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'ultimos'
+    item.search_type = 'movie'
+
+    return list_last(item)
 
 
 def search(item, texto):

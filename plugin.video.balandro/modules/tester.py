@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] >= 3: PY3 = True
-else: PY3 = False
-
-
 import os, re, time, xbmc, xbmcaddon
 
 from platformcode import config, logger, platformtools, updater
 from core import httptools, scrapertools, filetools, jsontools
+
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
 
 
 LINUX = False
@@ -120,6 +118,7 @@ txt_erase = '[COLOR orangered][B]Podrían Eliminarse los Proxies del Canal, pued
 txt_quita = '[COLOR orange][B]podrían Eliminarse los Proxies del Canal, al parecer No se necesitan[/B][/COLOR]'
 txt_suspe = '[CR]account: [COLOR goldenrod][B]Suspendida[/B][/COLOR][CR]'
 txt_reach = '[CR]status: [COLOR red[B]Suspendida[/B][/COLOR][CR]'
+txt_legal = 'legal: [COLOR springgreen][B]Copyright infringement[/B][/COLOR]'
 txt_sorry = '[CR]sorry: [COLOR springgreen][B]Contact your hosting Provider[/B][/COLOR]'
 txt_false = '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR]'
 txt_verif = '[COLOR limegreen][B]Podría estar Correcto (verificar la Web vía internet)[/B][/COLOR]'
@@ -185,9 +184,7 @@ def test_channel(channel_name):
 
     generar = False
 
-    if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')): generar = True
-    elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')): generar = True
-    elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')): generar = True
+    if config.get_setting('developer_team'): generar = True
 
     if config.get_setting('developer_mode', default=False):
         if generar:
@@ -200,10 +197,14 @@ def test_channel(channel_name):
 
     if last_ver is None: last_ver = '[B][I][COLOR %s](sin acceso)[/COLOR][/I][/B]' % color_alert
     elif not last_ver:
-          text_dev = ''
-          if config.get_setting('developer_mode', default=False): text_dev = '[COLOR darkorange][B]Desarrollo[/B][/COLOR] '
+          tex_dev = ''
+
+          if config.get_setting('developer_mode', default=False):
+              tex_dev = '[COLOR darkorange][B]Desarrollo[/B][/COLOR]'
+              if not config.get_setting('developer_team'): tex_dev = '[COLOR darkorange][B]Falso Desarrollo[/B][/COLOR]'
+
           last_ver = '[B][I][COLOR %s](desfasada)[/COLOR][/I][/B]' % color_adver
-          last_ver = last_ver + '  '  + text_dev
+          last_ver = last_ver + '  '  + tex_dev
     else: last_ver = ''
 
     last_fix = config.get_addon_version()
@@ -582,8 +583,6 @@ def test_channel(channel_name):
 
             elif channel_id == 'veronline': txt_clons = 'OnlineTv, SeriesEs, SeriesOnline, Star, VerFlix'
 
-            elif channel_id == 'zonapelis': txt_clons = 'TorrenFlix'
-
             if txt_clons:
                 txt_diag  += '[CR]clones: [COLOR gold][B]' + txt_clons + '[/B][/COLOR]'
 
@@ -618,7 +617,6 @@ def test_channel(channel_name):
             elif channel_id == 'verflix': txt_clones = 'VerOnline'
             elif channel_id == 'tomadivx': txt_clones = 'DonTorrents'
             elif channel_id == 'todotorrents': txt_clones = 'DonTorrents'
-            elif channel_id == 'torrenflix': txt_clones = 'ZonaPelis'
             elif channel_id == 'verdetorrent': txt_clones = 'DonTorrents'
             elif channel_id == 'verseries': txt_clones = 'JoinClub'
 
@@ -637,17 +635,24 @@ def test_channel(channel_name):
                     else:
                        tex_tor = cliente_torrent
                        cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
+
                        if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
-                          cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
-                          tex_tor += '  [COLOR fuchsia]' + cod_version + '[/COLOR]'
+                          try:
+                             cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
+                             tex_tor += '  [COLOR fuchsia]' + cod_version + '[/COLOR]'
+                          except:
+                             tex_tor += '  [COLOR gray]Desactivado[/COLOR]'
 
                           if txt_diag: txt_diag += '[CR]'
                           txt_diag  += 'motor: ' + '[COLOR gold][B]' + tex_tor + '[/B][/COLOR]'
                 else:
                     if channel_id in ['areadocumental', 'ciberdocumetales', 'mundodesconocido', 'documentaryheaven', 'documentarystorm', 'topdocumentaryfilms', 'youtubedocs']:
                         if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
-                            cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
-                            tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+                            try:
+                                cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
+                                tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+                            except:
+                                tex_yt = '  [COLOR gray][B]Desactivado'
                         else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
 
                         if txt_diag: txt_diag += '[CR]'
@@ -1030,6 +1035,12 @@ def test_channel(channel_name):
                    avis_causas = txt_verif
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
+
+               elif txt_legal in txt:
+                   avis_causas = '[COLOR goldenrod][B]Copyright Derechos de Autor.[/B][/COLOR]'
+                   platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
+                   avisado = True
+
                else:
                    if txt_sorry in txt or txt_suspe in txt: avis_causas = '[COLOR goldenrod][B]La Cuenta está Suspendida.[/B][/COLOR]'
 
@@ -1054,9 +1065,12 @@ def test_channel(channel_name):
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
-               elif 'Dominio Expirado' in txt:
-                   avis_causas = txt_false
+               elif txt_legal in txt:
+                   avis_causas = '[COLOR goldenrod][B]Copyright Derechos de Autor.[/B][/COLOR]'
+                   platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
+                   avisado = True
 
+               elif 'Dominio Expirado' in txt:
                    avis_causas = '[COLOR goldenrod][B]El Dominio de la Web está Expirado.[/B][/COLOR]'
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
@@ -1080,15 +1094,11 @@ def test_channel(channel_name):
                    avisado = True
 
                elif 'Inaccesible' in txt:
-                   avis_causas = txt_false
-
                    avis_causas = '[COLOR goldenrod][B]No se puede acceder a este sitio web.[/B][/COLOR]'
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
                elif 'Sin Información de Datos' in txt:
-                   avis_causas = txt_false
-
                    avis_causas = '[COLOR goldenrod][B]Sin Información de Datos.[/B][/COLOR]'
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
@@ -1100,6 +1110,7 @@ def test_channel(channel_name):
             if 'No Sponsors / Expired' in txt: return txt
             elif 'Suspendida' in txt: return txt
             elif 'Dominio Expirado' in txt: return txt
+            elif 'Copyright infringement' in txt: return txt
             elif 'Se pueden Eliminar los Proxies' in txt: return txt
             elif 'Falso Positivo.' in txt: return txt
             elif 'invalid:' in txt: return txt
@@ -1109,6 +1120,7 @@ def test_channel(channel_name):
             if 'No Sponsors / Expired' in txt: return txt
             elif 'Suspendida' in txt: return txt
             elif 'Dominio Expirado' in txt: return txt
+            elif 'Copyright infringement' in txt: return txt
             elif 'Se pueden Eliminar los Proxies' in txt: return txt
             elif 'Incidencia:' in txt: return txt
             elif 'No Accesible:' in txt: return txt
@@ -1425,6 +1437,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
             elif '>The domain has expired and may be available at' in response.data: txt += '[CR]web: [COLOR red][B]Dominio Expirado[/B][/COLOR]'
             elif 'Renew Now' in response.data: txt += '[CR]web: [COLOR red][B]Dominio Expirado[/B][/COLOR]'
+            elif '<title>Redirecting...</title>' in response.data: txt += '[CR]web: [COLOR red][B]Dominio Expirado[/B][/COLOR]'
 
             if len(response.data) < 1100:
                  if '.js"></script>' in str(response.data): txt += "[CR]web: [COLOR red][B]No Sponsors / Expired[/B][/COLOR]"
@@ -1503,7 +1516,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                             txt = txt.replace('[CR]quitar: ' + txt_quita, '[CR]quitar: [COLOR orangered][B]NO se pueden Eliminar los Proxies del Canal[/COLOR]')
                             txt += "[CR]invalid: [COLOR goldenrod][B]Acceso sin Host Válido en los datos.[/B][/COLOR]"
                     else:
-                        if 'This domain has expired.' in str(response.data):
+                        if 'This domain has expired' in str(response.data):
                             if not 'Dominio Expirado' in txt: txt += "[CR]web: [COLOR red][B]Dominio Expirado[/B][/COLOR]"
 
                 elif channel_id in str(channels_despised):
@@ -1891,9 +1904,7 @@ def test_server(server_name):
 
     generar = False
 
-    if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')): generar = True
-    elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')): generar = True
-    elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')): generar = True
+    if config.get_setting('developer_team'): generar = True
 
     if config.get_setting('developer_mode', default=False):
         if generar:
@@ -1907,10 +1918,14 @@ def test_server(server_name):
 
     if last_ver is None: last_ver = '[B][I][COLOR %s](sin acceso)[/COLOR][/I][/B]' % color_alert
     elif not last_ver:
-          text_dev = ''
-          if config.get_setting('developer_mode', default=False): text_dev = '[COLOR darkorange][B]Desarrollo[/B][/COLOR] '
+          tex_dev = ''
+
+          if config.get_setting('developer_mode', default=False):
+              tex_dev = '[COLOR darkorange][B]Desarrollo[/B][/COLOR]'
+              if not config.get_setting('developer_team'): tex_dev = '[COLOR darkorange][B]Falso Desarrollo[/B][/COLOR]'
+
           last_ver = '[B][I][COLOR %s](desfasada)[/COLOR][/I][/B]' % color_adver
-          last_ver = last_ver + '  '  + text_dev
+          last_ver = last_ver + '  '  + tex_dev
     else: last_ver = ''
 
     last_fix = config.get_addon_version()

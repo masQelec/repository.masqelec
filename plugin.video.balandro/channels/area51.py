@@ -190,6 +190,8 @@ def findvideos(item):
 def search(item, texto):
     logger.info()
     try:
+        config.set_setting('search_last_video', texto)
+
         item.tex = texto.replace(" ", "+") + '/'
         item.url = host + 'search/' + item.tex
         return list_all(item)

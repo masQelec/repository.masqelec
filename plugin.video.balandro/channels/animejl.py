@@ -451,6 +451,11 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(data, 'video\[\d+\]\s*=\s*\'<iframe.*?src="([^"]+)"')
 
+    if not matches:
+        bloque = scrapertools.find_single_match(str(data), 'var video =(.*?)</script>')
+
+        matches = scrapertools.find_multiple_matches(bloque, 'video.*?<a href="([^"]+)"')
+
     for url in matches:
         ses += 1
 
@@ -458,6 +463,38 @@ def findvideos(item):
             if url.startswith('//'): url = 'https:' + url
 
             if url.startswith('https://animejl.top/v/'): url = url.replace('https://animejl.top/v/', 'https://vanfem.com/v/')
+
+            if '/holuagency.' in url:
+                new_url = url.replace('/holuagency.top/', '/boracozinhar.top/')
+
+                data1 = do_downloadpage(new_url)
+
+                new_url = scrapertools.find_single_match(data1, 'window.location.href =.*?"(.*?)"')
+
+                if new_url:
+                    data2 = do_downloadpage(new_url)
+
+                    _token = scrapertools.find_single_match(data2, 'name="token".*?value="(.*?)"')
+                    _back = scrapertools.find_single_match(data2, 'name="back".*?value="(.*?)"')
+
+                    if _token and _back:
+                        datap = do_downloadpage('https://panelacheia.top/a', post = {'token': _token, 'back': _back})
+
+                        new_url = scrapertools.find_single_match(datap, '<link rel="canonical" href="(.*?)"')
+
+                        if new_url:
+                            h = {}
+
+                            _t = 't=' + _token + ';'
+                            _b = 'b=' + _back + ';'
+
+                            h['Cookie'] = _t + _b
+
+                            data3 = do_downloadpage(new_url, headers = h)
+
+                            url = scrapertools.find_single_match(data3, '<iframe name="playeriframe" src="(.*?)"')
+
+                            if not url: continue
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
@@ -535,6 +572,15 @@ def corregir_SerieName(SerieName):
     SerieName = SerieName.strip()
 
     return SerieName
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host
+    item.search_type = 'tvshow'
+
+    return last_epis(item)
 
 
 def search(item, texto):

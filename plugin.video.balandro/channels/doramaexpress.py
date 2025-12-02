@@ -190,7 +190,7 @@ def news_epis(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '>Últimos episodios<(.*?)> Artista')
+    bloque = scrapertools.find_single_match(data, '>Últimos episodios<(.*?)>Artista')
 
     matches = re.compile('<div class="sideranking-item"(.*?)</div> </div> </div>').findall(bloque)
 
@@ -324,11 +324,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color='tan' ))
 
@@ -511,6 +511,15 @@ def findvideos(item):
             return
 
     return itemlist
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host
+    item.search_type = 'tvshow'
+
+    return news_epis(item)
 
 
 def search(item, texto):

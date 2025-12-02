@@ -310,12 +310,12 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.url = item.url
-            item.contentType = 'season'
-            item.contentSeason = numtempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.url = item.url
+                item.contentType = 'season'
+                item.contentSeason = numtempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, url = item.url, page = 0, contentType = 'season', contentSeason = numtempo, text_color='tan' ))
 

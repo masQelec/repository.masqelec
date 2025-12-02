@@ -753,6 +753,15 @@ def corregir_SerieName(SerieName):
     return SerieName
 
 
+def _news(item):
+    logger.info()
+
+    item.url = host + '/ultimos/'
+    item.search_type = 'movie'
+
+    return list_list(item)
+
+
 def search(item, texto):
     logger.info()
     try:

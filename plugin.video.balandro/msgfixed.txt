@@ -262,7 +262,7 @@ Ejecución:
   [COLOR gold]Lista-proxies.txt[/COLOR] ó [COLOR gold]Lista-proxies.zip[/COLOR]
 
 Información:
-  Esta lista tiene mayor estabilidad y una caducidad mas longeva, es cuestión de ir probando,
+  Esta lista tiene mayor estabilidad y una caducidad más longeva, es cuestión de ir probando,
   cuando no se consigan obtener proxies por el método Automático ó Habitual.
 
 [COLOR chartreuse][B]Mensaje Fijado 10[/COLOR]  [COLOR yellow]SI APARECIERA LA VENTANA DE ERROR INESPERADO[/B][/COLOR] 
@@ -312,10 +312,13 @@ Revise sus [COLOR gold]Ajustes, categoría Play[/COLOR].
 Les recordamos que NO almacenamos [COLOR gold]NINGÚN[/COLOR] tipo de Contenido,
 tan SOLO presentamos lo que las Webs (Canales) Suministran.
 
-Última Versión  [COLOR gold]22/9/2025[/COLOR]  [COLOR cyan]4.0.21[/COLOR]
-ó acceder al Foro
-[COLOR dodgerblue]www.mimediacenter.info/foro/[/COLOR]  Balandro
-[COLOR gold]Aviso Mantenimiento del Addon (a mínimos)[/COLOR]
+Última Versión:
+  Acceda a la [COLOR chartreuse]Ayuda[/COLOR] [COLOR violet]Versiones[/COLOR]
+  [COLOR goldenrod][B]Historial[/B][/COLOR] de Versiones
+
+  ó acceder al Foro
+  [COLOR dodgerblue]www.mimediacenter.info/foro/[/COLOR]  Balandro
+  [COLOR gold]Aviso Mantenimiento del Addon (a mínimos)[/COLOR]
 
 [COLOR chartreuse][B]Mensaje Fijado 14[/COLOR]  [COLOR yellow]ACCESO A LOS MENSAJES FIJADOS DESDE EL FORO[/B][/COLOR] 
 

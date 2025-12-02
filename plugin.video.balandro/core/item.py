@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
 
-import base64
-import copy
-import os, sys
+import os, base64, copy
+
+from platformcode import config, logger
 
 from core import jsontools as json
 
-PY3 = False
-PY2 = False
 
-if sys.version_info[0] >= 3:
-    PY3 = True
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
+
+if PY3:
     unicode = str
+
     from urllib.parse import quote, unquote_plus, unquote
     from html.parser import unescape
 else:
-    PY2 = True
     from urllib import quote, unquote_plus, unquote
     from HTMLParser import HTMLParser
+
     unescape = HTMLParser().unescape
 
 
@@ -27,16 +28,16 @@ class InfoLabels(dict):
 
     def __setitem__(self, name, value):
         if name in ["season", "episode"]:
-            # forzamos int() en season y episode
+            # ~ forzamos int() en season y episode
             try:
                 super(InfoLabels, self).__setitem__(name, int(value))
             except:
                 pass
 
         elif name in ['IMDBNumber', 'imdb_id']:
-            # Por compatibilidad hemos de guardar el valor en los tres campos
+            # ~ Por compatibilidad hemos de guardar el valor en los tres campos
             super(InfoLabels, self).__setitem__('IMDBNumber', str(value))
-            # super(InfoLabels, self).__setitem__('code', value)
+            # ~ super(InfoLabels, self).__setitem__('code', value)
             super(InfoLabels, self).__setitem__('imdb_id', str(value))
 
         elif name == "mediatype" and value not in ["video", "movie", "tvshow", "season", "episode", "musicvideo"]:
@@ -47,7 +48,7 @@ class InfoLabels(dict):
         else:
             super(InfoLabels, self).__setitem__(name, value)
 
-    # Python 2.4
+    # ~ Python 2.4
     def __getitem__(self, key):
         try:
             return super(InfoLabels, self).__getitem__(key)
@@ -60,22 +61,22 @@ class InfoLabels(dict):
         El parametro 'default' en la funcion obj_infoLabels.get(key,default) tiene preferencia sobre los aqui definidos.
         """
         if key in ['rating']:
-            # Ejemplo de clave q devuelve un str formateado como float por defecto
+            # ~ Ejemplo de clave q devuelve un str formateado como float por defecto
             return '0.0'
 
         elif key == 'code':
             code = []
-            # Añadir imdb_id al listado de codigos
+            # ~ Añadir imdb_id al listado de codigos
             if 'imdb_id' in list(super(InfoLabels, self).keys()) and super(InfoLabels, self).__getitem__('imdb_id'):
                 code.append(super(InfoLabels, self).__getitem__('imdb_id'))
 
-            # Completar con el resto de codigos
+            # ~ Completar con el resto de codigos
             for scr in ['tmdb_id', 'tvdb_id', 'noscrap_id']:
                 if scr in list(super(InfoLabels, self).keys()) and super(InfoLabels, self).__getitem__(scr):
                     value = "%s%s" % (scr[:-2], super(InfoLabels, self).__getitem__(scr))
                     code.append(value)
 
-            # Opcion añadir un code del tipo aleatorio
+            # ~ Opcion añadir un code del tipo aleatorio
             if not code:
                 import time
                 value = time.strftime("%Y%m%d%H%M%S", time.gmtime())
@@ -84,7 +85,7 @@ class InfoLabels(dict):
 
             return code
 
-        elif key == 'mediatype': # "video", "movie", "tvshow", "season", "episode", "musicvideo"
+        elif key == 'mediatype': # ~ "video", "movie", "tvshow", "season", "episode", "musicvideo"
             if 'tvshowtitle' in list(super(InfoLabels, self).keys()) and super(InfoLabels, self).__getitem__('tvshowtitle') != "":              
 
                 if 'episode' in super(InfoLabels, self).keys() and super(InfoLabels, self).__getitem__('episode') != "":
@@ -131,7 +132,7 @@ class Item(object):
         Inicializacion del item
         """
 
-        # Creamos el atributo infoLabels
+        # ~ Creamos el atributo infoLabels
         self.__dict__["infoLabels"] = InfoLabels()
         if "infoLabels" in kwargs:
             if isinstance(kwargs["infoLabels"], dict):
@@ -172,15 +173,15 @@ class Item(object):
                 self.__setattr__(key, value[key])
             return
 
-        # Descodificamos los HTML entities
+        # ~ Descodificamos los HTML entities
 
         if name in ["title", "plot", "fulltitle", "contentPlot", "contentTitle"]:
             value = self.decode_html(value)
 
-        # Al modificar cualquiera de estos atributos content...
+        # ~ Al modificar cualquiera de estos atributos content...
         if name in ["contentTitle", "contentPlot", "plot", "contentSerieName", "contentType", "contentEpisodeTitle",
                     "contentSeason", "contentEpisodeNumber", "contentThumbnail", "show", "contentQuality", "quality"]:
-            # ...y actualizamos infoLables
+            # ~ ...y actualizamos infoLables
             if name == "contentTitle":
                 self.__dict__["infoLabels"]["title"] = value
             elif name == "contentPlot" or name == "plot":
@@ -201,13 +202,13 @@ class Item(object):
                 self.__dict__["infoLabels"]["quality"] = value
 
         elif name == "duration":
-            # String q representa la duracion del video en segundos
+            # ~ String q representa la duracion del video en segundos
             self.__dict__["infoLabels"]["duration"] = str(value)
 
         elif name == "viewcontent" and value not in ["files", "movies", "tvshows", "seasons", "episodes"]:
             super(Item, self).__setattr__("viewcontent", "files")
 
-        # Al asignar un valor a infoLables
+        # ~ Al asignar un valor a infoLables
         elif name == "infoLabels":
             if isinstance(value, dict):
                 value_defaultdict = InfoLabels(value)
@@ -223,17 +224,17 @@ class Item(object):
         if name.startswith("__"):
             return super(Item, self).__getattribute__(name)
 
-        # valor por defecto para folder
+        # ~ valor por defecto para folder
         if name == "folder":
             return True
 
-        # valor por defecto para contentChannel
+        # ~ valor por defecto para contentChannel
         elif name == "contentChannel":
             return "list"
 
-        # valor por defecto para viewcontent
+        # ~ valor por defecto para viewcontent
         elif name == "viewcontent":
-            # intentamos fijarlo segun el tipo de contenido...
+            # ~ intentamos fijarlo segun el tipo de contenido...
             if self.__dict__["infoLabels"]["mediatype"] == 'movie':
                 viewcontent = 'movies'
             elif self.__dict__["infoLabels"]["mediatype"] in ["tvshow", "season", "episode"]:
@@ -244,7 +245,7 @@ class Item(object):
             self.__dict__["viewcontent"] = viewcontent
             return viewcontent
 
-        # valores guardados en infoLabels
+        # ~ valores guardados en infoLabels
         elif name in ["contentTitle", "contentPlot", "contentSerieName", "show", "contentType", "contentEpisodeTitle",
                       "contentSeason", "contentEpisodeNumber", "contentThumbnail", "plot", "duration",
                       "contentQuality", "quality"]:
@@ -256,7 +257,7 @@ class Item(object):
                 return self.__dict__["infoLabels"]["tvshowtitle"]
             elif name == "contentType":
                 ret = self.__dict__["infoLabels"]["mediatype"]
-                if ret == 'list' and self.__dict__.get("fulltitle", None):  # retrocompatibilidad
+                if ret == 'list' and self.__dict__.get("fulltitle", None):  # ~ retrocompatibilidad
                     ret = 'movie'
                     self.__dict__["infoLabels"]["mediatype"] = ret
                 return ret
@@ -273,7 +274,7 @@ class Item(object):
             else:
                 return self.__dict__["infoLabels"][name]
 
-        # valor por defecto para el resto de atributos
+        # ~ valor por defecto para el resto de atributos
         else:
             return ""
 
@@ -286,10 +287,10 @@ class Item(object):
         @param parentContent: item padre
         @type parentContent: item
         """
-        # Comprueba que parentContent sea un Item
+        # ~ Comprueba que parentContent sea un Item
         if not type(parentContent) == type(self):
             return
-        # Copia todos los atributos que empiecen por "content" y esten declarados y los infoLabels
+        # ~ Copia todos los atributos que empiecen por "content" y esten declarados y los infoLabels
         for attr in parentContent.__dict__:
             if attr.startswith("content") or attr == "infoLabels":
                 self.__setattr__(attr, parentContent.__dict__[attr])
@@ -303,7 +304,7 @@ class Item(object):
         '"""
         dic = self.__dict__.copy()
 
-        # Añadimos los campos content... si tienen algun valor
+        # ~ Añadimos los campos content... si tienen algun valor
         for key in ["contentTitle", "contentPlot", "contentSerieName", "contentEpisodeTitle",
                     "contentSeason", "contentEpisodeNumber", "contentThumbnail"]:
             value = self.__getattr__(key)
@@ -344,11 +345,11 @@ class Item(object):
             dump = json.dump(self.__dict__).encode("utf8")
         except:
             dump = json.dump(self.__dict__)
-        # if empty dict
+        # ~ if empty dict
         if not dump:
-            # set a str to avoid b64encode fails
+            # ~ set a str to avoid b64encode fails
             dump = "".encode("utf8")
-        #return quote(base64.b64encode(dump))
+        # ~ return quote(base64.b64encode(dump))
         return str(quote(base64.b64encode(dump)))
     def fromurl(self, url):
         """
@@ -363,7 +364,7 @@ class Item(object):
             url = url.split("?")[1]
         decoded = False
         try:
-            if 'action=' not in url: # Si tiene action= es que no está b64encodeado
+            if 'action=' not in url: # ~ Si tiene action= es que no está b64encodeado
                 str_item = base64.b64decode(unquote(url))
                 json_item = json.load(str_item, object_hook=self.toutf8)
                 if json_item is not None and len(json_item) > 0:
@@ -488,8 +489,8 @@ class Item(object):
             for key in value:
                 value_unc = self.toutf8(value[key])
                 key_unc = self.toutf8(key)
-                #if isinstance(key, unicode):
-                #    key = key.encode("utf8")
+                # ~ if isinstance(key, unicode):
+                # ~    key = key.encode("utf8")
 
                 newdct[key_unc] = value_unc
 

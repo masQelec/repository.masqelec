@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] < 3: PY3 = False
-else: PY3 = True
-
-import os, time, re
-
-import xbmcgui
+import os, time, re, xbmcgui
 
 from threading import Thread
 
 from core import httptools, proxytoolsz, scrapertools
 from platformcode import config, logger, platformtools
+
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
 
 
 item = []

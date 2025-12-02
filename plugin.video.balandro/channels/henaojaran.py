@@ -462,6 +462,12 @@ def findvideos(item):
             if srv == 'savefiles':
                 servidor = 'zures'
                 other = srv
+            elif srv == 'veev':
+                servidor = 'zures'
+                other = srv
+            elif srv == 'streamruby':
+                servidor = 'various'
+                other = srv
 
             srv = srv.capitalize()
 
@@ -523,8 +529,10 @@ def findvideos(item):
         elif 'goodstream' in url: servidor = 'various'
         elif 'smoothpre' in url or 'movearnpre' in url: servidor = 'various'
 
-        elif 'ok' in url: servidor = 'okru'
-        elif 'dood' in url: servidor = 'doodstream'
+        elif '/ok' in url: servidor = 'okru'
+        elif '/dood' in url: servidor = 'doodstream'
+        elif '/veev.' in url: servidor = 'zures'
+        elif '/streamruby.' in url: servidor = 'various'
 
         else:
              if servertools.is_server_available(url):

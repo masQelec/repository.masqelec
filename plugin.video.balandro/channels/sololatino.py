@@ -312,6 +312,8 @@ def list_all(item):
 
         if not url or not title: continue
 
+        if 'guia-solo-latino' in url: continue
+
         title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;', "'").strip()
 
         thumb = scrapertools.find_single_match(match, '<data-srcset="(.*?)"')
@@ -387,11 +389,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
@@ -561,6 +563,7 @@ def findvideos(item):
                     elif 'uploadfox' in srv: continue
 
                     elif srv == 'download': continue
+                    elif srv == 'up2box': continue
 
                     servidor = servertools.corregir_servidor(srv)
 
@@ -572,12 +575,6 @@ def findvideos(item):
                     other = ''
 
                     if servidor == 'various': other = servertools.corregir_other(srv)
-
-                    if servidor == 'directo':
-                        if not config.get_setting('developer_mode', default=False): continue
-                        else:
-                           other = url.split("/")[2]
-                           other = other.replace('https:', '').strip()
 
                     if '.eyJs' in link: age = ''
 
@@ -685,7 +682,8 @@ def findvideos(item):
                 other = url.split("/")[2]
                 other = other.replace('https:', '').strip()
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other.capitalize() ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                                  language = lang, other = other.capitalize() ))
 
     # ~ P2
     match = scrapertools.find_single_match(data, '"dooplay_player_option ".*?<iframe.*?src="(.*?)".*?</iframe>')
@@ -723,7 +721,8 @@ def findvideos(item):
                 other = ''
                 if servidor == 'various': other = servertools.corregir_other(url)
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url=url, language=lang, other=other, age='P2' ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url=url,
+                                      language=lang, other=other, age='P2' ))
 
     if not itemlist:
         if not ses == 0:
@@ -786,6 +785,25 @@ def play(item):
         itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'pelicula/estrenos/'
+    item.search_type = 'movie'
+
+    return list_all(item)
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host + 'series/novedades/'
+    item.group = 'lasts'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
 
 
 def search(item, texto):

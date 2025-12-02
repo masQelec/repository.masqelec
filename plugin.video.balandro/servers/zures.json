@@ -145,12 +145,12 @@
         "url": "https://uploady.io/\\1"
       },
       {
-        "pattern": "https://veev.to/([0-9a-zA-Z]+)",
-        "url": "https://veev.to/\\1"
+        "pattern": "https://veev.to/(?:d/|e/)([0-9a-zA-Z]+)",
+        "url": "https://veev.to/e/\\1"
       },
       {
-        "pattern": "https://doods.to/([0-9a-zA-Z]+)",
-        "url": "https://veev.to/\\1"
+        "pattern": "https://doods.to/(?:d/|e/)([0-9a-zA-Z]+)",
+        "url": "https://veev.to/e/\\1"
       },
       {
         "pattern": "https://veoh.com/([0-9a-zA-Z]+)",

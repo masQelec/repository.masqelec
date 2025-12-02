@@ -27,11 +27,14 @@
 Unpacker for Dean Edward's p.a.c.k.e.r
 """
 
-import sys
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True
 
 import re
+
+from platformcode import config
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
+
 
 beginstr = ''
 endstr = ''

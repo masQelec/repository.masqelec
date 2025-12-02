@@ -217,10 +217,9 @@ def temporadas(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('channels_seasons', default=True):
-        title = 'Temporadas'
+    title = 'Temporadas'
 
-        platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]' + title + '[/COLOR]')
+    platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]' + title + '[/COLOR]')
 
     item.page = 0
     item.contentType = 'season'
@@ -436,6 +435,16 @@ def play(item):
         itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
+
+def _epis(item):
+    logger.info()
+
+    item.url = host
+    item.group ='last'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
+
 
 def search(item, texto):
     logger.info()

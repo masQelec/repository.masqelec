@@ -311,7 +311,12 @@ def list_all(item):
                 item_args['title'] = title
                 item_args['contentSerieName'] = title
                 infoLabels['year'] = year
+
+                tipo = 'tvshow'
             else:
+                if busca:
+                    if not "'type': 'tvshows'" in str(content): continue
+
                 title = content['title']
 
                 year = '-'
@@ -330,11 +335,16 @@ def list_all(item):
                 item_args['contentSerieName'] = title
                 infoLabels['year'] = year
 
+                tipo = 'tvshow'
+
             if type == 'episode':
                 infoLabels['season'] = content['season_number']
                 infoLabels['episode'] = content['episode_number']
                 item_args['title'] = '{}x{} {}'.format(infoLabels['season'], infoLabels['episode'], item_args['contentSerieName'])
         else:
+            if busca:
+                if not "'type': 'movies'" in str(content): continue
+
             title = content['title']
 
             year = '-'
@@ -353,12 +363,13 @@ def list_all(item):
             item_args['contentTitle'] = title
             infoLabels['year'] = year
 
-        tipo = 'movie' if type == 'movie' else 'tvshow'
-        sufijo = '' if type != 'all' else tipo
+            tipo = 'movie'
+
+        sufijo = tipo
 
         item_args['sufijo'] = sufijo
 
-        item_args['action'] = 'findvideos' if type in ['movie', 'episode'] else 'temporadas'  
+        item_args['action'] = 'findvideos' if type in ['movie', 'episode'] else 'temporadas'
 
         item_args['languages'] = get_lang(content['lang'])
         item_args['search_type'] = type
@@ -407,12 +418,12 @@ def temporadas(item):
                 title = 'Temporada ' + jdata['data']['seasons'][0]
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item._id = _id
-            item.page = 1
-            item.contentType = 'season'
-            item.contentSeason = jdata['data']['seasons'][0]
-            itemlist = episodios(item)
-            return itemlist
+                item._id = _id
+                item.page = 1
+                item.contentType = 'season'
+                item.contentSeason = jdata['data']['seasons'][0]
+                itemlist = episodios(item)
+                return itemlist
 
         for season in jdata['data']['seasons'][::-1]:
             season = int(season or 1)
@@ -639,7 +650,7 @@ def search(item, texto):
     logger.info()
     try:
         item.busca = 'search'
-        item.terms = texto.replace(" ", "+").lower()
+        item.terms = texto  # ~ La web quiere los espacion  .replace(" ", "+").lower()
         return list_all(item)
     except:
         import sys

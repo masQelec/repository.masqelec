@@ -541,6 +541,10 @@
         "url": "https://filelions.to/f/\\1"
       },
       {
+        "pattern": "https://dintezuvio.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
         "pattern": "(https://youdbox.)(?:com|net|org|site)/(?:embed-|)([0-9a-zA-Z]+)",
         "url": "https://youdbox.site/\\2"
       },
@@ -637,11 +641,19 @@
         "url": "https://emturbovid.com/t/\\1"
       },
       {
+        "pattern": "https://turbovidhls.com/(?:t/|d/)([0-9a-zA-Z]+)",
+        "url": "https://emturbovid.com/t/\\1"
+      },
+      {
         "pattern": "https://emturbovid.com/(?:t/|d/)([0-9a-zA-Z]+)",
         "url": "https://emturbovid.com/t/\\1"
       },
       {
         "pattern": "https://tuborstb.co/(?:t/|d/)([0-9a-zA-Z]+)",
+        "url": "https://emturbovid.com/t/\\1"
+      },
+      {
+        "pattern": "https://stbturbo.xyz/(?:t/|d/)([0-9a-zA-Z]+)",
         "url": "https://emturbovid.com/t/\\1"
       },
       {
@@ -806,6 +818,10 @@
       },
       {
         "pattern": "https://rubyvid.com/(?:embed-|e/|d/)([0-9a-zA-Z]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "https://rubyvidhub.com/(?:embed-|e/|d/)([0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {

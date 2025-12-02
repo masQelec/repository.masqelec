@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] < 3:
-    basestring = basestring
-else:
-    basestring = str
-
-
 import os, time, glob
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import filetools, jsontools
+
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
+
+if PY3:
+    basestring = basestring
+else:
+    basestring = str
+
 
 STATUS_CODES = type("StatusCode", (), {"stopped": 0, "canceled": 1, "completed": 2, "error": 3})
 

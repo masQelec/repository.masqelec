@@ -347,11 +347,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, url = item.url, page = 0, contentType = 'season', contentSeason = int(tempo), text_color = 'tan' ))
 
@@ -561,6 +561,15 @@ def list_search(item):
             itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_search', text_color='coral' ))
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'peliculas-subtituladas/?filtro=estrenos' 
+    item.search_type = 'movie'
+
+    return list_all(item)
 
 
 def search(item, texto):

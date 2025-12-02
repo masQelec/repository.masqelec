@@ -58,7 +58,7 @@ def escenas(item):
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host  + 'xxxscenes/movies' ))
 
-    itemlist.append(item.clone( title = ' - Últimas', action = 'list_all', url = host  + 'xxxscenes/#movie-featured' ))
+    itemlist.append(item.clone( title = ' - [COLOR cyan]Últimas[/COLOR]', action = 'list_all', url = host  + 'xxxscenes/#movie-featured' ))
 
     itemlist.append(item.clone( title = ' - Más vistas', action = 'list_all', url = host  + 'xxxscenes/#topview-today' ))
     itemlist.append(item.clone( title = ' - Más valoradas', action = 'list_all', url = host  + 'xxxscenes/#top-rating' ))
@@ -156,8 +156,9 @@ def list_all(item):
         if not thumb: thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
         time = scrapertools.find_single_match(match, '<span class="mli-info1">(.*?)</span>').strip()
+
         time = time.replace('hrs.', 'h').strip()
-        time = time.replace('mins.', 'm').strip()
+        time = time.replace('mins.', 'm').replace('mins', 'm').replace('min', 'm').strip()
 
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
 
@@ -213,6 +214,7 @@ def findvideos(item):
         elif '/freepopnews.' in url: continue
         elif '/filepv.' in url: continue
         elif '/vinovo.' in url: continue
+        elif '/p.' in url: continue
 
         elif '/nitroflare.' in url: continue
         elif 'rapidgator.' in url: continue

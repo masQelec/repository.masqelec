@@ -118,6 +118,15 @@ def findvideos(item):
     return itemlist
 
 
+def _news(item):
+    logger.info()
+
+    item._type = 'documentaries'
+    item.search_type = 'documentary'
+
+    return list_playlists(item)
+
+
 def search(item, texto):
     logger.info()
     try:

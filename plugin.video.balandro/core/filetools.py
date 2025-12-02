@@ -1,34 +1,34 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] < 3:
-    PY3 = False
-
-    basestring = basestring
-
-    import xbmc
-else:
-    PY3 = True
-
-    unicode = str
-    long = int
-    basestring = str
-
-    import xbmcvfs
-
 import os, traceback
 
 from core import scrapertools
-from platformcode import platformtools, logger
+from platformcode import config, logger, platformtools
+
 
 try:
     from lib.sambatools import libsmb as samba
 except:
     samba = None
-    # Python 2.4 No compatible con modulo samba, hay que revisar
+    # ~ Python 2.4 No compatible con modulo samba, hay que revisar
 
-# Windows es "mbcs" linux, osx, android es "utf8"
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
+
+if PY3:
+    unicode = str
+    long = int
+    basestring = str
+
+    import xbmcvfs
+else:
+    basestring = basestring
+
+    import xbmc
+
+
+# ~ Windows es "mbcs" linux, osx, android es "utf8"
 if not PY3 and os.name == "nt":
     fs_encoding = ""
 else:
@@ -408,13 +408,13 @@ def move(path, dest, strict=False):
 
             return result
 
-        # samba/samba
+        # ~ samba/samba
         elif path.lower().startswith("smb://") and dest.lower().startswith("smb://"):
             dest = encode(dest, True)
             path = encode(path, True)
             samba.rename(path, dest)
 
-        # local/local
+        # ~ local/local
         elif not path.lower().startswith("smb://") and not dest.lower().startswith("smb://"):
             dest = encode(dest)
             path = encode(path)
@@ -743,18 +743,18 @@ def walk(top, topdown=True, onerror=None):
     top = encode(top)
     if PY3:
         for a, b, c in walk_vfs(top, topdown, onerror):
-            # list(b) es para que haga una copia del listado de directorios
-            # si no da error cuando tiene que entrar recursivamente en directorios con caracteres especiales
+            # ~ list(b) es para que haga una copia del listado de directorios
+            # ~ si no da error cuando tiene que entrar recursivamente en directorios con caracteres especiales
             yield a, list(b), c
     elif top.lower().startswith("smb://"):
         for a, b, c in samba.walk(top, topdown, onerror):
-            # list(b) es para que haga una copia del listado de directorios
-            # si no da error cuando tiene que entrar recursivamente en directorios con caracteres especiales
+            # ~ list(b) es para que haga una copia del listado de directorios
+            # ~ si no da error cuando tiene que entrar recursivamente en directorios con caracteres especiales
             yield decode(a), decode(list(b)), decode(c)
     else:
         for a, b, c in os.walk(top, topdown, onerror):
-            # list(b) es para que haga una copia del listado de directorios
-            # si no da error cuando tiene que entrar recursivamente en directorios con caracteres especiales
+            # ~ list(b) es para que haga una copia del listado de directorios
+            # ~ si no da error cuando tiene que entrar recursivamente en directorios con caracteres especiales
             yield decode(a), decode(list(b)), decode(c)
 
 
