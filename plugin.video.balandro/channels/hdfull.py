@@ -861,12 +861,16 @@ def list_all(item):
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
 
+            sufijo = '' if item.search_type == 'movie' else 'movie'
+
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=', '.join(languages), fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
 
         if tipo == 'tvshow':
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
+
+            sufijo = '' if item.search_type == 'tvshow' else 'tvshow'
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, languages=', '.join(languages), fmt_sufijo=sufijo,
                                         contentType='tvshow', contentSerieName=title, referer=item.url, infoLabels={'year': '-'} ))
@@ -1032,15 +1036,15 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.referer = item.url
-            item.url = url
-            item.thumbnail = thumb
-            item.sid = sid
-            item.contentType = 'season'
-            item.contentSeason = numtempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.referer = item.url
+                item.url = url
+                item.thumbnail = thumb
+                item.sid = sid
+                item.contentType = 'season'
+                item.contentSeason = numtempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', url = url, title = titulo, thumbnail = thumb, sid = sid, referer = item.url, page = 0,
                                     contentType = 'season', contentSeason = numtempo, text_color = 'tan' ))
@@ -1558,6 +1562,41 @@ def show_credenciales(item):
     password = config.get_setting('hdfull_password', 'hdfull', default='')
 
     platformtools.dialog_ok(config.__addon_name + ' HdFull - Credenciales', 'Domain.:   [COLOR cyan][B]' + domain + '[/B][/COLOR]', 'User......:   [COLOR yellow][B]' + username, '[/B][/COLOR]Pass.....:   [COLOR yellow][B]' + password + '[/B][/COLOR]')
+
+
+def _news(item):
+    logger.info()
+
+    dominio = config.get_setting('dominio', 'hdfull', default=dominios[0])
+
+    if not config.get_setting('dominio', 'hdfull'): config.set_setting('dominio', dominio, 'hdfull')
+
+    item.url = dominio + 'peliculas-estreno'
+    item.search_type = 'movie'
+
+    return list_all(item)
+
+
+def _lasts(item):
+    logger.info()
+
+    dominio = config.get_setting('dominio', 'hdfull', default=dominios[0])
+
+    if not config.get_setting('dominio', 'hdfull'): config.set_setting('dominio', dominio, 'hdfull')
+
+    item.url = dominio + 'series/date'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
+
+
+def _epis(item):
+    logger.info()
+
+    item.opcion = 'premiere'
+    item.search_type = 'tvshow'
+
+    return list_episodes(item)
 
 
 def search(item, texto):

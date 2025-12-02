@@ -2,7 +2,7 @@
 
 import xbmc
 
-from platformcode import logger
+from platformcode import logger, config
 from core.item import Item
 from core import httptools, scrapertools
 
@@ -15,6 +15,8 @@ def mainlist(item):
     itemlist = []
 
     # ~ itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'documentary', text_color='cyan' ))
+
+    itemlist.append(item.clone( channel='youtubetrailers', action='search', title= '[B][COLOR yellow]Buscar[/COLOR] Youtube[/B] ...', thumbnail=config.get_thumb('youtube'), text_color='darksalmon', search_special = 'youtube', search_type = 'all' ))
 
     itemlist.append(item.clone( title = 'Academia Play', action = 'list_tubes', url = host + 'watch?v=99cd_dCl3pc&list=UULFv05qOuJ6Igbe-EyQibJgwQ'))
 

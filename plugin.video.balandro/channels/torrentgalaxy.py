@@ -32,7 +32,7 @@ def mainlist(item):
         itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'get-posts/category:Anime/', search_type = 'tvshow', text_color=' springgreen' ))
 
         if not config.get_setting('descartar_anime', default=False):
-            itemlist.append(item.clone( title = 'Animes xxx', action = 'list_all', url = host + 'get-posts/category:Anime:ncategory:XXX/', search_type = 'tvshow', text_color=' springgreen' ))
+            itemlist.append(item.clone( title = 'Animes [COLOR orange]xxx[/COLOR]', action = 'list_all', url = host + 'get-posts/category:Anime:ncategory:XXX/', search_type = 'tvshow', text_color=' springgreen' ))
 
     if config.get_setting('mnu_adultos', default=True):
         itemlist.append(item.clone( title = 'Adultos', action = 'mainlist_adults', group = '+18', adults='adults', search_type = 'movie', text_color = 'orange' ))

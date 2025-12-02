@@ -509,7 +509,6 @@ def play(item):
         url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
 
         if url_base64.endswith('.torrent'):
-            url_base64 = url_base64.replace('/verdetorrent.com/', '/ec1-eu-VerdeTorrent-compute-1.cdnbeta.in/')
             item.url = url_base64
 
     if item.url.endswith('.torrent'):
@@ -635,6 +634,15 @@ def corregir_SerieName(SerieName):
     SerieName = SerieName.strip()
 
     return SerieName
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'ultimos'
+    item.search_type = 'movie'
+
+    return list_last(item)
 
 
 def search(item, texto):

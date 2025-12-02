@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] < 3:
-    PY3 = False
-else:
-    PY3 = True
-    unicode = str
-
 import inspect, xbmc
 
 from platformcode import config
+
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
+
+if PY3:
+    unicode = str
+
 
 loglevel = config.get_setting('debug', 0) # 0 (error), 1 (error+info), 2 (error+info+debug)
 

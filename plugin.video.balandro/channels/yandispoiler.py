@@ -104,7 +104,11 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('<div id="item-(.*?)</div> </div> </div></div>').findall(data)
+    if '>Añadido recientemente<' in data:
+        bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)<span class="copyright-btm">')
+    else: bloque = data
+
+    matches = re.compile('<div id="item-(.*?)</div> </div> </div></div>').findall(bloque)
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
@@ -290,11 +294,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color='tan' ))
 
@@ -532,6 +536,15 @@ def list_search(item):
                     itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_search', text_color = 'coral' ))
 
     return itemlist
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host
+    item.search_type = 'tvshow'
+
+    return news_epis(item)
 
 
 def search(item, texto):

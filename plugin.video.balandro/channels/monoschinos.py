@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://wwv.monoschinos2.net/'
+host = 'https://wvv.monoschinos2.net/'
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://monoschinos2.net/']
+    ant_hosts = ['https://monoschinos2.net/', 'https://wwv.monoschinos2.net/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -532,6 +532,26 @@ def findvideos(item):
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    servidor = item.server
+
+    url = item.url
+
+    if url:
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
+
+        itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 

@@ -241,11 +241,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = nro_season
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = nro_season
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = nro_season, text_color='tan' ))
 
@@ -474,11 +474,10 @@ def findvideos(item):
                     if servidor == 'various': other = servertools.corregir_other(srv)
                     elif servidor == 'zures': other = servertools.corregir_zures(srv)
 
-                    if servidor == 'directo':
+                    if servertools.is_server_available(servidor):
+                        if not servertools.is_server_enabled(servidor): continue
+                    else:
                         if not config.get_setting('developer_mode', default=False): continue
-                        else:
-                           other = url.split("/")[2]
-                           other = other.replace('https:', '').strip()
 
                     if '.eyJs' in link: age = ''
 

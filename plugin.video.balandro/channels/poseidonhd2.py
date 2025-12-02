@@ -20,12 +20,64 @@ if domain:
     else: host = domain
 
 
+def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_poseidonhd2_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    hay_proxies = False
+    if config.get_setting('channel_poseidonhd2_proxies', default=''): hay_proxies = True
+
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers).data
+    else:
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('poseidonhd2', url, post=post, headers=headers).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers).data
+
+        if not data:
+            if not '/search?q=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PoseidonHd2', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('poseidonhd2', url, post=post, headers=headers, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     return data
 
@@ -50,6 +102,8 @@ def acciones(item):
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_poseidonhd2', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'poseidonhd2', thumbnail=config.get_thumb('poseidonhd2') ))
 
@@ -272,11 +326,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = season
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = season
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = season, text_color = 'tan' ))
 
@@ -474,6 +528,9 @@ def play(item):
     logger.info()
     itemlist = []
 
+    hay_proxies = False
+    if config.get_setting('channel_poseidonhd2_proxies', default=''): hay_proxies = True
+
     url = item.url
     servidor = item.server
 
@@ -491,7 +548,15 @@ def play(item):
         if item.other.lower() == 'player':
            try:
                headers = {'Referer': item.referer}
-               url_player = httptools.downloadpage(url, headers = headers, only_headers = True, follow_redirects = False).headers.get('location')
+
+               if not url.startswith(host):
+                   url_player = httptools.downloadpage(url, headers = headers, only_headers = True, follow_redirects = False).headers.get('location')
+               else:
+                   if hay_proxies:
+                       url_player = httptools.downloadpage_proxy('poseidonhd2', url, headers = headers, only_headers = True, follow_redirects = False).headers.get('location')
+                   else:
+                     url_player = httptools.downloadpage(url, headers = headers, only_headers = True, follow_redirects = False).headers.get('location')
+
                url_final = url_player + '&ver=si'
            except:
                url_final = ''
@@ -509,7 +574,13 @@ def play(item):
             url_final = httptools.downloadpage(host_player + 'r.php', post = post)
 
             if not url_final:
-                data_post = httptools.downloadpage(host_player + 'api.php', post = post).data
+                if not host_player.startswith(host):
+                    data_post = httptools.downloadpage(host_player + 'api.php', post = post).data
+                else:
+                    if hay_proxies:
+                        data_post = httptools.downloadpage_proxy('poseidonhd2', host_player + 'api.php', post = post).data
+                    else:
+                        data_post = httptools.downloadpage(host_player + 'api.php', post = post).data
 
                 url_final = scrapertools.find_single_match(str(data_post), '.*?":"(.*?)"')
                 url_final = url_final.replace('\/', '/')
@@ -519,17 +590,32 @@ def play(item):
         if value_php:
             post = {'data': value_php}
 
-            url_final = httptools.downloadpage(host + 'r.php', post = post).url
+            if hay_proxies:
+                url_final = httptools.downloadpage_proxy('poseidonhd2', host + 'r.php', post = post).url
+            else:
+                url_final = httptools.downloadpage(host + 'r.php', post = post).url
 
             if '/index.php?' in url_final:
                 index_php = url_final.replace(host_player + 'index.php?h=', '')
 
                 post = {'h': index_php}
 
-                url_final = httptools.downloadpage(host_player + 'r.php', post = post).url
+                if not url.startswith(host_player):
+                    url_final = httptools.downloadpage(host_player + 'r.php', post = post).url
+                else:
+                    if hay_proxies:
+                        url_final = httptools.downloadpage_proxy('poseidonhd2', host_player + 'r.php', post = post).url
+                    else:
+                        url_final = httptools.downloadpage(host_player + 'r.php', post = post).url
 
                 if not url_final:
-                    data_post = httptools.downloadpage(host_player + 'api.php', post = post).data
+                    if not url.startswith(host_player):
+                        data_post = httptools.downloadpage(host_player + 'api.php', post = post).data
+                    else:
+                        if hay_proxies:
+                            data_post = httptools.downloadpage_proxy('poseidonhd2', host_player + 'api.php', post = post).data
+                        else:
+                            data_post = httptools.downloadpage(host_player + 'api.php', post = post).data
 
                     url_final = scrapertools.find_single_match(str(data_post), '.*?":"(.*?)"')
                     url_final = url_final.replace('\/', '/')
@@ -570,13 +656,29 @@ def play(item):
 def get_link_player(servidor, url_final):
     referer = url_final.split('//', 1)
 
-    data = httptools.downloadpage(url_final, headers = {'referer': referer[0] + '//' + referer[1]}).data
+    hay_proxies = False
+    if config.get_setting('channel_poseidonhd2_proxies', default=''): hay_proxies = True
+
+    if not url_final.startswith(host):
+        data = httptools.downloadpage(url_final, headers = {'referer': referer[0] + '//' + referer[1]}).data
+    else:
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('poseidonhd2', url_final, headers = {'referer': referer[0] + '//' + referer[1]}).data
+        else:
+            data = httptools.downloadpage(url_final, headers = {'referer': referer[0] + '//' + referer[1]}).data
 
     url, type = scrapertools.find_single_match(data, '"file": "([^"]+)",\s+"type": "([^"]+)"')
 
     if type == 'mp4':
         headers = {'referer': url_final}
-        url = httptools.downloadpage(url, headers = headers, only_headers=True, follow_redirects = False).headers.get("location", url)
+
+        if not url.startswith(host):
+            url = httptools.downloadpage(url, headers = headers, only_headers=True, follow_redirects = False).headers.get("location", url)
+        else:
+            if hay_proxies:
+                url = httptools.downloadpage_proxy('poseidonhd2', url, headers = headers, only_headers=True, follow_redirects = False).headers.get("location", url)
+            else:
+                url = httptools.downloadpage(url, headers = headers, only_headers=True, follow_redirects = False).headers.get("location", url)
 
         url_player = "%s|Referer=%s&User-Agent=%s" % (url, url_final, httptools.get_user_agent())
         servidor = 'directo'
@@ -589,6 +691,33 @@ def get_link_player(servidor, url_final):
         url_player = url_final
 
     return servidor, url_player
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'peliculas/estrenos'
+    item.search_type = 'movie'
+
+    return list_all(item)
+
+
+def _lasts(item):
+    logger.info()
+
+    item.url = host + 'series/estrenos'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host + 'episodios'
+    item.search_type = 'tvshow'
+
+    return last_epis(item)
 
 
 def search(item, texto):

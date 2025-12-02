@@ -480,12 +480,14 @@ def findvideos(item):
 
         patron = '<div class="text-center">.*?'
         patron += "href='([^']+)'.*?download>Descargar</a>"
+
         url = scrapertools.find_single_match(data, patron)
 
         if not url:
             if item.contentType == 'documentary' or item.contentExtra == 'documentary':
                 patron = '<b class="bold">Formato:</b>.*?'
                 patron += "href='([^']+)'.*?download>Descargar</a>"
+
                 url = scrapertools.find_single_match(data, patron)
 
         if url:
@@ -500,6 +502,8 @@ def findvideos(item):
 
            servidor = 'torrent'
            other = ''
+
+           logger.info("check-02-atope: %s" % url)
 
            if url.endswith(".torrent"): pass
            elif url.startswith('magnet:'): other = 'magnet'
@@ -549,8 +553,6 @@ def play(item):
         if item.server == 'directo':
             host_torrent = host[:-1]
             url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
-
-            url_base64 = url_base64.replace('/divxatope.net/', '/ec1-eu-DivxaTope-compute-1.cdnbeta.in/')
 
             if url_base64.startswith('magnet:'):
                itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
@@ -677,6 +679,15 @@ def corregir_SerieName(SerieName):
     SerieName = SerieName.strip()
 
     return SerieName
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'ultimos'
+    item.search_type = 'movie'
+
+    return list_last(item)
 
 
 def search(item, texto):

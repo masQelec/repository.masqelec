@@ -292,7 +292,10 @@ def list_all(item):
         url = host[:-1] + url
 
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
-        thumb = host[:-1] + thumb
+        thumb = thumb.replace('&amp;', '&')
+
+        if '/image?url=' in thumb: thumb = scrapertools.find_single_match(thumb, 'url=(.*?)$')
+        else: thumb = host[:-1] + thumb
 
         year = scrapertools.find_single_match(article, '<span>(\d{4})</span>')
         if not year: year = '-'
@@ -394,11 +397,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
@@ -662,6 +665,33 @@ def play(item):
         itemlist.append(item.clone( url = url, server = servidor ))
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'peliculas/estrenos'
+    item.search_type = 'movie'
+
+    return list_all(item)
+
+
+def _lasts(item):
+    logger.info()
+
+    item.url = host + 'series/estrenos'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host + 'episodios'
+    item.search_type = 'tvshow'
+
+    return last_epis(item)
 
 
 def search(item, texto):

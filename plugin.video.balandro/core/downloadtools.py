@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] >= 3:
-    PY3 = True
-    unicode = str
-else:
-    PY3 = False
-
 from platformcode import config, logger
 from core.downloader import Downloader
 from core import filetools
 
 import ssl
+
 ssl._create_default_https_context = ssl._create_unverified_context
+
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
+
+if PY3:
+    unicode = str
 
 
 STATUS_CODES = type("StatusCode", (), {"stopped": 0, "canceled": 1, "completed": 2, "error": 3})

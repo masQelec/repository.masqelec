@@ -292,11 +292,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = int(season)
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = int(season)
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = int(season), text_color = 'tan' ))
 
@@ -462,6 +462,7 @@ def findvideos(item):
                 elif 'player-cdn' in srv: continue
 
                 elif srv == 'download': continue
+                elif srv == 'up2box': continue
 
                 servidor = servertools.corregir_servidor(srv)
 
@@ -473,12 +474,6 @@ def findvideos(item):
                 other = ''
 
                 if servidor == 'various': other = servertools.corregir_other(srv)
-
-                if servidor == 'directo':
-                    if not config.get_setting('developer_mode', default=False): continue
-                    else:
-                       other = url.split("/")[2]
-                       other = other.replace('https:', '').strip()
 
                 if '.eyJs' in link: age = ''
 

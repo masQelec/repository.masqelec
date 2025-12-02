@@ -363,12 +363,12 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.pills = ''
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.pills = ''
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         pills = tempo
         if hay_season0: pills = int(tempo) + 1
@@ -792,6 +792,24 @@ def list_search(item):
                     itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_search', text_color='coral' ))
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'peliculas/estrenos?page=1'
+    item.search_type = 'movie'
+
+    return list_all(item)
+
+
+def _lasts(item):
+    logger.info()
+
+    item.url = host + 'series/estrenos?page=1'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
 
 
 def search(item, texto):

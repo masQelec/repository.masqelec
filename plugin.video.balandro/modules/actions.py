@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] >= 3:
-    import xbmcvfs
-    translatePath = xbmcvfs.translatePath
-else:
-    import xbmc
-    translatePath = xbmc.translatePath
-
-
 import os, re, glob, xbmcgui, xbmc
 
 from platformcode import config, logger, platformtools
 from core import filetools, jsontools, scrapertools
 
 from core.item import Item
+
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
+
+if PY3:
+    import xbmcvfs
+    translatePath = xbmcvfs.translatePath
+else:
+    import xbmc
+    translatePath = xbmc.translatePath
 
 
 color_alert = config.get_setting('notification_alert_color', default='red')
@@ -175,7 +176,7 @@ def clean_db_cache(item):
 def more_info(item):
     logger.info()
 
-    # Si  menú contextual, recuperar parámetros action y channel
+    # ~ Si  menú contextual, recuperar parámetros action y channel
     if item.from_action: item.__dict__['action'] = item.__dict__.pop('from_action')
     if item.from_channel: item.__dict__['channel'] = item.__dict__.pop('from_channel')
 
@@ -204,18 +205,23 @@ def search_trailers(item):
         tmdb_search = Tmdb(texto_buscado=nombre, tipo=tipo, year=anyo, idioma_busqueda='es')
 
     opciones = []
+
     resultados = tmdb_search.get_videos()
+
     for res in resultados:
         it = xbmcgui.ListItem(res['name'], '[%sp] (%s)' % (res['size'], res['language']))
         if item.thumbnail: it.setArt({ 'thumb': item.thumbnail })
         opciones.append(it)
 
     if len(resultados) == 0:
-        notification_d_ok = config.get_setting('notification_d_ok', default=True)
-        if notification_d_ok:
-            platformtools.dialog_ok(nombre, 'No se encuentra ningún tráiler en TMDB')
-        else:
-            platformtools.dialog_notification(nombre, '[B][COLOR %s]Sin tráiler en TMDB[/COLOR][/B]' % color_alert)
+        if platformtools.dialog_yesno(config.__addon_name, '[COLOR yellow][B]' + nombre + '[/B][/COLOR]', '[COLOR red][B]Sin tráilers en TMDB.[/B][/COLOR] [COLOR cyan][B] ¿ Buscar en YouTube ?[/B][/COLOR]'):
+            from modules import youtubetrailers
+
+            item.youtube_search = nombre
+
+            video_urls = youtubetrailers.mainlist(item)
+
+            if video_urls: xbmc.Player().play(video_urls[0][1])
     else:
         while not xbmc.Monitor().abortRequested():
             ret = xbmcgui.Dialog().select('Tráilers para [B][COLOR yellow]%s[/B][/COLOR]' % nombre, opciones, useDetails=True)
@@ -229,22 +235,14 @@ def search_trailers(item):
                 video_urls, puedes, motivo = servertools.resolve_video_urls_for_playing('youtube', resultados[ret]['url'])
             else:
                 video_urls = []
-                logger.info("check-resultados: %s" % resultados[ret])
+                logger.info("check-Tráilers: %s" % resultados[ret])
 
             if len(video_urls) > 0:
                 xbmc.Player().play(video_urls[0][1])
-                xbmc.sleep(1000)
-
-                # ~ 5/4/24
-                # ~ while not xbmc.Monitor().abortRequested() and xbmc.Player().isPlaying():
-                # ~       xbmc.sleep(1000)
 
                 while not xbmc.Monitor().abortRequested():
-                      xbmc.sleep(1000)
                       if xbmc.Player().isPlaying():
-                         if len(video_urls) == 1: break
-                         else: xbmc.sleep(1000)
-                      else: xbmc.sleep(1000)
+                          if len(video_urls) == 1: break
             else:
                 la_notif = ('[B][COLOR %s]') % color_alert
                 la_notif += ('No se pudo reproducir el tráiler[/B][/COLOR]')
@@ -252,6 +250,30 @@ def search_trailers(item):
                 platformtools.dialog_notification(resultados[ret]['name'], la_notif, time=3000, sound=False)
 
             if len(resultados) == 1: break
+
+def search_trailers_youtube(item):
+    logger.info()
+
+    nombre = item.contentTitle if item.contentType == 'movie' else item.contentSerieName
+
+    from modules import youtubetrailers
+
+    item.youtube_search = nombre
+
+    video_urls = youtubetrailers.mainlist(item)
+
+    if video_urls: xbmc.Player().play(video_urls[0][1])
+
+
+def player_youtube(item):
+    logger.info()
+
+    if item.url:
+        try:
+            xbmc.Player().play(item.url)
+        except:
+            pass
+
 
 def global_proxies(item):
     logger.info()
@@ -380,7 +402,7 @@ def manto_proxies(item):
 
            if not 'proxies' in ch['notes'].lower(): continue
 
-           # por NAME anteriores a 2.0
+           # ~ por NAME anteriores a 2.0
            cfg_proxies_channel = 'channel_' + ch['name'] + '_proxies'
 
            if config.get_setting(cfg_proxies_channel, default=''):
@@ -392,7 +414,7 @@ def manto_proxies(item):
                cfg_proxytools_provider = 'channel_' + ch['name'] + '_proxytools_provider'
                if config.get_setting(cfg_proxytools_provider, default=''): config.set_setting(cfg_proxytools_provider, '')
 
-           # por ID
+           # ~ por ID
            cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
            cfg_proxytools_max_channel = 'channel_' + ch['id'] + '_proxytools_max'
            cfg_proxytools_provider = 'channel_' + ch['id'] + '_proxytools_provider'
@@ -561,7 +583,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '141.0.7390.123')  # ~ 22/10/25
+        config.set_setting('chrome_last_version', '143.0.7499.40')  # ~ 21/11/25
 
         config.set_setting('debug', '0')
 
@@ -573,11 +595,17 @@ def manto_params(item):
         config.set_setting('developer_test_channels', '')
         config.set_setting('developer_test_servers', '')
 
+        config.set_setting('developer_team', False)
+
         config.set_setting('user_test_channel', '')
 
         config.set_setting('sin_resp', '')
 
         config.set_setting('proxies_tplus_proces', '')
+
+        config.set_setting('kver', 0)
+
+        config.set_setting('PY3', '')
 
         manto_proxies(item)
 
@@ -1233,7 +1261,7 @@ def manto_folder_downloads(item):
     if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el contenido de Todas sus Descargas ?[/B][/COLOR]'):
         filetools.rmdirtree(path)
 
-        # por si varió el path y quedaron descargas huerfanas en el path default
+        # ~ por si varió el path y quedaron descargas huerfanas en el path default
         if downloadpath:
            try:
               path = filetools.join(config.get_data_path(), 'downloads')

@@ -261,14 +261,16 @@ def findvideos(item):
 
         if 'data:text' in url: continue
 
-        if not url.startswith('http'): url = 'https' + url
+        elif '.pegateya.' in url: continue
 
-        if '.bitchute.' in url: continue
+        if not url.startswith('http'): url = 'https' + url
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
+
+        if '.bitchute.' in url: servidor = ''
 
         lang = item.languages
         if not lang: lang = 'Lat'
@@ -279,6 +281,25 @@ def findvideos(item):
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if item.server:
+        itemlist.append(item.clone(server = item.server, url = url))
+    else:
+        data = do_downloadpage(url)
+
+        vid = scrapertools.find_single_match(data, "var media_url = '(.*?)'")
+
+        if vid:
+            itemlist.append(item.clone(server = 'directo', url = vid))
 
     return itemlist
 

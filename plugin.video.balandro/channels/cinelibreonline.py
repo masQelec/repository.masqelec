@@ -390,6 +390,8 @@ def play(item):
     if '/playlist?list=' in url:
         return 'YouTube Play List [COLOR goldenrod]No Soportada[/COLOR]'
 
+    if url.startswith('https://www.youtube.com/embed/'): url = url.replace('/embed/', '/watch?v=')
+
     if item.server == 'directo':
         data = do_downloadpage(url)
 

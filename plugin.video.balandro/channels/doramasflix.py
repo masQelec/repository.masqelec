@@ -682,6 +682,17 @@ def get_lang(code):
         return filter(lambda lang: lang['code_flix'] == code, languages)[0]['name']
 
 
+def _epis(item):
+    logger.info()
+
+    item.url = host
+    item._type = 'lasts'
+    item.group ='doramas'
+    item.search_type = 'tvshow'
+
+    return last_epis(item)
+
+
 def search(item, texto):
     logger.info()
     try:

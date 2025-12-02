@@ -1,25 +1,22 @@
 # -*- coding: utf-8 -*-
 
-import sys
+import re, base64
 
-if sys.version_info[0] < 3:
-    PY3 = False
+from core import httptools, scrapertools
+from platformcode import logger, config
 
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
+
+if PY3:
+    import urllib.parse as urlparse
+    from urllib.parse import unquote_plus
+else:
     import urllib
     from urllib import unquote_plus
 
     import urlparse
-else:
-    PY3 = True
-
-    import urllib.parse as urlparse
-    from urllib.parse import unquote_plus
-
-
-import re, base64
-
-from core import httptools, scrapertools
-from platformcode import logger
 
 
 patron_domain = '(?:http.*\:)?\/\/(?:.*ww[^\.]*)?\.?(?:[^\.]+\.)?([\w|\-]+\.\w+)(?:\/|\?|$)'

@@ -115,9 +115,8 @@ def temporadas(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('channels_seasons', default=True):
-        if not '[COLOR tan]Temp.[/COLOR]' in item.title:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]Temporadas[/COLOR]')
+    if not '[COLOR tan]Temp.[/COLOR]' in item.title:
+        platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]Temporadas[/COLOR]')
 
     item.page = 0
     item.contentType = 'season'

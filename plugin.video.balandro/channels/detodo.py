@@ -529,6 +529,16 @@ def list_search(item):
     return itemlist
 
 
+def _news(item):
+    logger.info()
+
+    item.url = host + 'peliculas-de-estreno/'
+    item._type = 'movies'
+    item.search_type = 'movie'
+
+    return list_all(item)
+
+
 def search(item, texto):
     logger.info()
     try:

@@ -295,11 +295,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = tempo, page = 0, text_color = 'tan' ))
 
@@ -733,6 +733,16 @@ def corregir_SerieName(SerieName):
     SerieName = SerieName.strip()
 
     return SerieName
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host
+    item.group = 'free'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
 
 
 def search(item, texto):

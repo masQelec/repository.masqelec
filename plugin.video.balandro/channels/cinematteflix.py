@@ -218,6 +218,8 @@ def findvideos(item):
     if item.grupo == 'colec':
         url = item.url.replace('?feature=oembed', '')
 
+        if url.startswith('https://www.youtube.com/embed/'): url = url.replace('/embed/', '/watch?v=')
+
         servidor = servertools.get_server_from_url(url)
 
         if servidor and servidor != 'directo':
@@ -238,6 +240,8 @@ def findvideos(item):
         url = url.replace('?feature=oembed', '')
 
         if url.startswith("//"): url = 'https:' + url
+
+        if url.startswith('https://www.youtube.com/embed/'): url = url.replace('/embed/', '/watch?v=')
 
         servidor = servertools.get_server_from_url(url)
 

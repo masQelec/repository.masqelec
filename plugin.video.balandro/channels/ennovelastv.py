@@ -362,8 +362,7 @@ def temporadas(item):
             if not epis: epis = re.compile('<a class="epNum"(.*?)</a>', re.DOTALL).findall(bloque)
 
             if epis:
-                if config.get_setting('channels_seasons', default=True):
-                    platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]Sin temporadas[/COLOR]')
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]Sin temporadas[/COLOR]')
 
                 item.page = 0
                 item.contentType = 'season'
@@ -382,11 +381,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = numtempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = numtempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = numtempo, text_color='tan' ))
 
@@ -760,6 +759,24 @@ def play(item):
         itemlist.append(item.clone( url=url, server=servidor ))
 
     return itemlist
+
+
+def _lasts(item):
+    logger.info()
+
+    item.url = host
+    item.search_type = 'tvshow'
+
+    return list_last(item)
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host + 'episodes11/'
+    item.search_type = 'tvshow'
+
+    return list_epis(item)
 
 
 def search(item, texto):

@@ -13,7 +13,7 @@ else:
 
 import re
 
-from platformcode import logger
+from platformcode import logger, config
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 
@@ -29,7 +29,9 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Buscar tráiler ...', action = 'search', search_type = 'movie', text_color = 'darkgoldenrod' ))
+    itemlist.append(item.clone( title = '[B][COLOR yellow]Buscar[/COLOR][/B] Tráiler ...', action = 'search', search_type = 'movie', text_color = 'darkgoldenrod' ))
+
+    itemlist.append(item.clone( channel='youtubetrailers', action='search', title= '[B][COLOR yellow]Buscar[/COLOR][/B] Youtube ...', thumbnail=config.get_thumb('youtube'), text_color='darksalmon', search_special = 'youtube', search_type = 'all' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'videos/', search_type = 'movie' ))
 

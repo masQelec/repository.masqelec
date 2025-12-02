@@ -1401,6 +1401,33 @@ def _themes(item):
 
     return temas(item)
 
+
+def _fear(item):
+    logger.info()
+
+    item.page = 1
+    item.search_type = 'all'
+
+    item.url = host + 'topgen.php?country=%s&genres=%s&fromyear=%s&toyear=%s'
+
+    item.cod_genre = 'TE'
+
+    if item.year: item.fromyear = item.year
+
+    return list_sel(item)
+
+
+def _halloween(item):
+    logger.info()
+
+    item.page = 1
+    item.search_type = 'all'
+
+    item.url = host + 'movietopic.php?topic=244405&nodoc&attr=all&order=BY_YEAR'
+
+    return list_temas(item)
+
+
 def _navidad(item):
     logger.info()
 

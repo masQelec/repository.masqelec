@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, re, time, base64, sqlite3
+import os, re, time, base64, sqlite3
+
 from datetime import datetime
 
 from core import filetools, jsontools
 from core.item import Item
 from platformcode import config, logger, platformtools
 
-PY3 = sys.version_info[0] >= 3
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
 
 
 # Devuelve el nombre de la base de datos de tracking activa (sin el sufijo .sqlite)

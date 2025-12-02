@@ -166,8 +166,7 @@ def temporadas(item):
            if temporadas: urls = True
 
     if not temporadas:
-        if config.get_setting('channels_seasons', default=True):
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]Temporadas' + '[/COLOR]')
+        platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]Temporadas' + '[/COLOR]')
 
         item.page = 0
 
@@ -183,12 +182,12 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
+                item.page = 0
 
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         if urls:
             links = scrapertools.find_multiple_matches(_bloque, '<article(.*?)</article>')

@@ -1,23 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True
-
-
-if PY3:
-    from http.server import BaseHTTPRequestHandler, HTTPServer
-else:
-    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-
-
 import xbmc, requests
 
 from threading import Thread
 
 from core import scrapertools
-from platformcode import logger
+from platformcode import logger, config
+
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
+
+if PY3:
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+else:
+    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 
 domain = ""

@@ -235,12 +235,12 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            item.url = scrapertools.find_single_match(data, '<div class="aa-drp choose-season">.*?<a href="(.*?)"')
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                item.url = scrapertools.find_single_match(data, '<div class="aa-drp choose-season">.*?<a href="(.*?)"')
+                itemlist = episodios(item)
+                return itemlist
 
         urls = scrapertools.find_multiple_matches(data, '<div class="aa-drp choose-season">.*?<a href="(.*?)"')
 
@@ -409,8 +409,7 @@ def play(item):
                if item.other == 'Waaw': url = url.replace('/tmdbcdn.lat/', '/waaw.to/').replace('/latlat.xyz/', '/waaw.to/')
 
     if item.other == 'Nupload':
-        if not config.get_setting('developer_mode', default=False): url = ''
-        else: return 'Servidor aún [COLOR goldenrod]NO programado[/COLOR]'
+        return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
     if url:
         servidor = servertools.get_server_from_url(url)
@@ -427,6 +426,24 @@ def play(item):
         itemlist.append(item.clone( url = url, server = servidor ))
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'genero/estrenos/'
+    item.search_type = 'movie'
+
+    return list_all(item)
+
+
+def _lasts(item):
+    logger.info()
+
+    item.url = host + 'genero/estrenos/'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
 
 
 def search(item, texto):

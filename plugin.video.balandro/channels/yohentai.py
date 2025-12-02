@@ -116,9 +116,8 @@ def episodios(item):
     if not data_ajax: return itemlist
 
     post = {'_token': _token, 'order': '1'}
-    headers = {'Referer': item.url}
 
-    data = httptools.downloadpage(data_ajax, post=post, headers=headers).data
+    data = httptools.downloadpage(data_ajax, post=post, headers={'Referer': item.url}).data
 
     data = str(data).replace('},', '"').replace('}]', '"')
 
@@ -129,7 +128,7 @@ def episodios(item):
 
         url = url + 'capitulo-' + str(match)
 
-        titulo = 'Episodio ' + str(match)
+        titulo = '[COLOR goldenrod]Epis.[/COLOR] ' + str(match) + ' ' + item.contentTitle
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, contentType = 'movie',
                                     contentTitle = item.title, contentExtra='adults' ))

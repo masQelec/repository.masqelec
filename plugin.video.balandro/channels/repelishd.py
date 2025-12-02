@@ -345,13 +345,14 @@ def temporadas(item):
         url = item.url
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
-            item.page = 0
-            item.url = url
-            item.contentType = 'season'
-            item.contentSeason = season
-            itemlist = episodios(item)
-            return itemlist
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+                item.page = 0
+                item.url = url
+                item.contentType = 'season'
+                item.contentSeason = season
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0,
                                     contentType = 'season', contentSeason = season, text_color='tan' ))

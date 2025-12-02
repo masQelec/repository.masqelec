@@ -30,7 +30,7 @@ def get_video_url(page_url, url_referer=''):
 
     resp = httptools.downloadpage(page_url, headers=headers)
 
-    if resp.code == 404 or "not found" in resp.data:
+    if resp.code == 404 or "not found" in resp.data or '<Title>Video unavailable</Title>' in resp.data:
         return 'Archivo inexistente ó eliminado'
 
     data = resp.data

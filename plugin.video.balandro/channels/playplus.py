@@ -93,7 +93,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_last', url = host, _type = 'episodes', search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host, _type = 'series', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_last', url = host, _type = 'series', search_type = 'tvshow', text_color = 'lightyellow' ))
 
     itemlist.append(item.clone( title = 'Cartelera', action = 'list_all', url = host + 'seriesa/?tipo=cartelera', search_type = 'tvshow', text_color = 'moccasin' ))
 
@@ -543,11 +543,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = int(tempo)
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = int(tempo)
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = int(tempo), text_color='tan' ))
 
@@ -943,6 +943,36 @@ def play(item):
         itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host
+    item._type = 'movies'
+    item.search_type = 'movie'
+
+    return list_last(item)
+
+
+def _lasts(item):
+    logger.info()
+
+    item.url = host
+    item._type = 'series'
+    item.search_type = 'tvshow'
+
+    return list_last(item)
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host
+    item._type = 'episodes'
+    item.search_type = 'tvshow'
+
+    return list_last(item)
 
 
 def search(item, texto):

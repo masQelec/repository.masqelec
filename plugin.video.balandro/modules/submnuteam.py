@@ -1,26 +1,23 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] >= 3:
-    PY3 = True
-
-    import xbmcvfs
-    translatePath = xbmcvfs.translatePath
-else:
-    PY3 = False
-
-    import xbmc
-    translatePath = xbmc.translatePath
-
-
-import os, xbmc, xbmcgui, xbmcaddon
+import os, sys, xbmc, xbmcgui, xbmcaddon
 
 from platformcode import logger, config, platformtools, updater
 from core import filetools, scrapertools
 from core.item import Item
 
 from modules import filters
+
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
+
+if PY3:
+    import xbmcvfs
+    translatePath = xbmcvfs.translatePath
+else:
+    import xbmc
+    translatePath = xbmc.translatePath
 
 
 ant_repos = ['4.0.0', '3.0.0', '2.0.0', '1.0.5', '1.0.3'] 
@@ -274,9 +271,7 @@ def submnu_team(item):
 
     avisar = False
 
-    if not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')): avisar = True
-    elif not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')): avisar = True
-    elif not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')): avisar = True
+    if not config.get_setting('developer_team'): avisar = True
 
     if not avisar:
         titulo = '[B]DESARROLLO:[/B]'
@@ -324,9 +319,7 @@ def submnu_team(item):
 
     presentar = False
 
-    if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')): presentar = True
-    elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')): presentar = True
-    elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')): presentar = True
+    if config.get_setting('developer_team'): presentar = True
 
     if presentar:
         itemlist.append(item.clone( action='submnu_gestionar', title=' - [B]Gestionar[/B]', thumbnail=config.get_thumb('tools'), text_color='teal' ))
@@ -344,10 +337,14 @@ def submnu_team(item):
 
     if last_ver is None: last_ver = '[B][I][COLOR gray](fixes off)[/COLOR][/I][/B]'
     elif not last_ver:
-          text_dev = ''
-          if config.get_setting('developer_mode', default=False): text_dev = '[COLOR darkorange][B]Desarrollo[/B][/COLOR] '
+          tex_dev = ''
+
+          if config.get_setting('developer_mode', default=False):
+              tex_dev = '[COLOR darkorange][B]Desarrollo[/B][/COLOR]'
+              if not config.get_setting('developer_team'): tex_dev = '[COLOR darkorange][B]Falso Desarrollo[/B][/COLOR]'
+
           last_ver = '[B][I][COLOR %s](desfasada)[/COLOR][/I][/B]' % color_adver
-          last_ver = last_ver + '  '  + text_dev
+          last_ver = last_ver + '  '  + tex_dev
     else: last_ver = ''
 
     title = '[COLOR chocolate][B]Ajustes [COLOR powderblue]Preferencias[/B][/COLOR] (%s)  %s' % (config.get_addon_version().replace('.fix', '-Fix'), last_ver)
@@ -596,36 +593,62 @@ def submnu_addons_info(item):
         else:
            tex_tor = cliente_torrent
            cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
+
            if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
-               cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
-               tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+               try:
+                   cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
+                   tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+               except:
+                   tex_tor += '  [COLOR gray]Desactivado[/COLOR]'
 
         itemlist.append(item.clone( action = '', title= ' - Cliente/Motor Torrent asignado ' + '[COLOR fuchsia][B] ' + tex_tor + '[/B][/COLOR]', thumbnail=config.get_thumb('torrents') ))
 
         if xbmc.getCondVisibility('System.HasAddon("script.elementum.burst")'):
-            cod_version = xbmcaddon.Addon("script.elementum.burst").getAddonInfo("version").strip()
-            tex_tor = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            try:
+                cod_version = xbmcaddon.Addon("script.elementum.burst").getAddonInfo("version").strip()
+                tex_tor = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            except:
+                tex_tor = '  [COLOR gray]Desactivado[/COLOR]'
         else: tex_tor = '  [COLOR red]No instalado[/COLOR]'
 
         itemlist.append(item.clone( action = '', title= ' - [COLOR fuchsia][B]Elementum Burst[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_tor + '[/B][/COLOR]', thumbnail=config.get_thumb('elementum') ))
 
     if xbmc.getCondVisibility('System.HasAddon("inputstream.adaptive")'):
-        cod_version = xbmcaddon.Addon("inputstream.adaptive").getAddonInfo("version").strip()
-        tex_ia = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        try:
+            cod_version = xbmcaddon.Addon("inputstream.adaptive").getAddonInfo("version").strip()
+            tex_ia = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_ia = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_ia = '  [COLOR red]No instalado[/COLOR]'
 
     itemlist.append(item.clone( action = '', title= ' - [COLOR fuchsia][B]InputStream Adaptive[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_ia + '[/B][/COLOR]', thumbnail=config.get_thumb('Inputstreamadaptive') ))
 
+    if xbmc.getCondVisibility('System.HasAddon("inputstream.ffmpegdirect")'):
+        try:
+            cod_version = xbmcaddon.Addon("inputstream.ffmpegdirect").getAddonInfo("version").strip()
+            tex_ia = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_ia = '  [COLOR gray]Desactivado[/COLOR]'
+    else: tex_ia = '  [COLOR red]No instalado[/COLOR]'
+
+    itemlist.append(item.clone( action = '', title= ' - [COLOR fuchsia][B]InputStream Ffmpegdirect[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_ia + '[/B][/COLOR]', thumbnail=config.get_thumb('Inputstreamadaptive') ))
+
     if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
-        cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
-        tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        try:
+            cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
+            tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_yt = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
 
     itemlist.append(item.clone( action = '', title= ' - [COLOR fuchsia][B]Youtube[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_yt + '[/B][/COLOR]', thumbnail=config.get_thumb('youtube') ))
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-        cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
-        tex_mr = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        try:
+            cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
+            tex_mr = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_mr = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_mr = '  [COLOR red]No instalado[/COLOR]'
 
     itemlist.append(item.clone( action = '', title= ' - [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_mr + '[/B][/COLOR]', thumbnail=config.get_thumb('resolveurl') ))
@@ -636,18 +659,24 @@ def submnu_addons_info(item):
     if xbmc.getCondVisibility('System.HasAddon("%s")' % 'repository.balandro'): hay_repo = True
 
     if hay_repo:
-        repo_version = xbmcaddon.Addon('repository.balandro').getAddonInfo("version").strip()
+        try:
+            repo_version = xbmcaddon.Addon('repository.balandro').getAddonInfo("version").strip()
 
-        tex_repo = 'Repositorio Balandro ' + repo_version
-        if repo_version in ant_repos: tex_repo = '[COLOR red]Desfasado ' + repo_version + '[/COLOR]'
+            tex_repo = 'Repositorio Balandro ' + repo_version
+            if repo_version in ant_repos: tex_repo = '[COLOR red]Desfasado ' + repo_version + '[/COLOR]'
+        except:
+            tex_repo = 'Repositorio Balandro [COLOR gray]Desactivado[/COLOR]'
     else:
         tex_repo = 'Repositorio Balandro [COLOR red]No Instalado[/COLOR]'
 
     itemlist.append(item.clone( action='', title=' - [COLOR cyan][B]' + tex_repo + '[/B][/COLOR]', thumbnail=config.get_thumb('repo') ))
 
     if xbmc.getCondVisibility('System.HasAddon("repository.resolveurl")'):
-        cod_version = xbmcaddon.Addon("repository.resolveurl").getAddonInfo("version").strip()
-        tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        try:
+            cod_version = xbmcaddon.Addon("repository.resolveurl").getAddonInfo("version").strip()
+            tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_rp = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
     itemlist.append(item.clone( action = '', title= ' - [COLOR gold][B]Repository ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR]', thumbnail=config.get_thumb('resolveurlrepo') ))
@@ -655,15 +684,21 @@ def submnu_addons_info(item):
     if config.get_setting('mnu_torrents', default=True):
         if not PY3:
             if xbmc.getCondVisibility('System.HasAddon("repository.elementum")'):
-                cod_version = xbmcaddon.Addon("repository.elementum").getAddonInfo("version").strip()
-                tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+                try:
+                    cod_version = xbmcaddon.Addon("repository.elementum").getAddonInfo("version").strip()
+                    tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+                except:
+                    tex_rp = '  [COLOR gray]Desactivado[/COLOR]'
             else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
             itemlist.append(item.clone( action = '', title= ' - [COLOR gold][B]Repository Elementum[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '  (hasta K18.x)[/B][/COLOR]', thumbnail=config.get_thumb('elementumrepo') ))
 
         if xbmc.getCondVisibility('System.HasAddon("repository.elementumorg")'):
-            cod_version = xbmcaddon.Addon("repository.elementumorg").getAddonInfo("version").strip()
-            tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            try:
+                cod_version = xbmcaddon.Addon("repository.elementumorg").getAddonInfo("version").strip()
+                tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            except:
+                tex_rp = '  [COLOR gray]Desactivado[/COLOR]'
         else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
         itemlist.append(item.clone( action = '', title= ' - [COLOR gold][B]Repository ElementumOrg[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR]', thumbnail=config.get_thumb('elementumrepo') ))
@@ -704,10 +739,15 @@ def submnu_resto_addons(item):
            elif addon == 'temp': continue
 
         cod_version = ''
-        if xbmc.getCondVisibility('System.HasAddon("%s")' % addon):
-            cod_version = xbmcaddon.Addon("%s" % addon).getAddonInfo("version")
 
-            cod_version = cod_version.strip()
+        if xbmc.getCondVisibility('System.HasAddon("%s")' % addon):
+            try:
+                cod_version = xbmcaddon.Addon("%s" % addon).getAddonInfo("version")
+                cod_version = cod_version.strip()
+            except:
+                cod_version = '  [COLOR gray]Desactivado[/COLOR]'
+        else:
+            cod_version = ' [COLOR red]No instalado[/COLOR]'
 
         addon = addon.replace('plugin', '[COLOR yellow]plugin[/COLOR]')
         addon = addon.replace('repository', '[COLOR cyan]repository[/COLOR]')
@@ -715,6 +755,8 @@ def submnu_resto_addons(item):
         addon = addon.replace('skin', '[COLOR aquamarine]skin[/COLOR]')
         addon = addon.replace('service', '[COLOR violet]service[/COLOR]')
         addon = addon.replace('resource', '[COLOR magenta]resource[/COLOR]')
+
+        addon = addon.replace('github', '[COLOR yellowgreen]github[/COLOR]')
 
         addon = addon.replace('inputstream', '[COLOR fuchsia]inputstream[/COLOR]')
 
@@ -990,9 +1032,7 @@ def submnu_gestionar(item):
 
     presentar = False
 
-    if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')): presentar = True
-    elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')): presentar = True
-    elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')): presentar = True
+    if config.get_setting('developer_team'): presentar = True
 
     if presentar:
         itemlist.append(item.clone( action='', title='[B]GESTIONAR:[/B]', thumbnail=config.get_thumb('tools'), text_color='teal' ))
@@ -1913,13 +1953,14 @@ def test_all_webs(item):
             if not config.get_setting('developer_mode', default=False):
                 platformtools.dialog_ok(config.__addon_name, 'Canales Testeados ' + str(i))
             else:
-                if platformtools.dialog_yesno(config.__addon_name, 'Canales Testeados ' + str(i), '[B][COLOR red]Hay Conflictos. [COLOR yellow]Desea Verlos ?[/B][/COLOR]'):
-                    txt_conflict = ''
+                if config.get_setting('developer_team'):
+                    if platformtools.dialog_yesno(config.__addon_name, 'Canales Testeados ' + str(i), '[B][COLOR red]Hay Conflictos. [COLOR yellow]Desea Verlos ?[/B][/COLOR]'):
+                        txt_conflict = ''
 
-                    for conflict in tests_all_webs:
-                        txt_conflict += conflict + '[CR]'
+                        for conflict in tests_all_webs:
+                            txt_conflict += conflict + '[CR]'
 
-                    platformtools.dialog_textviewer('Canales con Conflictos', txt_conflict)
+                        platformtools.dialog_textviewer('Canales con Conflictos', txt_conflict)
 
     config.set_setting('developer_test_channels', '')
 
@@ -2059,13 +2100,14 @@ def test_all_srvs(item):
             if not config.get_setting('developer_mode', default=False):
                 platformtools.dialog_ok(config.__addon_name, 'Servidores Testeados ' + str(i))
             else:
-                if platformtools.dialog_yesno(config.__addon_name, 'Servidores Testeados ' + str(i), '[B][COLOR red]Hay Conflictos. [COLOR yellow]Desea Verlos ?[/B][/COLOR]'):
-                    txt_conflict = ''
+                if config.get_setting('developer_team'):
+                    if platformtools.dialog_yesno(config.__addon_name, 'Servidores Testeados ' + str(i), '[B][COLOR red]Hay Conflictos. [COLOR yellow]Desea Verlos ?[/B][/COLOR]'):
+                        txt_conflict = ''
 
-                    for conflict in tests_all_srvs:
-                        txt_conflict += conflict + '[CR]'
+                        for conflict in tests_all_srvs:
+                            txt_conflict += conflict + '[CR]'
 
-                    platformtools.dialog_textviewer('Servidores con Conflictos', txt_conflict)
+                        platformtools.dialog_textviewer('Servidores con Conflictos', txt_conflict)
 
     config.set_setting('developer_test_servers', '')
 
@@ -2122,58 +2164,93 @@ def show_help_addons(item):
     else:
        tex_tor = cliente_torrent
        cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
+
        if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
-           cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
-           tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+           try:
+               cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
+               tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+           except:
+               tex_tor += '  [COLOR gray]Desactivado[/COLOR]'
 
     txt += ' - Cliente/Motor Torrent ' + '[COLOR fuchsia][B] ' + tex_tor + '[/B][/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("script.elementum.burst")'):
-        cod_version = xbmcaddon.Addon("script.elementum.burst").getAddonInfo("version").strip()
-        tex_tor = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        try:
+            cod_version = xbmcaddon.Addon("script.elementum.burst").getAddonInfo("version").strip()
+            tex_tor = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_tor = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_tor = '  [COLOR red]No instalado[/COLOR]'
 
     txt += ' - [COLOR fuchsia][B]Elementum Burst[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_tor + '[/B][/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("inputstream.adaptive")'):
-        cod_version = xbmcaddon.Addon("inputstream.adaptive").getAddonInfo("version").strip()
-        tex_ia = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        try:
+            cod_version = xbmcaddon.Addon("inputstream.adaptive").getAddonInfo("version").strip()
+            tex_ia = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_ia = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_ia = '  [COLOR red]No instalado[/COLOR]'
 
     txt += ' - [COLOR fuchsia][B]InputStream Adaptive[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_ia + '[/B][/COLOR][CR]'
 
+    if xbmc.getCondVisibility('System.HasAddon("inputstream.ffmpegdirect")'):
+        try:
+            cod_version = xbmcaddon.Addon("inputstream.ffmpegdirect").getAddonInfo("version").strip()
+            tex_ia = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_ia = '  [COLOR gray]Desactivado[/COLOR]'
+    else: tex_ia = '  [COLOR red]No instalado[/COLOR]'
+
+    txt += ' - [COLOR fuchsia][B]InputStream Ffmpegdirect[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_ia + '[/B][/COLOR][CR]'
+
     if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
-        cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
-        tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        try:
+            cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
+            tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_yt = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
 
     txt += ' - [COLOR fuchsia][B]Youtube[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_yt + '[/B][/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-        cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
-        tex_mr = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        try:
+            cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
+            tex_mr = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_mr = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_mr = '  [COLOR red]No instalado[/COLOR]'
 
     txt += ' - [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_mr + '[/B][/COLOR][CR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("repository.resolveurl")'):
-        cod_version = xbmcaddon.Addon("repository.resolveurl").getAddonInfo("version").strip()
-        tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        try:
+            cod_version = xbmcaddon.Addon("repository.resolveurl").getAddonInfo("version").strip()
+            tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_rp = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
     txt += ' - [COLOR cyan][B]Repository ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
 
     if not PY3:
         if xbmc.getCondVisibility('System.HasAddon("repository.elementum")'):
-            cod_version = xbmcaddon.Addon("repository.elementum").getAddonInfo("version").strip()
-            tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            try:
+                cod_version = xbmcaddon.Addon("repository.elementum").getAddonInfo("version").strip()
+                tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            except:
+                tex_rp = '  [COLOR gray]Desactivado[/COLOR]'
         else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
         txt += ' - [COLOR cyan][B]Repository Elementum[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + ' (hasta K18.x)[/B][/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("repository.elementumorg")'):
-        cod_version = xbmcaddon.Addon("repository.elementumorg").getAddonInfo("version").strip()
-        tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        try:
+            cod_version = xbmcaddon.Addon("repository.elementumorg").getAddonInfo("version").strip()
+            tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_yt = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
     txt += ' - [COLOR cyan][B]Repository ElementumOrg[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
@@ -2192,30 +2269,43 @@ def show_help_torrents(item):
     else:
        tex_tor = cliente_torrent
        cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
+
        if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
-           cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
-           tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+           try:
+               cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
+               tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+           except:
+               tex_tor += '  [COLOR gray]Desactivado[/COLOR]'
 
     txt += ' - Cliente/Motor Torrent ' + '[COLOR fuchsia][B] ' + tex_tor + '[/B][/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("script.elementum.burst")'):
-        cod_version = xbmcaddon.Addon("script.elementum.burst").getAddonInfo("version").strip()
-        tex_tor = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        try:
+            cod_version = xbmcaddon.Addon("script.elementum.burst").getAddonInfo("version").strip()
+            tex_tor = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_tor = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_tor = '  [COLOR red]No instalado[/COLOR]'
 
     txt += ' - [COLOR fuchsia][B]Elementum Burst[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_tor + '[/B][/COLOR][CR]'
 
     if not PY3:
         if xbmc.getCondVisibility('System.HasAddon("repository.elementum")'):
-            cod_version = xbmcaddon.Addon("repository.elementum").getAddonInfo("version").strip()
-            tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            try:
+                cod_version = xbmcaddon.Addon("repository.elementum").getAddonInfo("version").strip()
+                tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            except:
+                tex_rp = '  [COLOR gray]Desactivado[/COLOR]'
         else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
         txt += ' - [COLOR gold][B]Repository Elementum[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + ' (hasta K18.x)[/B][/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("repository.elementumorg")'):
-        cod_version = xbmcaddon.Addon("repository.elementumorg").getAddonInfo("version").strip()
-        tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        try:
+            cod_version = xbmcaddon.Addon("repository.elementumorg").getAddonInfo("version").strip()
+            tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_yt = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
     txt += ' - [COLOR gold][B]Repository ElementumOrg[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
@@ -2235,36 +2325,62 @@ def show_help_players(item):
         else:
            tex_tor = cliente_torrent
            cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
+
            if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
-               cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
-               tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+               try:
+                   cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
+                   tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+               except:
+                   tex_tor += '  [COLOR gray]Desactivado[/COLOR]'
 
         txt += ' - Cliente/Motor Torrent asignado ' + '[COLOR fuchsia][B] ' + tex_tor + '[/B][/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("inputstream.adaptive")'):
-        cod_version = xbmcaddon.Addon("inputstream.adaptive").getAddonInfo("version").strip()
-        tex_ia = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        try:
+            cod_version = xbmcaddon.Addon("inputstream.adaptive").getAddonInfo("version").strip()
+            tex_ia = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_ia = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_ia = '  [COLOR red]No instalado[/COLOR]'
 
     txt += ' - [COLOR fuchsia][B]InputStream Adaptive[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_ia + '[/B][/COLOR][CR]'
 
+    if xbmc.getCondVisibility('System.HasAddon("inputstream.ffmpegdirect")'):
+        try:
+            cod_version = xbmcaddon.Addon("inputstream.ffmpegdirect").getAddonInfo("version").strip()
+            tex_ia = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_ia = '  [COLOR gray]Desactivado[/COLOR]'
+    else: tex_ia = '  [COLOR red]No instalado[/COLOR]'
+
+    txt += ' - [COLOR fuchsia][B]InputStream Ffmpegdirect[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_ia + '[/B][/COLOR][CR]'
+
     if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
-        cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
-        tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        try:
+            cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
+            tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_yt = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
 
     txt += ' - [COLOR fuchsia][B]Youtube[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_yt + '[/B][/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-        cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
-        tex_mr = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        try:
+            cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
+            tex_mr = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_mr = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_mr = '  [COLOR red]No instalado[/COLOR]'
 
     txt += ' - [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_mr + '[/B][/COLOR][CR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("repository.resolveurl")'):
-        cod_version = xbmcaddon.Addon("repository.resolveurl").getAddonInfo("version").strip()
-        tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        try:
+            cod_version = xbmcaddon.Addon("repository.resolveurl").getAddonInfo("version").strip()
+            tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_rp = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
     txt += ' - [COLOR cyan][B]Repository ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
@@ -2272,15 +2388,21 @@ def show_help_players(item):
     if config.get_setting('mnu_torrents', default=True):
         if not PY3:
             if xbmc.getCondVisibility('System.HasAddon("repository.elementum")'):
-                cod_version = xbmcaddon.Addon("repository.elementum").getAddonInfo("version").strip()
-                tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+                try:
+                    cod_version = xbmcaddon.Addon("repository.elementum").getAddonInfo("version").strip()
+                    tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+                except:
+                    tex_rp = '  [COLOR gray]Desactivado[/COLOR]'
             else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
             txt += ' - [COLOR cyan][B]Repository Elementum[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
 
         if xbmc.getCondVisibility('System.HasAddon("repository.elementumorg")'):
-            cod_version = xbmcaddon.Addon("repository.elementumorg").getAddonInfo("version").strip()
-            tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            try:
+                cod_version = xbmcaddon.Addon("repository.elementumorg").getAddonInfo("version").strip()
+                tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            except:
+                tex_rp = '  [COLOR gray]Desactivado[/COLOR]'
         else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
         txt += ' - [COLOR cyan][B]Repository Elementum[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
@@ -2356,6 +2478,11 @@ def show_sistema(item):
     if config.get_setting('channels_charges', default=True): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
     else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
 
+    txt += ' - No Presentar la Temporada 0 (Especiales): '
+
+    if config.get_setting('channels_especiales', default=True): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
+    else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
+
     txt += '[CR][COLOR goldenrod][B]DEPURACIÓN:[/B][/COLOR][CR]'
 
     loglevel = config.get_setting('debug', 0)
@@ -2369,15 +2496,13 @@ def show_sistema(item):
 
     avisar = False
 
-    if not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')): avisar = True
-    elif not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')): avisar = True
-    elif not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')): avisar = True
+    if not config.get_setting('developer_team'): avisar = True
 
     if config.get_setting('developer_mode', default=False):
         if not avisar:
-            txt += '- [COLOR crimson][B]Opción Desarrollo:[/B][/COLOR]  [COLOR yellow][B]Activada[/B][/COLOR]'
+            txt += '- [COLOR crimson][B]Opción Desarrollo:[/B][/COLOR]  [COLOR yellow][B]Opción Habilitada[/B][/COLOR]'
         else:
-            txt += '- [COLOR crimson][B]Falso Desarrollo:[/B][/COLOR]  [COLOR yellow][B]Activada[/B][/COLOR]'
+            txt += '- [COLOR crimson][B]Falso Desarrollo:[/B][/COLOR]  [COLOR yellow][B]Opción Habilitada/B][/COLOR]'
 
     platformtools.dialog_textviewer('Información Ajustes del Sistema', txt)
 
@@ -3103,6 +3228,8 @@ def resumen_servidores(item):
     presentar = False
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'): presentar = True
+    elif xbmc.getCondVisibility('System.HasAddon("inputstream.adaptive")'): presentar = True
+    elif xbmc.getCondVisibility('System.HasAddon("inputstream.ffmpegdirect")'): presentar = True
     elif xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'): presentar = True
     else:
        cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
@@ -3110,11 +3237,14 @@ def resumen_servidores(item):
        if not cliente_torrent == 'Ninguno':  presentar = True
 
     if presentar:
-        txt += '[COLOR yellow][B][CR]SERVIDORES VÍAS ALTERNATIVAS, ADICIONALES, TORRENTS, YOUTUBE:[/B][/COLOR]'
+        txt += '[COLOR yellow][B][CR]SERVIDORES VÍAS ALTERNATIVAS, ADICIONALES, TORRENTS, INPUTSTREAM, YOUTUBE:[/B][/COLOR]'
 
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-            cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
-            tex_mr = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            try:
+                cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
+                tex_mr = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            except:
+                tex_mr = '  [COLOR gray]Desactivado[/COLOR]'
 
             txt += '[CR]  [COLOR goldenrod][B]Resolveurl:[/B][/COLOR][CR]'
 
@@ -3131,25 +3261,66 @@ def resumen_servidores(item):
            cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
 
            if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
-               cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
-               tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+               try:
+                   cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
+                   tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+
+                   aditionals += 1
+               except:
+                   tex_tor += '  [COLOR gray]Desactivado[/COLOR]'
 
         if not cliente_torrent == 'Ninguno':
             txt += '[CR]  [COLOR goldenrod][B]Torrents:[/B][/COLOR][CR]'
 
             txt += '       1' + '   [COLOR fuchsia]' + tex_tor + '[/COLOR][CR]'
 
-            aditionals += 1
+        tex_ia = ''
+
+        if xbmc.getCondVisibility('System.HasAddon("inputstream.adaptive")'):
+            try:
+                cod_version = xbmcaddon.Addon("inputstream.adaptive").getAddonInfo("version").strip()
+                tex_ia = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+
+                aditionals += 1
+            except:
+                tex_ia = '  [COLOR gray]Desactivado[/COLOR]'
+        else: tex_ia = '  [COLOR red]No instalado[/COLOR]'
+
+        tex_ia = '       1' + '   [COLOR orchid]InputStream Adaptive[/COLOR] ' + tex_ia + '[CR]'
+
+        tex_if = ''
+
+        if xbmc.getCondVisibility('System.HasAddon("inputstream.ffmpegdirect")'):
+            try:
+                cod_version = xbmcaddon.Addon("inputstream.ffmpegdirect").getAddonInfo("version").strip()
+                tex_if = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+
+                aditionals += 1
+            except:
+                tex_if = '  [COLOR gray]Desactivado[/COLOR]'
+        else: tex_if = '  [COLOR red]No instalado[/COLOR]'
+
+        tex_if = '       1' + '   [COLOR orchid]InputStream Ffmpegdirect[/COLOR] ' + tex_if + '[CR]'
+
+        if tex_ia or tex_if:
+            txt += '[CR]  [COLOR goldenrod][B]InputStream:[/B][/COLOR][CR]'
+
+            if tex_ia: txt += tex_ia
+            if tex_if: txt += tex_if
 
         if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
-            cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
-            tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            try:
+                cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
+                tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
 
-            txt += '[CR]  [COLOR goldenrod][B]Youtube:[/B][/COLOR][CR]'
+                aditionals += 1
+            except:
+                tex_yt = '  [COLOR gray]Desactivado[/COLOR]'
+        else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
 
-            txt += '       1' + '   [COLOR green]Vía alternativa[/COLOR]' + tex_yt + '[CR]'
+        txt += '[CR]  [COLOR goldenrod][B]Youtube:[/B][/COLOR][CR]'
 
-            aditionals += 1
+        txt += '       1' + '   [COLOR green]Vía alternativa[/COLOR]' + tex_yt + '[CR]'
 
     accesibles = (disponibles + aditionals + alternatives)
 
@@ -3206,8 +3377,11 @@ def show_help_alternativas(item):
     txt = ''
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-        cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
-        tex_mr = '  ' + cod_version
+        try:
+            cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
+            tex_mr = '  ' + cod_version
+        except:
+            tex_mr = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_mr = '[COLOR red][B]No instalado[/B][/COLOR]'
 
     txt += '[CR][COLOR fuchsia][B]ResolveUrl Script[/B]:[/COLOR]  %s' % tex_mr
@@ -3241,8 +3415,11 @@ def show_help_alternativas(item):
         txt += '   [COLOR yellow]Zures[/COLOR]'
 
     if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
-        cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
-        tex_yt = '  ' + cod_version
+        try:
+            cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
+            tex_yt = '  ' + cod_version
+        except:
+            tex_yt = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
 
     txt += '[CR][CR][COLOR fuchsia][B]Youtube Plugin[/B]:[/COLOR]  %s' % tex_yt
@@ -3261,8 +3438,11 @@ def show_help_adicionales(item):
     txt = ''
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-        cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
-        tex_mr = '  ' + cod_version
+        try:
+            cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
+            tex_mr = '  ' + cod_version
+        except:
+            tex_mr = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_mr = '[COLOR red][B]No instalado[/B][/COLOR]'
 
     txt += '[CR][COLOR fuchsia][B]ResolveUrl Script[/B]:[/COLOR]  %s' % tex_mr

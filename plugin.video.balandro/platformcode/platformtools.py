@@ -1,29 +1,29 @@
 # -*- coding: utf-8 -*-
 
 import sys, os, re
+
 import xbmc, xbmcgui, xbmcplugin, xbmcvfs
 
 from platformcode import config, logger
 from core.item import Item
 
 
-if sys.version_info[0] >= 3:
-    PY3 = True
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
 
+if PY3:
     translatePath = xbmcvfs.translatePath
     basestring = str
 
     from urllib.parse import quote_plus
 else:
-    PY3 = False
-
     translatePath = xbmc.translatePath
 	
     from urllib import quote_plus
 
 
-# Acceso a DB de Kodi
-# como variable global para no repetir get_kodi_db() si hay múltiples querys
+# ~ Acceso a DB de Kodi
+# ~ como variable global para no repetir get_kodi_db() si hay múltiples querys
 file_kodi_db = ''
 
 color_alert = config.get_setting('notification_alert_color', default='red')
@@ -33,7 +33,7 @@ color_avis  = config.get_setting('notification_avis_color', default='yellow')
 color_exec  = config.get_setting('notification_exec_color', default='cyan')
 
 
-# Diálogos de Kodi
+# ~ Diálogos de Kodi
 
 def compat(line1, line2, line3):
     message = line1
@@ -59,7 +59,7 @@ def dialog_notification(heading, message, icon=0, time=5000, sound=None):
 
 
 def dialog_yesno(heading, line1, line2="", line3="", nolabel="No", yeslabel="Sí", autoclose=0, customlabel=None):
-    # customlabel only on kodi 19
+    # ~ customlabel only on kodi 19
     dialog = xbmcgui.Dialog()
     if PY3:
         if autoclose > 0:
@@ -130,14 +130,14 @@ def dialog_recaptcha(sitekey, referer):
     return recaptcha.get_recaptcha_response(sitekey, referer)
 
 
-# Para generar items para dialog_select, dialog_multiselect, cuando se llaman con useDetails=True
+# ~ Para generar items para dialog_select, dialog_multiselect, cuando se llaman con useDetails=True
 def listitem_to_select(title, subtitle='', thumbnail=''):
     it = xbmcgui.ListItem(title, subtitle)
     if thumbnail != '': it.setArt({ 'thumb': thumbnail })
     return it
 
 
-# Renderización
+# ~ Renderización
 
 def itemlist_refresh():
     xbmc.executebuiltin("Container.Refresh")
@@ -159,22 +159,22 @@ def render_items(itemlist, parent_item):
     @param parent_item: elemento padre
     """
 
-    # Si el itemlist no es un list salimos
+    # ~ Si el itemlist no es un list salimos
     if not type(itemlist) == list: return
 
-    # Si no hay ningun item, mostramos un aviso
+    # ~ Si no hay ningun item, mostramos un aviso
     if not len(itemlist):
         itemlist.append(Item(title='[COLOR coral]Sin resultados[/COLOR]', thumbnail=config.get_thumb('roadblock')))
 
-    # Asignamos variables
+    # ~ Asignamos variables
     handle = int(sys.argv[1])
     breadcrumb = parent_item.category if parent_item.category != '' else parent_item.channel
 
-    # Formatear títulos de manera standard para los listados de pelis/series de los canales
+    # ~ Formatear títulos de manera standard para los listados de pelis/series de los canales
     if parent_item.channel == 'search' or (parent_item.channel != 'tracking' and itemlist[0].contentType in ['movie', 'tvshow']):
         itemlist = formatear_titulos(itemlist)
 
-    # Colores personalizados para menú contextual
+    # ~ Colores personalizados para menú contextual
     colores = {}
     colores['tracking'] = config.get_setting('context_tracking_color', default='blue')
     colores['search_exact'] = config.get_setting('context_search_exact_color', default='gold')
@@ -182,43 +182,43 @@ def render_items(itemlist, parent_item):
     colores['download'] = config.get_setting('context_download_color', default='orange')
     colores['trailer'] = config.get_setting('context_trailer_color', default='pink')
 
-    # Recorremos el itemlist
+    # ~ Recorremos el itemlist
     for item in itemlist:
-        # Si no hay action o es findvideos/play, folder=False pq no se va a devolver ningún listado
+        # ~ Si no hay action o es findvideos/play, folder=False pq no se va a devolver ningún listado
         if item.action in ['findvideos', 'play', '']: item.folder = False
 
-        # Si el item no contiene categoría, le ponemos la del item padre
+        # ~ Si el item no contiene categoría, le ponemos la del item padre
         if item.category == '': item.category = parent_item.category
 
-        # Si hay color se aplica al título y se suprime el tag para que no se arrastre
+        # ~ Si hay color se aplica al título y se suprime el tag para que no se arrastre
         if item.text_color != '': 
             item.title = '[COLOR %s]%s[/COLOR]' % (item.text_color, item.title)
             item.__dict__.pop('text_color')
 
-        # Creamos el listitem
+        # ~ Creamos el listitem
         listitem = xbmcgui.ListItem(item.title)
 
-        # Añadimos los infoLabels
+        # ~ Añadimos los infoLabels
         set_infolabels(listitem, item)
 
-        # No arrastrar plot si no es una peli/serie/temporada/episodio
+        # ~ No arrastrar plot si no es una peli/serie/temporada/episodio
         if item.plot and item.contentType not in ['movie', 'tvshow', 'season', 'episode']:
             try:
                 item.__dict__['infoLabels'].pop('plot')
             except: pass                
 
-        # Montamos el menu contextual y se suprime el tag para que no se arrastre
+        # ~ Montamos el menu contextual y se suprime el tag para que no se arrastre
         context_commands = set_context_commands(item, parent_item, colores)
         listitem.addContextMenuItems(context_commands)
         if item.context: item.__dict__.pop('context')
 
-        # IsPlayable necesario con setResolvedUrl para recibir un "id" en sys.argv[1] (sino recibiría -1)
+        # ~ IsPlayable necesario con setResolvedUrl para recibir un "id" en sys.argv[1] (sino recibiría -1)
         if item.action == 'findvideos': 
             listitem.setProperty('IsPlayable', 'true')
             if item.channel == 'tracking':
-                # Generar url con los datos mínimos pq Kodi indexa con la url exacta en la tabla files.
-                # De esta manera, aunque se cambien title,infoLabels,thumbnail,etc, la url se mantendrá igual
-                # y no se perderán las marcas de visto/no visto propias de Kodi.
+                # ~ Generar url con los datos mínimos pq Kodi indexa con la url exacta en la tabla files.
+                # ~ De esta manera, aunque se cambien title,infoLabels,thumbnail,etc, la url se mantendrá igual
+                # ~ y no se perderán las marcas de visto/no visto propias de Kodi.
                 it_minimo = Item( channel = 'tracking', action = 'findvideos', folder = False, title='',
                                   contentType = item.contentType, infoLabels = {'tmdb_id': item.infoLabels['tmdb_id']} )
 
@@ -233,21 +233,21 @@ def render_items(itemlist, parent_item):
 
         xbmcplugin.addDirectoryItem(handle=handle, url=item_url, listitem=listitem, isFolder=item.folder)
 
-    # Fijar los tipos de vistas
+    # ~ Fijar los tipos de vistas
     if parent_item.channel == 'mainmenu' or (parent_item.channel == 'tracking' and parent_item.action in ['mainlist', 'mainlist_listas']):
-        # vista con: Lista amplia, Muro de iconos
+        # ~ vista con: Lista amplia, Muro de iconos
         xbmcplugin.setContent(handle, '')
     elif parent_item.channel == 'tracking' and parent_item.action in ['mainlist_series', 'mainlist_doramas', 'mainlist_animes', 'mainlist_episodios', 'serie_temporadas', 'serie_episodios']:
-        # vista con: Lista, Cartel, Mays., Muro de información, Lista amplia, Muro, Pancarta, Fanart
+        # ~ vista con: Lista, Cartel, Mays., Muro de información, Lista amplia, Muro, Pancarta, Fanart
         xbmcplugin.setContent(handle, 'tvshows')
     else:
-        # vista con: Lista, Cartel, Mays., Muro de información, Lista amplia, Muro, Fanart
+        # ~ vista con: Lista, Cartel, Mays., Muro de información, Lista amplia, Muro, Fanart
         xbmcplugin.setContent(handle, 'movies')
 
-    # Fijamos el "breadcrumb"
+    # ~ Fijamos el "breadcrumb"
     xbmcplugin.setPluginCategory(handle=handle, category=breadcrumb)
 
-    # No ordenar items
+    # ~ No ordenar items
     orden = xbmcplugin.SORT_METHOD_NONE
     if parent_item.channel == 'tracking':
         if parent_item.action == 'serie_temporadas': 
@@ -255,10 +255,10 @@ def render_items(itemlist, parent_item):
 
     xbmcplugin.addSortMethod(handle=handle, sortMethod=orden)
 
-    # Cerramos el directorio
+    # ~ Cerramos el directorio
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
-    # Fijar la vista
+    # ~ Fijar la vista
     if parent_item.channel == 'tracking':
         if parent_item.action == 'mainlist_pelis': viewmode = config.get_setting('tracking_viewmode_movies', default=0)
         elif parent_item.action == 'mainlist_series': viewmode = config.get_setting('tracking_viewmode_tvshows', default=0)
@@ -287,12 +287,12 @@ def set_infolabels(listitem, item, player=False):
     @type item: item
     """
 
-    # values icon, thumb or poster are skin dependent.. so we set all to avoid problems. if not exists thumb it's used icon value
+    # ~ values icon, thumb or poster are skin dependent.. so we set all to avoid problems. if not exists thumb it's used icon value
     icon_image = "DefaultFolder.png" if item.folder else "DefaultVideo.png"
     poster_image = item.poster if item.poster != '' else item.thumbnail
     listitem.setArt({'icon': icon_image, 'thumb': item.thumbnail, 'poster': poster_image, 'fanart': item.fanart})
 
-    # Para evitar algunas acciones de kodi en menú contextual (Play, Mark as watched, etc.)
+    # ~ Para evitar algunas acciones de kodi en menú contextual (Play, Mark as watched, etc.)
     if not item.folder:
        if item.action == 'configurar_proxies': return
        elif item.action == 'configurar_dominio': return
@@ -303,7 +303,7 @@ def set_infolabels(listitem, item, player=False):
         if 'mediatype' not in item.infoLabels and item.contentType != '':
             item.infoLabels['mediatype'] = item.contentType
 
-        # Descartar infoLabels no reconocidos (https://kodi.wiki/view/InfoLabels)
+        # ~ Descartar infoLabels no reconocidos (https://kodi.wiki/view/InfoLabels)
         nflbls = item.infoLabels.copy()
         descartes = ['tmdb_id', 'tvdb_id', 'imdb_id', 'type', 'filtro', 'quality', 'video', 
                      'popularity', 'homepage', 'budget', 'revenue', 'in_production', 'original_language',
@@ -362,7 +362,7 @@ def set_context_commands(item, parent_item, colores):
 
     context_commands = []
 
-    # Creamos un list con las diferentes opciones incluidas en item.context
+    # ~ Creamos un list con las diferentes opciones incluidas en item.context
     if type(item.context) == str:
         context = item.context.split("|")
     elif type(item.context) == list:
@@ -371,21 +371,21 @@ def set_context_commands(item, parent_item, colores):
         context = []
 
     for command in context:
-        # Predefinidos
+        # ~ Predefinidos
         if type(command) == str:
             if command == "no_context":
                 return []
 
-        # Formato dict
+        # ~ Formato dict
         if type(command) == dict:
-            # Los parametros del dict, se sobreescriben al nuevo context_item en caso de sobreescribir "action" y
-            # "channel", los datos originales se guardan en "from_action" y "from_channel"
+            # ~ Los parametros del dict, se sobreescriben al nuevo context_item en caso de sobreescribir "action" y
+            # ~ "channel", los datos originales se guardan en "from_action" y "from_channel"
             if "action" in command: command["from_action"] = item.action
             if "channel" in command: command["from_channel"] = item.channel
 
-            # link_mode y link_item se usan para especificar como se genera la llamada (run y clone por defecto)
-            # link_mode: refresh / update / replace / run (default)
-            # link_item: new / clone (default)
+            # ~ link_mode y link_item se usan para especificar como se genera la llamada (run y clone por defecto)
+            # ~ link_mode: refresh / update / replace / run (default)
+            # ~ link_item: new / clone (default)
 
             if parent_item.channel == 'tracking': titulo = '[COLOR %s]%s[/COLOR]' % (colores['tracking'], command['title'])
             elif '[/COLOR]' not in command['title']: titulo = '[COLOR blue]%s[/COLOR]' % command['title']
@@ -401,7 +401,7 @@ def set_context_commands(item, parent_item, colores):
             elif link_mode == 'replace': context_commands.append( (titulo, config.build_ContainerUpdate(c_it, replace=True)) )
             else: context_commands.append( (titulo, config.build_RunPlugin(c_it)) )
 
-    # Guardar seguimiento (preferidos)
+    # ~ Guardar seguimiento (preferidos)
     if not config.get_setting('mnu_simple', default=False):
         if config.get_setting('mnu_preferidos', default=True):
             if item.contentType in ['movie', 'tvshow', 'season', 'episode']:
@@ -417,7 +417,7 @@ def set_context_commands(item, parent_item, colores):
                    context_commands.append( ('[B][COLOR %s]Guardar %s en Preferidos[/COLOR][/B]' % (colores['tracking'], tipo[item.contentType]), config.build_RunPlugin(
                    item.clone(channel="tracking", action="addFavourite", from_channel=item.channel, from_action=item.action))) )
 
-    # Buscar misma peli/serie en otros canales
+    # ~ Buscar misma peli/serie en otros canales
     if item.contentType in ['movie', 'tvshow']:
         presentar = False
 
@@ -442,7 +442,7 @@ def set_context_commands(item, parent_item, colores):
                 item_search = Item(channel='search', action='search', buscando=buscando, search_type=search_type, from_channel='', similar = True)
                 context_commands.append( ('[B][COLOR %s]Buscar Parecido en los canales[/COLOR][/B]' % colores['search_similar'], config.build_ContainerUpdate(item_search)) )
 
-    # Descargar vídeo
+    # ~ Descargar vídeo
     if not config.get_setting('mnu_simple', default=False):
         if config.get_setting('mnu_desargas', default=True):
             if item.channel != '' and item.action == 'findvideos' and parent_item.channel != 'downloads':
@@ -455,9 +455,12 @@ def set_context_commands(item, parent_item, colores):
                     context_commands.append( ('[B][COLOR %s]Descargar Vídeo[/COLOR][/B]' % colores['download'], config.build_RunPlugin(
                         item.clone(channel="downloads", action="save_download", from_channel=item.channel, from_action=item.action))) )
 
-    # Buscar trailer
-    if item.contentType in ['movie', 'tvshow'] and item.infoLabels['tmdb_id']:
-        context_commands.append( ('[B][COLOR %s]Buscar Tráiler[/COLOR][/B]' % colores['trailer'], config.build_RunPlugin(item.clone(channel="actions", action="search_trailers"))) )
+    # ~ Buscar trailer
+    if item.contentType in ['movie', 'tvshow']:
+        if item.infoLabels['tmdb_id']:
+            context_commands.append( ('[B][COLOR %s]Buscar Tráiler en TMDB[/COLOR][/B]' % colores['trailer'], config.build_RunPlugin(item.clone(channel="actions", action="search_trailers"))) )
+
+        context_commands.append( ('[B][COLOR darksalmon]Buscar Tráiler en YouTube[/COLOR][/B]', config.build_RunPlugin(item.clone(channel="actions", action="search_trailers_youtube"))) )
 
     # ~ # Mostrar info haciendo una nueva llamada a tmdb para recuperar más datos
     # ~ if item.contentType in ['movie', 'tvshow', 'season', 'episode'] and item.contentExtra != 'documentary':
@@ -470,7 +473,7 @@ def set_context_commands(item, parent_item, colores):
     return context_commands
 
 
-# Formatear elementos a mostrar
+# ~ Formatear elementos a mostrar
 
 def formatear_enlace_play(item, colorear=False, colores={}):
     if item.server == '' or (item.server != '' and item.title != '' and item.quality == '' and item.language == '' and item.age == '' and item.other == ''):
@@ -497,7 +500,7 @@ def formatear_enlace_play(item, colorear=False, colores={}):
     return titulo
 
 
-# Formateo de enlaces devueltos por findvideos 
+# ~ Formateo de enlaces devueltos por findvideos 
 def formatear_enlaces_servidores(itemlist):
     colorear = config.get_setting('colorear_enlaces_play')
     colores = {}
@@ -536,7 +539,7 @@ def formatear_titulo_peli_serie(item, colores={}, formato={}):
             titulo += ' [COLOR %s]%s[/COLOR]' % (colores['languages'], item.languages)
 
     if item.fmt_sufijo != '':
-        # diferenciar pelis/series en búsquedas mixtas
+        # ~ diferenciar pelis/series en búsquedas mixtas
         if item.fmt_sufijo in ['movie', 'tvshow']:
             opciones = { 'movie': ['deepskyblue', 'Película'], 'tvshow': ['hotpink', 'Serie'] }
             titulo += ' [COLOR %s]%s[/COLOR]' % (opciones[item.fmt_sufijo][0], opciones[item.fmt_sufijo][1])
@@ -545,7 +548,7 @@ def formatear_titulo_peli_serie(item, colores={}, formato={}):
 
     return titulo
 
-# Formateo de títulos en listados de pelis, series, temporadas, episodios
+# ~ Formateo de títulos en listados de pelis, series, temporadas, episodios
 def formatear_titulos(itemlist):
     colores = {}
     colores['movie'] = config.get_setting('list_movie_color', default='white')
@@ -566,27 +569,29 @@ def formatear_titulos(itemlist):
 
 
 def developer_mode_check_findvideos(itemlist, parent_item):
-    txt_log_servers = ''; checkeds = []
+    checkeds = []
+
+    txt_log_servers = ''
     txt_log_qualities = ''
 
     for it in itemlist:
-        # Verificar servers desconocidos o no implementados
+        # ~ Verificar servers desconocidos o no implementados
         apuntar = False
 
         if it.server == 'desconocido':
-            # El canal no ha fijado server, y la url no se ha detectado de ningún server conocido
+            # ~ El canal no ha fijado server, y la url no se ha detectado de ningún server conocido
             apuntar = True
         elif it.server:
-            # El canal ha fijado server sin verificar la url, y puede que no esté implementado
+            # ~ El canal ha fijado server sin verificar la url, y puede que no esté implementado
             if it.server not in checkeds:
-                # para no repetir servers ya verificados
+                # ~ para no repetir servers ya verificados
                 checkeds.append(it.server)
                 path = os.path.join(config.get_runtime_path(), 'servers', it.server + '.json')
                 if not os.path.isfile(path): apuntar = True
 
-        # Server Various y anulados/controlados
+        # ~ Server Various y anulados/controlados
         if apuntar:
-            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'hexload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'yadi.', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidroba', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhide', 'hxfile', 'drop', 'embedv', 'vgplayer', 'userload', 'uploadraja', 'cdnwish', 'goodstream', 'asnwish', 'flastwish', 'jodwish', 'fmoonembed', 'embedmoon', 'moonjscdn', 'rumble', 'bembed', 'javlion', 'streamruby', 'sruby', 'rubystream', 'stmruby', 'rubystm', 'rubyvid', 'swhoi', 'listeamed', 'go-streamer.net', 'fsdcmo', 'fdewsdc', 'peytonepre', 'ryderjet', 'smoothpre' , 'qiwi', 'swdyu', 'streamhihi', 'luluvdoo', 'lulu', 'ponmi', 'wishonly', 'streamsilk', 'playerwish', 'hlswish', 'iplayerhls', 'hlsflast', 'ghbrisk', 'cybervynx', 'streamhg', 'stbhg', 'dhcplay', 'wish', 'stblion', 'terabox', 'dhtpre', 'dramacool', 'l1afav', 'hlsflex', 'swiftplayers', 'movearnpre', 'seraphinap', 'seraphinapl', 'gradehgplus', 'tryzendm', 'hglink', 'hailindihg', 'guxhag', 'habetar', 'yuguaab', 'mivalyo', 'taylorplayer', 'xenolyzb', 'hgplaycdn', 'videoland', 'bingezove', 'dinisglows', 'dingtezuni', 'd00ds.site', 'davioad', 'haxloppd', 'dumbalag', 'kravaxxa', 'hgbazooka', 'cavanhabg']:
+            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'hexload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'yadi.', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'stbturbo', 'turbovidhls', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidroba', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhide', 'hxfile', 'drop', 'embedv', 'vgplayer', 'userload', 'uploadraja', 'cdnwish', 'goodstream', 'asnwish', 'flastwish', 'jodwish', 'fmoonembed', 'embedmoon', 'moonjscdn', 'rumble', 'bembed', 'javlion', 'streamruby', 'sruby', 'rubystream', 'stmruby', 'rubystm', 'rubyvid', 'rubyvidhub', 'swhoi', 'listeamed', 'go-streamer.net', 'fsdcmo', 'fdewsdc', 'peytonepre', 'ryderjet', 'smoothpre' , 'qiwi', 'swdyu', 'streamhihi', 'luluvdoo', 'lulu', 'ponmi', 'wishonly', 'streamsilk', 'playerwish', 'hlswish', 'iplayerhls', 'hlsflast', 'ghbrisk', 'cybervynx', 'streamhg', 'stbhg', 'dhcplay', 'wish', 'stblion', 'terabox', 'dhtpre', 'dramacool', 'l1afav', 'hlsflex', 'swiftplayers', 'movearnpre', 'seraphinap', 'seraphinapl', 'gradehgplus', 'tryzendm', 'hglink', 'hailindihg', 'guxhag', 'habetar', 'yuguaab', 'mivalyo', 'taylorplayer', 'xenolyzb', 'hgplaycdn', 'videoland', 'bingezove', 'dinisglows', 'dingtezuni', 'dintezuvio', 'd00ds.site', 'davioad', 'haxloppd', 'dumbalag', 'kravaxxa', 'hgbazooka', 'cavanhabg']:
                 apuntar = False
 
             elif it.server in ['allviid', 'cloudfile', 'cloudmail', 'dailyuploads', 'darkibox', 'dembed', 'downace', 'fastdrive', 'filegram', 'gostream', 'letsupload', 'liivideo', 'myupload', 'neohd', 'oneupload', 'pandafiles', 'rovideo', 'send', 'streamable', 'streamdav', 'streamgzzz', 'streamoupload', 'turbovid', 'tusfiles', 'uploadba', 'uploadflix', '1uploadflix', 'uploadhub', 'uploady', 'upvid', 'veev', 'doods', 'veoh', 'vidbob', 'vidlook', 'vidmx', 'vido.', 'vidpro', 'vidstore', 'vipss', 'vkprime', 'worlduploads', 'ztreamhub' 'amdahost', 'updown', 'videa', 'asianplay', 'swiftload', 'udrop', 'vidtube',  'bigwarp', 'bgwp', 'wecima', 'asianload', 'savefiles', 'streamhls', 'vidbasic', 'streamup', 'strmup', 'vimeos']:
@@ -614,9 +619,9 @@ def developer_mode_check_findvideos(itemlist, parent_item):
 
             txt_log_servers += os.linesep
 
-        # Verificar calidades
-        if it.quality == '' or it.quality_num == '': continue # Si no hay calidad o el canal no ha fijado el orden de calidades, nada a comprobar
-        if it.quality_num == 0: # Orden de calidad no contemplado en el canal, apuntar para añadirlo
+        # ~ Verificar calidades
+        if it.quality == '' or it.quality_num == '': continue # ~ Si no hay calidad o el canal no ha fijado el orden de calidades, nada a comprobar
+        if it.quality_num == 0: # ~ Orden de calidad no contemplado en el canal, apuntar para añadirlo
             txt_log_qualities += 'Calidad: %s Canal: %s Server: %s Url: %s' % (it.quality, it.channel, it.server, it.url)
             if parent_item.contentType == 'movie':
                 txt_log_qualities += ' Película: %s' % (parent_item.contentTitle)
@@ -625,8 +630,9 @@ def developer_mode_check_findvideos(itemlist, parent_item):
 
             txt_log_qualities += os.linesep
 
-    # Guardar en ficheros de log
-    loglevel = config.get_setting('debug', 0) # 0 (error), 1 (error+info), 2 (error+info+debug)
+    # ~ Guardar en ficheros de log
+    # ~ 0 (error), 1 (error+info), 2 (error+info+debug)
+    loglevel = config.get_setting('debug', 0)
 
     if loglevel == 2:
         avisar = False
@@ -647,39 +653,43 @@ def developer_mode_check_findvideos(itemlist, parent_item):
 
         if avisar: dialog_notification(config.__addon_name, '[B][COLOR %s]Revisar Logs Servers y/ó Qualities[/COLOR][/B]' % color_exec)
 
-        if os.path.isfile(os.path.join(config.get_runtime_path(), 'core', 'developertools.py')):
-            try:
-               from core import developertools
+        if config.get_setting('developer_mode', default=False):
+            if config.get_setting('developer_team'):
+                try:
+                   from modules import developertools
 
-               developertools.developer_mode_check_findvideos(itemlist, parent_item)
-            except:
-               pass
+                   developertools.developer_mode_check_findvideos(itemlist, parent_item)
+                except:
+                   pass
 
 
-# Reproducción
-# Debe acabar haciendo play (o play_fake en su defecto) ya que en Kodi se considera playable
-# itemlist: datos de los enlaces devueltos por findvideos (server, url, y opcionalmente quality,language,age,other) 
-# parent_item: datos de la película/episodio (para usar sus infoLabels)
+# ~ Reproducción
+# ~ Debe acabar haciendo play (o play_fake en su defecto) ya que en Kodi se considera playable
+# ~ itemlist: datos de los enlaces devueltos por findvideos (server, url, y opcionalmente quality,language,age,other) 
+# ~ parent_item: datos de la película/episodio (para usar sus infoLabels)
 def play_from_itemlist(itemlist, parent_item):
     notification_d_ok = config.get_setting('notification_d_ok', default=True)
 
-    # si viene de tracking y se cancela el play por no seleccionar ningún canal
+    # ~ si viene de tracking y se cancela el play por no seleccionar ningún canal
     if itemlist is None:
         play_fake()
         return
 
-    # si viene de tracking, parent_item contiene los datos mínimos, recuperar infolabels
+    # ~ si viene de tracking, parent_item contiene los datos mínimos, recuperar infolabels
     if parent_item.channel == 'tracking':
         from core import trackingtools
 
         trackingtools.set_infolabels_from_min(parent_item)
-        # Para algunos servers (ej: gamovideo) se necesita la url para usar como referer
+        # ~ Para algunos servers (ej: gamovideo) se necesita la url para usar como referer
         if len(itemlist) > 0: parent_item.url = itemlist[0].parent_item_url
 
-    # Reordenar/Filtrar enlaces (descartar servers inactivos, y según idioma)
-    itemlist = list(filter(lambda it: it.action == 'play', itemlist)) # aunque por ahora no se usan action != 'play' en los findvideos
+    # ~ Reordenar/Filtrar enlaces (descartar servers inactivos, y según idioma)
+    # ~ aunque por ahora no se usan action != 'play' en los findvideos
+    itemlist = list(filter(lambda it: it.action == 'play', itemlist))
 
-    if config.get_setting('developer_mode', default=False): developer_mode_check_findvideos(itemlist, parent_item)
+    if config.get_setting('developer_mode', default=False):
+        if config.get_setting('developer_team'):
+            developer_mode_check_findvideos(itemlist, parent_item)
 
     total_enlaces = len(itemlist)
     
@@ -706,19 +716,19 @@ def play_from_itemlist(itemlist, parent_item):
 
     itemlist = formatear_enlaces_servidores(itemlist)
 
-    erroneos = [] # para marcar los enlaces que fallan
-    esperar_seleccion = True # indica si hay que mostrar el diálogo de selección al usuario. Sí a menos que haya autoplay.
+    erroneos = [] # ~ para marcar los enlaces que fallan
+    esperar_seleccion = True # ~ indica si hay que mostrar el diálogo de selección al usuario. Sí a menos que haya autoplay.
 
     autoplay = config.get_setting('autoplay', default=False)
 
-    # Activar autoplay si solamente hay un enlace
+    # ~ Activar autoplay si solamente hay un enlace
     if not autoplay and len(itemlist) == 1 and config.get_setting('autoplay_one_link', default=True): autoplay = True
 
     if autoplay:
         autoplay_max_links = config.get_setting('autoplay_max_links', default=10)
         autoplay_channels_discarded = config.get_setting('autoplay_channels_discarded', default='').lower().replace(' ', '').split(',')
 
-    # Descartar autoplay en canales concretos que el usuario haya configurado
+    # ~ Descartar autoplay en canales concretos que el usuario haya configurado
     if autoplay and itemlist[0].channel in autoplay_channels_discarded: autoplay = False
 
     if autoplay:
@@ -735,7 +745,7 @@ def play_from_itemlist(itemlist, parent_item):
             perc = int(i / num_opciones * 100)
             p_dialog.update(perc, 'Reproducción con Auto Play', '%d/%d: %s' % (i+1, num_opciones, it.title))
 
-            # Si el canal tiene play propio interpretar el itemlist que devuelve (Item o list)
+            # ~ Si el canal tiene play propio interpretar el itemlist que devuelve (Item o list)
             canal_play = __import__('channels.' + it.channel, fromlist=[''])
             if hasattr(canal_play, 'play'):
                 itemlist_play = canal_play.play(it)
@@ -764,7 +774,7 @@ def play_from_itemlist(itemlist, parent_item):
 
         p_dialog.close()
         if not ok_play:
-            if esperar_seleccion: # si se ha llegado al límite de enlaces a intentar y todavía quedan, se muestra diálogo para selección del usuario
+            if esperar_seleccion: # ~ si se ha llegado al límite de enlaces a intentar y todavía quedan, se muestra diálogo para selección del usuario
                 dialog_notification('Auto Play sin éxito', 'Fallaron los %d primeros enlaces' % autoplay_max_links, time=3000)
             else:
                 play_fake()
@@ -778,7 +788,7 @@ def play_from_itemlist(itemlist, parent_item):
             if len(itemlist) == 1: dialog_notification('Auto Play resuelto', it.title, time=2000, sound=False)
             else: dialog_notification('Auto Play resuelto', it.title)
 
-    # Diálogo hasta que el usuario cancele o play ok
+    # ~ Diálogo hasta que el usuario cancele o play ok
     if esperar_seleccion:
         while not xbmc.Monitor().abortRequested():
             opciones = []
@@ -794,7 +804,7 @@ def play_from_itemlist(itemlist, parent_item):
                 play_fake()
                 break
             else:
-                # Si el canal tiene play propio interpretar el itemlist que devuelve (Item o list)
+                # ~ Si el canal tiene play propio interpretar el itemlist que devuelve (Item o list)
                 canal_play = __import__('channels.' + itemlist[seleccion].channel, fromlist=[''])
                 if hasattr(canal_play, 'play'):
                     itemlist_play = canal_play.play(itemlist[seleccion])
@@ -826,7 +836,7 @@ def play_from_itemlist(itemlist, parent_item):
                 else: erroneos.append(seleccion)
 
 
-# Reproducción fictícia para usar cuando Kodi espera que se haga un play
+# ~ Reproducción fictícia para usar cuando Kodi espera que se haga un play
 def play_fake(resuelto=False):
     logger.info()
     if resuelto:
@@ -836,10 +846,15 @@ def play_fake(resuelto=False):
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), False, xbmcgui.ListItem(path=os.path.join(config.get_runtime_path(), 'resources', 'subtitle.mp4')) )
 
 
-# Hacer la reproducción del item recibido. Devuelve False si falla el vídeo, True si ok o cancelado
-# item: datos del enlace (server, url, y opcionalmente quality,language,age,other) 
-# parent_item: datos de la película/episodio (infoLabels)
-# autoplay: Si True no muestra dialog_ok() en caso de error ni diálogo para elegir si hay varias opciones
+# ~ Poner settings inputstream adaptive
+def setInputstreamProp(addon_name, xlistitem, prop, val):
+    xlistitem.setProperty('{}.{}'.format(addon_name, prop), val)
+
+
+# ~ Hacer la reproducción del item recibido. Devuelve False si falla el vídeo, True si ok o cancelado
+# ~ item: datos del enlace (server, url, y opcionalmente quality,language,age,other) 
+# ~ parent_item: datos de la película/episodio (infoLabels)
+# ~ autoplay: Si True no muestra dialog_ok() en caso de error ni diálogo para elegir si hay varias opciones
 def play_video(item, parent_item, autoplay=False):
     notification_d_ok = config.get_setting('notification_d_ok', default=True)
 
@@ -892,7 +907,7 @@ def play_video(item, parent_item, autoplay=False):
         else:
            opciones.append('[COLOR fuchsia]Play[COLOR moccasin] ver el vídeo en [B]' + video_url[0] + '[/B][/COLOR]')
 
-    # Si hay varias opciones dar a elegir, si sólo hay una reproducir directamente
+    # ~ Si hay varias opciones dar a elegir, si sólo hay una reproducir directamente
     if len(opciones) > 1:
         if not autoplay: 
             seleccion = dialog_select("Seleccione una opción para [B][COLOR fuchsia]" + item.server.capitalize() + '[/B][/COLOR]', opciones)
@@ -906,6 +921,7 @@ def play_video(item, parent_item, autoplay=False):
         return True
     else:
         mediaurl, view, mpd = get_video_seleccionado(item, seleccion, video_urls)
+
         if mediaurl == '':
             if not autoplay:
                 if notification_d_ok:
@@ -915,7 +931,15 @@ def play_video(item, parent_item, autoplay=False):
             return False
 
         if mpd and not is_mpd_enabled():
-            if not autoplay: dialog_ok(config.__addon_name, '[COLOR moccasin][B]Para ver el formato MPD se require el AddOn inputstream.adaptive[/B][/COLOR]')
+            if not autoplay:
+                avisar = False
+                if config.get_setting('developer_mode', default=False):
+                    if config.get_setting('developer_team'): avisar = True
+
+                if avisar:
+                    dialog_notification(config.__addon_name, '[B][COLOR %s]Falta Inputstream Adaptive[/COLOR][/B]' % color_exec)
+                else:
+                    dialog_ok(config.__addon_name, '[COLOR yellow][B]Para ver el formato MPD se require el AddOn[/B][/COLOR] [COLOR cyan][B]Inputstream Adaptive[/B][/COLOR]')
             return False
 
         if item.server == 'torrent':
@@ -934,20 +958,140 @@ def play_video(item, parent_item, autoplay=False):
             xlistitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
             xlistitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
 
+        # ~ si se trata de un vídeo en formato mpd, se configura el listitem para reproducirlo
+        # ~ con el addon Inputstreamaddon implementado en Kodi 18
+        # ~ el itemlist debe enviarse de esta manera:
+        # ~ video_urls.append(['.mpd', url, 0, "", "mpd"])
+        # ~ donde el quinto parámetro debe existir (tipo: str o int) para que sea reconocido como un mpd
+        # ~ https://github.com/xbmc/inputstream.adaptive/wiki/Integration
+
+        kver = config.get_setting('kver')
+
+        if not kver: kver = 0
+
+        _stream_sets = False
+
+        if kver >= 18:
+            if ".m3u8" in mediaurl: _stream_sets = True
+            elif mpd: _stream_sets = True
+
+        if _stream_sets:
+            addon_name = 'inputstream.adaptive'
+
+            if not xbmc.getCondVisibility("System.HasAddon({})".format(addon_name)):
+                avisar = False
+                if config.get_setting('developer_mode', default=False):
+                    if config.get_setting('developer_team'): avisar = True
+
+                if avisar:
+                    dialog_notification(config.__addon_name, '[B][COLOR %s]Falta Inputstream Adaptive[/COLOR][/B]' % color_exec)
+                else:
+                    dialog_ok(config.__addon_name, '[COLOR yellow][B]Para Reproducir formato MPD ó M3U se require el AddOn[/B][/COLOR] [COLOR cyan][B]Inputstream Adaptive[/B][/COLOR]')
+
+            else:
+
+                if mpd: mime = 'application/dash+xml'
+                else: mime = 'application/vnd.apple.mpegurl'
+
+                xlistitem.setMimeType(mime)
+ 
+                xlistitem.setContentLookup(False)
+
+                if kver == 18: setaddon = "inputstreamaddon"
+                else: setaddon = "inputstream"
+ 
+                xlistitem.setProperty(setaddon, addon_name)
+
+                if "|" in mediaurl:
+                    mediaurl, headers = mediaurl.split("|", 1)
+                    setInputstreamProp(addon_name, xlistitem, "stream_headers", headers)
+
+                    if kver >= 20:
+                        setInputstreamProp(addon_name, xlistitem, "manifest_headers", headers)
+
+                if kver >= 20:
+                    if "?" in mediaurl:
+                        mediaurl, params = mediaurl.split("?", 1)
+                        setInputstreamProp(addon_name, xlistitem, "manifest_params", params)
+                        setInputstreamProp(addon_name, xlistitem, "stream_params", params)
+
+                if kver <= 21:
+                    setInputstreamProp(addon_name, xlistitem, "manifest_type", "mpd" if mpd else "hls")
+
+                if kver >= 21:
+                    setInputstreamProp(addon_name, xlistitem, "manifest_config",
+                                       '{"hls_fix_mediasequence": true, "hls_ignore_endlist": true, "hls_fix_discsequence": true}')
+                    setInputstreamProp(addon_name, xlistitem, "config",
+                                       '{"internal_cookies": true, "ssl_verify_peer": false}')
+
+                if config.get_setting('developer_mode', default=False):
+                    if config.get_setting('developer_team'):
+                        dialog_notification(config.__addon_name, '[B][COLOR cyan]' + setaddon.capitalize() + '[/COLOR][/B]')
+
+        if not _stream_sets:
+            if not kver == 0:
+                if kver > 18:
+                    if ".mp4" in mediaurl or ".m3u8" in mediaurl: _stream_sets = True
+
+            if _stream_sets:
+                addon_name = 'inputstream.ffmpegdirect'
+
+                if not xbmc.getCondVisibility("System.HasAddon({})".format(addon_name)):
+                    avisar = False
+                    if config.get_setting('developer_mode', default=False):
+                        if config.get_setting('developer_team'): avisar = True
+
+                    if avisar:
+                        dialog_notification(config.__addon_name, '[B][COLOR %s]Falta Inputstream Ffmpegdirect[/COLOR][/B]' % color_exec)
+                    else:
+                        dialog_ok(config.__addon_name, '[COLOR yellow][B]Para Reproducir el formato MP4 ó M3U se require el AddOn[/B][/COLOR] [COLOR cyan][B]Inputstream Ffmpegdirect[/B][/COLOR]')
+
+                else:
+
+                    xlistitem.setMimeType('application/x-mpegURL')
+
+                    xlistitem.setContentLookup(False)
+
+                    setaddon = "inputstream"
+
+                    xlistitem.setProperty(setaddon, addon_name)
+
+                    # ~ https://github.com/xbmc/inputstream.ffmpegdirect
+                    setInputstreamProp(addon_name, xlistitem, "is_realtime_stream", 'false')
+
+                    # ~ open_mode: If the value ffmpeg is supplied the inputstream will be opened with AVFormat.
+                    # ~ If the value curl is supplied the inputstream will be opened with cURL. If neither value
+                    # ~ is supplied the default is to open HLS, Dash and Smooth Streaming with AVFormat and anything else
+                    # ~ as a kodi file. Note that a mimetype or manifest_type property is required to be able to tell
+                    # ~ if a stream is HLS or Dash. If using Smooth streaming only a manifest_type property will work as
+                    # ~ Smooth Streaming does not have a mimetype.
+                    setInputstreamProp(addon_name, xlistitem, "open_mode", 'ffmpeg')
+
+                    # ~ manifest_type: Allowed values are hls for HLS, mpd for Dash and ism for Smooth Streaming.
+                    setInputstreamProp(addon_name, xlistitem, "manifest_type", 'hls')
+
+                    # ~ playback_as_live: Should the playback be considerd as live tv, 
+                    # ~ allowing skipping from one programme to the next over the entire catchup window, 
+                    # ~ if so set to true. Otherwise set to false to treat all programmes as videos.
+                    setInputstreamProp(addon_name, xlistitem, "playback_as_live", 'false')
+
+                    if config.get_setting('developer_mode', default=False):
+                        if config.get_setting('developer_team'):
+                            dialog_notification(config.__addon_name, '[B][COLOR cyan]' + setaddon.capitalize() + '[/COLOR][/B]')
+
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xlistitem)
         # ~ xbmcplugin.setResolvedUrl(int(sys.argv[1]), False, xlistitem) # para probar forzando como si fallara
 
         if item.subtitle:
-            logger.info('Subtítulos: %s' % item.subtitle)
             xbmc.sleep(2000)
             xbmc.Player().setSubtitles(item.subtitle)
 
-        # espera de unos segundos y comprobar si está funcionando !?
+        # ~ espera de unos segundos y comprobar si está funcionando !?
         # ~ return xbmc.Player().isPlaying()
         return True
 
 
-# video_urls: [0]:título [1]:url [2]:wait_time [3]:subtitle [4]:is_mpd
+# ~ video_urls: [0]:título [1]:url [2]:wait_time [3]:subtitle [4]:is_mpd
 def get_video_seleccionado(item, seleccion, video_urls):
     logger.info()
     mediaurl = ""
@@ -955,7 +1099,7 @@ def get_video_seleccionado(item, seleccion, video_urls):
     wait_time = 0
     mpd = False
 
-    # Ha elegido uno de los vídeos
+    # ~ Ha elegido uno de los vídeos
     if seleccion < len(video_urls):
         mediaurl = video_urls[seleccion][1]
         if len(video_urls[seleccion]) > 4:
@@ -969,13 +1113,13 @@ def get_video_seleccionado(item, seleccion, video_urls):
             wait_time = video_urls[seleccion][2]
         view = True
 
-    # Si no hay mediaurl es porque el vídeo no está :)
-    logger.info("mediaurl=" + mediaurl)
+    # ~ Si no hay mediaurl es porque el vídeo no está :)
+    logger.info("mediaurl=" + str(mediaurl))
     if mediaurl == '':
         logger.error('No video to play ;-(')
         wait_time = 0
 
-    # Si hay un tiempo de espera (como en megaupload), lo impone ahora
+    # ~ Si hay un tiempo de espera (como en megaupload), lo impone ahora
     if wait_time > 0:
         continuar = handle_wait(wait_time, item.server, "Cargando vídeo ...")
         if not continuar: mediaurl = ''
@@ -1061,7 +1205,7 @@ def play_torrent(mediaurl, parent_item):
         return False
 
     mediaurl = quote_plus(mediaurl)
-    # Llamada con más parámetros para completar el título en algunos clientes
+    # ~ Llamada con más parámetros para completar el título en algunos clientes
     if cliente_torrent in ['quasar', 'elementum'] and parent_item.infoLabels['tmdb_id']:
         if parent_item.contentType == 'episode' and cliente_torrent == 'quasar':
             mediaurl += "&episode=%s&library=&season=%s&show=%s&tmdb=%s&type=episode" % (parent_item.infoLabels['episode'], parent_item.infoLabels['season'], parent_item.infoLabels['tmdb_id'], parent_item.infoLabels['tmdb_id'])
@@ -1082,9 +1226,9 @@ def is_mpd_enabled():
     return xbmc.getCondVisibility('System.HasAddon("inputstream.adaptive")')
 
 
-# Diálogos internos
-# Si falla un enlace de una peli/serie, en default.py se intercepta el error y se ofrece este diálogo
-# para buscar la misma peli/serie en otros canales o en el propio canal.
+# ~ Diálogos internos
+# ~ Si falla un enlace de una peli/serie, en default.py se intercepta el error y se ofrece este diálogo
+# ~ para buscar la misma peli/serie en otros canales o en el propio canal.
 def dialogo_busquedas_por_fallo_web(item):
     item_search = None
 
@@ -1123,7 +1267,7 @@ def dialogo_busquedas_por_fallo_web(item):
 def get_kodi_db():
     from core import filetools
 
-    # Buscamos el archivo de la BBDD de vídeos más reciente (MyVideos[NUM].db)
+    # ~ Buscamos el archivo de la BBDD de vídeos más reciente (MyVideos[NUM].db)
     file_db = ''
     current_version = 0
 

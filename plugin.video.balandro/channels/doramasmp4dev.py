@@ -84,6 +84,12 @@ def list_all(item):
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
         title = scrapertools.find_single_match(match, '<div class="Title">(.*?)</div>')
+        if not title:
+            title1 = scrapertools.find_single_match(match, 'data-subtitle="(.*?)"')
+            title2 = scrapertools.find_single_match(match, '<h2 class="Title".*?">(.*?)</h2>')
+
+            title = title1 + ' ' + title2
+
         if not title: title = scrapertools.find_single_match(match, 'data-subtitle="(.*?)"')
 
         if not url or not title: continue
@@ -158,7 +164,6 @@ def temporadas(item):
             platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]Proximamente[/B][/COLOR]')
             return
 
-    if config.get_setting('channels_seasons', default=True):
         title = 'Sin temporadas'
 
         platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]' + title + '[/COLOR]')
@@ -345,22 +350,45 @@ def play(item):
     item.url = item.url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
     item.url = item.url.replace('amp;#038;', '&').replace('#038;', '&').replace('amp;', '&')
 
+    item.url = item.url.replace('&&', '&')
+
     url = item.url
 
     if item.server == 'directo':
-        if '/fkplayer.xyz' in url:
-            return 'Servidor [COLOR plum]NO Soportado[/COLOR]'
+        if '/easytubedatablabmyfire.' in url:
+            return '[COLOR red]CloudFlare[COLOR orangered] Protection[/COLOR]'
 
         elif '.mundodrama.' in url or '/?trembed=' in url:
             data = do_downloadpage(url)
 
-            url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
-            if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="(.*?)"')
+            url = scrapertools.find_single_match(data, '<div class="Video">.*?<iframe.*?src="(.*?)"')
+            if not url: url = scrapertools.find_single_match(data, '<div class="Video">.*?<IFRAME.*?SRC="(.*?)"')
 
-            if '/fkplayer.xyz' in url:
-                return 'Servidor [COLOR plum]NO Soportado[/COLOR]'
+            if '/easytubedatablabmyfire.' in url:
+                return '[COLOR red]CloudFlare[COLOR orangered] Protection[/COLOR]'
 
         else: url = ''
+
+    if '/fkplayer.' in url:
+        _token = scrapertools.find_single_match(url, "/e/(.*?)$")
+
+        if _token:
+            headers = {'Referer': url}
+            post = {'token': _token}
+
+            data = do_downloadpage('https://fkplayer.xyz/api/decoding', post=post, headers=headers)
+
+            link = scrapertools.find_single_match(data, '"link":"(.*?)"')
+
+            if not link: return itemlist
+
+            new_url = base64.b64decode(link).decode("utf-8")
+
+            if new_url:
+                servidor = servertools.get_server_from_url(new_url)
+                servidor = servertools.corregir_servidor(servidor)
+
+                url = new_url
 
     if url:
         servidor = servertools.get_server_from_url(url)
@@ -377,6 +405,16 @@ def play(item):
         itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host
+    item.group ='last'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
 
 
 def search(item, texto):

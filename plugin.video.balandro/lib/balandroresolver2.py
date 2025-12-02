@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import sys
+import xbmc, re, base64, random
 
-if sys.version_info[0] >= 3:
+from platformcode import logger, config
+from core import jsontools
+
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
+
+if PY3:
     unicode = str
 
     from urllib.parse import unquote
 else:
     from urllib import unquote
-
-
-import xbmc, re, base64, random
-
-from platformcode import logger
-
-from core import jsontools
 
 
 class EstructuraInicial(object):

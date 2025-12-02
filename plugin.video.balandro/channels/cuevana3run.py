@@ -380,6 +380,8 @@ def last_epis(item):
 
         if not url or not title: continue
 
+        title = title.replace('(Online)', '').strip()
+
         title = title.replace('&#039;s', "'s").replace('&#038;', '').replace('&#8211;', '').replace('&#215;', 'x').replace('&amp;', '').strip()
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
@@ -426,11 +428,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action='episodios', title=title, page = 0, contentType='season', contentSeason=tempo, text_color = 'tan' ))
 
@@ -696,6 +698,15 @@ def list_search(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host + 'episodio/'
+    item.search_type = 'tvshow'
+
+    return last_epis(item)
 
 
 def search(item, texto):

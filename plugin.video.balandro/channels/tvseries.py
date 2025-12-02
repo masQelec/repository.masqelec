@@ -23,6 +23,8 @@ def mainlist_series(item):
 
     # ~ itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
+    itemlist.append(item.clone( channel='youtubetrailers', action='search', title= '[B][COLOR yellow]Buscar[/COLOR] Youtube[/B] ...', thumbnail=config.get_thumb('youtube'), text_color='darksalmon', search_special = 'youtube', search_type = 'all' ))
+
     itemlist.append(item.clone( title = 'Series de [COLOR hotpink]Ciencia Ficción[/COLOR]', action = 'menu_series', url = host + '-02.weebly.com' ))
 
     itemlist.append(item.clone( title = 'Series de [COLOR hotpink]Comedias[/COLOR]', action = 'menu_series', url = host + '-05.weebly.com' ))
@@ -39,9 +41,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Series de [COLOR hotpink]Westerns[/COLOR]', action = 'menu_series', url = host + '-01.weebly.com' ))
 
-    itemlist.append(item.clone( title = 'YouTube [COLOR hotpink]Animación[/COLOR] ', action = 'youtubes', thumbnail=config.get_thumb('youtube'), text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = '[B]YouTube[/B] [COLOR hotpink]Animación[/COLOR]', action = 'youtubes', thumbnail=config.get_thumb('youtube'), text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'YouTube [COLOR hotpink]Humor[/COLOR] ', action = 'youtubes2', thumbnail=config.get_thumb('youtube'), text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = '[B]YouTube[/B] [COLOR hotpink]Humor[/COLOR]', action = 'youtubes2', thumbnail=config.get_thumb('youtube'), text_color = 'moccasin' ))
 
     return itemlist
 
@@ -50,7 +52,13 @@ def menu_series(item):
     logger.info()
     itemlist = []
 
+    cab = item.title.replace('[COLOR hotpink]', '').replace('[/COLOR]', '')
+
+    itemlist.append(item.clone( title = cab.upper(), action = '', text_color = 'yellow' ))
+
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', url = item.url, search_type = 'tvshow', text_color = 'hotpink' ))
+
+    itemlist.append(item.clone( channel='youtubetrailers', action='search', title= '[B][COLOR yellow]Buscar[/COLOR] Youtube[/B] ...', thumbnail=config.get_thumb('youtube'), text_color='darksalmon', search_special = 'youtube', search_type = 'all' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'series', url = item.url, search_type = 'tvshow' ))
 

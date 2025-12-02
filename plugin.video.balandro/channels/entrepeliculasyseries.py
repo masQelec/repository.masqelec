@@ -273,6 +273,8 @@ def list_all(item):
 
         if '/release/' in item.url: year = scrapertools.find_single_match(item.url, "/release/(.*?)/")
 
+        title = title.replace('Ver ', '').replace('online en HD', '').replace('- Película completa', '').replace('- Serie completa', '').replace('- Anime completa', '').strip()
+
         title = title.replace('&#39;s', "'s").replace('&#039;s', "'s").replace('&#8211;', '').replace('&#039;', "'").replace('&#8230;', ' &').replace('&amp;', '&').replace('&#8217;s', "'").strip()
 
         if url.startswith("/"): url = host[:-1] + url
@@ -332,12 +334,12 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.id_season = id_season
-            item.contentSeason = nro_season
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.id_season = id_season
+                item.contentSeason = nro_season
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, id_season = id_season,
                                     contentType = 'season', contentSeason = nro_season, text_color='tan' ))
@@ -451,9 +453,9 @@ def findvideos(item):
 
     embeds = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)".*?</iframe>')
 
-    if not 'http' in embeds: embeds = ''
-
     if not embeds: embeds = scrapertools.find_single_match(data, 'data-src="(.*?)"')
+
+    if not 'http' in embeds: embeds = ''
 
     if not embeds: return itemlist
 
@@ -528,6 +530,7 @@ def findvideos(item):
                 elif 'uploadfox' in srv: continue
 
                 elif srv == 'download': continue
+                elif srv == 'up2box': continue
 
                 servidor = servertools.corregir_servidor(srv)
 
@@ -539,12 +542,6 @@ def findvideos(item):
                 other = ''
 
                 if servidor == 'various': other = servertools.corregir_other(srv)
-
-                if servidor == 'directo':
-                    if not config.get_setting('developer_mode', default=False): continue
-                    else:
-                       other = url.split("/")[2]
-                       other = other.replace('https:', '').strip()
 
                 if '.eyJs' in link: age = ''
 

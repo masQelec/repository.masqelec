@@ -344,12 +344,12 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = numtempo
-            item.url = url
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = numtempo
+                item.url = url
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = numtempo, text_color='tan' ))
 
@@ -584,6 +584,15 @@ def findvideos(item):
             return
 
     return itemlist
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host + 'ver-novela/'
+    item.search_type = 'tvshow'
+
+    return last_epis(item)
 
 
 def search(item, texto):

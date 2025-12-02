@@ -170,6 +170,8 @@ def findvideos(item):
 def search(item, texto):
     logger.info()
     try:
+        config.set_setting('search_last_video', texto)
+
         item.url =  host + "spage/1/?s=%s" % (texto.replace(" ", "%20"))
         return list_all(item)
     except:
