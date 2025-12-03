@@ -161,16 +161,6 @@ def _has_network() -> bool:
     except Exception:
         return True
 
-def _is_idle() -> bool:
-    """Inactivo = no limpiando, no escaneando, no reproduciendo."""
-    try:
-        cleaning = xbmc.getCondVisibility("Library.IsCleaningVideo")
-        scanning = xbmc.getCondVisibility("Library.IsScanningVideo")
-        playing  = xbmc.getCondVisibility("Player.HasMedia")
-        return not (cleaning or scanning or playing)
-    except Exception:
-        return True
-
 def _mounts_ready() -> bool:
     """Comprobación ligera de montajes rclone: directorios existen y son accesibles."""
     try:
@@ -261,7 +251,11 @@ def _update_system_wrapper():
     try:
         enabled = _get_bool_setting("auto_update", True)
         if enabled:
-            log("Auto update enabled -> update_system()")
+            # Para auto-update de sistema somos más conservadores: exigimos más inactividad
+            if not utils.kodi_is_idle(min_idle_secs=300):
+                log("Skip auto update: Kodi no está inactivo el tiempo suficiente.", "INFO")
+                return
+            log("Auto update enabled & Kodi inactivo -> update_system()")
             update_system()
         else:
             log("Auto update disabled")
@@ -318,7 +312,7 @@ def _periodic_pvr_worker():
 
     if not _has_network():
         log("Skip PVR check: sin red.", "WARNING"); return
-    if not _is_idle():
+    if not utils.kodi_is_idle():
         log("Skip PVR check: Kodi no está inactivo.", "INFO"); return
     if not _mounts_ready():
         log("Skip PVR check: montajes rclone no listos.", "WARNING"); return
@@ -354,8 +348,8 @@ def _periodic_update_worker():
 
     if not _has_network():
         log("Skip UpdateLibrary: sin red.", "WARNING"); return
-    if not _is_idle():
-        log("Skip UpdateLibrary: Kodi no está inactivo (escaneando/limpiando/reproduciendo).", "INFO"); return
+    if not utils.kodi_is_idle():
+        log("Skip UpdateLibrary: Kodi no está inactivo.", "INFO"); return
     if not _mounts_ready():
         log("Skip UpdateLibrary: montajes rclone no listos.", "WARNING"); return
 
@@ -389,8 +383,8 @@ def _periodic_clean_worker():
 
     if not _has_network():
         log("Skip CleanLibrary: sin red.", "WARNING"); return
-    if not _is_idle():
-        log("Skip CleanLibrary: Kodi no está inactivo (escaneando/limpiando/reproduciendo).", "INFO"); return
+    if not utils.kodi_is_idle():
+        log("Skip CleanLibrary: Kodi no está inactivo.", "INFO"); return
     if not _mounts_ready():
         log("Skip CleanLibrary: montajes rclone no listos.", "WARNING"); return
 
@@ -500,8 +494,8 @@ def run_service():
     # Workers periódicos
     workers_periodic = [
         StoppableWorker("periodic_pvr_tick",    _periodic_pvr_worker,    monitor, interval=CHECK_TICK_SECS),
-        StoppableWorker("periodic_update_tick", _periodic_update_worker, monitor, interval=CHECK_TICK_SECS),
         StoppableWorker("periodic_clean_tick",  _periodic_clean_worker,  monitor, interval=CHECK_TICK_SECS),
+        StoppableWorker("periodic_update_tick", _periodic_update_worker, monitor, interval=CHECK_TICK_SECS),
     ]
     for w in workers_periodic:
         try:
@@ -522,7 +516,6 @@ def run_service():
         except Exception:
             pass
     log("Service stopped cleanly")
-
 
 if __name__ == "__main__":
     run_service()

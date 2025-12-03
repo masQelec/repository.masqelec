@@ -40,7 +40,6 @@ from lib import log_utils
 from lib import utils
 from lib import jsonrpc_utils
 from lib import rclone_utils
-from lib import fix_guisettings
 
 # ---------- Config ----------
 RCLONE_REMOTE = "masqelec"
@@ -671,10 +670,6 @@ def update_library():
         _disable_libraryautoupdate_if_enabled()
     except Exception:
         log_utils.write_log("No se pudo deshabilitar 'service.libraryautoupdate'.", level="WARNING")
-
-    # (3) corregir ajuste de sets
-    fix_guisettings.fix_movieset_folder()
-    fix_guisettings.fix_cache()
     
     local_db_dir = _database_dir_os()
     latest_name, latest_path = _pick_latest_myvideos(local_db_dir)

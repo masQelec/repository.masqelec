@@ -33,7 +33,7 @@
 	<!-- Categoría: Registro (solo visible en modo experto) -->
     <category label="30020" level="2">
         <setting label="30021" id="activar_log" type="bool" default="true"/>
-        <setting label="30022" id="ver_log" type="action" option="close" action="RunScript(special://home/addons/<service.cloud.masqelec>/service.py,viewlog)"/>
+        <setting label="30022" id="ver_log" type="action" option="close" action="RunScript(special://home/addons/service.cloud.masqelec/service.py,viewlog)"/>
     </category>
 	
 </settings>

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-update_pvr.py — Gestión de PVR IPTV Simple:
+update_pvr.py — Gestión de PVR:
 - Playlist con USER_CODE/PASS_CODE
 - Instalación/actualización del addon
 - Edición segura de instance-settings-1.xml (siempre con el addon detenido)
@@ -112,7 +112,7 @@ def update_playlist(reload_if_enabled: bool = True) -> tuple[bool, bool]:
       Para ello usa rclone_utils.copy_remote_to_tmp_then_move(remote, remote_path, final_dir) con final_dir="/tmp",
       valida y, si es correcto, lo instala en /storage/.user/user.
     - Solo escribe la playlist si cambia.
-    - Si cambia y reload_if_enabled=True y pvr.iptvsimple está habilitado, lo recarga.
+    - Si cambia y reload_if_enabled=True y pvr.hts está habilitado, lo recarga.
     Retorna: (ok, changed)
     """
     user_dir = "/storage/.user"
@@ -242,10 +242,10 @@ def update_playlist(reload_if_enabled: bool = True) -> tuple[bool, bool]:
         log_utils.write_log(f"Playlist {'creada' if not local_exists else 'actualizada'}: {playlist_file}")
 
         if reload_if_enabled:
-            enabled = _get_addon_enabled_state("pvr.iptvsimple")
+            enabled = _get_addon_enabled_state("pvr.hts")
             if enabled:
                 log_utils.write_log("Playlist modificada y PVR habilitado → recargando PVR…")
-                if restart_pvr_addon("pvr.iptvsimple", wait_ready=True):
+                if restart_pvr_addon("pvr.hts", wait_ready=True):
                     log_utils.write_log("PVR recargado tras cambiar la playlist.")
                 else:
                     log_utils.write_log("No se pudo recargar PVR automáticamente.", level="WARNING")
@@ -394,7 +394,7 @@ def _disable_conflict_services_enabled() -> bool:
         pass
     return True
 
-def _disable_other_pvr_clients(keep_id: str = "pvr.iptvsimple"):
+def _disable_other_pvr_clients(keep_id: str = "pvr.hts"):
     """Deshabilita todos los PVR clients habilitados excepto 'keep_id'."""
     if not _disable_conflicts_enabled():
         log_utils.write_log("Omitiendo deshabilitar PVR conflictivos (ajuste desactivado).")
@@ -433,7 +433,6 @@ def _looks_conflicting_service(a: dict) -> bool:
         "service.sledovani",
         "service.nextpvr",
         "service.tvheadend42",
-        "service.tvheadend43",
         "service.enigma2",
         "service.pvr.proxy",
     }
@@ -482,7 +481,7 @@ def wait_for_pvr_ready(max_wait: int = 180) -> bool:
         xbmc.sleep(500)
     return False
 
-def restart_pvr_addon(addon_id: str = "pvr.iptvsimple", wait_ready: bool = True) -> bool:
+def restart_pvr_addon(addon_id: str = "pvr.hts", wait_ready: bool = True) -> bool:
     """Recarga el PVR (disable → enable) con verificación y espera opcional a canales/EPG."""
     log_utils.write_log("Recargando PVR…")
     if not _set_addon_enabled(addon_id, False):
@@ -504,16 +503,16 @@ def restart_pvr_addon(addon_id: str = "pvr.iptvsimple", wait_ready: bool = True)
     return True
 
 # ------------------------------
-# Settings de pvr.iptvsimple
+# Settings de pvr.hts
 # ------------------------------
 
-def _pvr_settings_dir(addon_id="pvr.iptvsimple") -> str:
+def _pvr_settings_dir(addon_id="pvr.hts") -> str:
     return os.path.join(_path_profile(), "addon_data", addon_id)
 
-def _settings_file(addon_id="pvr.iptvsimple") -> str:
+def _settings_file(addon_id="pvr.hts") -> str:
     return os.path.join(_pvr_settings_dir(addon_id), "instance-settings-1.xml")
 
-def ensure_instance_settings_exists(addon_id: str = "pvr.iptvsimple") -> bool:
+def ensure_instance_settings_exists(addon_id: str = "pvr.hts") -> bool:
     """
     Asegura que existe instance-settings-1.xml. Si no existe, crea una plantilla mínima.
     No arranca el addon para generarlo: escribimos un XML válido directamente.
@@ -637,7 +636,7 @@ def _is_pvr_installed(addon_id: str) -> Tuple[bool, bool, str]:
 # ------------------------------
 
 def update_pvr() -> bool:
-    addon_id = "pvr.iptvsimple"
+    addon_id = "pvr.hts"
     db_dir = _path_database()
     addon_data_dir = _pvr_settings_dir(addon_id)
 
@@ -653,7 +652,7 @@ def update_pvr() -> bool:
     # 2) instalar si falta
     if not installed:
         log_utils.write_log("PVR no instalado completamente. Instalando…")
-        log_utils.notify("Instalando PVR IPTV Simple…")
+        log_utils.notify("Instalando PVR")
 
         ok = utils.install_addon_from_repo(
             addon_id,
