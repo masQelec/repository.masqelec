@@ -51,7 +51,9 @@ def _exec(payload, retries=2, sleep_s=0.3):
 
 
 def jsonrpc_call(method, params=None):
-    """
+    """import json
+import xbmc
+from lib import log_utils
     Llamada genérica. Devuelve:
       - el valor de 'result' si existe,
       - 'OK' si no hay 'result' pero tampoco error.
@@ -145,3 +147,60 @@ def get_kodi_version():
     except Exception as e:
         log_utils.write_log(f"[JSON-RPC] get_kodi_version falló: {e}", level="ERROR")
         return None
+
+# ------------------------------------------------------------
+# Estadísticas de biblioteca (películas, sets, series, episodios)
+# ------------------------------------------------------------
+def get_library_stats():
+    """
+    Devuelve estadísticas de la videoteca:
+      - total_movies
+      - total_movie_sets
+      - total_tvshows
+      - total_episodes
+    """
+    stats = {
+        "total_movies": 0,
+        "total_movie_sets": 0,
+        "total_tvshows": 0,
+        "total_episodes": 0
+    }
+
+    try:
+        # ---------- Películas ----------
+        r = xbmc.executeJSONRPC(json.dumps({
+            "jsonrpc": "2.0", "method": "VideoLibrary.GetMovies",
+            "params": {"properties": ["title"]}, "id": 1
+        }))
+        data = json.loads(r)
+        stats["total_movies"] = len(data.get("result", {}).get("movies", []) or [])
+
+        # ---------- Sets / Sagas ----------
+        r = xbmc.executeJSONRPC(json.dumps({
+            "jsonrpc": "2.0", "method": "VideoLibrary.GetMovieSets",
+            "params": {"properties": ["title"]}, "id": 2
+        }))
+        data = json.loads(r)
+        stats["total_movie_sets"] = len(data.get("result", {}).get("sets", []) or [])
+
+        # ---------- Series ----------
+        r = xbmc.executeJSONRPC(json.dumps({
+            "jsonrpc": "2.0", "method": "VideoLibrary.GetTVShows",
+            "params": {"properties": ["title"]}, "id": 3
+        }))
+        data = json.loads(r)
+        stats["total_tvshows"] = len(data.get("result", {}).get("tvshows", []) or [])
+
+        # ---------- Episodios ----------
+        r = xbmc.executeJSONRPC(json.dumps({
+            "jsonrpc": "2.0", "method": "VideoLibrary.GetEpisodes",
+            "params": {"properties": ["title"]}, "id": 4
+        }))
+        data = json.loads(r)
+        stats["total_episodes"] = len(data.get("result", {}).get("episodes", []) or [])
+
+    except Exception as e:
+        log_utils.write_log(f"get_library_stats error: {e}", level="ERROR")
+
+    return stats
+

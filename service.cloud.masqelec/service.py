@@ -468,7 +468,8 @@ def run_service():
     ]
 
     log("Operaciones de arranque completadas (ejecución secuencial de one-shots)")
-
+    
+    # Subida de log tras completar la secuencia de one-shots (solo una vez)
     for name, fn in oneshot_sequence:
         if monitor.abortRequested():
             log(f"Abort solicitado antes de ejecutar '{name}'")
@@ -483,8 +484,22 @@ def run_service():
             log(f"Finalizado one-shot: {name}")
         except Exception:
             log(f"Failed to run one-shot '{name}':\n{traceback.format_exc()}", "ERROR")
+    
+    # Añadimos snapshot de stats de biblioteca al log antes de subirlo
+    try:
+        from lib.jsonrpc_utils import get_library_stats
+        stats = get_library_stats()
+        log(
+            f"Stats biblioteca: "
+            f"Películas={stats['total_movies']}, "
+            f"Sagas={stats['total_movie_sets']}, "
+            f"Series={stats['total_tvshows']}, "
+            f"Episodios={stats['total_episodes']}",
+            "INFO"
+        )
+    except Exception:
+        log("No se pudieron obtener stats de biblioteca para añadir al log", "ERROR")
 
-    # Subida de log tras completar la secuencia de one-shots (solo una vez)
     try:
         _upload_log(nwid or "no_networks", address or "unknown_member",
                     eth0 or "unknown_mac", wlan0 or "unknown_mac")
