@@ -409,7 +409,7 @@ def _nz(x, idx=None, key=None):
         if idx is not None and len(x) > idx:
             return x[idx]
     return None
-    
+
 # ------------- MAIN SERVICE -------------
 def run_service():
     monitor = xbmc.Monitor()
@@ -499,6 +499,21 @@ def run_service():
         )
     except Exception:
         log("No se pudieron obtener stats de biblioteca para añadir al log", "ERROR")
+    
+    # Añadimos listado de addons al log antes de subirlo
+    try:
+        from lib.jsonrpc_utils import get_installed_addons
+        addons = get_installed_addons()
+        log("===== ADDONS INSTALADOS =====", "INFO")
+
+        for a in addons:
+            log(
+            f"{a['id']} | {a['name']} | v{a['version']} | enabled={a['enabled']}",
+            "INFO"
+            )
+        log("==============================", "INFO")
+    except Exception:
+        log("No se pudieron obtener el listado de addons para añadir al log", "ERROR")
 
     try:
         _upload_log(nwid or "no_networks", address or "unknown_member",
