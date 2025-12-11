@@ -16,9 +16,12 @@ import threading
 import traceback
 import json
 import time
+import threading
 
 import xbmc
 import xbmcgui
+
+import urllib.request
 
 from lib import log_utils
 from lib import jsonrpc_utils
@@ -35,12 +38,14 @@ SLEEP_INTERVAL_SECS = 10
 RETRY_BACKOFF_SECS = 30
 CHECK_TICK_SECS    = 60  # cada cuánto evaluar condiciones
 
-REQUIRED_MOUNTS = [
-    "/storage/videos/1",
-    "/storage/videos/2",
-    "/storage/tvshows/1",
-    "/storage/tvshows/2",
+REQUIRED_RCLONE_MOUNTS = [
+    ("users_library_1:movies",  "/storage/videos/1"),
+    ("users_library_2:movies",  "/storage/videos/2"),
+    ("users_library_1:tvshows", "/storage/tvshows/1"),
+    ("users_library_2:tvshows", "/storage/tvshows/2"),
 ]
+
+LIST_TIMEOUT = 2.0  # segundos
 
 LOG_FILE = log_utils.LOG_FILE
 
@@ -177,23 +182,105 @@ def _has_network() -> bool:
     except Exception:
         return True
 
-
-def _mounts_ready() -> bool:
-    """Comprobación ligera de montajes rclone: directorios existen y son accesibles."""
+def _has_internet(timeout: float = 3.0) -> bool:
     try:
-        for p in REQUIRED_MOUNTS:
-            if not os.path.isdir(p):
-                log(f"Montaje no disponible (no existe): {p}", "WARNING")
-                return False
-            try:
-                os.listdir(p)
-            except Exception:
-                log(f"Montaje no accesible: {p}", "WARNING")
-                return False
+        urllib.request.urlopen("https://www.google.com/generate_204", timeout=timeout)
         return True
     except Exception:
         return False
 
+def is_online() -> bool:
+    if not _has_network():
+        return False
+    return _has_internet()
+
+def _safe_listdir(path: str, timeout: float = LIST_TIMEOUT):
+    """
+    Ejecuta os.listdir(path) en un hilo para evitar bloqueos.
+    Si pasa del timeout, devuelve None.
+    """
+    result = {"items": None}
+
+    def runner():
+        try:
+            result["items"] = os.listdir(path)
+        except Exception:
+            result["items"] = None
+
+    t = threading.Thread(target=runner, daemon=True)
+    t.start()
+    t.join(timeout)
+
+    # Si el hilo siguió bloqueado, devolvemos None
+    return result["items"]
+
+
+def _mounts_ready() -> bool:
+    """
+    Verifica que los montajes rclone están:
+      ✔ en /proc/mounts como fuse.rclone
+      ✔ accesibles
+      ✔ NO vacíos
+      ✔ sin bloquear por FUSE colgado
+    """
+
+    try:
+        # 1) Leer /proc/mounts
+        try:
+            with open("/proc/mounts", "r") as f:
+                lines = f.readlines()
+        except Exception as e:
+            log(f"_mounts_ready: no se pudo leer /proc/mounts: {e}", "ERROR")
+            return False
+
+        # Extraer montajes fuse.rclone
+        rclone_mounts = []
+        for line in lines:
+            if "fuse.rclone" not in line:
+                continue
+            parts = line.split()
+            if len(parts) < 3:
+                continue
+            src, target, fstype = parts[0], parts[1], parts[2]
+            if fstype == "fuse.rclone":
+                rclone_mounts.append((src, target))
+
+        if not rclone_mounts:
+            log("_mounts_ready: no hay montajes fuse.rclone en /proc/mounts", "WARNING")
+            return False
+
+        # 2) Verificación de los 4 montajes requeridos
+        for required_src, required_target in REQUIRED_RCLONE_MOUNTS:
+            found = any(
+                (src == required_src and target == required_target)
+                for src, target in rclone_mounts
+            )
+            if not found:
+                log(f"_mounts_ready: falta montaje {required_src} → {required_target}", "WARNING")
+                return False
+
+        # 3) Accesibilidad + contenido + timeout
+        for _, target in REQUIRED_RCLONE_MOUNTS:
+
+            if not os.path.isdir(target):
+                log(f"_mounts_ready: directorio no existe: {target}", "WARNING")
+                return False
+
+            items = _safe_listdir(target, timeout=LIST_TIMEOUT)
+
+            if items is None:
+                log(f"_mounts_ready: TIMEOUT listando {target} (posible rclone colgado)", "WARNING")
+                return False
+
+            if not items:
+                log(f"_mounts_ready: carpeta vacía (montaje incompleto): {target}", "WARNING")
+                return False
+
+        return True
+
+    except Exception as e:
+        log(f"_mounts_ready: excepción inesperada: {e}", "ERROR")
+        return False
 
 # ------------- Tareas silenciosas JSON-RPC -------------
 def clean_library_silent():
@@ -321,6 +408,69 @@ def _update_pvr_wrapper():
     except Exception:
         log(f"Fallo en update_pvr:\n{traceback.format_exc()}", "ERROR")
 
+def _startup_maintenance_wrapper():
+    """
+    Mantenimiento de arranque, en ESTE orden y de forma SECUENCIAL
+    (no comienza uno hasta que termina el anterior):
+
+      1) Actualizar lista PVR (update_playlist)
+      2) CleanLibrary (silencioso)
+      3) UpdateLibrary (silencioso)
+
+    Se ejecuta una sola vez al inicio, independiente de los workers periódicos.
+    Respeta los ajustes existentes donde tiene sentido.
+    """
+    try:
+        # Primero, comprobaciones básicas
+        if not is_online():
+            log("Mantenimiento de arranque: sin red, se omite.", "WARNING")
+            return
+        if not _mounts_ready():
+            log("Mantenimiento de arranque: montajes rclone no listos, se omite.", "WARNING")
+            return
+
+        # 1) Actualizar lista PVR (si está habilitado)
+        try:
+            update_pvr_enabled = _get_bool_setting("update_pvr", True)
+        except Exception:
+            update_pvr_enabled = True
+
+        if update_pvr_enabled:
+            log("Mantenimiento de arranque: actualización de lista PVR -> inicio")
+            update_playlist()
+            log("Mantenimiento de arranque: actualización de lista PVR -> finalizado")
+        else:
+            log("Mantenimiento de arranque: actualización de lista PVR desactivada por ajustes")
+
+        # 2) CleanLibrary (según ajustes de biblioteca)
+        prefs = _load_library_prefs()
+        if prefs.get("clean_enabled", True):
+            log("Mantenimiento de arranque: CleanLibrary (silencioso) -> inicio")
+            clean_library_silent()
+            log("Mantenimiento de arranque: CleanLibrary (silencioso) -> finalizado")
+        else:
+            log("Mantenimiento de arranque: CleanLibrary desactivado por ajustes")
+
+        # 3) UpdateLibrary (según ajustes de biblioteca)
+        if prefs.get("update_enabled", True) and prefs.get("update_on_start", True):
+            log("Mantenimiento de arranque: UpdateLibrary (silencioso) -> inicio")
+            update_library_silent()
+            # actualizamos _last_update_ts para que el periódico respete el intervalo
+            global _last_update_ts
+            _last_update_ts = time.time()
+            log("Mantenimiento de arranque: UpdateLibrary (silencioso) -> finalizado")
+        else:
+            log(
+                "Mantenimiento de arranque: UpdateLibrary al inicio desactivado "
+                "por ajustes"
+            )
+
+    except Exception:
+        log(
+            "Fallo en mantenimiento de arranque (PVR + Clean + Update):\n"
+            f"{traceback.format_exc()}",
+            "ERROR",
+        )
 
 # ---------- Workers periódicos ----------
 def _periodic_pvr_worker():
@@ -344,7 +494,7 @@ def _periodic_pvr_worker():
     if (now - _last_pvrcheck_ts) < period_secs:
         return
 
-    if not _has_network():
+    if not is_online():
         log("Omitiendo revisión PVR: sin red.", "WARNING")
         return
     if not utils.kodi_is_idle():
@@ -392,7 +542,7 @@ def _periodic_update_worker():
     if (now - _last_update_ts) < period_secs:
         return
 
-    if not _has_network():
+    if not is_online():
         log("Omitiendo UpdateLibrary: sin red.", "WARNING")
         return
     if not utils.kodi_is_idle():
@@ -443,7 +593,7 @@ def _periodic_clean_worker():
     if (now - _last_clean_ts) < period_secs:
         return
 
-    if not _has_network():
+    if not is_online():
         log("Omitiendo CleanLibrary: sin red.", "WARNING")
         return
     if not utils.kodi_is_idle():
@@ -465,7 +615,7 @@ def _periodic_clean_worker():
                 "ERROR",
             )
         finally:
-            _LIBRARY_LOCK_RELEASE()
+            _LIBRARY_LOCK.release()
     else:
         log(
             "Omitiendo CleanLibrary: ya hay una operación de biblioteca en curso.",
@@ -534,6 +684,7 @@ def run_service():
         ("auto_update_once",    _update_system_wrapper),
         ("library_update_once", _update_library_wrapper),
         ("pvr_update_once",     _update_pvr_wrapper),
+        ("startup_maintenance", _startup_maintenance_wrapper),
     ]
 
     log("Iniciando operaciones de arranque (one-shots secuenciales)")

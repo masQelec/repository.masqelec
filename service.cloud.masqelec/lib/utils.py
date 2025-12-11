@@ -45,67 +45,59 @@ UA = f"{ADDON_NAME}/1.0 (+Kodi)"
 
 # ----------------- Estado de Kodi / inactividad -----------------
 
-def kodi_is_idle(min_idle_secs: int = 60) -> bool:
-    """Devuelve True si Kodi está razonablemente inactivo.
-
-    Criterios:
-      - NO está limpiando/escaneando bibliotecas (vídeo/música)
-      - NO hay reproducción ni contenido cargado en el player
-      - NO hay grabaciones PVR activas
-      - NO hay diálogos modales visibles
-      - El usuario lleva al menos ``min_idle_secs`` segundos sin interacción
+def kodi_is_idle(min_idle_secs: int = 0) -> bool:
     """
+    Heurística PERMISIVA diseñada para:
+      - CleanLibrary
+      - UpdateLibrary / escaneos
+      - Actualización de canales/EPG PVR
+
+    Bloquea sólo en casos que comprometerían rendimiento o integridad:
+      - Reproducción o pausa de vídeo/audio (no ralentizar playback)
+      - Juegos activos
+      - Limpieza/escaneo de bibliotecas en curso
+      - Grabaciones PVR activas
+
+    NO bloquea por:
+      - Tiempo de inactividad
+      - Diálogos modales
+      - Navegación del usuario
+      - Notificaciones, overlays, OSD, etc.
+    """
+
     try:
-        # 1) Operaciones de biblioteca (vídeo/música)
-        busy_library = any([
+        # 1) Biblioteca: NO ejecutar si Kodi ya está limpiando o escaneando
+        if any([
             xbmc.getCondVisibility("Library.IsCleaningVideo"),
             xbmc.getCondVisibility("Library.IsScanningVideo"),
             xbmc.getCondVisibility("Library.IsCleaningMusic"),
             xbmc.getCondVisibility("Library.IsScanningMusic"),
-        ])
-        if busy_library:
+        ]):
             return False
 
-        # 2) Reproductor (audio/vídeo/juegos, etc.)
-        busy_player = any([
-            xbmc.getCondVisibility("Player.HasMedia"),
+        # 2) Reproductor: evitar ralentizar playback
+        if any([
             xbmc.getCondVisibility("Player.Playing"),
-            xbmc.getCondVisibility("Player.Paused"),
+            xbmc.getCondVisibility("Player.Paused"),  # también consume recursos si escaneas en pausa
             xbmc.getCondVisibility("Player.HasGame"),
-        ])
-        if busy_player:
+        ]):
             return False
 
-        # 3) PVR / grabaciones
-        busy_pvr = any([
+        # 3) PVR: evitar problemas durante grabaciones
+        if any([
             xbmc.getCondVisibility("Pvr.IsRecording"),
             xbmc.getCondVisibility("Pvr.IsRecordingTV"),
             xbmc.getCondVisibility("Pvr.IsRecordingRadio"),
-        ])
-        if busy_pvr:
+        ]):
             return False
 
-        # 4) Diálogos modales (ventanas bloqueantes)
-        if xbmc.getCondVisibility("System.HasVisibleModalDialog"):
-            return False
-
-        # 5) Tiempo de inactividad del usuario (segundos)
-        # System.IdleTime(N) es True si no hay entrada de usuario desde hace N segundos
-        try:
-            idle_secs = int(min_idle_secs)
-        except Exception:
-            idle_secs = 60
-
-        if idle_secs > 0:
-            if not xbmc.getCondVisibility(f"System.IdleTime({idle_secs})"):
-                return False
-
+        # Todo lo demás nos da igual → ejecutamos mantenimiento
         return True
 
     except Exception as e:
-        # Si algo falla preferimos no bloquear tareas automáticas
+        # Política: preferimos siempre ejecutar mantenimiento aunque falle una comprobación.
         try:
-            log_utils.write_log(f"[idle] Error comprobando inactividad: {e}", level="WARNING")
+            log_utils.write_log(f"[idle] Error comprobando estado: {e}", level="WARNING")
         except Exception:
             pass
         return True

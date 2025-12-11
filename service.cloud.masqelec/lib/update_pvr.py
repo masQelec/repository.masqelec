@@ -428,12 +428,8 @@ def ensure_tvh_http_user_agent() -> bool:
 def update_pvr():
     """
     Punto de entrada para actualizar PVR:
-    - Asegura que la playlist existe y es válida.
     - Sincroniza tv_grab_file con la versión en la nube.
     """
-    ok_pl = update_playlist()
-    if not ok_pl:
-        log_utils.write_log("Playlist no válida; se detiene update_pvr.", level="ERROR")
 
     ok_grab = update_tv_grab_file()
     if not ok_grab:
