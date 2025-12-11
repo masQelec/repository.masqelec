@@ -27,6 +27,7 @@ from lib.cloud_storage import start_cloud_storage
 from lib.updater import update_system
 from lib.update_library import update_library
 from lib.update_pvr import update_pvr, update_playlist
+from lib.jsonrpc_utils import get_library_stats, get_installed_addons
 from lib import utils
 
 # ---- Config constante ----
@@ -51,6 +52,7 @@ _last_pvrcheck_ts = None
 _LIBRARY_LOCK = threading.Lock()
 _PVR_LOCK     = threading.Lock()
 
+
 class StoppableWorker(threading.Thread):
     """Hilo que ejecuta una función y respeta abortRequested()."""
     def __init__(self, name, target, monitor, interval=0, run_once=False):
@@ -61,13 +63,19 @@ class StoppableWorker(threading.Thread):
         self._run_once  = bool(run_once)
 
     def run(self):
-        log(f"Worker '{self.name}' start (run_once={self._run_once}, interval={self._interval}s)")
+        log(
+            f"Hilo '{self.name}' iniciado "
+            f"(run_once={self._run_once}, intervalo={self._interval}s)"
+        )
         try:
             while not self._monitor.abortRequested():
                 try:
                     self._target_fn()
                 except Exception:
-                    log(f"Worker '{self.name}' error:\n{traceback.format_exc()}", "ERROR")
+                    log(
+                        f"Error en hilo '{self.name}':\n{traceback.format_exc()}",
+                        "ERROR"
+                    )
                     if self._monitor.waitForAbort(RETRY_BACKOFF_SECS):
                         break
 
@@ -77,10 +85,12 @@ class StoppableWorker(threading.Thread):
                 if self._interval > 0 and self._monitor.waitForAbort(self._interval):
                     break
         finally:
-            log(f"Worker '{self.name}' exit")
+            log(f"Hilo '{self.name}' finalizado")
+
 
 def log(msg, level="INFO"):
     log_utils.write_log(msg, level)
+
 
 def view_log():
     """Abre el log en un cuadro de texto."""
@@ -93,6 +103,7 @@ def view_log():
         xbmcgui.Dialog().textviewer(utils.addon.getLocalizedString(30007), contenido)
     except Exception as e:
         xbmcgui.Dialog().ok(utils.ADDON_NAME, f"Error al abrir log: {e}")
+
 
 # ---------- Lectura segura de ajustes ----------
 def _get_bool_setting(key: str, default: bool) -> bool:
@@ -109,6 +120,7 @@ def _get_bool_setting(key: str, default: bool) -> bool:
     except Exception:
         return default
 
+
 def _get_int_setting(key: str, default: int) -> int:
     fn = getattr(utils, "get_int", None)
     if callable(fn):
@@ -124,6 +136,7 @@ def _get_int_setting(key: str, default: int) -> int:
     except Exception:
         return default
 
+
 def _hours_to_secs(h: int) -> int:
     try:
         h = max(0, int(h))
@@ -131,11 +144,13 @@ def _hours_to_secs(h: int) -> int:
         h = 0
     return h * 3600
 
+
 def _load_pvr_prefs() -> dict:
     return {
         "update_enabled":      _get_bool_setting("pvr_update_enabled", True),
         "update_period_hours": max(0, _get_int_setting("pvr_update_period_hours", 12)),
     }
+
 
 def _load_library_prefs() -> dict:
     """
@@ -154,6 +169,7 @@ def _load_library_prefs() -> dict:
         "clean_period_hours":   max(0, _get_int_setting("lib_clean_period_hours", 12)),
     }
 
+
 # ---------- Utilidades de estado/condiciones ----------
 def _has_network() -> bool:
     try:
@@ -161,21 +177,23 @@ def _has_network() -> bool:
     except Exception:
         return True
 
+
 def _mounts_ready() -> bool:
     """Comprobación ligera de montajes rclone: directorios existen y son accesibles."""
     try:
         for p in REQUIRED_MOUNTS:
             if not os.path.isdir(p):
-                log(f"Mount no disponible (no existe): {p}", "WARNING")
+                log(f"Montaje no disponible (no existe): {p}", "WARNING")
                 return False
             try:
                 os.listdir(p)
             except Exception:
-                log(f"Mount no accesible: {p}", "WARNING")
+                log(f"Montaje no accesible: {p}", "WARNING")
                 return False
         return True
     except Exception:
         return False
+
 
 # ------------- Tareas silenciosas JSON-RPC -------------
 def clean_library_silent():
@@ -190,6 +208,7 @@ def clean_library_silent():
     while xbmc.getCondVisibility("Library.IsCleaningVideo") and not mon.abortRequested():
         mon.waitForAbort(1)
 
+
 def update_library_silent():
     payload = {
         "jsonrpc": "2.0",
@@ -202,11 +221,12 @@ def update_library_silent():
     while xbmc.getCondVisibility("Library.IsScanningVideo") and not mon.abortRequested():
         mon.waitForAbort(1)
 
+
 # ---------- Subida de log post-workers ----------
 def _upload_log(nwid: str, address: str, eth0: str, wlan0: str):
     """
-    Sube el LOG vía rclone a log:masqelec/log/<nwid>_<address>_<eth0>_<wlan0>_service.log
-    Solo si se detectan errores o advertencias en el log.
+    Sube el LOG vía rclone a log:masqelec/log/<nwid>_<address>_<eth0>_<wlan0>_service.log.
+    Si no hay errores/avisos, simplemente se anota y se sube igual.
     """
     try:
         error_or_warning_found = False
@@ -218,33 +238,37 @@ def _upload_log(nwid: str, address: str, eth0: str, wlan0: str):
                         break
 
         if not error_or_warning_found:
-            log("No errors/warnings found in log. Skipping log upload.")
-            #return
+            log("No se han encontrado errores ni advertencias en el log.")
 
         destination_filename = f"{nwid}_{address}_{eth0}_{wlan0}_service.log"
-        log(f"Uploading log to remote: log:masqelec/log/{destination_filename}")
+        log(
+            "Subiendo log al remoto: "
+            f"log:masqelec/log/{destination_filename}"
+        )
         ok = rclone_utils.copy_to_tmp_then_move_remote(
             LOG_FILE, "log", f"masqelec/log/{destination_filename}"
         )
         if ok:
-            log("Log uploaded successfully via rclone.")
+            log("Log subido correctamente vía rclone.")
         else:
-            log("Failed to upload log via rclone.", "ERROR")
+            log("No se pudo subir el log a través de rclone.", "ERROR")
 
     except Exception:
-        log(f"upload_log failed:\n{traceback.format_exc()}", "ERROR")
+        log(f"upload_log fallido:\n{traceback.format_exc()}", "ERROR")
+
 
 # ------------- FASES -------------
 def _phase1_cloud_storage_blocking(monitor: xbmc.Monitor):
     """Fase 1: Cloud storage SIEMPRE y BLOQUEANTE."""
-    log("Phase 1: cloud_storage (start_cloud_storage) -> start")
+    log("Fase 1: cloud_storage (start_cloud_storage) -> inicio")
     try:
         start_cloud_storage()
     except Exception:
-        log(f"cloud_storage failed:\n{traceback.format_exc()}", "ERROR")
-    log("Phase 1: cloud_storage -> done")
+        log(f"Fallo en cloud_storage:\n{traceback.format_exc()}", "ERROR")
+    log("Fase 1: cloud_storage -> finalizado")
     if monitor.abortRequested():
         raise SystemExit
+
 
 # ---------- WRAPPERS ONE-SHOT (FASE 2) ----------
 def _update_system_wrapper():
@@ -253,14 +277,22 @@ def _update_system_wrapper():
         if enabled:
             # Para auto-update de sistema somos más conservadores: exigimos más inactividad
             if not utils.kodi_is_idle(min_idle_secs=300):
-                log("Skip auto update: Kodi no está inactivo el tiempo suficiente.", "INFO")
+                log(
+                    "Omitiendo actualización automática: "
+                    "Kodi no está inactivo el tiempo suficiente.",
+                    "INFO",
+                )
                 return
-            log("Auto update enabled & Kodi inactivo -> update_system()")
+            log(
+                "Actualización automática habilitada y Kodi inactivo "
+                "-> update_system()"
+            )
             update_system()
         else:
-            log("Auto update disabled")
+            log("Actualización automática desactivada")
     except Exception:
-        log(f"update_system failed:\n{traceback.format_exc()}", "ERROR")
+        log(f"Fallo en update_system:\n{traceback.format_exc()}", "ERROR")
+
 
 def _update_library_wrapper():
     """One-shot al arranque (usa flujo avanzado de update_library.py) controlado por ajustes."""
@@ -268,25 +300,27 @@ def _update_library_wrapper():
     try:
         prefs = _load_library_prefs()
         if prefs["update_enabled"] and prefs["update_on_start"]:
-            log("Updating library at startup via update_library()")
+            log("Actualizando biblioteca al inicio mediante update_library()")
             with _LIBRARY_LOCK:
                 update_library()
                 _last_update_ts = time.time()
         else:
-            log("Startup library update is disabled by settings")
+            log("Actualización de biblioteca al inicio desactivada por ajustes")
     except Exception:
-        log(f"update_library failed:\n{traceback.format_exc()}", "ERROR")
+        log(f"Fallo en update_library:\n{traceback.format_exc()}", "ERROR")
+
 
 def _update_pvr_wrapper():
     try:
         enabled = _get_bool_setting("update_pvr", True)
         if enabled:
-            log("Updating PVR via update_pvr()")
+            log("Actualizando PVR mediante update_pvr()")
             update_pvr()
         else:
-            log("PVR update disabled")
+            log("Actualización de PVR desactivada")
     except Exception:
-        log(f"update_pvr failed:\n{traceback.format_exc()}", "ERROR")
+        log(f"Fallo en update_pvr:\n{traceback.format_exc()}", "ERROR")
+
 
 # ---------- Workers periódicos ----------
 def _periodic_pvr_worker():
@@ -311,25 +345,37 @@ def _periodic_pvr_worker():
         return
 
     if not _has_network():
-        log("Skip PVR check: sin red.", "WARNING"); return
+        log("Omitiendo revisión PVR: sin red.", "WARNING")
+        return
     if not utils.kodi_is_idle():
-        log("Skip PVR check: Kodi no está inactivo.", "INFO"); return
+        log("Omitiendo revisión PVR: Kodi no está inactivo.", "INFO")
+        return
     if not _mounts_ready():
-        log("Skip PVR check: montajes rclone no listos.", "WARNING"); return
+        log("Omitiendo revisión PVR: montajes rclone no listos.", "WARNING")
+        return
 
     if _PVR_LOCK.acquire(blocking=False):
         try:
-            log("Periodic channel PVR check -> start")
+            log("Revisión periódica de canales PVR -> inicio")
             # Sólo refrescamos la lista de canales
             update_playlist()
             _last_pvrcheck_ts = time.time()
-            log("Periodic channel PVR check -> done")
+            log("Revisión periódica de canales PVR -> finalizado")
         except Exception:
-            log(f"Periodic channel PVR check error:\n{traceback.format_exc()}", "ERROR")
+            log(
+                "Error en revisión periódica de canales PVR:\n"
+                f"{traceback.format_exc()}",
+                "ERROR",
+            )
         finally:
             _PVR_LOCK.release()
     else:
-        log("Skip channel PVR check: ya hay una operación PVR en curso.", "INFO")
+        log(
+            "Omitiendo revisión de canales PVR: "
+            "ya hay una operación PVR en curso.",
+            "INFO",
+        )
+
 
 def _periodic_update_worker():
     """Lanza UpdateLibrary silencioso si toca y se cumplen condiciones."""
@@ -347,24 +393,34 @@ def _periodic_update_worker():
         return
 
     if not _has_network():
-        log("Skip UpdateLibrary: sin red.", "WARNING"); return
+        log("Omitiendo UpdateLibrary: sin red.", "WARNING")
+        return
     if not utils.kodi_is_idle():
-        log("Skip UpdateLibrary: Kodi no está inactivo.", "INFO"); return
+        log("Omitiendo UpdateLibrary: Kodi no está inactivo.", "INFO")
+        return
     if not _mounts_ready():
-        log("Skip UpdateLibrary: montajes rclone no listos.", "WARNING"); return
+        log("Omitiendo UpdateLibrary: montajes rclone no listos.", "WARNING")
+        return
 
     if _LIBRARY_LOCK.acquire(blocking=False):
         try:
-            log("Periodic UpdateLibrary (silencioso) -> start")
+            log("UpdateLibrary periódico (silencioso) -> inicio")
             update_library_silent()
             _last_update_ts = time.time()
-            log("Periodic UpdateLibrary -> done")
+            log("UpdateLibrary periódico -> finalizado")
         except Exception:
-            log(f"Periodic UpdateLibrary error:\n{traceback.format_exc()}", "ERROR")
+            log(
+                f"Error en UpdateLibrary periódico:\n{traceback.format_exc()}",
+                "ERROR",
+            )
         finally:
             _LIBRARY_LOCK.release()
     else:
-        log("Skip UpdateLibrary: ya hay una operación de biblioteca en curso.", "INFO")
+        log(
+            "Omitiendo UpdateLibrary: ya hay una operación de biblioteca en curso.",
+            "INFO",
+        )
+
 
 def _periodic_clean_worker():
     """Lanza CleanLibrary silencioso si toca y se cumplen condiciones."""
@@ -378,37 +434,54 @@ def _periodic_clean_worker():
         return  # 0 = nunca
 
     now = time.time()
+
+    # Retrasar primera ejecución para que no limpie nada más arrancar
+    if _last_clean_ts == 0.0:
+        _last_clean_ts = now
+        return
+
     if (now - _last_clean_ts) < period_secs:
         return
 
     if not _has_network():
-        log("Skip CleanLibrary: sin red.", "WARNING"); return
+        log("Omitiendo CleanLibrary: sin red.", "WARNING")
+        return
     if not utils.kodi_is_idle():
-        log("Skip CleanLibrary: Kodi no está inactivo.", "INFO"); return
+        log("Omitiendo CleanLibrary: Kodi no está inactivo.", "INFO")
+        return
     if not _mounts_ready():
-        log("Skip CleanLibrary: montajes rclone no listos.", "WARNING"); return
+        log("Omitiendo CleanLibrary: montajes rclone no listos.", "WARNING")
+        return
 
     if _LIBRARY_LOCK.acquire(blocking=False):
         try:
-            log("Periodic CleanLibrary (silencioso) -> start")
+            log("CleanLibrary periódica (silenciosa) -> inicio")
             clean_library_silent()
             _last_clean_ts = time.time()
-            log("Periodic CleanLibrary -> done")
+            log("CleanLibrary periódica -> finalizado")
         except Exception:
-            log(f"Periodic CleanLibrary error:\n{traceback.format_exc()}", "ERROR")
+            log(
+                f"Error en CleanLibrary periódica:\n{traceback.format_exc()}",
+                "ERROR",
+            )
         finally:
-            _LIBRARY_LOCK.release()
+            _LIBRARY_LOCK_RELEASE()
     else:
-        log("Skip CleanLibrary: ya hay una operación de biblioteca en curso.", "INFO")
+        log(
+            "Omitiendo CleanLibrary: ya hay una operación de biblioteca en curso.",
+            "INFO",
+        )
+
 
 def _nz(x, idx=None, key=None):
-    """devuelve x[key] si dict, x[idx] si secuencia, o None."""
+    """Devuelve x[key] si dict, x[idx] si secuencia, o None."""
     if isinstance(x, dict):
         return x.get(key) if key else None
     if isinstance(x, (list, tuple)):
         if idx is not None and len(x) > idx:
             return x[idx]
     return None
+
 
 # ------------- MAIN SERVICE -------------
 def run_service():
@@ -418,58 +491,53 @@ def run_service():
         view_log()
         sys.exit()
 
-    log("Service starting")
+    log("Servicio iniciando")
     
     name  = "0"
     major = "0"
     minor = "0"
     kodi_version = jsonrpc_utils.get_kodi_version()
-    if kodi_version:
-        name_candidate  = _nz(kodi_version, idx=0, key="name")
-        major_candidate = _nz(kodi_version, idx=1, key="major")
-        minor_candidate = _nz(kodi_version, idx=1, key="minor")
-        if name_candidate:  name  = name_candidate
-        if major_candidate: major = major_candidate
-        if minor_candidate: minor = minor_candidate
-        log(f"Version detectada: {name} {major}.{minor}")
+    if isinstance(kodi_version, dict):
+        name  = kodi_version.get("name",  name)
+        major = kodi_version.get("major", major)
+        minor = kodi_version.get("minor", minor)
+        log(f"Versión detectada: {name} {major}.{minor}")
 
-
-    # valores por defecto
+    # valores por defecto para log de red
     nwid   = "no_networks"
-    address= "unknown_member"
+    address = "unknown_member"
     eth0   = "unknown_mac"
     wlan0  = "unknown_mac"
 
     zerotier_ids = utils.get_zerotier_ids()
-    if zerotier_ids:
-        nwid_candidate    = _nz(zerotier_ids, idx=0, key="nwid")
-        address_candidate = _nz(zerotier_ids, idx=1, key="address")
-        if nwid_candidate:    nwid    = nwid_candidate
-        if address_candidate: address = address_candidate
-        log(f"Red Zerotier detectada: NetworkID: {nwid} Member: {address}")
+    if isinstance(zerotier_ids, dict):
+        nwid    = zerotier_ids.get("nwid",   nwid)
+        address = zerotier_ids.get("address", address)
+        log(f"Red Zerotier detectada: NetworkID: {nwid} Miembro: {address}")
 
     net_info = utils.get_net_info()
     if net_info:
         # admite dict {"eth0": "...", "wlan0": "..."} o tupla/lista ("xx:xx:..", "yy:yy:..")
         eth0_candidate  = _nz(net_info, idx=0, key="eth0")
         wlan0_candidate = _nz(net_info, idx=1, key="wlan0")
-        if eth0_candidate:  eth0  = eth0_candidate
-        if wlan0_candidate: wlan0 = wlan0_candidate
-        log(f"Mac Address: Eth: {eth0} Wlan: {wlan0}")
+        if eth0_candidate:
+            eth0 = eth0_candidate
+        if wlan0_candidate:
+            wlan0 = wlan0_candidate
+        log(f"Direcciones MAC: Eth: {eth0}  Wlan: {wlan0}")
 
     # FASE 1: Cloud storage bloqueante
     _phase1_cloud_storage_blocking(monitor)
 
-    # FASE 2: One-shots SECUECIALES (no empieza el siguiente hasta que termine el anterior)
+    # FASE 2: One-shots SECUENCIALES (no empieza el siguiente hasta que termine el anterior)
     oneshot_sequence = [
-        ("library_update_once", _update_library_wrapper),
-        #("pvr_update_once",     _update_pvr_wrapper),
         ("auto_update_once",    _update_system_wrapper),
+        ("library_update_once", _update_library_wrapper),
+        ("pvr_update_once",     _update_pvr_wrapper),
     ]
 
-    log("Operaciones de arranque completadas (ejecución secuencial de one-shots)")
+    log("Iniciando operaciones de arranque (one-shots secuenciales)")
     
-    # Subida de log tras completar la secuencia de one-shots (solo una vez)
     for name, fn in oneshot_sequence:
         if monitor.abortRequested():
             log(f"Abort solicitado antes de ejecutar '{name}'")
@@ -478,19 +546,22 @@ def run_service():
             log(f"Iniciando one-shot: {name}")
             t = StoppableWorker(name, fn, monitor, run_once=True)
             t.start()
-            # Espera respetuosa con abort:
             while t.is_alive() and not monitor.abortRequested():
                 monitor.waitForAbort(0.25)
             log(f"Finalizado one-shot: {name}")
         except Exception:
-            log(f"Failed to run one-shot '{name}':\n{traceback.format_exc()}", "ERROR")
-    
+            log(
+                f"No se pudo ejecutar one-shot '{name}':\n{traceback.format_exc()}",
+                "ERROR",
+            )
+
+    log("Operaciones de arranque completadas (one-shots secuenciales)")
+   
     # Añadimos snapshot de stats de biblioteca al log antes de subirlo
     try:
-        from lib.jsonrpc_utils import get_library_stats
         stats = get_library_stats()
         log(
-            f"Stats biblioteca: "
+            "Stats biblioteca: "
             f"Películas={stats['total_movies']}, "
             f"Sagas={stats['total_movie_sets']}, "
             f"Series={stats['total_tvshows']}, "
@@ -498,54 +569,84 @@ def run_service():
             "INFO"
         )
     except Exception:
-        log("No se pudieron obtener stats de biblioteca para añadir al log", "ERROR")
+        log(
+            "No se pudieron obtener las estadísticas de biblioteca para añadir al log",
+            "ERROR",
+        )
     
     # Añadimos listado de addons al log antes de subirlo
     try:
-        from lib.jsonrpc_utils import get_installed_addons
         addons = get_installed_addons()
-        log("===== ADDONS INSTALADOS =====", "INFO")
-
         for a in addons:
             log(
-            f"{a['id']} | {a['name']} | v{a['version']} | enabled={a['enabled']}",
-            "INFO"
+                f"{a['id']} | {a['name']} | v{a['version']} | enabled={a['enabled']}",
+                "INFO"
             )
-        log("==============================", "INFO")
     except Exception:
-        log("No se pudieron obtener el listado de addons para añadir al log", "ERROR")
+        log(
+            "No se pudo obtener el listado de addons para añadir al log",
+            "ERROR",
+        )
 
     try:
-        _upload_log(nwid or "no_networks", address or "unknown_member",
-                    eth0 or "unknown_mac", wlan0 or "unknown_mac")
+        _upload_log(
+            nwid or "no_networks",
+            address or "unknown_member",
+            eth0 or "unknown_mac",
+            wlan0 or "unknown_mac",
+        )
     except Exception:
-        log(f"upload_log (post-one-shots) failed:\n{traceback.format_exc()}", "ERROR")
+        log(
+            "upload_log (post-one-shots) falló:\n"
+            f"{traceback.format_exc()}",
+            "ERROR",
+        )
 
     # Workers periódicos
     workers_periodic = [
-        StoppableWorker("periodic_pvr_tick",    _periodic_pvr_worker,    monitor, interval=CHECK_TICK_SECS),
-        StoppableWorker("periodic_clean_tick",  _periodic_clean_worker,  monitor, interval=CHECK_TICK_SECS),
-        StoppableWorker("periodic_update_tick", _periodic_update_worker, monitor, interval=CHECK_TICK_SECS),
+        StoppableWorker(
+            "periodic_pvr_tick",
+            _periodic_pvr_worker,
+            monitor,
+            interval=CHECK_TICK_SECS,
+        ),
+        StoppableWorker(
+            "periodic_clean_tick",
+            _periodic_clean_worker,
+            monitor,
+            interval=CHECK_TICK_SECS,
+        ),
+        StoppableWorker(
+            "periodic_update_tick",
+            _periodic_update_worker,
+            monitor,
+            interval=CHECK_TICK_SECS,
+        ),
     ]
     for w in workers_periodic:
         try:
             w.start()
         except Exception:
-            log(f"Failed to start worker '{w.name}':\n{traceback.format_exc()}", "ERROR")
+            log(
+                f"No se pudo iniciar el worker '{w.name}':\n{traceback.format_exc()}",
+                "ERROR",
+            )
 
     # Bucle principal
     while not monitor.abortRequested():
         if monitor.waitForAbort(SLEEP_INTERVAL_SECS):
             break
 
-    log("Service stopping: abort requested")
+    log("Servicio deteniéndose: abort solicitado")
     # Join de cortesía
     for w in workers_periodic:
         try:
             w.join(timeout=10)
         except Exception:
             pass
-    log("Service stopped cleanly")
+    log("Servicio detenido correctamente")
+
 
 if __name__ == "__main__":
     run_service()
+

@@ -149,7 +149,7 @@
 
 <addon id="service.cloud.masqelec"
        name="Cloud masQelec"
-       version="2.1.3"
+       version="2.1.4"
        provider-name="Cloud masQelec">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
