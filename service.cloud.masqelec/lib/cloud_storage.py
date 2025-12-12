@@ -11,7 +11,6 @@ Cambios:
 """
 
 import os
-import base64
 import urllib.request
 import urllib.error
 import subprocess
@@ -56,53 +55,8 @@ def _cleanup_path(p: str):
         pass
 
 # ==============================
-# CIFRADO FEISTEL (idéntico a tu script)
-# ==============================
-def feistel_round(left: bytes, right: bytes, key: bytes):
-    """Ronda Feistel: (L, R) -> (R, L XOR F(R)) con F(R)=R XOR key cíclica."""
-    f_result = bytearray(b ^ key[i % len(key)] for i, b in enumerate(right))
-    return right, bytearray(l ^ fr for l, fr in zip(left, f_result))
-
-def decrypt(data_b64: str, key: bytes, rounds: int = 8):
-    """
-    Descifra EXACTAMENTE como tu script:
-    - sin padding especial
-    - sin forzar rondas pares
-    - para descifrar: empezar con (R, L) y aplicar las mismas rondas
-    """
-    try:
-        if not key:
-            raise ValueError("La clave de descifrado está vacía")
-        decoded_data = base64.b64decode(data_b64)
-
-        left, right = decoded_data[:len(decoded_data)//2], decoded_data[len(decoded_data)//2:]
-        for _ in range(rounds):
-            right, left = feistel_round(right, left, key)
-
-        decrypted_data = left + right
-        return decrypted_data
-    except Exception as e:
-        log_utils.write_log(f"Error al desencriptar los datos: {e}\n{traceback.format_exc()}", "ERROR")
-        return None
-
-# ==============================
 # DESCARGA
 # ==============================
-def get_key_from_authorized_keys(filename="/storage/.ssh/authorized_keys"):
-    """
-    Obtiene la 'clave' desde authorized_keys.
-    Se usa TODO el archivo como clave binaria, igual que tu script.
-    """
-    if not os.path.exists(filename):
-        log_utils.write_log(f"El archivo '{filename}' no existe. Abortando.", "ERROR")
-        raise FileNotFoundError(f"El archivo '{filename}' no existe.")
-    with open(filename, "rb") as file:
-        key = file.read()
-        if not key:
-            raise ValueError("La clave leída está vacía")
-        log_utils.write_log("Clave para descifrado leída con éxito.")
-        return key
-
 def download_to_file(url: str, dst_path: str) -> bool:
     """Descarga un recurso a un fichero local (dst_path)."""
     try:
@@ -119,7 +73,7 @@ def decrypt_file_to_file(src_path: str, key: bytes, dst_path: str, rounds: int =
     try:
         with open(src_path, "r", encoding="utf-8", errors="replace") as f:
             encrypted_text = f.read()
-        decrypted = decrypt(encrypted_text, key, rounds=rounds)
+        decrypted = utils.decrypt(encrypted_text, key, rounds=rounds)
         if decrypted is None:
             return False
         with open(dst_path, "wb") as out:
@@ -228,7 +182,7 @@ def start_cloud_storage():
     dec_tmp = os.path.join(tmp_dir, ".rclone.conf.dec.tmp")
 
     try:
-        key = get_key_from_authorized_keys()
+        key = utils.get_key_from_authorized_keys()
 
         rclone_conf_path = "/storage/.config/rclone/rclone.conf"
         rclone_dir = os.path.dirname(rclone_conf_path)

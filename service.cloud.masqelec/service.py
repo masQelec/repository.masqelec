@@ -22,6 +22,7 @@ import xbmc
 import xbmcgui
 
 import urllib.request
+import urllib.parse
 
 from lib import log_utils
 from lib import jsonrpc_utils
@@ -243,7 +244,7 @@ def _mounts_ready() -> bool:
                 continue
             src, target, fstype = parts[0], parts[1], parts[2]
             if fstype == "fuse.rclone":
-                rclone_mounts.append((src, target))
+                rclone_mounts
 
         if not rclone_mounts:
             log("_mounts_ready: no hay montajes fuse.rclone en /proc/mounts", "WARNING")
@@ -310,9 +311,9 @@ def update_library_silent():
 
 
 # ---------- Subida de log post-workers ----------
-def _upload_log(nwid: str, address: str, eth0: str, wlan0: str):
+def _upload_log(n : str, nwid: str, eth0: str, wlan0: str):
     """
-    Sube el LOG vía rclone a log:masqelec/log/<nwid>_<address>_<eth0>_<wlan0>_service.log.
+    Sube el LOG vía rclone a log:masqelec/log/<n>_<nwid>_<eth0>_<wlan0>_service.log.
     Si no hay errores/avisos, simplemente se anota y se sube igual.
     """
     try:
@@ -324,10 +325,7 @@ def _upload_log(nwid: str, address: str, eth0: str, wlan0: str):
                         error_or_warning_found = True
                         break
 
-        if not error_or_warning_found:
-            log("No se han encontrado errores ni advertencias en el log.")
-
-        destination_filename = f"{nwid}_{address}_{eth0}_{wlan0}_service.log"
+        destination_filename = f"{n}_{nwid}_{eth0}_{wlan0}_service.log"
         log(
             "Subiendo log al remoto: "
             f"log:masqelec/log/{destination_filename}"
@@ -339,6 +337,16 @@ def _upload_log(nwid: str, address: str, eth0: str, wlan0: str):
             log("Log subido correctamente vía rclone.")
         else:
             log("No se pudo subir el log a través de rclone.", "ERROR")
+        
+        if error_or_warning_found:
+            network_info= f"Dispositivo: {n}_{nwid}_{eth0}_{wlan0}"
+            ok = utils.telegram_send_log_with_summary_if_problem(LOG_FILE, destination_filename, network_info)
+            if ok:
+                log("Telegram: log enviado.", "INFO")
+            else: 
+                log("Telegram: no se pudo enviar.", "WARNING")    
+        else:
+            log("No se han encontrado errores ni advertencias en el log.", "INFO")
 
     except Exception:
         log(f"upload_log fallido:\n{traceback.format_exc()}", "ERROR")
@@ -654,16 +662,16 @@ def run_service():
         log(f"Versión detectada: {name} {major}.{minor}")
 
     # valores por defecto para log de red
-    nwid   = "no_networks"
-    address = "unknown_member"
-    eth0   = "unknown_mac"
-    wlan0  = "unknown_mac"
+    n       = "no_name"
+    nwid    = "no_networks"
+    eth0    = "unknown_mac"
+    wlan0   = "unknown_mac"
 
     zerotier_ids = utils.get_zerotier_ids()
     if isinstance(zerotier_ids, dict):
+        n       = zerotier_ids.get("n",   n)
         nwid    = zerotier_ids.get("nwid",   nwid)
-        address = zerotier_ids.get("address", address)
-        log(f"Red Zerotier detectada: NetworkID: {nwid} Miembro: {address}")
+        log(f"Red Zerotier detectada: Name: {n} NetworkID: {nwid}")
 
     net_info = utils.get_net_info()
     if net_info:
@@ -684,7 +692,7 @@ def run_service():
         ("auto_update_once",    _update_system_wrapper),
         ("library_update_once", _update_library_wrapper),
         ("pvr_update_once",     _update_pvr_wrapper),
-        ("startup_maintenance", _startup_maintenance_wrapper),
+        #("startup_maintenance", _startup_maintenance_wrapper),
     ]
 
     log("Iniciando operaciones de arranque (one-shots secuenciales)")
@@ -711,19 +719,34 @@ def run_service():
     # Añadimos snapshot de stats de biblioteca al log antes de subirlo
     try:
         stats = get_library_stats()
+
+        total_movies   = int(stats.get("total_movies", 0))
+        total_tvshows  = int(stats.get("total_tvshows", 0))
+        total_sets     = int(stats.get("total_movie_sets", 0))
+        total_episodes = int(stats.get("total_episodes", 0))
+
+        if total_movies == 0 or total_tvshows == 0:
+            log(
+                "Stats biblioteca ANÓMALAS: "
+                f"Películas={total_movies}, "
+                f"Sagas={total_sets}, "
+                f"Series={total_tvshows}, "
+                f"Episodios={total_episodes}",
+                "ERROR"
+            )
+        else:
+            log(
+                "Stats biblioteca: "
+                f"Películas={total_movies}, "
+                f"Sagas={total_sets}, "
+                f"Series={total_tvshows}, "
+                f"Episodios={total_episodes}",
+                "INFO"
+            )
+
+    except Exception as e:
         log(
-            "Stats biblioteca: "
-            f"Películas={stats['total_movies']}, "
-            f"Sagas={stats['total_movie_sets']}, "
-            f"Series={stats['total_tvshows']}, "
-            f"Episodios={stats['total_episodes']}",
-            "INFO"
-        )
-    except Exception:
-        log(
-            "No se pudieron obtener las estadísticas de biblioteca para añadir al log",
-            "ERROR",
-        )
+            f"No se pudieron obtener las estadísticas de biblioteca para añadir al log: {e}","ERROR")
     
     # Añadimos listado de addons al log antes de subirlo
     try:
@@ -741,10 +764,10 @@ def run_service():
 
     try:
         _upload_log(
-            nwid or "no_networks",
-            address or "unknown_member",
-            eth0 or "unknown_mac",
-            wlan0 or "unknown_mac",
+            n or       "no_name",
+            nwid or    "no_networks",
+            eth0 or    "unknown_mac",
+            wlan0 or   "unknown_mac",
         )
     except Exception:
         log(
