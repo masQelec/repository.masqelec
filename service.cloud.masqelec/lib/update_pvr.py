@@ -63,7 +63,7 @@ def update_playlist() -> tuple[bool, bool]:
     user_dir = "/storage/.user"
     playlist_file = os.path.join(user_dir, "playlist.m3u")
     user_file = os.path.join(user_dir, "user")
-    base_url = "https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/playlist.m3u"
+    base_url = "https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/pvr/playlist.m3u"
 
     def _read_text(path: str) -> str:
         with open(path, "r", encoding="utf-8", errors="replace") as f:
@@ -243,13 +243,13 @@ def update_tv_grab_file() -> bool:
     """
     Verifica que /storage/.kodi/addons/service.tvheadend43/bin/tv_grab_file
     es igual que el archivo remoto en:
-      https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/tv_grab_file
+      https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/pvr/tv_grab_file
 
     - Si no existe el local o es diferente, descarga el remoto y sobrescribe.
     - Operación atómica (usa .part) y deja el fichero con permisos 0o755.
     """
     local_path = "/storage/.kodi/addons/service.tvheadend43/bin/tv_grab_file"
-    remote_url = "https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/tv_grab_file"
+    remote_url = "https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/pvr/tv_grab_file"
     remote_tmp = local_path + ".remote"
 
     def _read_bytes(path: str) -> bytes:
