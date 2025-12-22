@@ -370,6 +370,20 @@ def update_library_silent(timeout_start=5, timeout_total=30*30):
     return True
 
 
+# --- NUEVO: Verificación DB vs FS (solo clientes) ---
+def _client_verify_db_vs_fs() -> dict:
+    try:
+        res = core_catalog.verify_catalog_db_vs_fs()
+        tot = (res or {}).get("total") or {}
+        missing = int(tot.get("missing", 0) or 0)
+        extra   = int(tot.get("extra", 0) or 0)
+        log(f"Cliente: DB↔FS catálogo => Missing={missing} Extra={extra}", "INFO")
+        return res
+    except Exception:
+        log(f"Cliente: fallo verificación DB↔FS:\n{traceback.format_exc()}", "ERROR")
+        return {"total": {"missing": 0, "extra": 0}}
+
+
 # ---------- Subida de log post-workers ----------
 def _upload_log(n: str, nwid: str, eth0: str, wlan0: str):
     try:
@@ -492,8 +506,9 @@ def _startup_maintenance_wrapper():
 
         prefs = _load_library_prefs()
 
-        # ---- CAMBIO: en CLIENTE sincronizamos UNA vez y reutilizamos resultado ----
         sync_applied = False
+        verify = None
+
         if utils.is_client():
             log("Cliente: comprobando/sincronizando catálogo remoto…")
             try:
@@ -503,12 +518,19 @@ def _startup_maintenance_wrapper():
                 sync_applied = False
 
             if not sync_applied:
-                log_utils.write_log("Cliente: catálogo al día o fallo → se omite Clean/Scan", "INFO")
+                verify = _client_verify_db_vs_fs()
 
         # 2) CleanLibrary
         if prefs.get("clean_enabled", True):
             if utils.is_client():
+                do_clean = False
                 if sync_applied:
+                    do_clean = True
+                else:
+                    tot = (verify or {}).get("total") or {}
+                    do_clean = int(tot.get("extra", 0) or 0) > 0
+
+                if do_clean:
                     log("Mantenimiento de arranque: CleanLibrary (silencioso) -> inicio")
                     clean_library_silent()
                     log("Mantenimiento de arranque: CleanLibrary (silencioso) -> finalizado")
@@ -524,7 +546,16 @@ def _startup_maintenance_wrapper():
         # 3) UpdateLibrary
         if prefs.get("update_enabled", True) and prefs.get("update_on_start", True):
             if utils.is_client():
+                do_scan = False
                 if sync_applied:
+                    do_scan = True
+                else:
+                    tot = (verify or {}).get("total") or {}
+                    missing = int(tot.get("missing", 0) or 0)
+                    extra   = int(tot.get("extra", 0) or 0)
+                    do_scan = (missing > 0) or (extra > 0)
+
+                if do_scan:
                     log("Mantenimiento de arranque: UpdateLibrary (silencioso) -> inicio")
                     update_library_silent()
                     log("Mantenimiento de arranque: UpdateLibrary (silencioso) -> finalizado")
@@ -628,7 +659,19 @@ def _periodic_update_worker():
                     applied = False
 
                 if not applied:
-                    log_utils.write_log("Cliente: catálogo al día o fallo → se omite Scan", "INFO")
+                    verify = _client_verify_db_vs_fs()
+                    tot = (verify or {}).get("total") or {}
+                    missing = int(tot.get("missing", 0) or 0)
+                    extra   = int(tot.get("extra", 0) or 0)
+
+                    if (missing > 0) or (extra > 0):
+                        log_utils.write_log("Cliente: DB↔FS desfasado (sin cambios remotos) → Scan", "INFO")
+                        log("UpdateLibrary periódico (silencioso) -> inicio")
+                        update_library_silent()
+                        _last_update_ts = time.time()
+                        log("UpdateLibrary periódico (silencioso) -> finalizado")
+                    else:
+                        log_utils.write_log("Cliente: catálogo al día y DB↔FS OK → se omite Scan", "INFO")
                     return
 
                 log_utils.write_log("Cliente: catálogo actualizado → se ejecuta Scan", "INFO")
@@ -655,7 +698,7 @@ def _periodic_update_worker():
 
 
 def _periodic_clean_worker():
-    global _last_clean_ts
+    global _last_clean_ts, _last_update_ts
     prefs = _load_library_prefs()
     if not prefs["clean_enabled"]:
         return
@@ -695,7 +738,25 @@ def _periodic_clean_worker():
                     applied = False
 
                 if not applied:
-                    log_utils.write_log("Cliente: catálogo al día o fallo → se omite Clean", "INFO")
+                    verify = _client_verify_db_vs_fs()
+                    tot = (verify or {}).get("total") or {}
+                    extra = int(tot.get("extra", 0) or 0)
+
+                    if extra > 0:
+                        log_utils.write_log("Cliente: DB tiene extras (sin cambios remotos) → Clean + Scan", "INFO")
+
+                        log("CleanLibrary periódica (silenciosa) -> inicio")
+                        clean_library_silent()
+                        log("CleanLibrary periódica (silenciosa) -> finalizado")
+
+                        log("UpdateLibrary post-clean (silencioso) -> inicio")
+                        update_library_silent()
+                        log("UpdateLibrary post-clean (silencioso) -> finalizado")
+
+                        _last_clean_ts = time.time()
+                        _last_update_ts = time.time()
+                    else:
+                        log_utils.write_log("Cliente: catálogo al día y sin extras → se omite Clean", "INFO")
                     return
 
                 log_utils.write_log("Cliente: catálogo actualizado → se ejecuta Clean", "INFO")

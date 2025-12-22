@@ -6,6 +6,7 @@ import json
 import shutil
 import hashlib
 import zipfile
+import calendar
 from datetime import datetime
 import urllib.parse
 import urllib.request
@@ -60,7 +61,7 @@ _HASH64_RE = re.compile(r"\b([0-9a-fA-F]{64})\b")
 
 def _parse_utc(ver_text: str):
     """
-    Devuelve epoch (int) si puede extraer utc=... (Z).
+    Devuelve epoch UTC (int) si puede extraer utc=... (Z).
     Si no puede, devuelve None.
     """
     if not ver_text:
@@ -69,9 +70,8 @@ def _parse_utc(ver_text: str):
     if not m:
         return None
     try:
-        dt = datetime.strptime(m.group(1), "%Y-%m-%dT%H:%M:%SZ")
-        # dt es naive UTC; lo convertimos a epoch
-        return int(time.mktime(dt.timetuple()))
+        dt = datetime.strptime(m.group(1), "%Y-%m-%dT%H:%M:%SZ")  # naive UTC
+        return int(calendar.timegm(dt.timetuple()))
     except Exception:
         return None
 
@@ -84,7 +84,6 @@ def _version_hash(ver_text: str) -> str:
     tok = ver_text.split()[0].strip()
     if re.fullmatch(r"[0-9a-fA-F]{64}", tok):
         return tok.lower()
-    # fallback: buscar un hash64 en la línea
     m = _HASH64_RE.search(ver_text)
     return (m.group(1).lower() if m else "")
 
@@ -111,13 +110,11 @@ def _is_remote_newer(remote_ver: str, local_ver: str) -> bool:
     if l_utc is not None and r_utc is None:
         return False
 
-    # sin utc: fallback a hash
     r_hash = _version_hash(remote_ver)
     l_hash = _version_hash(local_ver)
     if r_hash and l_hash:
         return r_hash != l_hash
 
-    # último fallback: texto distinto
     return (remote_ver or "").strip() != (local_ver or "").strip()
 
 # ==========================
@@ -235,7 +232,6 @@ def build_movies_strm():
         strm = os.path.join(MOVIES_DIR, base + ".strm")
         write_text(strm, fpath + "\n")
 
-        # CLONADO DE FECHA
         _clone_mtime_from_video(fpath, strm)
 
         n += 1
@@ -277,7 +273,6 @@ def build_tv_strm():
         strm = os.path.join(season_dir, base + ".strm")
         write_text(strm, fpath + "\n")
 
-        # CLONADO DE FECHA
         _clone_mtime_from_video(fpath, strm)
 
         total += 1
@@ -340,7 +335,6 @@ def generate_catalog():
 
     new_hash, count = compute_version_hash(CATALOG_ROOT)
 
-    # Solo guarda nueva version si el hash ha cambiado
     if old_hash and old_hash == new_hash.lower():
         log_utils.write_log(f"Hash idéntico al anterior; NO se actualiza {VER_NAME} (hash={new_hash})")
     else:
@@ -349,7 +343,6 @@ def generate_catalog():
         write_text(ver_path, ver_txt)
         log_utils.write_log(f"Version actualizada: {ver_path} (hash={new_hash})")
 
-    # El ZIP se crea SIEMPRE (por si el anterior estaba corrupto)
     if MAKE_ZIP:
         zip_path = os.path.join(EXPORT_DIR, ZIP_NAME)
         log_utils.write_log("Creando ZIP (.strm)…")
@@ -508,7 +501,6 @@ def _extract_zip_with_mtime(zip_path: str, dest_dir: str) -> int:
 
         for m in members:
             zf.extract(m, dest_dir)
-
             try:
                 zi = zf.getinfo(m)
                 epoch = time.mktime(zi.date_time + (0, 0, -1))
@@ -565,6 +557,79 @@ def _cleanup_tmp_best_effort():
         pass
 
 # ==========================
+# VERIFY: DB (Kodi) vs FS (.strm)
+# ==========================
+def verify_catalog_db_vs_fs(sample_limit: int = 50) -> dict:
+    """
+    Compara:
+      - FS: .strm en MOVIES_DIR y TV_DIR
+      - DB: entries de Kodi cuyo "file" apunta a esos .strm
+
+    Retorna:
+      {
+        "total": {"missing": int, "extra": int, "fs": int, "db": int},
+        "missing_samples": [...],  # FS - DB
+        "extra_samples":   [...],  # DB - FS
+      }
+    """
+    # FS
+    fs_movies = _collect_strm(MOVIES_DIR)
+    fs_tv     = _collect_strm(TV_DIR)
+
+    fs_keys = set()
+    for rel in fs_movies.keys():
+        fs_keys.add("videos/" + rel)
+    for rel in fs_tv.keys():
+        fs_keys.add("tvshows/" + rel)
+
+    # DB (solo "file")
+    db_keys = set()
+
+    try:
+        res = rpc("VideoLibrary.GetMovies", {
+            "properties": ["file"],
+            "limits": {"start": 0, "end": 300000},
+        })
+        for m in (res.get("movies", []) or []):
+            p = _normalize_kodi_path(m.get("file") or "")
+            if not p:
+                continue
+            if p.startswith(_normalize_kodi_path(MOVIES_DIR) + "/") and p.endswith(".strm"):
+                rel = p[len(_normalize_kodi_path(MOVIES_DIR) + "/"):]
+                db_keys.add("videos/" + rel)
+    except Exception as e:
+        log_utils.write_log(f"verify_catalog_db_vs_fs: GetMovies falló: {e}", "ERROR")
+
+    try:
+        res = rpc("VideoLibrary.GetEpisodes", {
+            "properties": ["file"],
+            "limits": {"start": 0, "end": 3000000},
+        })
+        for ep in (res.get("episodes", []) or []):
+            p = _normalize_kodi_path(ep.get("file") or "")
+            if not p:
+                continue
+            if p.startswith(_normalize_kodi_path(TV_DIR) + "/") and p.endswith(".strm"):
+                rel = p[len(_normalize_kodi_path(TV_DIR) + "/"):]
+                db_keys.add("tvshows/" + rel)
+    except Exception as e:
+        log_utils.write_log(f"verify_catalog_db_vs_fs: GetEpisodes falló: {e}", "ERROR")
+
+    missing = sorted(fs_keys - db_keys)
+    extra   = sorted(db_keys - fs_keys)
+
+    return {
+        "total": {
+            "missing": int(len(missing)),
+            "extra": int(len(extra)),
+            "fs": int(len(fs_keys)),
+            "db": int(len(db_keys)),
+        },
+        "missing_samples": missing[:max(0, int(sample_limit))],
+        "extra_samples": extra[:max(0, int(sample_limit))],
+    }
+
+# ==========================
 # SYNC (CAMBIO: compara por utc)
 # ==========================
 def sync_catalog_https() -> bool:
@@ -576,8 +641,6 @@ def sync_catalog_https() -> bool:
     """
     if not acquire_lock():
         return False
-
-    applied_any = False
 
     try:
         ver_url = _url(RAW_BASE, VER_NAME)
@@ -596,14 +659,12 @@ def sync_catalog_https() -> bool:
 
         local_ver = _read_local_version()
 
-        # Decide por utc remoto vs utc local (fallback hash/texto)
         if not _is_remote_newer(remote_ver, local_ver):
             log_utils.write_log(
                 f"Catálogo al día. local_utc={_parse_utc(local_ver)} remoto_utc={_parse_utc(remote_ver)}"
             )
             return False
 
-        # Sanity: remoto debe tener al menos un hash válido
         remote_hash = _version_hash(remote_ver)
         if not remote_hash:
             log_utils.write_log("catalog.version remoto inválido (sin hash64). No aplico nada.", "ERROR")
@@ -692,7 +753,7 @@ def sync_catalog_https() -> bool:
                 except Exception as e:
                     log_utils.write_log(f"No se pudo borrar {dst}: {e}", "WARNING")
 
-        # Añadir / actualizar (COPIA ATÓMICA + preserva mtime del staging)
+        # Añadir / actualizar
         changed = 0
         for rel in to_apply:
             src = os.path.join(STAGING_DIR, rel.replace("/", os.sep))
@@ -706,7 +767,6 @@ def sync_catalog_https() -> bool:
             old_hash = local_all.get(rel)
             new_hash = staged.get(rel)
 
-            # Si coincide hash y existe, no tocar
             if old_hash == new_hash and os.path.isfile(dst):
                 continue
 
@@ -720,10 +780,7 @@ def sync_catalog_https() -> bool:
         _cleanup_empty_dirs(TV_DIR)
 
         # Guardar version local (atómico)
-        try:
-            _write_local_version(remote_ver)
-        except Exception as e:
-            log_utils.write_log(f"No se pudo escribir catalog.version local: {e}", "ERROR")
+        _write_local_version(remote_ver)
 
         applied_any = (changed > 0) or (deleted > 0)
 
@@ -736,5 +793,4 @@ def sync_catalog_https() -> bool:
     finally:
         _cleanup_tmp_best_effort()
         release_lock()
-
 
