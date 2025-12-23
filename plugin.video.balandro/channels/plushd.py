@@ -7,7 +7,10 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww3.pelisplus.to/'
+host = 'https://ww3.tioplus.net/'
+
+
+espera = config.get_setting('servers_waiting', default=6)
 
 
 def item_configurar_proxies(item):
@@ -43,6 +46,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True, timeout=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://ww3.pelisplus.to/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     hay_proxies = False
     if config.get_setting('channel_plushd_proxies', default=''): hay_proxies = True
 
@@ -58,7 +67,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True, timeout=N
 
     if not data:
         if not '/search/' in url:
-            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PlusHd', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PlusHd', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
             timeout = config.get_setting('channels_repeat', default=30)
 
@@ -488,13 +497,12 @@ def findvideos(item):
 
         if not url:
              if 'Estas saturando la red se te dará un bloqueo temporal' in str(data):
-                 espera = 5
-
                  timeout = config.get_setting('channels_repeat', default=30)
 
-                 if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PlusHd [COLOR yellow][B]Saturado[/B][/COLOR]', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                 if config.get_setting('channels_re_charges', default=True):
+                     platformtools.dialog_notification('PlusHd [COLOR yellow][B]Saturado[/B][/COLOR]', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
-                 time.sleep(espera)
+                     time.sleep(int(espera))
 
                  data = do_downloadpage(link, timeout=timeout)
 
@@ -502,7 +510,7 @@ def findvideos(item):
 
                  if not url:
                      if 'Estas saturando la red se te dará un bloqueo temporal' in str(data):
-                         time.sleep(espera)
+                         time.sleep(int(espera))
 
                          data = do_downloadpage(link, timeout=timeout)
 

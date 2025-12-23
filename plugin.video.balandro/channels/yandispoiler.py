@@ -450,6 +450,7 @@ def findvideos(item):
             elif '/hgbazooka.' in url: continue
             elif '.tickcounter.' in url: continue
             elif '/zuvioeb.' in url: continue
+            elif '/minochinos.' in url: continue
 
             url = url.replace('/Mivalyo.com/', '/mivalyo.com/')
 

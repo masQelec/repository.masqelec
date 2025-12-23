@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.veronline.bond/'
+host = 'https://www.veronline.cfd/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.veronline.sh/', 'https://www.veronline.cc/', 'https://www.veronline.in/',
-             'https://www.veronline.mov/', 'https://www.veronline.cfd/']
+             'https://www.veronline.mov/', 'https://www.veronline.bond/']
 
 domain = config.get_setting('dominio', 'veronline', default='')
 
@@ -78,7 +78,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not 'recherche?q=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('VerOnline', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('VerOnline', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -153,11 +153,18 @@ def paises(item):
     itemlist = []
 
     itemlist.append(item.clone( title = 'América', action = 'list_all', url = host + 'series-online/pais/usa.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Argentina', action = 'list_all', url = host + 'series-online/pais/ar.html', text_color='hotpink' ))
     itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'series-online/pais/br.html', text_color='hotpink' ))
-    itemlist.append(item.clone( title = 'España', action = 'list_all', url = host + 'series-online/pais/es.html', text_color='hotpink' ))
     itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'series-online/pais/co.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Corea', action = 'list_all', url = host + 'series-online/pais/kr.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Egipto', action = 'list_all', url = host + 'series-online/pais/eg.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'España', action = 'list_all', url = host + 'series-online/pais/es.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Francia', action = 'list_all', url = host + 'series-online/pais/fr.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Italia', action = 'list_all', url = host + 'series-online/pais/it.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Japón', action = 'list_all', url = host + 'series-online/pais/jp.html', text_color='hotpink' ))
     itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'series-online/pais/mx.html', text_color='hotpink' ))
     itemlist.append(item.clone( title = 'Reino Unido', action = 'list_all', url = host + 'series-online/pais/gb.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Suecia', action = 'list_all', url = host + 'series-online/pais/se.html', text_color='hotpink' ))
     itemlist.append(item.clone( title = 'Turquía', action = 'list_all', url = host + 'series-online/pais/tr.html', text_color='hotpink' ))
 
     return itemlist
@@ -215,9 +222,9 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<span>Veronline.bond</span>(.*?)>mas vistas<')
+    bloque = scrapertools.find_single_match(data, '<span>Veronline.</span>(.*?)>mas vistas<')
 
-    if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline.bond</span>(.*?)>mas vistas<')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline.</span>(.*?)>mas vistas<')
 
     if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline</span>(.*?)>mas vistas<')
     if not bloque: bloque = scrapertools.find_single_match(data, '<span>Veronline</span>(.*?)>mas vistas<')
@@ -235,7 +242,7 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
-        title = title.replace('online gratis', '').replace('&#039;', "'").replace('&amp;', '&').replace(' online', '').strip()
+        title = title.replace('online gratis', '').replace(' online', '').replace('&#039;', "'").replace('&amp;', '&').strip()
 
         year = '-'
         if '/series-online/año/' in item.url:
@@ -246,6 +253,7 @@ def list_all(item):
                if '/page-' in year: year = scrapertools.find_single_match(year, "(.*?)/page-")
 
         if not year: year = '-'
+
         itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb,
                                     contentType='tvshow', contentSerieName=title,  infoLabels = {'year': year} ))
 

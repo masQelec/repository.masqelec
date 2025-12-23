@@ -75,7 +75,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not '?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('SeriesPapayaTo', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('SeriesPapayaTo', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 

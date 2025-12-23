@@ -60,7 +60,7 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '/animes?q=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('AnimeJl', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('AnimeJl', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -265,7 +265,7 @@ def last_epis(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, "<h2>Últimos episodios agregados(.*?)</ul>")
+    bloque = scrapertools.find_single_match(data, ">Episodios Recientes Agregados<(.*?)</ul>")
 
     patron = "<li><a href='(.*?)' class.*?<img src='(.*?)' alt='(.*?)'></span><span class='Capi'>(.*?)</span>"
 

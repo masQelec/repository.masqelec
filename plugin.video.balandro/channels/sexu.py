@@ -33,12 +33,12 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color='orange' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host  + 'all'))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host  + 'all' ))
 
-    itemlist.append(item.clone( title = 'Nuevos', action = 'list_all', url = host + 'new'))
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + 'new', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'trending'))
-    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'engaging'))
+    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'trending' ))
+    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'engaging' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + 'categories?sort=name' ))
 
@@ -58,14 +58,11 @@ def categorias(item):
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;", "", data)
 
     patron = '<a class="item" href="([^"]+)" title="([^"]+)".*?'
-    patron += '(?:data-src|src)="([^"]+)".*?'
-    patron += '<div class="item__counter">([^<]+)<'
+    patron += '(?:data-src|src)="([^"]+)"'
 
     matches = re.compile(patron,re.DOTALL).findall(data)
 
-    for url, title, thumb, cantidad in matches:
-        title = "%s (%s)" % (title, cantidad)
-
+    for url, title, thumb in matches:
         if not thumb.startswith("https"): thumb = "http:%s" % thumb
 
         url = host[:-1] + url + '?st=upload'
@@ -98,6 +95,8 @@ def list_all(item):
     matches = re.compile(patron,re.DOTALL).findall(data)
 
     for url, title, thumb, time in matches:
+        title = title.replace('&#039;s', "'s").strip()
+
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
 
         if not thumb.startswith("https"): thumb = "http:%s" % thumb

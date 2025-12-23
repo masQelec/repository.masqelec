@@ -9,6 +9,11 @@ from platformcode import config, logger, platformtools
 
 color_exec  = config.get_setting('notification_exec_color', default='cyan')
 
+developer = False
+if config.get_setting('developer_mode', default=False):
+    if config.get_setting('developer_team'): developer = True
+
+
 tipos_plus = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61]
 
 
@@ -138,10 +143,13 @@ def plus_proxies(proxies, max_proxies):
         enlaces = scrapertools.find_multiple_matches(str(block), '"(.*?)"')
 
         if enlaces:
-            for prox in enlaces:
-                 prox = prox.strip()
+            try:
+               for prox in enlaces:
+                    prox = prox.strip()
 
-                 proxies_plus.append(prox)
+                    proxies_plus.append(prox)
+            except:
+               if developer: platformtools.dialog_ok('Openproxy', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 3:
         if '<title>Just a moment...</title>' in resp.data or '<title>Just a moment please...</title>' in resp.data:
@@ -155,29 +163,35 @@ def plus_proxies(proxies, max_proxies):
 
             enlaces = scrapertools.find_multiple_matches(str(resp.data), '<tr>(.*?)</tr>')
 
-            for match in enlaces:
-                prox = scrapertools.find_single_match(match, '<td style=".*?">(.*?)</td>')
+            try:
+               for match in enlaces:
+                   prox = scrapertools.find_single_match(match, '<td style=".*?">(.*?)</td>')
 
-                if not '.' in prox: continue
+                   if not '.' in prox: continue
 
-                puerto = scrapertools.find_single_match(match, '<td style=".*?".*?</td>.*?">(.*?)</td>')
+                   puerto = scrapertools.find_single_match(match, '<td style=".*?".*?</td>.*?">(.*?)</td>')
 
-                if not puerto: continue
+                   if not puerto: continue
 
-                proxies_plus.append(prox + ':' + puerto)
+                   proxies_plus.append(prox + ':' + puerto)
+            except:
+               if developer: platformtools.dialog_ok('Privacyaffairs', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
         else:
             el_provider = '[B][COLOR %s] Vpnoverview[/B][/COLOR]' % color_exec
             platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
 
             enlaces = scrapertools.find_multiple_matches(str(resp.data), '<td><strong>(.*?)</strong></td><td>(.*?)</td>')
 
-            for prox, port in enlaces:
-                prox = prox.strip()
-                port = port.strip()
+            try:
+               for prox, port in enlaces:
+                   prox = prox.strip()
+                   port = port.strip()
 
-                if not prox or not port: continue
+                   if not prox or not port: continue
 
-                proxies_plus.append(prox + ':' + port)
+                   proxies_plus.append(prox + ':' + port)
+            except:
+               if developer: platformtools.dialog_ok('Vpnoverview', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 4 or tplus == 5 or tplus == 6 or tplus == 7 or tplus == 56:
         el_provider = '[B][COLOR %s] Fyvri[/B][/COLOR]' % color_exec
@@ -185,10 +199,13 @@ def plus_proxies(proxies, max_proxies):
 
         enlaces = scrapertools.find_multiple_matches(str(resp.data), '(.*?)\n')
 
-        for prox in enlaces:
-            prox = prox.strip()
+        try:
+           for prox in enlaces:
+               prox = prox.strip()
 
-            proxies_plus.append(prox)
+               proxies_plus.append(prox)
+        except:
+           if developer: platformtools.dialog_ok('Fyvri', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 8:
         el_provider = '[B][COLOR %s] Netzwelt[/B][/COLOR]' % color_exec
@@ -196,13 +213,16 @@ def plus_proxies(proxies, max_proxies):
 
         enlaces = scrapertools.find_multiple_matches(str(resp.data), 'rel="nofollow">(.*?)</a></td><td>(.*?)</td>')
 
-        for prox, port in enlaces:
-            prox = prox.strip()
-            port = port.strip()
+        try:
+           for prox, port in enlaces:
+               prox = prox.strip()
+               port = port.strip()
 
-            if not prox or not port: continue
+               if not prox or not port: continue
 
-            proxies_plus.append(prox + ':' + port)
+               proxies_plus.append(prox + ':' + port)
+        except:
+           if developer: platformtools.dialog_ok('Netzwelt', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 9 or tplus == 10 or tplus == 11 or tplus == 12:
         el_provider = '[B][COLOR %s] Proxy-list.download[/B][/COLOR]' % color_exec
@@ -214,12 +234,15 @@ def plus_proxies(proxies, max_proxies):
 
         enlaces = scrapertools.find_multiple_matches(str(block), '<tr>.*?<td>(.*?)</td>.*?<td>(.*?)</td>')
 
-        for prox, puerto in enlaces:
-            prox = prox.strip()
+        try:
+           for prox, puerto in enlaces:
+               prox = prox.strip()
 
-            if not prox: continue
+               if not prox: continue
 
-            if puerto: proxies_plus.append(prox + ':' + puerto)
+               if puerto: proxies_plus.append(prox + ':' + puerto)
+        except:
+           if developer: platformtools.dialog_ok('Proxy-list.download', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 13 or tplus == 14:
         el_provider = '[B][COLOR %s] Freeproxy[/B][/COLOR]' % color_exec
@@ -227,14 +250,20 @@ def plus_proxies(proxies, max_proxies):
 
         resp.data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', resp.data)
 
+        enlaces = []
+
         if '<td class="show-ip-div">' in str(resp.data): enlaces = scrapertools.find_multiple_matches(str(resp.data), '<td class="show-ip-div">(.*?)</td>.*?<a href=".*?">(.*?)</a>')
-        else: enlaces = scrapertools.find_multiple_matches(str(resp.data), '<a href=".*?">(.*?)</a>')
 
-        for prox, puerto in enlaces:
-            prox = prox.strip()
-            puerto = puerto.strip()
+        elif '<td style="font-weight:' in str(resp.data): enlaces = scrapertools.find_multiple_matches(str(resp.data), '<td style="font-weight:.*?">(.*?)</td>.*?<a href=".*?">(.*?)</a>')
 
-            if puerto: proxies_plus.append(prox + ':' + puerto)
+        try:
+           for prox, puerto in enlaces:
+               prox = prox.strip()
+               puerto = puerto.strip()
+
+               if puerto: proxies_plus.append(prox + ':' + puerto)
+        except:
+           if developer: platformtools.dialog_ok('Freeproxy', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 15:
         el_provider = '[B][COLOR %s] Hidemyna[/B][/COLOR]' % color_exec
@@ -244,13 +273,16 @@ def plus_proxies(proxies, max_proxies):
 
         enlaces = scrapertools.find_multiple_matches(str(block), '<tr><td>(.*?)</td><td>(.*?)</td>')
 
-        for prox, port in enlaces:
-            prox = prox.strip()
-            port = port.strip()
+        try:
+           for prox, port in enlaces:
+               prox = prox.strip()
+               port = port.strip()
 
-            if not prox or not port: continue
+               if not prox or not port: continue
 
-            proxies_plus.append(prox + ':' + port)
+               proxies_plus.append(prox + ':' + port)
+        except:
+           if developer: platformtools.dialog_ok('Hidemyna', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 16:
         el_provider = '[B][COLOR %s] Proxylistplus[/B][/COLOR]' % color_exec
@@ -258,13 +290,16 @@ def plus_proxies(proxies, max_proxies):
 
         enlaces = scrapertools.find_multiple_matches(str(resp.data), '<td><img src=".*?<td>(.*?)</td>.*?<td>(.*?)</td>')
 
-        for prox, puerto in enlaces:
-            prox = prox.strip()
-            puerto = puerto.strip()
+        try:
+           for prox, puerto in enlaces:
+               prox = prox.strip()
+               puerto = puerto.strip()
 
-            if not prox or not puerto: continue
+               if not prox or not puerto: continue
 
-            proxies_plus.append(prox + ':' + puerto)
+               proxies_plus.append(prox + ':' + puerto)
+        except:
+           if developer: platformtools.dialog_ok('Proxylistplus', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 19 or tplus == 20 or tplus == 54 or tplus == 55:
         if tplus == 19: el_provider = '[B][COLOR %s] Proxyscan Http[/B][/COLOR]' % color_exec
@@ -276,12 +311,15 @@ def plus_proxies(proxies, max_proxies):
 
         enlaces = scrapertools.find_multiple_matches(str(resp.data), '(.*?)\n')
 
-        for prox in enlaces:
-            prox = prox.strip()
+        try:
+           for prox in enlaces:
+               prox = prox.strip()
 
-            prox = prox.replace('http://', '').replace('https://', '').replace('socks4://', '').replace('socks5://', '')
+               prox = prox.replace('http://', '').replace('https://', '').replace('socks4://', '').replace('socks5://', '')
 
-            if prox: proxies_plus.append(prox)
+               if prox: proxies_plus.append(prox)
+        except:
+           if developer: platformtools.dialog_ok('Plus', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 21 or tplus == 22 or tplus == 23:
         el_provider = '[B][COLOR %s] Openproxylist[/B][/COLOR]' % color_exec
@@ -289,10 +327,13 @@ def plus_proxies(proxies, max_proxies):
 
         enlaces = scrapertools.find_multiple_matches(str(resp.data), '(.*?)\n')
 
-        for prox in enlaces:
-            prox = prox.strip()
+        try:
+           for prox in enlaces:
+               prox = prox.strip()
 
-            proxies_plus.append(prox)
+               proxies_plus.append(prox)
+        except:
+           if developer: platformtools.dialog_ok('Openproxylist', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 17:
         el_provider = '[B][COLOR %s] Niek[/B][/COLOR]' % color_exec
@@ -302,12 +343,15 @@ def plus_proxies(proxies, max_proxies):
 
         enlaces = scrapertools.find_multiple_matches(str(block), '<td><code>(.*?)</code>.*?<td>(.*?)</td>')
 
-        for prox, _on in enlaces:
-            if _on == '❌': continue
+        try:
+           for prox, _on in enlaces:
+               if _on == '❌': continue
 
-            prox = prox.strip()
+               prox = prox.strip()
 
-            proxies_plus.append(prox)
+               proxies_plus.append(prox)
+        except:
+           if developer: platformtools.dialog_ok('Niek', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 24 or tplus == 25:
         el_provider = '[B][COLOR %s] Proxy-list.download[/B][/COLOR]' % color_exec
@@ -315,10 +359,13 @@ def plus_proxies(proxies, max_proxies):
 
         enlaces = scrapertools.find_multiple_matches(str(resp.data), '(.*?)\n')
 
-        for prox in enlaces:
-            prox = prox.strip()
+        try:
+           for prox in enlaces:
+               prox = prox.strip()
 
-            proxies_plus.append(prox)
+               proxies_plus.append(prox)
+        except:
+           if developer: platformtools.dialog_ok('Proxy-list.download', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 18 or tplus == 26 or tplus == 27 or tplus == 28 or tplus == 29 or tplus == 30 or tplus == 31 or tplus == 32 or tplus == 33 or tplus == 34 or tplus == 35 or tplus == 36 or tplus == 57 or tplus == 58 or tplus == 59 or tplus == 60 or tplus == 61:
         if tplus == 18: el_provider = '[B][COLOR %s] TheSpeedX/PROXY-List[/B][/COLOR]' % color_exec
@@ -339,28 +386,34 @@ def plus_proxies(proxies, max_proxies):
         elif tplus == 60: el_provider = '[B][COLOR %s] Vakhov socks4[/B][/COLOR]' % color_exec
         elif tplus == 61: el_provider = '[B][COLOR %s] Vakhov socks5[/B][/COLOR]' % color_exec
 
-        platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
+        platformtools.dialog_notification('Plus2 ' + str(tplus), 'Vía' + el_provider)
 
         enlaces = scrapertools.find_multiple_matches(str(resp.data), '(.*?)\n')
 
-        for prox in enlaces:
-            prox = prox.strip()
+        try:
+           for prox in enlaces:
+               prox = prox.strip()
 
-            proxies_plus.append(prox)
+               proxies_plus.append(prox)
+        except:
+           if developer: platformtools.dialog_ok('Plus2', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 37:
         el_provider = '[B][COLOR %s] Lamt3012[/B][/COLOR]' % color_exec
-        platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
+        platformtools.dialog_notification('Plus3 ' + str(tplus), 'Vía' + el_provider)
 
         block = scrapertools.find_single_match(str(resp.data), '>DOWNLOAD(.*?)>Country<')
 
         enlaces = scrapertools.find_multiple_matches(str(block), 'br class="wixui-rich-text__text">\n(.*?),')
 
         if enlaces:
-            for prox in enlaces:
-                 if not ':' in prox: continue
+            try:
+               for prox in enlaces:
+                    if not ':' in prox: continue
 
-                 proxies_plus.append(prox)
+                    proxies_plus.append(prox)
+            except:
+               if developer: platformtools.dialog_ok('Plus3', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 38 or tplus == 39 or tplus == 40 or tplus == 45:
         if tplus == 38: el_provider = '[B][COLOR %s] Proxyfly Http[/B][/COLOR]' % color_exec
@@ -368,17 +421,20 @@ def plus_proxies(proxies, max_proxies):
         elif tplus == 40: el_provider = '[B][COLOR %s] Proxyfly Socks5[/B][/COLOR]' % color_exec
         elif tplus == 45: el_provider = '[B][COLOR %s] Proxyfly Https[/B][/COLOR]' % color_exec
 
-        platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
+        platformtools.dialog_notification('Plus4 ' + str(tplus), 'Vía' + el_provider)
 
         enlaces = scrapertools.find_multiple_matches(str(resp.data), '(.*?)\n')
 
-        for prox in enlaces:
-            prox = prox.replace('http://', '').replace('https://', '').replace('socks4://', '').replace('socks5://', '')
+        try:
+           for prox in enlaces:
+               prox = prox.replace('http://', '').replace('https://', '').replace('socks4://', '').replace('socks5://', '')
 
-            prox = prox.strip()
+               prox = prox.strip()
 
-            if prox:
-                proxies_plus.append(prox)
+               if prox:
+                   proxies_plus.append(prox)
+        except:
+           if developer: platformtools.dialog_ok('Plus4', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 41 or tplus == 42 or tplus == 43 or tplus == 44:
         if tplus == 41: el_provider = '[B][COLOR %s] ErcinDedeoglu Http[/B][/COLOR]' % color_exec
@@ -386,43 +442,52 @@ def plus_proxies(proxies, max_proxies):
         elif tplus == 43: el_provider = '[B][COLOR %s] ErcinDedeoglu Socks4[/B][/COLOR]' % color_exec
         elif tplus == 44: el_provider = '[B][COLOR %s] ErcinDedeoglu socks5[/B][/COLOR]' % color_exec
 
-        platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
+        platformtools.dialog_notification('Plus5 ' + str(tplus), 'Vía' + el_provider)
 
         enlaces = scrapertools.find_multiple_matches(str(resp.data), '(.*?)\n')
 
-        for prox in enlaces:
-            prox = prox.strip()
+        try:
+           for prox in enlaces:
+               prox = prox.strip()
 
-            if prox:
-                proxies_plus.append(prox)
+               if prox:
+                   proxies_plus.append(prox)
+        except:
+           if developer: platformtools.dialog_ok('Plus5', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 46:
         el_provider = '[B][COLOR %s] Proxycompass[/B][/COLOR]' % color_exec
-        platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
+        platformtools.dialog_notification('Plus6 ' + str(tplus), 'Vía' + el_provider)
 
         enlaces = scrapertools.find_multiple_matches(str(resp.data), '<td class="table-ip">(.*?)</td>.*?<td>(.*?)</td>')
 
-        for prox, puerto in enlaces:
-            prox = prox.strip()
-            puerto = puerto.strip()
+        try:
+           for prox, puerto in enlaces:
+               prox = prox.strip()
+               puerto = puerto.strip()
 
-            if not prox or not puerto: continue
+               if not prox or not puerto: continue
 
-            proxies_plus.append(prox + ':' + puerto)
+               proxies_plus.append(prox + ':' + puerto)
+        except:
+           if developer: platformtools.dialog_ok('Plus6', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 47:
         el_provider = '[B][COLOR %s] Proxybros[/B][/COLOR]' % color_exec
-        platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
+        platformtools.dialog_notification('Plus7 ' + str(tplus), 'Vía' + el_provider)
 
         enlaces = scrapertools.find_multiple_matches(str(resp.data), '<span class="proxy-ip" data-ip>(.*?)</span>.*?<td data-port>(.*?)</td>')
 
-        for prox, puerto in enlaces:
-            prox = prox.strip()
-            puerto = puerto.strip()
+        try:
+           for prox, puerto in enlaces:
+               prox = prox.strip()
+               puerto = puerto.strip()
 
-            if not prox or not puerto: continue
+               if not prox or not puerto: continue
 
-            proxies_plus.append(prox + ':' + puerto)
+               proxies_plus.append(prox + ':' + puerto)
+        except:
+           if developer: platformtools.dialog_ok('Plus7', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 48 or tplus == 49 or tplus == 50 or tplus == 51 or tplus == 52:
         if tplus == 48: el_provider = '[B][COLOR %s] Proxyscrape All[/B][/COLOR]' % color_exec
@@ -431,23 +496,29 @@ def plus_proxies(proxies, max_proxies):
         elif tplus == 51: el_provider = '[B][COLOR %s] Proxyscrape Transparent[/B][/COLOR]' % color_exec
         elif tplus == 52: el_provider = '[B][COLOR %s] Proxyscrape Https[/B][/COLOR]' % color_exec
 
-        platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
+        platformtools.dialog_notification('Plus8 ' + str(tplus), 'Vía' + el_provider)
 
-        if resp.data:
-           if not "<title>404" in str(resp.data): proxies_plus = resp.data.split()
+        try:
+           if resp.data:
+               if not "<title>404" in str(resp.data): proxies_plus = resp.data.split()
+        except:
+           if developer: platformtools.dialog_ok('Plus8', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     elif tplus == 53:
         el_provider = '[B][COLOR %s] Markavale[/B][/COLOR]' % color_exec
-        platformtools.dialog_notification('Plus ' + str(tplus), 'Vía' + el_provider)
+        platformtools.dialog_notification('Plus9 ' + str(tplus), 'Vía' + el_provider)
 
         block = scrapertools.find_single_match(str(resp.data), '"proxy-list.txt">(.*?)</table>')
 
         enlaces = scrapertools.find_multiple_matches(str(block), '<td id="file-proxy-list-txt-.*?js-file-line">(.*?)</td>')
-                                                
-        for prox in enlaces:
-            prox = prox.strip()
+             
+        try:			 
+           for prox in enlaces:
+               prox = prox.strip()
 
-            if prox: proxies_plus.append(prox)
+               if prox: proxies_plus.append(prox)
+        except:
+           if developer: platformtools.dialog_ok('Plus9', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     # ~ si no se obtuvo ninguno
     if not proxies_plus:
@@ -462,13 +533,16 @@ def plus_proxies(proxies, max_proxies):
 
             enlaces = scrapertools.find_multiple_matches(str(resp.data), '<td><strong>(.*?)</strong></td><td>(.*?)</td>')
 
-            for prox, port in enlaces:
-                prox = prox.strip()
-                port = port.strip()
+            try:
+               for prox, port in enlaces:
+                   prox = prox.strip()
+                   port = port.strip()
 
-                if not prox or not port: continue
+                   if not prox or not port: continue
 
-                proxies_plus.append(prox + ':' + port)
+                   proxies_plus.append(prox + ':' + port)
+            except:
+               if developer: platformtools.dialog_ok('Vpnoverview', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
 
     if proxies_plus: proxies = proxies + proxies_plus
@@ -489,13 +563,16 @@ def z_xroxy(url, tipo_proxy, pais_proxy, max_proxies):
     enlaces = scrapertools.find_multiple_matches(str(resp.data), "'View this Proxy details'>(.*?)<.*?Select proxies with port number.*?>(.*?)</a>")
 
     if enlaces:
-        for prox, port in enlaces:
-            prox = prox.strip()
-            port = port.strip()
+        try:
+           for prox, port in enlaces:
+               prox = prox.strip()
+               port = port.strip()
 
-            if not prox or not port: continue
+               if not prox or not port: continue
 
-            proxies.append(prox + ':' + port)
+               proxies.append(prox + ':' + port)
+        except:
+           if developer: platformtools.dialog_ok('Xroxy', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
     else:
         el_provider = '[B][COLOR %s] Proxylist.to[/B][/COLOR]' % color_exec
         platformtools.dialog_notification('Xroxy', 'Vía' + el_provider)
@@ -507,13 +584,16 @@ def z_xroxy(url, tipo_proxy, pais_proxy, max_proxies):
 
         enlaces = scrapertools.find_multiple_matches(str(resp.data), '<td class="t_ip">(.*?)</td>.*?<td class="t_port">(.*?)</td>')
 
-        for prox, port in enlaces:
-            prox = prox.strip()
-            port = port.strip()
+        try:
+           for prox, port in enlaces:
+               prox = prox.strip()
+               port = port.strip()
 
-            if not prox or not port: continue
+               if not prox or not port: continue
 
-            proxies.append(prox + ':' + port)
+               proxies.append(prox + ':' + port)
+        except:
+           if developer: platformtools.dialog_ok('Proxylist.to', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     if len(proxies) < 50: proxies = plus_proxies(proxies, max_proxies)
 
@@ -534,8 +614,11 @@ def z_proxy_daily(url, tipo_proxy, pais_proxy, max_proxies):
 
     enlaces = scrapertools.find_multiple_matches(block, '(.*?)\n')
 
-    for prox in enlaces:
-        proxies.append(prox)
+    try:
+       for prox in enlaces:
+           proxies.append(prox)
+    except:
+       if developer: platformtools.dialog_ok('Proxy-daily', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     if len(proxies) < 50: proxies = plus_proxies(proxies, max_proxies)
 
@@ -554,12 +637,15 @@ def z_proxy_list_org(url, tipo_proxy, pais_proxy, max_proxies):
 
     enlaces = scrapertools.find_multiple_matches(str(resp.data), '<li class="proxy"><script.*?' + "'(.*?)'")
 
-    for prox in enlaces:
-        prox = base64.b64decode(prox)
+    try:
+       for prox in enlaces:
+           prox = base64.b64decode(prox)
 
-        if "b'" in str(prox): prox = scrapertools.find_single_match(str(prox), "b'(.*?)'")
+           if "b'" in str(prox): prox = scrapertools.find_single_match(str(prox), "b'(.*?)'")
 
-        if prox: proxies.append(prox)
+           if prox: proxies.append(prox)
+    except:
+       if developer: platformtools.dialog_ok('Proxy-list.org', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     if len(proxies) < 50: proxies = plus_proxies(proxies, max_proxies)
 
@@ -579,10 +665,13 @@ def z_proxyhub(url, tipo_proxy, pais_proxy, max_proxies):
     enlaces = scrapertools.find_multiple_matches(str(resp.data), '<tr><td>(.*?)</td><td>(.*?)</td>')
 
     if enlaces:
-        for prox, port in enlaces:
-            if not prox or not port: continue
+        try:
+           for prox, port in enlaces:
+               if not prox or not port: continue
 
-            if prox: proxies.append(prox + ':' + port)
+               if prox: proxies.append(prox + ':' + port)
+        except:
+           if developer: platformtools.dialog_ok('Proxyhub', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
     else:
         el_provider = '[B][COLOR %s] TheSpeedX.proxy-list-s4[/B][/COLOR]' % color_exec
         platformtools.dialog_notification('Proxyhub', 'Vía' + el_provider)
@@ -596,8 +685,11 @@ def z_proxyhub(url, tipo_proxy, pais_proxy, max_proxies):
 
         enlaces = scrapertools.find_multiple_matches(block, '"(.*?)"')
 
-        for prox in enlaces:
-            proxies.append(prox)
+        try:
+           for prox in enlaces:
+               proxies.append(prox)
+        except:
+           if developer: platformtools.dialog_ok('TheSpeedX', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     if len(proxies) < 50: proxies = plus_proxies(proxies, max_proxies)
 
@@ -616,10 +708,13 @@ def z_proxyranker(url, tipo_proxy, pais_proxy, max_proxies):
 
     enlaces = scrapertools.find_multiple_matches(str(resp.data), '<td>(.*?)</td>.*?<span title="Proxy port">(.*?)</span>.*?</tr>')
 
-    for prox, port in enlaces:
-        if not prox or not port: continue
+    try:
+       for prox, port in enlaces:
+           if not prox or not port: continue
 
-        if prox: proxies.append(prox + ':' + port)
+           if prox: proxies.append(prox + ':' + port)
+    except:
+       if developer: platformtools.dialog_ok('Proxyranker', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     if len(proxies) < 50: proxies = plus_proxies(proxies, max_proxies)
 
@@ -638,13 +733,16 @@ def z_echolink(url, tipo_proxy, pais_proxy, max_proxies):
 
     enlaces = scrapertools.find_multiple_matches(str(resp.data), '<tr class="normal-row">.*?</td>.*?<td>(.*?)</td>.*?<td>(.*?)</td>')
 
-    for prox, port in enlaces:
-        prox = prox.replace('&nbsp;', '').strip()
-        port = port.replace('&nbsp;', '').strip()
+    try:
+       for prox, port in enlaces:
+           prox = prox.replace('&nbsp;', '').strip()
+           port = port.replace('&nbsp;', '').strip()
 
-        if not prox or not port: continue
+           if not prox or not port: continue
 
-        proxies.append(prox + ':' + port)
+           proxies.append(prox + ':' + port)
+    except:
+       if developer: platformtools.dialog_ok('Echolink', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     if len(proxies) < 50: proxies = plus_proxies(proxies, max_proxies)
 
@@ -665,13 +763,16 @@ def z_free_proxy_list_anon(url, tipo_proxy, pais_proxy, max_proxies):
 
     enlaces = scrapertools.find_multiple_matches(block, '(.*?)\n')
 
-    for prox in enlaces:
-        prox = prox.strip()
+    try:
+       for prox in enlaces:
+           prox = prox.strip()
 
-        if not prox: continue
-        elif '-' in prox: continue
+           if not prox: continue
+           elif '-' in prox: continue
 
-        proxies.append(prox)
+           proxies.append(prox)
+    except:
+       if developer: platformtools.dialog_ok('Free-proxy-list.net', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     if len(proxies) < 50: proxies = plus_proxies(proxies, max_proxies)
 
@@ -692,13 +793,16 @@ def z_free_proxy_list_uk(url, tipo_proxy, pais_proxy, max_proxies):
 
     enlaces = scrapertools.find_multiple_matches(block, '(.*?)\n')
 
-    for prox in enlaces:
-        prox = prox.strip()
+    try:
+       for prox in enlaces:
+           prox = prox.strip()
 
-        if not prox: continue
-        elif '-' in prox: continue
+           if not prox: continue
+           elif '-' in prox: continue
 
-        proxies.append(prox)
+           proxies.append(prox)
+    except:
+       if developer: platformtools.dialog_ok('Free-proxy-list.net/uk', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     if len(proxies) < 50: proxies = plus_proxies(proxies, max_proxies)
 
@@ -717,8 +821,11 @@ def z_github(url, tipo_proxy, pais_proxy, max_proxies):
 
     enlaces = scrapertools.find_multiple_matches(str(resp.data), '(.*?)\n')
 
-    for prox in enlaces:
-        proxies.append(prox)
+    try:
+       for prox in enlaces:
+           proxies.append(prox)
+    except:
+       if developer: platformtools.dialog_ok('Hendrikbgr', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     if len(proxies) < 50: proxies = plus_proxies(proxies, max_proxies)
 
@@ -737,10 +844,13 @@ def z_squidproxyserver(url, tipo_proxy, pais_proxy, max_proxies):
 
     enlaces = scrapertools.find_multiple_matches(str(resp.data), '<tr><td>(.*?)</td><td>(.*?)</td>')
 
-    for prox, port in enlaces:
-        if not prox or not port: continue
+    try:
+       for prox, port in enlaces:
+           if not prox or not port: continue
 
-        proxies.append(prox + ':' + port)
+           proxies.append(prox + ':' + port)
+    except:
+       if developer: platformtools.dialog_ok('Squidproxyserver', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     if len(proxies) < 50: proxies = plus_proxies(proxies, max_proxies)
 
@@ -761,12 +871,15 @@ def z_socks(url, tipo_proxy, pais_proxy, max_proxies):
 
     enlaces = scrapertools.find_multiple_matches(block, '(.*?)\n')
 
-    for prox in enlaces:
-        if prox:
-            if '-' in prox: continue
-            elif not ':' in prox: continue
+    try:
+       for prox in enlaces:
+           if prox:
+               if '-' in prox: continue
+               elif not ':' in prox: continue
 
-        proxies.append(prox)
+           proxies.append(prox)
+    except:
+       if developer: platformtools.dialog_ok('Socks', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     if len(proxies) < 50: proxies = plus_proxies(proxies, max_proxies)
 
@@ -785,8 +898,11 @@ def z_opsxcq(url, tipo_proxy, pais_proxy, max_proxies):
 
     enlaces = scrapertools.find_multiple_matches(str(resp.data), '(.*?)\n')
 
-    for prox in enlaces:
-        proxies.append(prox)
+    try:
+       for prox in enlaces:
+           proxies.append(prox)
+    except:
+       if developer: platformtools.dialog_ok('Opsxcq', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     if len(proxies) < 50: proxies = plus_proxies(proxies, max_proxies)
 
@@ -805,8 +921,11 @@ def z_free_proxy_list_com(url, tipo_proxy, pais_proxy, max_proxies):
 
     enlaces = scrapertools.find_multiple_matches(str(resp.data), '<td class=""><a href=.*?title="(.*?)"')
 
-    for prox in enlaces:
-        proxies.append(prox)
+    try:
+       for prox in enlaces:
+           proxies.append(prox)
+    except:
+       if developer: platformtools.dialog_ok('Free-proxy-list.com', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     if len(proxies) < 50: proxies = plus_proxies(proxies, max_proxies)
 
@@ -830,11 +949,14 @@ def z_coderduck(url, tipo_proxy, pais_proxy, max_proxies):
 
     if block:
         block = block + ' '
+
         enlaces = scrapertools.find_multiple_matches(block, '(.*?) ')
 
-        for prox in enlaces:
-            proxies.append(prox)
-
+        try:
+           for prox in enlaces:
+               proxies.append(prox)
+        except:
+          if developer: platformtools.dialog_ok('Pdfcoffee', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
     else:
         # ~ 13/9/2022 no devuelve proxies
         url_provider = 'https://www.coderduck.com/free-proxy-list'
@@ -844,12 +966,15 @@ def z_coderduck(url, tipo_proxy, pais_proxy, max_proxies):
 
         enlaces = scrapertools.find_multiple_matches(str(resp.data), '<tr>.*?</td>.*?<td>(.*?)</td>.*?<td>(.*?)</td>')
 
-        for prox, port in enlaces:
-            if not prox or not port: continue
+        try:
+           for prox, port in enlaces:
+               if not prox or not port: continue
 
-            prox = prox.replace("' + '", '').strip()
+               prox = prox.replace("' + '", '').strip()
 
-            if prox: proxies.append(prox + ':' + port)
+               if prox: proxies.append(prox + ':' + port)
+        except:
+          if developer: platformtools.dialog_ok('Coderduck', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     if len(proxies) < 50: proxies = plus_proxies(proxies, max_proxies)
 

@@ -74,7 +74,7 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('AllPeliculasSe', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('AllPeliculasSe', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -664,12 +664,17 @@ def findvideos(item):
                 _raw = scrapertools.find_single_match(rest, '".*?"url_raw":"(.*?)"')
 
                 if _raw:
-                    _raw = _raw.replace('\\/', '/').replace('https://', '')
+                    _raw = _raw.replace('\\/', '/')
+
+                    if '/1fichier.' in _raw: continue
+                    elif '/turbobit.' in _raw: continue
+
+                    _raw = _raw.replace('https://', '').replace('www.', '').replace('.com', '').replace('.net', '').replace('.nz', '').strip()
 
                     age = _raw
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url,
-                              language = lang, other = other.capitalize(), age = age ))
+                              language = lang, other = other.capitalize(), age = age.capitalize() ))
 
     if not itemlist:
         if not ses == 0:

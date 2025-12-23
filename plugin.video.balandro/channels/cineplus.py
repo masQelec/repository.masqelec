@@ -64,7 +64,7 @@ def generos(item):
 
     bloque = scrapertools.find_single_match(data, '>Categorías<(.*?)</ul>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?title=".*?">(.*?)</a>')
+    matches = scrapertools.find_multiple_matches(bloque, "<a href='(.*?)'.*?'>(.*?)</a>")
 
     for url, title in matches:
         itemlist.append(item.clone( action='list_all', title=title, url=url, text_color = 'deepskyblue' ))
@@ -86,7 +86,7 @@ def list_all(item):
     if not bloque: bloque = scrapertools.find_single_match(data, '<h1>Películas(.*?)</section>')
     if not bloque: bloque = scrapertools.find_single_match(data, '<h1>Peliculas(.*?)</section>')
 
-    matches = re.compile('<div class="col-mt-5 postsh">(.*?)</div></div>', re.DOTALL).findall(bloque)
+    matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
 
     num_matches = len(matches)
 
@@ -135,30 +135,26 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    blk = scrapertools.find_single_match(str(data), "var (.*?)click")
+    blk = scrapertools.find_single_match(str(data), "const videosPorIdioma =(.*?)</script>")
 
     if not blk: return itemlist
-
-    blk = str(blk).replace('e[', 'e="').replace(']=', '"=')
 
     hay_https = False
     if 'https://' in str(blk): hay_https = True
 
     ses = 0
 
-    matches = scrapertools.find_multiple_matches(data, '<li data-id="(.*?)">(.*?)</li>')
-    if not matches: matches = scrapertools.find_multiple_matches(data, "<li data-id='(.*?)'>(.*?)</li>")
+    matches = scrapertools.find_multiple_matches(data, '<li data-id=.*?">(.*?)<div class="server">(.*?)</div>')
 
-    for opt, idio in matches:
+    for idio, opt in matches:
         ses += 1
 
-        if idio == 'Latino': idio = 'Lat'
-        elif idio == 'Castellano' or idio == 'Español': idio = 'Esp'
-        elif idio == 'Subtitulado': idio = 'Vose'
+        if idio == 'lat': idio = 'Lat'
+        elif idio == 'cast' or idio == 'esp': idio = 'Esp'
+        elif idio == 'sub': idio = 'Vose'
         else: idio = '?'
 
-        url = scrapertools.find_single_match(str(blk),  'e="' + str(opt) + '"=' +".*?'(.*?)'")
-        if not url: url = scrapertools.find_single_match(str(blk), 'e="' + str(opt) + '"=' + '.*?"(.*?)"')
+        url = opt
 
         avisar = True
 

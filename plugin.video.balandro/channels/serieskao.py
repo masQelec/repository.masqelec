@@ -462,7 +462,6 @@ def findvideos(item):
                 elif 'player-cdn' in srv: continue
 
                 elif srv == 'download': continue
-                elif srv == 'up2box': continue
 
                 servidor = servertools.corregir_servidor(srv)
 

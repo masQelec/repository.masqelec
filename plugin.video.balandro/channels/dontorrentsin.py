@@ -144,7 +144,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'movie', text_color='cyan' ))
 
-    itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'peliculas/4K/page/1', search_type = 'movie', text_color='moccasin' ))
+
+    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'peliculas/hd/page/1', search_type = 'movie', text_color='tan' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie', tipo = 'genero' ))
 
@@ -168,6 +170,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Catálogo (alfabético)', action = 'list_all', url = host + 'series/letra-.', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'tvshow', text_color='cyan' ))
+
+    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'series/4K/page/1', search_type = 'tvshow', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Catálogo HD', action = 'list_all', url = host + 'series/hd/page/1', search_type = 'tvshow' ))
 
@@ -193,16 +197,6 @@ def mainlist_documentary(item):
     itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'documentary', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', url = host + 'documentales', search_type = 'documentary' ))
-
-    return itemlist
-
-
-def calidades(item):
-    logger.info()
-    itemlist = []
-
-    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'peliculas/4K/page/1', search_type = 'movie', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'peliculas/hd/page/1', search_type = 'movie', text_color='moccasin' ))
 
     return itemlist
 

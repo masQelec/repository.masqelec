@@ -6,7 +6,7 @@
   [COLOR chartreuse][B]04[/B][/COLOR]  [COLOR yellow]INSTALACION BALANDRO[/COLOR]
   [COLOR chartreuse][B]05[/B][/COLOR]  [COLOR yellow]DESCARGA E INSTALACION DEL ADDON DE VIDEO BALANDRO[/COLOR]
   [COLOR chartreuse][B]06[/B][/COLOR]  [COLOR yellow]BALANDRO REPRODUCCIONES[/COLOR]
-  [COLOR chartreuse][B]07[/B][/COLOR]  [COLOR yellow]GRUPO TELEGRAM BALANDRO ASESOR[/COLOR]
+  [COLOR chartreuse][B]07[/B][/COLOR]  [COLOR yellow]GRUPO PRIVADO/PÜBLICO TELEGRAM BALANDRO ASESOR[/COLOR]
   [COLOR chartreuse][B]08[/B][/COLOR]  [COLOR yellow]QUITAR LOS PROXIES DE UN CANAL[/COLOR]
   [COLOR chartreuse][B]09[/B][/COLOR]  [COLOR yellow]GESTION DE PROXIES[/COLOR]
   [COLOR chartreuse][B]10[/B][/COLOR]  [COLOR yellow]SI APARECIERA LA VENTANA DE ERROR INESPERADO[/COLOR]
@@ -14,7 +14,7 @@
   [COLOR chartreuse][B]12[/B][/COLOR]  [COLOR yellow]IDIOMAS (AUDIOS)[/COLOR]
   [COLOR chartreuse][B]13[/B][/COLOR]  [COLOR yellow]ULTIMA VERSION DE BALANDRO[/COLOR]
   [COLOR chartreuse][B]14[/B][/COLOR]  [COLOR yellow]ACCESO A LOS MENSAJES FIJADOS DESDE EL FORO[/COLOR]
-  [COLOR chartreuse][B]15[/B][/COLOR]  [COLOR yellow]COMUNICADO HISTORIAL DE TELEGRAM[/COLOR]
+  [COLOR chartreuse][B]15[/B][/COLOR]  [COLOR yellow]HISTORIAL DE TELEGRAM[/COLOR]
 
 [COLOR chartreuse][B]Mensaje Fijado 01[/COLOR]  [COLOR yellow]COMUNICADO BALANDRO TEAM[/B][/COLOR]
 
@@ -199,11 +199,14 @@ Comrobación antes de reportar un posible fallo en la Reproducción de [COLOR go
   porque si la carga solo recayera sobre nosotros,
   sería imposible abordarlo por saturación/falta de tiempo.
 
-[COLOR chartreuse][B]Mensaje Fijado 07[/COLOR]  [COLOR yellow]GRUPO TELEGRAM BALANDRO ASESOR[/B][/COLOR] 
+[COLOR chartreuse][B]Mensaje Fijado 07[/COLOR]  [COLOR yellow]GRUPO PRIVADO/PÜBLICO TELEGRAM BALANDRO ASESOR[/B][/COLOR] 
 
 Atención:
-  Este Grupo ha pasado a ser [COLOR cyan]Privado[/COLOR] desde el [COLOR gold]10/10/2024[/COLOR].
+  Este Grupo pasa a ser [COLOR cyan]Privado[/COLOR] cada mes de [COLOR gold]Febrero[/COLOR].
 
+  Excepcionalmente, durante los Meses de [COLOR gold]Octubre a Enero[/COLOR] de cada Año,
+  permitimos que sea [COLOR cyan]Público[/COLOR].
+ 
   Si lo abandonaís, ya NO podreís acceder a el, en consecuencia el grupo estará cerrado para
   [COLOR gold]Nuevas Incorporaciones[/COLOR], a partir de esa Fecha.
 
@@ -327,7 +330,7 @@ tan SOLO presentamos lo que las Webs (Canales) Suministran.
 
 [COLOR chartreuse][B]Mensaje Fijado 15[/COLOR]  [COLOR yellow]HISTORIAL DE TELEGRAM[/B][/COLOR]
 
-Nota Informativa [COLOR gold]27/9/2025[/COLOR] Hemos eliminado Todo el Historial de Chats.
+Nota Informativa cada cierto tiempo, procedemos a eliminar Todo el Historial de Chats.
 
 Normativa General:
   Abstenerse de publicar Fotos/Vídeos excepto Emoticones 

@@ -116,6 +116,8 @@ def list_all(item):
     matches = re.compile(patron,re.DOTALL).findall(data)
 
     for url, title, thumb in matches:
+        title = title.replace('&#8217;s', "'s").replace('&#8217;t', "'t").replace('&#8211;', '').replace('&amp;', '&').replace('&#038;', '').strip()
+
         itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb,
                                     contentType = 'movie', contentTitle = title, contentExtra='adults') )
 
@@ -152,8 +154,19 @@ def findvideos(item):
     for url in matches:
         ses += 1
 
-        if '/drivevideo.' in url: continue
+        if '/frdl.' in url: continue
+        elif '/drivevideo.' in url: continue
+        elif '/snowdayonline.' in url: continue
+        elif '/freepopnews.' in url: continue
+        elif '/filepv.' in url: continue
+        elif '/vinovo.' in url: continue
         elif '/p.' in url: continue
+
+        elif '.player4me.' in url: continue
+        elif '.embedseek.' in url: continue
+
+        elif '/nitroflare.' in url: continue
+        elif 'rapidgator.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)

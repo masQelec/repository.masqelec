@@ -120,7 +120,7 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '</h1>(.*?)<p>©')
+    bloque = scrapertools.find_single_match(data, '</h1>(.*?)©')
 
     matches = scrapertools.find_multiple_matches(str(bloque), '<div data-slot="card-content"(.*?)content-visibility-auto">')
 
@@ -231,11 +231,11 @@ def temporadas(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '>Seasons and Episodes<(.*?)</div></div></div></div>')
+    bloque: bloque = scrapertools.find_single_match(data, '>Temporadas y Episodios<(.*?)</div></div></div></div></div></div></div>')
 
     bloque = bloque.replace('<!-- -->', '"').replace('</span></button>', '"')
 
-    matches = re.compile('>Season "(.*?)</button>', re.DOTALL).findall(bloque)
+    matches = re.compile('>Temporada "(.*?)</button>', re.DOTALL).findall(bloque)
 
     for numtempo in matches:
          numtempo = numtempo.strip()
@@ -342,7 +342,7 @@ def episodios(item):
 
         url = scrapertools.find_single_match(title, '-(.*?)$').strip()
 
-        url = url.replace(' ', '-').lower()
+        url = url.replace(' ', '-').replace('Capítulo', 'Capitulo').lower()
 
         if not item.only_one_season:
             if not str(item.contentSeason) == '1':
@@ -353,7 +353,10 @@ def episodios(item):
         if not '-capitulo-' in url:
             url = host + 'episodes/' + url + '-capitulo-' + str(epis)
         else:
-            url = host + 'episodes/' + url
+            url = host + 'episodes/' + url + '-s1'
+
+        if '/episodes/-capitulo-' in url:
+            url = host + '/episodes/' + item.contentSerieName.replace(' ' , '-').lower() + '-capitulo-' + str(epis) + '-completo-fhd-s1'
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title.replace(' - ', ' ').strip()
 

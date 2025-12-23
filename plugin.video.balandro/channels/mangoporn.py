@@ -40,13 +40,13 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'adult/genres/porn-movies/' ))
 
-    itemlist.append(item.clone( title = ' - Tendencias', action = 'list_all', url = host + 'adult/trending/' ))
+    itemlist.append(item.clone( title = ' - Más vistas', action = 'list_all', url = host + 'adult/trending/' ))
 
     itemlist.append(item.clone( title = '[B]Vídeos:[/B]', folder=False, text_color='moccasin' ))
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'xxxfree/' ))
 
-    itemlist.append(item.clone( title = ' - Tendencias', action = 'list_all', url = host + 'xxxfree/trending/' ))
+    itemlist.append(item.clone( title = ' - Más vistos', action = 'list_all', url = host + 'xxxfree/trending/' ))
 
     itemlist.append(item.clone( title = ' - Más valorados', action = 'list_all', url = host + 'xxxfree/ratings/' ))
 
@@ -119,7 +119,7 @@ def list_all(item):
 
         title = title.replace('Porn Online Free', '').replace('Watch', '').strip()
 
-        title = title.replace('&#8211;', '').replace('&#038;', '&').replace('&#8217;', "'").replace('&#8230;', '').strip()
+        title = title.replace('&#8211;', '').replace('&#038;', '&').replace('&#8217;', "'").replace('&#8230;', '').replace('&#8220;', '').replace('&#8221;', '').strip()
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
         if not thumb: thumb = scrapertools.find_single_match(match, 'data-wpfc-original-src="(.*?)"')
@@ -129,7 +129,7 @@ def list_all(item):
         titulo = title
 
         if time:
-            time = time.replace(' hrs.', 'h').replace(' mins.', 'm').replace(' min.', 'm')
+            time = time.replace(' hrs.', 'h').replace(' mins.', 'm').replace(' min.', 'm').replace(' hrs', 'h').replace(' mins', 'm').replace(' min', 'm')
 
             titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
 

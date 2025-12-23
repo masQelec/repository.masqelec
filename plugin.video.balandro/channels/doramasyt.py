@@ -62,7 +62,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not 'buscar?q=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('DoramasYt', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('DoramasYt', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -336,10 +336,13 @@ def last_epis(item):
         SerieName = title
 
         if "capitulo" in title:SerieName = title.split("capitulo")[0]
-        elif "Capitulo" in title:SerieName = title.split("Capitulo")[0]
-        elif "episodio" in title:SerieName = title.split("episodio")[0]
-        elif "Episodio" in title:SerieName = title.split("Episodio")[0]
-        else: titulo = SerieName
+        if "Capitulo" in title:SerieName = title.split("Capitulo")[0]
+
+        if "episodio" in title:SerieName = title.split("episodio")[0]
+        if "Episodio" in title:SerieName = title.split("Episodio")[0]
+
+        if "latino" in title:SerieName = title.split("latino")[0]
+        if "Latino" in title:SerieName = title.split("Latino")[0]
 
         SerieName = SerieName.strip()
 

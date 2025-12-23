@@ -148,7 +148,7 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CineCalidadLoL', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CineCalidadLoL', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -348,7 +348,7 @@ def list_all(item):
 
         elif not 'http' in url: continue
 
-        elif '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url or '/netflix/o/' in url or '/product/' in url or '.ggpickaff.' in url:
+        elif '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url or '/netflix/o/' in url or '/product/' in url or '.ggpickaff.' in url or title == 'promo':
               _promos += 1
               continue
         elif 'Netflix Premium' in match or 'Suscripción Disney Plus' in match or 'Suscripción HBO' in match:
@@ -792,7 +792,7 @@ def findvideos(item):
 
 
 def puntuar_calidad(txt):
-    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', 'REMUX 1080p', '1080', 'HD', 'WEBRip 1080p', 'WEB-DL 4k', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', 'REMUX 4k', '4K']
+    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'DVD Rip', 'WEBRip', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', 'REMUX 1080p', '1080', 'HD', 'HDRip', 'WEBRip 1080p', 'WEB-DL 4k', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', 'REMUX 4k', '4K']
 
     txt = txt.strip()
     if txt not in orden: return 0

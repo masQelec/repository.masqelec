@@ -3,7 +3,7 @@
   "name": "MejorTorrentNz",
   "thumbnail": "mejortorrentnz.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow", "torrent"],
   "language": ["cast"],
 
-  "clusters": ["onlyone", "current", "news", "lasts", "torrents", "docs", "4k"],
+  "clusters": ["onlyone", "news", "lasts", "torrents", "docs", "4k"],
 
-  "notes": "Canal con enlaces Torrent exclusivamente. Películas y Series por calidad. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Web CERRADA. Canal con enlaces Torrent exclusivamente. Películas y Series."
 }

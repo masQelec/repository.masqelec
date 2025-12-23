@@ -37,10 +37,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + 'newest-clips/1.html', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Tendencias', action = 'list_all', url = host + 'trending/1.html' ))
-
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'most-popular/1.html' ))
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'top-rated/1.html' ))
+
+    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'trending/1.html' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
 
@@ -79,6 +79,8 @@ def list_all(item):
 
     for url, thumb, title, duration, in matches:
         url = host[:-1] + url
+
+        title = title.replace('&#039;s', "'s").replace('&#039;', '').strip()
 
         thumb = 'https:' + thumb
 

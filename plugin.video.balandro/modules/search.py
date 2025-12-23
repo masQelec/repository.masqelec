@@ -308,24 +308,23 @@ def do_search(item, tecleado):
         item.search_type = 'all'
 
     # ~ status para descartar desactivados por el usuario
-    if item.search_special == 'anime' or item.search_special == 'dorama': filtros = {'status': 0 }
+    if item.search_special == 'anime' or item.search_special == 'dorama': filtros = {'searchable': False, 'status': 0}
 
-    elif item.extra == '+18': filtros = {'categories': 'adults', 'status': 0 }
+    elif item.extra == '+18': filtros = {'categories': 'adults', 'status': 0}
 
-    elif item.search_special == 'torrent': filtros = {'searchable': True, 'categories': 'torrent', 'status': 0 }
+    elif item.search_special == 'torrent': filtros = {'searchable': True, 'categories': 'torrent', 'status': 0}
 
     else:
         if item.only_channels_group:
-            if item.group == 'dorama': filtros = {'searchable': True, 'status': 0 }
-            elif item.group == 'anime': filtros = {'searchable': True, 'status': 0 }
-            else: filtros = {'searchable': True, 'status': 0 }
-        else: filtros = {'searchable': True, 'status': 0 }
+            if item.group == 'anime' or item.group == 'dorama': filtros = {'status': 0}
+            else: filtros = {'searchable': True, 'status': 0}
+        else: filtros = {'searchable': True, 'status': 0}
 
     if item.search_type != 'all':
         if item.only_channels_group:
             if not item.group == 'docs': filtros['search_types'] = item.search_type
         else:
-            if item.search_type == 'documentary': filtros['search_types'] = 'all'
+            if item.search_type == 'documentary': filtros['search_types'] = 'documentary'
             else: filtros['search_types'] = item.search_type
     else:
         if item.only_channels_group:
@@ -622,9 +621,9 @@ def do_search(item, tecleado):
             else:
                 pendent = [a for a in threads if a.isAlive()]
 
-    nro = 0
-    sin = 0
-    sip = 0
+    _nro = 0
+    _sin = 0
+    _sip = 0
 
     config.set_setting('sin_resp', 'si')
 
@@ -654,6 +653,7 @@ def do_search(item, tecleado):
             if 'itemlist_search' in ch and len(ch['itemlist_search']) > 0:
                 for it in ch['itemlist_search']:
                     if it.contentType not in ['movie','tvshow','season']: continue
+
                     if it.infoLabels['tmdb_id'] and item.infoLabels['tmdb_id']:
                         if it.infoLabels['tmdb_id'] != item.infoLabels['tmdb_id']: continue
                     else:
@@ -738,15 +738,19 @@ def do_search(item, tecleado):
                     if config.get_setting(cfg_proxies_channel, default=''):
                         if not config.get_setting('search_no_results_proxies', default=True): continue
 
-                    sin += 1
+                    _sin += 1
 
-                    if sin == 1:
-                        if not search_person:
-                            if not item.extra == '+18':
-                                title = '[B][I]- CANALES:  [COLOR red]Sin Resultados[/COLOR][/I][/B]'
-                                if len(itemlist) == 0: title = title + ' [COLOR turquoise](compruebe el Texto Buscado)[/COLOR]'
+                    if _sin == 1:
+                        if len(itemlist) == 0:
+                            title = '[B][I]Texto Buscado: [COLOR moccasin]' + tecleado + '[/COLOR][/I][/B]'
 
-                                itemlist.append(item.clone( action='', title = title, thumbnail=config.get_thumb('search'), text_color='yellow' ))
+                            itemlist.append(item.clone( action='', title=title, thumbnail=config.get_thumb('search'), text_color='paleturquoise' ))
+
+                            title = '[B][I]- CANALES:  [COLOR red]Sin Resultados en Ningún Canal[/COLOR][/I][/B]'
+                        else:
+                            title = '[B][I]- CANALES:  [COLOR red]Sin Resultados[/COLOR][/I][/B]'
+
+                        itemlist.append(item.clone( action='', title = title, thumbnail=config.get_thumb('search'), text_color='yellow' ))
 
                     if not search_no_accesibles:
                         if no_accesibles:
@@ -1004,9 +1008,9 @@ def do_search(item, tecleado):
                                   if no_channels: titulo = titulo + ' [COLOR cyan]Ignorado por Excluido'
                               else: titulo = titulo + ' [COLOR yellow]comprobar el canal'
 
-            nro += 1
+            _nro += 1
 
-            if nro == 1:
+            if _nro == 1:
                 text_cab = '[COLOR darkcyan][B]- Buscado:[/COLOR] '
 
                 if item.search_type == 'movie':
@@ -1037,7 +1041,7 @@ def do_search(item, tecleado):
 
                 itemlist.append(item.clone( action='', title=title, context=context_cfg_search, thumbnail=config.get_thumb('search'), text_color='yellow' ))
 
-                if not sip == 0:
+                if not _sip == 0:
                     if config.get_setting('sub_mnu_cfg_prox_search', default=True):
                         itemlist.append(Item( channel='submnuctext', action='submnu_search', title='[B]Personalizar Próximas búsquedas[/B]', context=context_cfg_search, extra = item.search_type, thumbnail=config.get_thumb('help'), fanart=fanart, text_color='moccasin' ))
 
@@ -1121,13 +1125,13 @@ def do_search(item, tecleado):
                                if not config.get_setting(cfg_proxies_channel, default=''): continue
 
                       if not no_results:
-                           if not config.get_setting(cfg_proxies_channel, default=''): titulo = ''
+                          if not config.get_setting(cfg_proxies_channel, default=''): titulo = ''
 
                       if not no_results_proxies:
                           if not config.get_setting(cfg_proxies_channel, default=''): titulo = ''
 
             if titulo:
-                sip =+ 1
+                _sip += 1
 
                 color = 'chartreuse'
 
@@ -1145,7 +1149,7 @@ def do_search(item, tecleado):
 
     if config.get_setting('sub_mnu_cfg_prox_search', default=True):
         if channels_new_proxies:
-            if not sip == 0:
+            if not _sip == 0:
                 itemlist.append(Item( channel='submnuctext', action='_search_new_proxies', title='[B][COLOR goldenrod]BUSCAR [COLOR red]Proxies[/COLOR] en [/COLOR][COLOR chartreuse]TODOS los Canales [/COLOR][COLOR coral]SIN RESULTADOS[/COLOR][/B]', channels_new_proxies = channels_new_proxies, extra = item.search_type, thumbnail=config.get_thumb('flame'), fanart=fanart ))
 
     progreso.close()
@@ -1162,7 +1166,7 @@ def do_search(item, tecleado):
         elif only_includes: platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Búsqueda solo en Incluidos[/COLOR][/B]' % color_infor)
         else: platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Búsqueda sin resultados[/COLOR][/B]' % color_infor)
     else:
-        if nro == 0 and sip == 0:
+        if _nro == 0 and _sip == 0:
             if not item.from_channel != '':
                 platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Búsqueda sin resultados[/COLOR][/B]' % color_infor)
 

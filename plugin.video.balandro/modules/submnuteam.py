@@ -229,7 +229,7 @@ if 'fix' in last_fix:
     context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_last_fix'})
 
     tit = '[COLOR darkcyan][B]Resumen Fix[/B][/COLOR]'
-    context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'resumen_fix'})
+    context_ayuda.append({'title': tit, 'channel': 'actions', 'action': 'resumen_fix'})
 
 tit = '[COLOR %s]Comprobar Actualizaciones Fix[/COLOR]' % color_avis
 context_ayuda.append({'title': tit, 'channel': 'actions', 'action': 'check_addon_updates'})
@@ -906,14 +906,14 @@ def submnu_sistema_info(item):
         itemlist.append(item.clone( action='', title='[B][I]FIXES:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
 
         if config.get_setting('addon_update_atstart', default=True):
-            itemlist.append(item.clone( action='', title= ' - Comprobar Fixes al [COLOR goldenrod][B]Iniciar[/B][/COLOR] su Media Center [COLOR yellow][B]Activado[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
+            itemlist.append(item.clone( action='', title= '- Comprobar Fixes al [COLOR goldenrod][B]Iniciar[/B][/COLOR] su Media Center [COLOR yellow][B]Activado[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
         else:
-            itemlist.append(item.clone( action='', title= ' - Comprobar Fixes al [COLOR goldenrod][B]Iniciar[/B][/COLOR] su Media Center [COLOR red][B]Des-Activado[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
+            itemlist.append(item.clone( action='', title= '- Comprobar Fixes al [COLOR goldenrod][B]Iniciar[/B][/COLOR] su Media Center [COLOR red][B]Des-Activado[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
 
 
         itemlist.append(item.clone( channel='helper', action='show_last_fix', title= ' - [COLOR green][B]Información[/B][/COLOR] Fix instalado', thumbnail=config.get_thumb('news') ))
 
-        itemlist.append(item.clone( channel='helper',  action='resumen_fix', title= ' - [COLOR darkcyan][B]Resumen[/B][/COLOR] Fix Instalado', thumbnail=config.get_thumb('news') ))
+        itemlist.append(item.clone( channel='actions',  action='resumen_fix', title= ' - [COLOR darkcyan][B]Resumen[/B][/COLOR] Fix Instalado', thumbnail=config.get_thumb('news') ))
 
         itemlist.append(item.clone( channel='actions', action='manto_last_fix', title= " - Eliminar fichero control 'Fix'", thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
@@ -1268,10 +1268,10 @@ def submnu_developers(item):
 
     itemlist.append(item.clone( action='', title= '[COLOR firebrick][B][I]INCORPORACIONES:[/B][/I][/COLOR]', folder=False ))
 
-    itemlist.append(item.clone( action='', title='[COLOR yellow][B][I]  Solicitudes solo con Enlace de Invitación[/I][/B][/COLOR]', folder=False, thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( action='', title=' - [COLOR yellow][B][I]Solicitudes solo con Enlace de Invitación[/I][/B][/COLOR]', folder=False, thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(item.clone( action='', title= '  Foro ' + _foro, thumbnail=config.get_thumb('foro'), folder=False ))
-    itemlist.append(item.clone( action='', title= '  Telegram ' + _telegram, thumbnail=config.get_thumb('telegram'), folder=False ))
+    itemlist.append(item.clone( action='', title= ' - Foro ' + _foro, thumbnail=config.get_thumb('foro'), folder=False ))
+    itemlist.append(item.clone( action='', title= ' - Telegram ' + _telegram, thumbnail=config.get_thumb('telegram'), folder=False ))
 
     return itemlist
 

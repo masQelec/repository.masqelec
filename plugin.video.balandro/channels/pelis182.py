@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-# ~ Las series no se tratan pq solo hay 17
+# ~ 9/12/25 Las series no se tratan pq solo hay 17
 
 host = 'https://www.pelis182.com/'
 
@@ -69,6 +69,8 @@ def list_all(item):
         if not url or not title: continue
 
         if '-temporada-' in url: continue
+
+        title = title.replace('&#8217;s', "'s").strip()
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
@@ -136,7 +138,7 @@ def get_video_url(url):
     if "NOT FOUND!" in data: return "error" 
 
     try:
-        headers = '|Referer=https://lauchacohete.top/'
+        headers = '|Referer=https://barmonrey.com/'
 
         video = scrapertools.find_single_match(data, 'sources:\s+\[\{"file":"([^"]+)')
 

@@ -37,13 +37,13 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + 'catalogo?order=latest_released', text_color = 'cyan' ))
 
+    itemlist.append(item.clone( title = 'Sin censura', action = 'list_all', url = host + 'catalogo?uncensored=', text_color = 'tan' ))
+
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'catalogo?order=popular' ))
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'catalogo?order=score' ))
 
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'catalogo?status=emision' ))
     itemlist.append(item.clone( title = 'Finalizados', action = 'list_all', url = host + 'catalogo?status=finalizado' ))
-
-    itemlist.append(item.clone( title = 'Sin censura', action = 'list_all', url = host + 'catalogo?uncensored=', text_color = 'tan' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
 

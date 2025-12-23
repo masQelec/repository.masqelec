@@ -31,7 +31,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host +'/2/', page = 1, text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Por repertorio', action = 'repertorios' ))
+    itemlist.append(item.clone( title = 'Por colección', action = 'colecciones' ))
+
     itemlist.append(item.clone( title = 'Por canal', action = 'canales' ))
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
     itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars', ))
@@ -39,7 +40,7 @@ def mainlist_pelis(item):
     return itemlist
 
 
-def repertorios(item):
+def colecciones(item):
     logger.info()
     itemlist = []
 
@@ -184,16 +185,18 @@ def list_all(item):
 
     matches = scrapertools.find_multiple_matches(data, patron)
 
-    for url, thumb, title, durac, qlty in matches:
+    for url, thumb, title, time, qlty in matches:
         url = host + url
 
         if not thumb.startswith('http'): thumb = 'https:' + thumb
 
         thumb = thumb.replace('ep1.jpg', 'ep.jpg')
 
-        durac = durac.replace(' m', '').strip()
+        title = title.replace('&#039;s', "'s").strip()
 
-        titulo = "[COLOR tan]%s[/COLOR] %s" % (durac, title)
+        time = time.replace(' m', '').strip()
+
+        titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, quality = qlty,
                                     contentType = 'movie', contentTitle = title, contentExtra='adults' ))

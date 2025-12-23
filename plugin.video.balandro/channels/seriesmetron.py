@@ -76,9 +76,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action ='list_all', url = host + 'cartelera-series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'last_epis', url = host, group =' slast', search_type = 'tvshow', text_color = 'moccasin' ))
-
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, group = 'elast', search_type = 'tvshow', text_color = 'cyan' ))
+
+    itemlist.append(item.clone( title = 'Últimas', action = 'last_epis', url = host, group = 'slast', search_type = 'tvshow', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
@@ -237,9 +237,13 @@ def last_epis(item):
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
 
         if tipo == 'movie':
+            if item.search_type == 'tvshow': continue
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
                                         contentType = 'movie', contentTitle = title, infoLabels = {'year': '-'} ))
         if tipo == 'tvshow':
+            if item.search_type == "movie": continue
+
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': '-'} ))
 

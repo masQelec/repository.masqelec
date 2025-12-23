@@ -8,55 +8,12 @@ if sys.version_info[0] >= 3: PY3 = True
 
 import re, xbmcgui
 
-from platformcode import config, logger, platformtools, dynamic
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb, jsontools
 
 
-LINUX = False
-BR = False
-BR2 = False
-
-if PY3:
-    try:
-       import xbmc
-       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
-    except: pass
-
-try:
-   if LINUX:
-       try:
-          from lib import balandroresolver2 as balandroresolver
-          BR2 = True
-       except: pass
-   else:
-       if PY3:
-           from lib import balandroresolver
-           BR = true
-       else:
-          try:
-             from lib import balandroresolver2 as balandroresolver
-             BR2 = True
-          except: pass
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-      BR2 = True
-   except: pass
-
-
-host = 'https://www12.playdede.link/'
-
-
-dominios = [
-         'https://www12.playdede.link/',
-         'https://playdede.club/',
-         'https://playdede.in/'
-         ]
-
-
-# ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
-# ~ webs  0)-https://privacidad.me/@playdede  1)-https://entrarplaydede.com  2)-X https://x.com/webplaydede
+host = 'https://playdede.club/'
 
 
 # ~ por si viene de enlaces guardados posteriores
@@ -66,29 +23,7 @@ ant_hosts = ['https://playdede.com/', 'https://playdede.org/', 'https://playdede
              'https://www2.playdede.link/', 'https://www3.playdede.link/', 'https://www4.playdede.link/',
              'https://www5.playdede.link/', 'https://www6.playdede.link/', 'https://www7.playdede.link/',
              'https://www8.playdede.link/', 'https://www9.playdede.link/', 'https://www10.playdede.link/',
-             'https://www11.playdede.link/']
-
-
-domain = config.get_setting('dominio', 'playdede', default='')
-
-if domain:
-    if domain == host: config.set_setting('dominio', '', 'playdede')
-    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'playdede')
-    else: host = domain
-
-
-_dynamic = False
-
-cur_host = host
-new_host = dynamic.host(host, dominios)
-
-if not cur_host == new_host:
-    _dynamic = True
-
-    if config.get_setting('developer_mode', default=False):
-        platformtools.dialog_notification(config.__addon_name + ' Playdede', '[COLOR cyan][B]Dominio Dinámico[/B][/COLOR]')
-
-    config.set_setting('dominio', new_host, 'playdede')
+             'https://www11.playdede.link/', 'https://www12.playdede.link/', 'https://playdede.in/']
 
 
 elepage = 42
@@ -197,23 +132,6 @@ def do_make_login_logout(url, post=None, headers=None):
             data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, raise_weberror=False).data
         else:
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
-
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-
-                if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, raise_weberror=False).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
-            except:
-                pass
 
     if '<title>Just a moment...</title>' in data:
         platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
@@ -380,44 +298,6 @@ def logout(item):
     platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]PlayDede Sin cerrar la Sesión[/B][/COLOR]')
     return False
 
-
-def item_configurar_dominio(item):
-    plot = 'Este canal tiene varios posibles dominios. Si uno no te funciona puedes probar con los otros antes de intentarlo con proxies.'
-    return item.clone( title = '[B]Configurar dominio a usar ...[/B]', action = 'configurar_dominio', folder=False, plot=plot, text_color='yellowgreen' )
-
-def configurar_dominio(item):
-    dominio = config.get_setting('dominio', 'playdede', default=dominios[0])
-    num_dominio = dominios.index(dominio) if dominio in dominios else 0
-    ret = platformtools.dialog_select('Dominio a usar PlayDede', dominios, preselect=num_dominio)
-    if ret == -1: return False
-
-    if dominios[ret] in str(ant_hosts):
-        platformtools.dialog_ok(config.__addon_name + ' PlayDede - Configurar Dominio', '[COLOR red][B]Dominio Obsoleto.[/B][/COLOR]', '[COLOR cyan][B]' + dominios[ret] + ' [/B][/COLOR]')
-        return False
-
-    if dominio == dominios[ret]:
-        return False
-
-    procesar = True
-
-    platformtools.dialog_ok(config.__addon_name + ' PlayDede - Configurar Dominio', '[COLOR yellow][B]Este Dominio, [COLOR plum](si no hay resultados)[/COLOR][COLOR yellow], Quizás Necesitará[/COLOR] [COLOR red] Configurar Proxies [/B][/COLOR]', '[COLOR cyan][B]' + dominios[ret] + ' [/B][/COLOR]')
-
-    if not config.get_setting('channel_playdede_proxies', default=''):
-        procesar = False
-
-    if procesar:
-        if config.get_setting('playdede_login', 'playdede', default=False):
-            logout(item)
-            login(item)
-        else:
-            login(item)
-
-    config.set_setting('dominio', dominios[ret], 'playdede')
-
-    platformtools.itemlist_refresh()
-    return True
-
-
 def item_configurar_proxies(item):
     color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
 
@@ -483,23 +363,6 @@ def do_downloadpage(url, post=None, headers=None, referer=None):
         if '?genre=' in url:
             if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PlayDede Error', '[COLOR cyan]Espere y Re-intentelo otra vez[/COLOR]')
 
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-
-                if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False, timeout=timeout).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('playdede', url, post=post, headers=headers, raise_weberror=False, timeout=timeout).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False, timeout=timeout).data
-            except:
-                pass
-
     if '<title>Just a moment...</title>' in data:
         if not 'search/?s=' in url:
             platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
@@ -520,36 +383,10 @@ def acciones(item):
     logger.info()
     itemlist = []
 
-    domain_memo = config.get_setting('dominio', 'playdede', default='')
-
-    if domain_memo: url = domain_memo
-    else: url = host
-
-    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
-
-    itemlist.append(item.clone( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', text_color='green' ))
-
-    dom_dinamico = ''
-    if _dynamic: dom_dinamico = ' [COLOR dodgerblue] Dinámico'
-
-    itemlist.append(item.clone( channel='domains', action='test_domain_playdede', title='Test Web del canal [COLOR yellow][B] ' + url + dom_dinamico + '[/B][/COLOR]', from_channel='playdede', folder=False, text_color='chartreuse' ))
+    itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
+                                from_channel='playdede', folder=False, text_color='chartreuse' ))
 
     username = config.get_setting('playdede_username', 'playdede', default='')
-
-    if username:
-        itemlist.append(item.clone( action='show_currents_domains', title='[B]Dominios Actuales[COLOR dodgerblue] entrarplaydede.com[/B][/COLOR]',
-                                    text_color='darkgoldenrod' ))
-
-        itemlist.append(item.clone( channel='domains', action='operative_domains_playdede', title='[B]Dominios Operativos Vigentes' + '[COLOR dodgerblue] privacidad.me/@playdede[/B][/COLOR]',
-                                    desde_el_canal = True, host_canal = url, text_color='mediumaquamarine' ))
-
-        itemlist.append(item.clone( channel='domains', action='last_domain_playdede', title='[B]Comprobar últimos dominios vigentes[/B]',
-                                    desde_el_canal = True, host_canal = url, text_color='chocolate' ))
-
-    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
-    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
-
-    itemlist.append(item.clone( channel='domains', action='manto_domain_playdede', title=title, desde_el_canal = True, host_canal = url, folder=False, text_color='darkorange' ))
 
     if not config.get_setting('playdede_login', 'playdede', default=False):
         if username:
@@ -558,7 +395,6 @@ def acciones(item):
             itemlist.append(item.clone( channel='submnuctext', action='_credenciales_playdede', title= 'Test [COLOR cyan][B]Login[/B][/COLOR] Credenciales' ))
 
             itemlist.append(item.clone( title = '[COLOR springgreen][B]Credenciales[/B][/COLOR]', action = 'show_credenciales' ))
-            itemlist.append(item.clone( channel='domains', action='del_datos_playdede', title='[B]Eliminar Credenciales[/B]', text_color='crimson' ))
         else:
             itemlist.append(item.clone( channel='helper', action='show_help_register', title='Información para [COLOR violet][B]Registrarse[/B][/COLOR]',                            desde_el_canal = True, channel_id='playdede', text_color='green' ))
 
@@ -570,16 +406,8 @@ def acciones(item):
         itemlist.append(item.clone( channel='submnuctext', action='_credenciales_playdede', title= 'Test [COLOR cyan][B]Login[/B][/COLOR] Credenciales' ))
 
         itemlist.append(item.clone( title = '[COLOR springgreen][B]Credenciales[/B][/COLOR]', action = 'show_credenciales' ))
-        itemlist.append(item.clone( channel='domains', action='del_datos_playdede', title='[B]Eliminar Credenciales[/B]', text_color='crimson' ))
 
-    itemlist.append(item_configurar_dominio(item))
     itemlist.append(item_configurar_proxies(item))
-
-    itemlist.append(item.clone(channel='helper', action = 'show_help_playdede_media_center', title = '[COLOR aquamarine][B]Aviso[/COLOR] [COLOR violet][B]Ubicación[/B][/COLOR] Media Center',  thumbnail=config.get_thumb('mediacenter') ))
-
-    itemlist.append(item.clone( channel='helper', action='show_help_playdede_bloqueo', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR yellowgreen][B]Bloqueo[/B][/COLOR] Operadoras', thumbnail=config.get_thumb('roadblock') ))
-
-    itemlist.append(item.clone( channel='helper', action='show_help_playdede', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal' ))
 
     itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'playdede' ))
 
@@ -701,8 +529,6 @@ def mainlist_series(item):
         itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'series?orderBy=score', slug = 'series',
                                     nro_pagina = 1, order = '?orderBy=score', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = 'Por plataforma', action= 'plataformas', slug = 'series', nro_pagina = 1, search_type='tvshow', text_color = 'moccasin' ))
-
         itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
         itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
 
@@ -710,6 +536,8 @@ def mainlist_series(item):
         itemlist.append(item.clone( title = 'Por año', action = 'anios', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
 
         itemlist.append(item.clone( title = 'Por país', action = 'paises', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
+
+        itemlist.append(item.clone( title = 'Por estudio', action= 'plataformas', slug = 'series', nro_pagina = 1, search_type='tvshow', text_color = 'moccasin' ))
 
     return itemlist
 
@@ -743,8 +571,6 @@ def mainlist_animes(item):
         itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'animes?orderBy=score', slug = 'animes',
                                     nro_pagina = 1, order = '?orderBy=score', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = 'Por plataforma', action= 'plataformas', group = 'anime', slug = 'animes', nro_pagina = 1, search_type='tvshow', text_color = 'moccasin' ))
-
         itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', group = 'anime', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
         itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', group = 'anime', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
 
@@ -752,6 +578,8 @@ def mainlist_animes(item):
         itemlist.append(item.clone( title = 'Por año', action = 'anios', group = 'anime', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
 
         itemlist.append(item.clone( title = 'Por país', action = 'paises', group = 'anime', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
+
+        itemlist.append(item.clone( title = 'Por estudio', action= 'plataformas', group = 'anime', slug = 'animes', nro_pagina = 1, search_type='tvshow', text_color = 'moccasin' ))
 
     return itemlist
 
@@ -1510,11 +1338,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = int(tempo)
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = int(tempo)
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = int(tempo), text_color='tan' ))
 
@@ -1607,6 +1435,11 @@ def episodios(item):
         s_e = scrapertools.get_season_and_episode(name)
         season = int(s_e.split("x")[0])
         episode = s_e.split("x")[1]
+
+        if 'episodie' in titulo.lower() or 'episodio' in titulo.lower() or 'capítulo' in titulo.lower() or 'capitulo' in titulo.lower():
+            titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+        elif titulo.lower() == 'tba':
+            titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
 
         titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
         titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
@@ -1954,13 +1787,19 @@ def list_search(item):
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo, contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+            sufijo = '' if item.search_type == 'movie' else 'movie'
+
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo,
+                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
 
         if tipo == 'tvshow':
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
 
-            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo, contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
+            sufijo = '' if item.search_type == 'tvshow' else 'tvshow'
+
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo,
+                                        contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
 
         if len(itemlist) >= perpage: break
 
@@ -2015,72 +1854,6 @@ def clean_title(title, url):
     return title
 
 
-def show_currents_domains(item):
-    logger.info()
-
-    domains = []
-
-    avisar = False
-
-    try:
-        data = httptools.downloadpage('https://entrarplaydede.com/').data
-
-        bloque = scrapertools.find_single_match(data, '<main>(.*?)</section>')
-
-        currents_domains = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?</a>')
-        if not currents_domains: currents_domains = scrapertools.find_multiple_matches(bloque, 'data-url="(.*?)".*?</a>')
-
-        if currents_domains:
-            for current_domain in currents_domains:
-                if current_domain:
-                    current_domain = current_domain.lower().strip()
-
-                    if not 'playdede.' in current_domain: continue
-
-                    if not 'https' in current_domain: current_domain  = 'https://' + current_domain
-                    if not current_domain.endswith('/'): current_domain = current_domain + '/'
-
-                    domains.append(current_domain)
-
-                    if not current_domain in str(dominios): avisar = True
-    except:
-        pass
-
-    if not domains:
-        platformtools.dialog_notification(config.__addon_name + ' - PlayDede', '[B][COLOR red]No se pudo comprobar[/B][/COLOR]')
-        return
-
-    if avisar:
-        if config.get_setting('developer_mode', default=False):
-            platformtools.dialog_notification(config.__addon_name + ' Playdede', '[COLOR cyan][B]Nuevos Dominios[/B][/COLOR]')
-
-    dominio = config.get_setting('dominio', 'playdede', default=dominios[0])
-    num_dominio = dominios.index(dominio) if dominio in dominios else 0
-
-    ret = platformtools.dialog_select('Playdede Dominios Actuales', dominios, preselect=num_dominio)
-    if ret == -1: return False
-
-    if dominios[ret] in str(ant_hosts):
-        platformtools.dialog_ok(config.__addon_name + ' PlayDede', '[COLOR red][B]Dominio Obsoleto.[/B][/COLOR]', '[COLOR cyan][B]' + dominios[ret] + ' [/B][/COLOR]')
-        return False
-
-    if dominio == dominios[ret]:
-        return False
-
-    procesar = True
-    if dominios[ret] == host: procesar = False
-
-    if procesar:
-        logout(item)
-
-        config.set_setting('dominio', dominios[ret], 'playdede')
-
-        if procesar:
-            login(item)
-
-        platformtools.dialog_ok(config.__addon_name + ' - Playdede' + '  ' + dominios[ret], '[COLOR yellow][B]Dominio Memorizado, pero aún NO guardado.[/B][/COLOR]', 'Por favor,  [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.')
-
-
 def show_help_usuario(item):
     logger.info()
 
@@ -2110,9 +1883,7 @@ def show_help_usuario(item):
 def show_credenciales(item):
     logger.info()
 
-    domain = config.get_setting('dominio', 'playdede', default='')
-
-    if not domain: domain = host
+    domain = host
 
     if config.get_setting('playdede_login', 'playdede', default=False):
        domain += '[I][COLOR teal] (sesion)[/I][/COLOR]'

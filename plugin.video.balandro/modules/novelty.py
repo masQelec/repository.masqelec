@@ -25,6 +25,48 @@ color_avis = config.get_setting('notification_avis_color', default='yellow')
 color_exec = config.get_setting('notification_exec_color', default='cyan')
 
 
+con_incidencias = ''
+no_accesibles = ''
+con_problemas = ''
+
+try:
+    with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
+except:
+    try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
+    except: txt_status = ''
+
+if txt_status:
+    # ~ Incidencias
+    bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_incidencias += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    # ~ No Accesibles
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    # ~ Con Problemas
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES CON PROBLEMAS(.*?)$')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_problemas += '[B' + match + '/I][/B][/COLOR][CR]'
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
@@ -187,6 +229,8 @@ def mainlist(item):
             if ch['status'] == 1:
                titulo += '[I][B][COLOR wheat] (preferido)[/COLOR][/I][/B]'
 
+            if 'suggested' in ch['clusters']: titulo += '[I][B][COLOR olivedrab] (sugerido)[/COLOR][/I][/B]'
+
             if config.get_setting(cfg_proxies_channel, default=''):
                 if ch['status'] == 1: titulo += '[I][B][COLOR %s] (proxies)[/COLOR][/I][/B]' % color_list_proxies
                 else: color = color_list_proxies
@@ -236,6 +280,25 @@ def mainlist(item):
                     if 'tales' in ch['clusters']: titulo += '[B][I][COLOR limegreen] novelas[/COLOR][/I][/B]'
                 elif "documentary" in ch['categories']: titulo += '[B][I][COLOR cyan] documentales[/COLOR][/I][/B]'
 
+        if con_incidencias:
+           if ch['name'] in str(con_incidencias): titulo += '[I][B][COLOR tan] (incidencia)[/COLOR][/I][/B]'
+
+        if no_accesibles:
+           if ch['name'] in str(no_accesibles): titulo += '[I][B][COLOR indianred] (no accesible)[/COLOR][/I][/B]'
+
+        if con_problemas:
+           if ch['name'] in str(con_problemas):
+               hay_problemas = str(con_problemas).replace('[B][COLOR moccasin]', 'CHANNEL').replace('[COLOR lime]', '/CHANNEL')
+               channels_con_problemas = scrapertools.find_multiple_matches(hay_problemas, "CHANNEL(.*?)/CHANNEL")
+
+               for channel_con_problema in channels_con_problemas:
+                    channel_con_problema = channel_con_problema.strip()
+
+                    if not channel_con_problema == ch['name']: continue
+
+                    titulo += '[I][B][COLOR tomato] (con problema)[/COLOR][/I][/B]'
+                    break
+
         if item.extra == 'movies':
             if not 'movie' in ch['categories']: continue
 
@@ -265,6 +328,7 @@ def mainlist(item):
             elif ch['id'] == 'verflix': continue
             elif ch['id'] == 'vernovelas': continue
             elif ch['id'] == 'veronline': continue
+            elif ch['id'] == 'veronlinelatino': continue
 
         elif item.extra == 'documentaries':
             if not 'documentary' in ch['categories']: continue
@@ -348,6 +412,9 @@ def mainlist(item):
         if not 'suggested' in ch['clusters']:
             if 'torrent' in ch['categories']:
                 if not item.extra == 'torrents': continue
+
+            elif item.extra == 'episodes':
+                if ch['id'] == 'veronlinelatino': pass
 
             elif item.extra == 'doramas': pass
             elif item.extra == 'animes': pass

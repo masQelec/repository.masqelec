@@ -14,9 +14,11 @@ import os
 
 import traceback
 
+
 from platformcode import config
 
-if config.get_setting('PY3') == '': config.set_setting('PY3', PY3)
+# ~ Primera Ejecución
+if str(config.get_setting('PY3')) == '': config.set_setting('PY3', PY3)
 
 
 from platformcode import logger, platformtools, updater

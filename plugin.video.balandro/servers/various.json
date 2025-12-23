@@ -53,6 +53,10 @@
         "url": "https://filemoon.sx/e/\\1"
       },
       {
+        "pattern": "https://byseqekaho.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
         "pattern": "(https://disk.yandex.(?:ru|com|sk|disk)/(?:d/|i/)[A-z0-9]+)",
         "url": "https://yadi.sk/i/\\2"
       },

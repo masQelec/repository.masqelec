@@ -65,7 +65,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not '/?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('Cuevana3Run', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('Cuevana3Run', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -388,14 +388,19 @@ def last_epis(item):
 
         season, episode = scrapertools.get_season_and_episode(url).split("x")
 
-        contentSerieName = scrapertools.find_single_match(title, '(.*?) \d')
+        SerieName = scrapertools.find_single_match(title, '(.*?) \d')
+
+        if 'Temporada' in SerieName: SerieName = SerieName.split("Temporada")[0]
+        if 'temporada' in SerieName: SerieName = SerieName.split("temporada")[0]
+
+        SerieName = SerieName.strip()
 
         titulo = str(season) + 'x' + str(episode) + ' ' + title.replace(str(season) + 'x' + str(episode), '')
 
         titulo = titulo.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail=thumb, url = url,
-                                    contentType = 'episode', contentSerieName=contentSerieName, contentSeason = season, contentEpisodeNumber = episode,
+                                    contentType = 'episode', contentSerieName=SerieName, contentSeason = season, contentEpisodeNumber = episode,
                                     infoLabels={'year': '-'}))
 
     tmdb.set_infoLabels(itemlist)

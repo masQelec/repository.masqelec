@@ -503,8 +503,6 @@ def findvideos(item):
            servidor = 'torrent'
            other = ''
 
-           logger.info("check-02-atope: %s" % url)
-
            if url.endswith(".torrent"): pass
            elif url.startswith('magnet:'): other = 'magnet'
            else:
@@ -512,7 +510,8 @@ def findvideos(item):
               if '/ttlinks.live/' in url: other = 'ttlinks'
               else: other = 'Torrent'
 
-           itemlist.append(Item( channel = item.channel, action = 'play', title = '', language = lang, quality = qlty, url = url, server = servidor, other = other ))
+           itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor,
+                                 language = lang, quality = qlty, other = other ))
 
     return itemlist
 

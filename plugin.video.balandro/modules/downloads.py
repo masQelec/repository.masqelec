@@ -11,9 +11,9 @@ PY3 = False
 if config.get_setting('PY3', default=''): PY3 = True
 
 if PY3:
-    basestring = basestring
-else:
     basestring = str
+else:
+    basestring = basestring
 
 
 STATUS_CODES = type("StatusCode", (), {"stopped": 0, "canceled": 1, "completed": 2, "error": 3})
@@ -162,7 +162,7 @@ def acciones_enlace(item):
         return False
 
     elif acciones[ret] == 'Eliminar descarga':
-        if not platformtools.dialog_yesno('Eliminar descarga', '¿ [COLOR red][B]Confirma Eliminar la descarga[/B][/COLOR] %s ?' % item.title, 'Se eliminará el fichero %s y su json con la información.' % item.downloadFilename): 
+        if not platformtools.dialog_yesno('Eliminar descarga', '¿ [COLOR red][B]Confirma Eliminar la descarga[/B][/COLOR] %s ?' % item.title, 'Se eliminará el fichero: [COLOR cyan][B]%s[/B][/COLOR]' % item.downloadFilename): 
             return False
 
         path_video = filetools.join(download_path, item.downloadFilename)
@@ -331,7 +331,26 @@ def download_video(item, parent_item):
             motivo = '[COLOR crimson][B]Está en formato Comprimido[/B][/COLOR]'
 
     if not puedes:
-        platformtools.dialog_ok("No puedes descargar este vídeo porque ...", motivo, item.url)
+        if '[' in motivo:
+            c_motivo = motivo
+
+            if 'Falta el Servidor' in c_motivo: pass
+
+            elif 'Captcha erróneo' in c_motivo: pass
+            elif 'obf_link' in c_motivo: pass
+            elif 'get_int' in c_motivo: pass
+
+            else: c_motivo = c_motivo.replace('[', '').replace(']', ' -')
+
+            motivo = '[COLOR darkorange][B]' + c_motivo + '[/B][/COLOR]'
+        else:
+            motivo = '[COLOR orange][B]' + motivo + '[/B][/COLOR]'
+
+        if 'Archivo inexistente' in motivo:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR fuchsia]' + 'Archivo Inexistente[/COLOR][/B]')
+        else:
+            platformtools.dialog_ok("No puedes descargar este vídeo porque ...", motivo, item.url)
+
         return False
 
     opciones = []
@@ -438,7 +457,7 @@ def download_video(item, parent_item):
             file_name = '%s - S%02dE%02d' % (parent_item.contentSerieName, int(nro_season), int(nro_epis))
 
         ch_name = parent_item.channel if parent_item.channel != 'tracking' else item.channel
-        file_name += ' [%s][%s]' % (ch_name, item.server)
+        file_name += ' - %s - %s' % (ch_name.capitalize(), item.server.capitalize())
 
         return do_download(mediaurl, file_name, parent_item, item)
 
@@ -513,6 +532,7 @@ def write_download_json(path, item):
 
     filetools.write(path, item.tojson())
     time.sleep(0.1)
+
 
 def update_download_json(path, params):
     item = Item().fromjson(filetools.read(path))

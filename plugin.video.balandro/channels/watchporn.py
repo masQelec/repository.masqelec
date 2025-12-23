@@ -42,9 +42,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Long play', action = 'list_all', url = host  + 'search/?sort_by=duration&from_videos=1' ))
 
+    itemlist.append(item.clone( title = 'Por canal', action = 'listas', url = host + 'categories/?sort_by=total_videos&from=1' ))
+
     itemlist.append(item.clone( title = 'Por categoría', action = 'listas', url = host + 'tags/' ))
 
-    itemlist.append(item.clone( title = 'Por canal', action = 'listas', url = host + 'categories/?sort_by=total_videos&from=1' ))
     itemlist.append(item.clone( title = 'Por estrella', action = 'listas', url = host + 'models/?sort_by=total_videos&from=1' ))
 
     return itemlist
@@ -161,7 +162,9 @@ def listas(item):
     matches = scrapertools.find_multiple_matches(bloque, patron)
 
     for url, title, thumb in matches:
-        if '/tags/' in item.url: title = scrapertools.find_single_match(url, '/tags/(.*?)/').capitalize()
+        if '/tags/' in item.url:
+            title = scrapertools.find_single_match(url, '/tags/(.*?)/').capitalize()
+            thumb = config.get_thumb('watchporn')
 
         url = url + '1/'
 

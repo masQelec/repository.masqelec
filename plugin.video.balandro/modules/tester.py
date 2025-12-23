@@ -566,7 +566,7 @@ def test_channel(channel_name):
             txt_clons = ''
             if channel_id == 'cuevana2esp': txt_clons = 'Cuevana2'
 
-            elif channel_id == 'dontorrents': txt_clons = 'DivxATope, DonTorrentsIn, EliteDivx, LilaTorrent, MejorTorrentApp, NaranjaTorrent, ReinvenTorrent, RojoTorrent, TomaDivx, TodoTorrents, VerdeTorrent'
+            elif channel_id == 'dontorrents': txt_clons = 'DivxATope, DonTorrent21, DonTorrentsIn, EliteDivx, LilaTorrent, MejorTorrentApp, MejorTorrentIn, NaranjaTorrent, ReinvenTorrent, RojoTorrent, TomaDivx, TodoTorrents, VerdeTorrent'
 
             elif channel_id == 'detodo': txt_clons = 'DPeliculas'
 
@@ -581,7 +581,7 @@ def test_channel(channel_name):
             elif channel_id == 'mundodonghua': txt_clons = 'MundoDonghua'
             elif channel_id == 'serieskao': txt_clons = 'PelisPlusHdNz'
 
-            elif channel_id == 'veronline': txt_clons = 'OnlineTv, SeriesEs, SeriesOnline, Star, VerFlix'
+            elif channel_id == 'veronline': txt_clons = 'OnlineTv, SeriesEs, SeriesOnline, Star'
 
             if txt_clons:
                 txt_diag  += '[CR]clones: [COLOR gold][B]' + txt_clons + '[/B][/COLOR]'
@@ -591,6 +591,7 @@ def test_channel(channel_name):
 
             if channel_id == 'cuevana2': txt_clones = 'Cuevana2Esp'
             elif channel_id == 'divxatope': txt_clones = 'DonTorrents'
+            elif channel_id == 'dontorrent21': txt_clones = 'DonTorrents'
             elif channel_id == 'dontorrentsin': txt_clones = 'DonTorrents'
             elif channel_id == 'dpeliculas': txt_clones = 'DeTodo'
             elif channel_id == 'elitedivx': txt_clones = 'DonTorrents'
@@ -600,6 +601,7 @@ def test_channel(channel_name):
             elif channel_id == 'joinclub': txt_clones = 'VerSeries'
             elif channel_id == 'lilatorrent': txt_clones = 'DonTorrents'
             elif channel_id == 'mejortorrentapp': txt_clones = 'DonTorrents'
+            elif channel_id == 'mejortorrentin': txt_clones = 'DonTorrents'
             elif channel_id == 'mundodonghuaxyz': txt_clones = 'MundoDonghua'
             elif channel_id == 'naranjatorrent': txt_clones = 'DonTorrents'
             elif channel_id == 'onlinetv': txt_clones = 'VerOnline'
@@ -614,7 +616,6 @@ def test_channel(channel_name):
             elif channel_id == 'seriesmetron': txt_clones = 'HomeCine'
             elif channel_id == 'seriesonline': txt_clones = 'VerOnline'
             elif channel_id == 'star': txt_clones = 'VerOnline'
-            elif channel_id == 'verflix': txt_clones = 'VerOnline'
             elif channel_id == 'tomadivx': txt_clones = 'DonTorrents'
             elif channel_id == 'todotorrents': txt_clones = 'DonTorrents'
             elif channel_id == 'verdetorrent': txt_clones = 'DonTorrents'
@@ -1410,6 +1411,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             elif '/images/trace/captcha/nojs/h/transparent.' in response.data: txt += '[CR]captcha: [COLOR orangered][B]Invisible Captcha[/B][/COLOR]'
             elif '<title>Access Denied</title>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
             elif 'se encuentra en mantenimiento' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+
             elif '<h1>Index of /</h1>' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Puede estar en mantenimiento[/B][/COLOR]'
             else:
                if len(response.data) > 0:
@@ -1431,6 +1433,11 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
         if len(response.data) >= 1000:
             if 'Estamos en mantenimiento, por favor inténtelo más tarde' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
             elif '<h1>Index of /</h1>' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Puede estar en mantenimiento[/B][/COLOR]'
+
+            elif 'This site is currently under construction' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+
+            elif '>MANTENIMIENTO<' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+            elif '¡ALGO ESTÁ PASANDO!' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
 
             elif '/cgi-sys/defaultwebpage.cgi' in str(response.data): txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
             elif '>This site is currently suspended<' in response.data: txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
@@ -1542,6 +1549,11 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                 elif '>This site is currently suspended<' in response.data: txt += '[CR]status: [COLOR goldenrod][B]Suspendida[/B][/COLOR]'
                 elif 'The website is under maintenance' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
                 elif 'The server is temporarily busy' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+                elif 'This site is currently under construction' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+
+                elif '>MANTENIMIENTO<' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+                elif '¡ALGO ESTÁ PASANDO!' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+
                 elif '/cgi-sys/defaultwebpage.cgi' in response.data: txt += txt_sorry
                 elif '/www.alliance4creativity.com/' in new_web: txt += '[CR]legal: [COLOR springgreen][B]Copyright infringement[/B][/COLOR]'
                 elif '<h1>Index of /</h1>' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Puede estar en mantenimiento[/B][/COLOR]'

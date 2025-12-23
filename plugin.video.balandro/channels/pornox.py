@@ -42,9 +42,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Long play', action = 'list_all', url = host  + 'en/kereses/search?sort_by=duration&from_videos=1' ))
 
+    itemlist.append(item.clone( title = 'Por canal', action = 'listas', url = host + 'en/szexcsatorna/1/' ))
+
     itemlist.append(item.clone( title = 'Por categoría', action = 'listas', url = host + 'en/szex-kategoriak/' ))
 
-    itemlist.append(item.clone( title = 'Por canal', action = 'listas', url = host + 'en/szexcsatorna/1/' ))
     itemlist.append(item.clone( title = 'Por estrella', action = 'listas', url = host + 'en/pornosztarok/1/' ))
 
     return itemlist

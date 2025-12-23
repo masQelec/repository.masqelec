@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww5.pelisplushd.to/'
+host = 'https://www25.pelisplushd.to/'
 
 
 # ~ por si viene de enlaces guardados
@@ -16,7 +16,7 @@ ant_hosts = ['https://pelisplushd.lat/', 'https://www1.pelisplushd.lat/', 'https
              'https://www11.pelisplushd.to/', 'https://www15.pelisplushd.to/', 'https://www16.pelisplushd.to/',
              'https://www17.pelisplushd.to/', 'https://www18.pelisplushd.to/', 'https://www19.pelisplushd.to/',
              'https://www20.pelisplushd.to/', 'https://www23.pelisplushd.to/', 'https://www24.pelisplushd.to/',
-             'https://ww3.pelisplushd.to/','https://ww4.pelisplushd.to/' ]
+             'https://ww3.pelisplushd.to/', 'https://ww4.pelisplushd.to/', 'https://ww5.pelisplushd.to/']
              
 
 

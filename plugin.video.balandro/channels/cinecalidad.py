@@ -5,6 +5,7 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
+
 import re, os, base64
 
 from platformcode import config, logger, platformtools
@@ -130,7 +131,7 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CineCalidad', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CineCalidad', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -188,8 +189,6 @@ def acciones(item):
     itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(Item( channel='helper', action='show_help_cinecalidad', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('cinecalidad') ))
-
-    itemlist.append(Item( channel='helper', action='show_help_prales', title='[B]Cuales son sus Clones[/B]', thumbnail=config.get_thumb('cinecalidad'), text_color='turquoise' ))
 
     itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'cinecalidad', thumbnail=config.get_thumb('cinecalidad') ))
 
@@ -335,7 +334,7 @@ def list_all(item):
 
         elif not 'http' in url: continue
 
-        elif '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url or '/netflix/o/' in url or '/product/' in url or '.ggpickaff.' in url:
+        elif '-premium-12-meses' in url or '-premium-1-ano' in url or '-12-meses' in url or '/netflix/o/' in url or '/product/' in url or '.ggpickaff.' in url or title == 'promo':
             _promos += 1
             continue
         elif 'Netflix Premium' in match or 'Suscripción Disney Plus' in match or 'Suscripción HBO' in match:
@@ -750,7 +749,7 @@ def findvideos(item):
 
 
 def puntuar_calidad(txt):
-    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', 'REMUX 1080p', '1080', 'HD', 'WEBRip 1080p', 'WEB-DL 4k', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', 'REMUX 4k', '4K']
+    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'DVD Rip', 'WEBRip', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', 'REMUX 1080p', '1080', 'HD', 'HDRip', 'WEBRip 1080p', 'WEB-DL 4k', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', 'REMUX 4k', '4K']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
 
@@ -822,6 +821,9 @@ def play(item):
     if url:
         if host_player in url:
             data = do_downloadpage(url)
+
+            if 'There has been a critical error on this website' in data:
+                 return '[COLOR red]Website [COLOR orangered]Critical Error[/COLOR]'
 
             url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
             if not url: url = scrapertools.find_single_match(data, 'id="btn_enlace">.*?href="(.*?)"')

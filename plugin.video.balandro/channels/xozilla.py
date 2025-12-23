@@ -42,9 +42,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Long play', action = 'list_all', url = host  + 'search/?sort_by=duration&from_videos=1' ))
 
+    itemlist.append(item.clone( title = 'Por canal', action = 'listas', url = host + 'channels/?sort_by=avg_videos_popularity&from=1' ))
+
     itemlist.append(item.clone( title = 'Por categoría', action = 'listas', url = host + 'categories/1/' ))
 
-    itemlist.append(item.clone( title = 'Por canal', action = 'listas', url = host + 'channels/?sort_by=avg_videos_popularity&from=1' ))
     itemlist.append(item.clone( title = 'Por estrella', action = 'listas', url = host + 'models/?sort_by=total_videos&from=1' ))
 
     return itemlist

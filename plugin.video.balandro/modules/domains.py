@@ -24,10 +24,9 @@ channels_currents = [
         'elifilms', 'elitetorrent', 'elitetorrentnz', 'ennovelastv', 'entrepeliculasyseries',
         'gnula', 'gnula24', 'gnula24h', 'grantorrent',
         'hdfull', 'henaojara', 'homecine',
-        'mejortorrentapp', 'mejortorrentnz', 'mitorrent',
+        'mejortorrentapp', 'mitorrent',
         'peliculaspro', 
         'pelisforte', 'pelismart', 'pelispanda', 'pelispediaws', 'pelisplushd', 'pelisplushdlat', 'pelisplushdnz',
-        'pgratishd',
         'poseidonhd2',
         'series24', 'serieskao', 'seriespapayato', 'seriesplus', 'srnovelas', 'subtorrents',
         'todotorrents',
@@ -1765,52 +1764,6 @@ def test_domain_mejortorrentapp(item):
         platformtools.dialog_notification(config.__addon_name + ' - MejorTorrentApp', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
-def manto_domain_mejortorrentnz(item):
-    logger.info()
-
-    channel_json = 'mejortorrentnz.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    id = params['id']
-    name = params['name']
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] ' + name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando MejorTorrentNz[/B][/COLOR]' % color_exec)
-
-    manto_domain_common(item, id, name)
-
-
-def test_domain_mejortorrentnz(item):
-    logger.info()
-
-    datos = channeltools.get_channel_parameters('mejortorrentnz')
-    if not datos['active']:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
-        return
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('MejorTorrentNz')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - MejorTorrentNz', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
-
 def manto_domain_mitorrent(item):
     logger.info()
 
@@ -2223,52 +2176,6 @@ def test_domain_pelisplushdnz(item):
         tester.test_channel('PelisPlusHdNz')
     except:
         platformtools.dialog_notification(config.__addon_name + ' - PelisPlusHdNz', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
-
-def manto_domain_pgratishd(item):
-    logger.info()
-
-    channel_json = 'pgratishd.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    id = params['id']
-    name = params['name']
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] ' + name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando PGratisHd[/B][/COLOR]' % color_exec)
-
-    manto_domain_common(item, id, name)
-
-
-def test_domain_pgratishd(item):
-    logger.info()
-
-    datos = channeltools.get_channel_parameters('pgratishd')
-    if not datos['active']:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
-        return
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('PGratisHd')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - PGratisHd', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_poseidonhd2(item):
@@ -3035,16 +2942,6 @@ def manto_domain_common(item, id, name):
         if new_domain is None: return
         elif new_domain == 'https://': return
 
-    elif id == 'mejortorrentnz':
-        config.set_setting('user_test_channel', '')
-
-        if not domain: domain = 'https://mejortorrent.'
-
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio MejorTorrentNz  -->  [COLOR %s]https://mejortorrent.???[/COLOR]' % color_avis)
-
-        if new_domain is None: return
-        elif new_domain == 'https://mejortorrent.': return
-
     elif id == 'mitorrent':
         config.set_setting('user_test_channel', '')
 
@@ -3134,16 +3031,6 @@ def manto_domain_common(item, id, name):
 
         if new_domain is None: return
         elif new_domain == 'https://pelisplushd.': return
-
-    elif id == 'pgratishd':
-        config.set_setting('user_test_channel', '')
-
-        if not domain: domain = 'https://'
-
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio PGratisHd  -->  [COLOR %s]https://???.pelisgratishd.???/[/COLOR]' % color_avis)
-
-        if new_domain is None: return
-        elif new_domain == 'https://': return
 
     elif id == 'poseidonhd2':
         config.set_setting('user_test_channel', '')
@@ -3283,13 +3170,11 @@ def manto_domain_common(item, id, name):
         if not new_domain.endswith('/'):
             if id == 'cuevana3pro': pass
             elif id == 'mejortorrentapp': pass
-            elif id == 'mejortorrentnz': pass
             else: new_domain = new_domain + '/'
         else:
             avisar = False
             if id == 'cuevana3pro': avisar = True
             elif id == 'mejortorrentapp': avisar = True
-            elif id == 'mejortorrentnz': avisar = True
 
             if avisar:
                 platformtools.dialog_notification(config.__addon_name + ' - ' + id.capitalize(), '[B][COLOR %s]Dominio sin / al final[/B][/COLOR]' % color_adver)
