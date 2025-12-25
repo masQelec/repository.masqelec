@@ -1,0 +1,1406 @@
+# Kodi Media Center language file
+# Addon Name: KodiELEC Configuration
+# Addon id: service.coreelec.settings
+# Addon Provider: KodiELEC
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: es_ES\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#600"
+msgid "KodiELEC Settings"
+msgstr "Configuración de KodiELEC"
+
+msgctxt "#601"
+msgid "Interface"
+msgstr "Interfaz"
+
+msgctxt "#602"
+msgid "Address"
+msgstr "Dirección"
+
+msgctxt "#603"
+msgid "Type"
+msgstr "Tipo"
+
+msgctxt "#604"
+msgid "State"
+msgstr "Estado"
+
+msgctxt "#605"
+msgid "Address"
+msgstr "Dirección"
+
+msgctxt "#606"
+msgid "Distribution: "
+msgstr "Distribución: "
+
+msgctxt "#607"
+msgid "Version: "
+msgstr "Versión: "
+
+msgctxt "#608"
+msgid "Architecture: "
+msgstr "Arquitectura: "
+
+msgctxt "#609"
+msgid "KodiELEC is created by a global team of Linux and Kodi enthusiasts who contribute time and effort to manage the project, write code, and provide support. We have fun making it. We hope you have fun using it!"
+msgstr "KodiELEC ha sido creado por un equipo global de entusiastas de Linux y Kodi que dedican su tiempo y esfuerzo a gestionar el proyecto, escribir código y proporcionar soporte. Nos divertimos haciéndolo. ¡Esperamos que te diviertas usándolo!"
+
+msgctxt "#610"
+msgid "[B]Support[/B] is provided via our forum:[CR]https://discourse.coreelec.org[CR][CR][B]Documentation[/B] can be read at our website:[CR]https://coreelec.org[CR][CR][B]Wiki[/B] can be read at our website:[CR]https://wiki.coreelec.org[CR][CR][B]Code[/B] can be found on GitHub:[CR]https://github.com/KodiELEC[CR][CR]"
+msgstr "[B]Soporte[/B] disponible en nuestro foro:[CR]https://discourse.coreelec.org[CR][CR][B]Documentación[/B] disponible en nuestra web:[CR]https://coreelec.org[CR][CR][B]Wiki[/B] disponible en nuestra web:[CR]https://wiki.coreelec.org[CR][CR][B]Código[/B] disponible en GitHub:[CR]https://github.com/KodiELEC[CR][CR]"
+
+msgctxt "#700"
+msgid "Configure a hostname, keyboard type, perform a reset, update, or backups and restores"
+msgstr "Configurar el nombre de host, el tipo de teclado, realizar un reinicio, actualizar o hacer copias de seguridad y restauraciones"
+
+msgctxt "#701"
+msgid "Configure network startup options, NTP and VPNs"
+msgstr "Configurar las opciones de inicio de red, NTP y VPN"
+
+msgctxt "#702"
+msgid "Manage the Ethernet, Wireless and VPN connections available to the system"
+msgstr "Gestionar las conexiones Ethernet, inalámbricas y VPN disponibles en el sistema"
+
+msgctxt "#703"
+msgid "Configure system services like Samba, SSH, Cron, Avahi and Syslog"
+msgstr "Configurar servicios del sistema como Samba, SSH, Cron, Avahi y Syslog"
+
+msgctxt "#704"
+msgid "Configure and pair Bluetooth devices"
+msgstr "Configurar y emparejar dispositivos Bluetooth"
+
+msgctxt "#705"
+msgid "Useful information like version and architecture details, support and documentation links."
+msgstr "Información útil como los detalles de la versión y la arquitectura, enlaces de soporte y documentación."
+
+msgctxt "#707"
+msgid "Configure updates"
+msgstr "Configurar actualizaciones"
+
+msgctxt "#710"
+msgid "Configure the Hostname of your KodiELEC system. This will be used for the HTPC \\\\hostname in Windows and SMB server name in the Mac OS Finder"
+msgstr "Configurar el nombre de host de su sistema KodiELEC. Se usará para el HTPC \\\\nombredehost en Windows y como nombre del servidor SMB en el Finder de Mac OS"
+
+msgctxt "#711"
+msgid "Configure the 1st keyboard software layout"
+msgstr "Configurar la 1ª distribución de teclado"
+
+msgctxt "#712"
+msgid "Configure the 2nd keyboard software layout"
+msgstr "Configurar la 2ª distribución de teclado"
+
+msgctxt "#713"
+msgid "Configure the physical keyboard type"
+msgstr "Configurar el tipo de teclado físico"
+
+msgctxt "#714"
+msgid "KodiELEC can be configured for automatic or manual updates. Automatic updates are available on stable releases and stable release candidates. Automatic update self-disables on beta and development builds"
+msgstr "KodiELEC se puede configurar para actualizaciones automáticas o manuales. Las actualizaciones automáticas están disponibles en las versiones estables y candidatas. La actualización automática se desactiva en las compilaciones beta y de desarrollo"
+
+msgctxt "#715"
+msgid "Set to ON and an on-screen notification will be displayed when a new update is available"
+msgstr "Activar para mostrar una notificación en pantalla cuando haya una nueva actualización disponible"
+
+msgctxt "#716"
+msgid "Update to the next stable release instead of remaining on nightly builds, when the next stable release is ready."
+msgstr "Actualizar a la siguiente versión estable en lugar de permanecer en las compilaciones nocturnas, cuando la siguiente versión estable esté lista."
+
+msgctxt "#718"
+msgid "Send boot config files from /flash, kodi.log, kernel log and Samba configs to https://paste.coreelec.org, and display the short URL"
+msgstr "Enviar los archivos de configuración de arranque de /flash, kodi.log, el registro del kernel y las configuraciones de Samba a https://paste.coreelec.org y mostrar la URL corta"
+
+msgctxt "#719"
+msgid "Send boot config files from /flash, kodi_crash.log, kernel log and Samba configs to https://paste.coreelec.org, and display the short URL"
+msgstr "Enviar los archivos de configuración de arranque de /flash, kodi_crash.log, el registro del kernel y las configuraciones de Samba a https://paste.coreelec.org y mostrar la URL corta"
+
+msgctxt "#720"
+msgid "Set to ON to enable the Bluetooth service"
+msgstr "Activar para habilitar el servicio Bluetooth"
+
+msgctxt "#721"
+msgid "Send KodiELEC debug info without logs to https://paste.coreelec.org, and display the short URL"
+msgstr "Enviar información de depuración de KodiELEC sin registros a https://paste.coreelec.org y mostrar la URL corta"
+
+msgctxt "#722"
+msgid "Create a tar archive containing all KodiELEC and Kodi configuration settings, databases and thumbnail content. Backup files will be stored in /storage/backup/"
+msgstr "Crear un archivo tar que contenga todos los ajustes de configuración de KodiELEC y Kodi, las bases de datos y el contenido de las miniaturas. Los archivos de la copia de seguridad se guardarán en /storage/backup/"
+
+msgctxt "#723"
+msgid "Restore a tar archive backup previously created using the backup option above"
+msgstr "Restaurar una copia de seguridad de un archivo tar creada previamente con la opción anterior"
+
+msgctxt "#724"
+msgid "[COLOR FF00FF00]SOFT RESET[/COLOR]\nPermanently reset KodiELEC configuration to defaults (resets also Kodi to default including your library. your media - music/videos/etc are not touched)"
+msgstr "[COLOR FF00FF00]REINICIO PARCIAL[/COLOR]\nRestablecer permanentemente la configuración de KodiELEC a los valores predeterminados (también restablece Kodi a los valores predeterminados, incluida su biblioteca. Sus archivos multimedia - música/vídeos/etc. no se verán afectados)"
+
+msgctxt "#725"
+msgid "[COLOR FFFF0000]HARD RESET[/COLOR]\nPermanently reset KodiELEC and Kodi configuration to defaults (everything in your storage partition will be deleted)"
+msgstr "[COLOR FFFF0000]REINICIO COMPLETO[/COLOR]\nRestablecer permanentemente la configuración de KodiELEC y Kodi a los valores predeterminados (se eliminará todo el contenido de la partición de almacenamiento)"
+
+msgctxt "#726"
+msgid "Enable or disable support for Wireless (WLAN) networks"
+msgstr "Activar o desactivar el soporte para redes inalámbricas (WLAN)"
+
+msgctxt "#727"
+msgid "Enable a 'tethered' Wireless Access Point. This requires your wireless card (and driver) to support bridging and access point mode. Not all cards are capable."
+msgstr "Activar un punto de acceso inalámbrico anclado (tethering). Esto requiere que su tarjeta inalámbrica (y su controlador) admita el modo puente y el modo de punto de acceso. No todas las tarjetas son compatibles."
+
+msgctxt "#728"
+msgid "Configure the Access Point SSID"
+msgstr "Configurar el SSID del punto de acceso"
+
+msgctxt "#729"
+msgid "Configure the Access Point Passphrase"
+msgstr "Configurar la contraseña del punto de acceso"
+
+msgctxt "#730"
+msgid "Enable or disable support for Wired (Ethernet) networks"
+msgstr "Activar o desactivar el soporte para redes cableadas (Ethernet)"
+
+msgctxt "#732"
+msgid "Configure the 1st time (NTP) server"
+msgstr "Configurar el 1er servidor de tiempo (NTP)"
+
+msgctxt "#733"
+msgid "Configure the 2nd time (NTP) server"
+msgstr "Configurar el 2º servidor de tiempo (NTP)"
+
+msgctxt "#734"
+msgid "Configure the 3rd time (NTP) server"
+msgstr "Configurar el 3er servidor de tiempo (NTP)"
+
+msgctxt "#736"
+msgid "Set to ON to delay Kodi startup until the network is available. Use this if the OS is booting into Kodi before the network is up and central MySQL databases are accessible."
+msgstr "Activar para retrasar el inicio de Kodi hasta que la red esté disponible. Use esta opción si el sistema operativo arranca en Kodi antes de que la red esté activa y las bases de datos centrales de MySQL sean accesibles."
+
+msgctxt "#737"
+msgid "Time in seconds to wait for an established network connection."
+msgstr "Tiempo en segundos de espera para una conexión de red establecida."
+
+msgctxt "#738"
+msgid "Set to ON to enable the embedded Samba (SMB) filesharing service"
+msgstr "Activar para habilitar el servicio integrado de compartición de archivos Samba (SMB)"
+
+msgctxt "#739"
+msgid "Set to ON to require username/password access to local Samba fileshares"
+msgstr "Activar para requerir nombre de usuario/contraseña para acceder a los recursos compartidos locales de Samba"
+
+msgctxt "#740"
+msgid "Set the username for Samba sharing"
+msgstr "Establecer el nombre de usuario para compartir con Samba"
+
+msgctxt "#741"
+msgid "Set the password for Samba sharing"
+msgstr "Establecer la contraseña para compartir con Samba"
+
+msgctxt "#742"
+msgid "Set to ON to enable the embedded SSH server. The SSH console can be accessed with username 'root' and password 'coreelec'."
+msgstr "Activar para habilitar el servidor SSH integrado. Se puede acceder a la consola SSH con el nombre de usuario 'root' y la contraseña 'coreelec'."
+
+msgctxt "#743"
+msgid "Set to ON if you have copied private SSH keys to your HTPC and would like to improve security by disabling SSH username and password authentication."
+msgstr "Activar si ha copiado claves SSH privadas a su HTPC y desea mejorar la seguridad desactivando la autenticación por nombre de usuario y contraseña SSH."
+
+msgctxt "#744"
+msgid "Set to ON to enable the Avahi (Zeroconf/Bonjour) network discovery service"
+msgstr "Activar para habilitar el servicio de descubrimiento de red Avahi (Zeroconf/Bonjour)"
+
+msgctxt "#745"
+msgid "Set to ON to enable the cron daemon"
+msgstr "Activar para habilitar el demonio cron"
+
+msgctxt "#746"
+msgid "Set the password for SSH"
+msgstr "Establecer la contraseña para SSH"
+
+msgctxt "#747"
+msgid "Enable a PIN for KodiELEC Settings access"
+msgstr "Activar un PIN para acceder a los Ajustes de KodiELEC"
+
+msgctxt "#748"
+msgid "Change the PIN Lock for KodiELEC Settings access"
+msgstr "Cambiar el PIN de bloqueo para acceder a los Ajustes de KodiELEC"
+
+msgctxt "#749"
+msgid "Overrride the Wireless Regulatory Domain so radio properties (channels and transmit power) comply with local laws or match the country configuration of your router."
+msgstr "Sobrescribir el dominio regulador inalámbrico para que las propiedades de la radio (canales y potencia de transmisión) cumplan con las leyes locales o coincidan con la configuración de país de su router."
+
+msgctxt "#750"
+msgid "750"
+msgstr "750"
+
+msgctxt "#751"
+msgid "With OBEX filetransfer you can send files, for example movies or pictures over bluetooth to KodiELEC."
+msgstr "Con la transferencia de archivos OBEX puede enviar archivos, por ejemplo, películas o imágenes, a KodiELEC a través de Bluetooth."
+
+msgctxt "#752"
+msgid "Here you can set the folder location where OBEX file transfer should store incoming files"
+msgstr "Aquí puede establecer la ubicación de la carpeta donde la transferencia de archivos OBEX debe almacenar los archivos entrantes"
+
+msgctxt "#753"
+msgid "Configure the 1st keyboard software Variant"
+msgstr "Configurar la 1ª variante de la distribución de teclado"
+
+msgctxt "#754"
+msgid "Configure the 2nd keyboard software Variant"
+msgstr "Configurar la 2ª variante de la distribución de teclado"
+
+msgctxt "#755"
+msgid "Auto share external drives / partitions"
+msgstr "Compartir automáticamente unidades/particiones externas"
+
+msgctxt "#756"
+msgid "Disable older SMB protocols by specifying the minimum supported protocol."
+msgstr "Desactivar protocolos SMB más antiguos especificando el protocolo mínimo admitido."
+
+msgctxt "#757"
+msgid "Disable more recent SMB protocols for backward compatability with legacy clients."
+msgstr "Desactivar protocolos SMB más recientes para la retrocompatibilidad con clientes antiguos."
+
+msgctxt "#758"
+msgid "NetBIOS group to which the server belongs. Default is WORKGROUP."
+msgstr "Grupo NetBIOS al que pertenece el servidor. El valor predeterminado es WORKGROUP."
+
+msgctxt "#760"
+msgid "Select an update channel"
+msgstr "Seleccionar un canal de actualización"
+
+msgctxt "#761"
+msgid "Enable to allow entering a custom update url"
+msgstr "Activar para permitir introducir una URL de actualización personalizada"
+
+msgctxt "#762"
+msgid "Enter a custom update url (url should be the root of the update files)"
+msgstr "Introducir una URL de actualización personalizada (la URL debe ser la raíz de los archivos de actualización)"
+
+msgctxt "#770"
+msgid "Select an available version"
+msgstr "Seleccionar una versión disponible"
+
+msgctxt "#771"
+msgid "The firewall blocks unwanted network traffic. Home (default) allows traffic from private network ranges (192.168.x.x, 172.16.x.x and 10.x.x.x) only. Public blocks all traffic from all networks. Custom uses rules in /storage/.config/iptables. Off disables the firewall."
+msgstr "El cortafuegos bloquea el tráfico de red no deseado. Doméstico (predeterminado) permite el tráfico desde rangos de red privada (192.168.x.x, 172.16.x.x y 10.x.x.x) únicamente. Público bloquea todo el tráfico de todas las redes. Personalizado usa reglas en /storage/.config/iptables. Desactivado deshabilita el cortafuegos."
+
+msgctxt "#772"
+msgid "Checking for a new version will submit the installed Distribution, Project, CPU Arch and Version to the update server. This data is also used to report basic statistics for the project. To continue checking for updates while opting-out of stats reporting, disable this option."
+msgstr "La comprobación de una nueva versión enviará la distribución, el proyecto, la arquitectura de la CPU y la versión instalados al servidor de actualizaciones. Estos datos también se utilizan para generar estadísticas básicas para el proyecto. Para seguir buscando actualizaciones y, al mismo tiempo, optar por no participar en el envío de estadísticas, desactive esta opción."
+
+msgctxt "#773"
+msgid "Set the idle timeout (in minutes) before devices will be disconnected (defaults to 0 for no timeout). Applies to devices where \"Enable Standby\" has been activated in the KodiELEC device connection context menu."
+msgstr "Establecer el tiempo de inactividad (en minutos) antes de que los dispositivos se desconecten (el valor predeterminado es 0 para no tener tiempo de espera). Se aplica a los dispositivos en los que se ha activado \"Activar modo de espera\" en el menú contextual de conexión de dispositivos de KodiELEC."
+
+msgctxt "#774"
+msgid "Automatic reconnect previously paired device after booting"
+msgstr "Reconectar automáticamente el dispositivo emparejado previamente después de arrancar"
+
+msgctxt "#775"
+msgid "Automatic change audio output to PULSE when a audio device get connected"
+msgstr "Cambiar automáticamente la salida de audio a PULSE cuando se conecta un dispositivo de audio"
+
+msgctxt "#780"
+msgid "Configure hardware settings"
+msgstr "Configurar los ajustes de hardware"
+
+msgctxt "#781"
+msgid "Set fan mode (off/auto/manual)"
+msgstr "Establecer el modo del ventilador (apagado/auto/manual)"
+
+msgctxt "#782"
+msgid "Set fan speed level"
+msgstr "Establecer el nivel de velocidad del ventilador"
+
+msgctxt "#785"
+msgid "Modify Vendor Bootloader to support all wake-up features such as CEC, Wake-On-LAN, IR, and GPIO wake-up from suspend or power off state!"
+msgstr "¡Modificar el gestor de arranque del fabricante para admitir todas las funciones de reactivación, como CEC, Wake-On-LAN, IR y reactivación por GPIO desde el estado de suspensión o apagado!"
+
+msgctxt "#786"
+msgid "Set the IR remote control power button code"
+msgstr "Establecer el código del botón de encendido del mando a distancia por infrarrojos"
+
+msgctxt "#787"
+msgid "Enable/Disable Wake-on-LAN"
+msgstr "Activar/Desactivar Wake-on-LAN"
+
+msgctxt "#788"
+msgid "Enable/Disable USB Power when device is off/suspend"
+msgstr "Activar/Desactivar la alimentación USB cuando el dispositivo está apagado/suspendido"
+
+msgctxt "#789"
+msgid "Change device LED behavior"
+msgstr "Cambiar el comportamiento del LED del dispositivo"
+
+msgctxt "#790"
+msgid "Enable/Disable VESA display modes"
+msgstr "Activar/Desactivar los modos de pantalla VESA"
+
+msgctxt "#791"
+msgid "Set CPU governor for all cores"
+msgstr "Establecer el regulador de la CPU para todos los núcleos"
+
+msgctxt "#792"
+msgid "Enable/Disable HDD parking on power off/suspend"
+msgstr "Activar/Desactivar inactividad del disco duro al apagar/suspender"
+
+msgctxt "#793"
+msgid "Time in seconds to wait for the HDD to spin down when parking"
+msgstr "Especificar cuánto tiempo permanecerá inactivo el disco duro antes de apagarse"
+
+msgctxt "#794"
+msgid "Time in minutes/hours until the HDD should enter suspend mode"
+msgstr "Tiempo en minutos/horas hasta que el disco duro deba entrar en modo de suspensión"
+
+msgctxt "#900"
+msgid "Configure eMMC speed mode"
+msgstr "Configurar el modo de velocidad de eMMC"
+
+msgctxt "#901"
+msgid "Configure WiFi SoC SDIO speed"
+msgstr "Configurar la velocidad SDIO del SoC WiFi"
+
+msgctxt "#902"
+msgid "Enable/Disable SPI interface"
+msgstr "Activar/Desactivar la interfaz SPI"
+
+msgctxt "#903"
+msgid "Choose IR protocol type for meson-remote"
+msgstr "Elegir el tipo de protocolo IR para meson-remote"
+
+msgctxt "#904"
+msgid "Configure DVB GPIO support"
+msgstr "Configurar el soporte DVB GPIO"
+
+msgctxt "#905"
+msgid "Configure Wired Network Interface"
+msgstr "Configurar la interfaz de red cableada"
+
+msgctxt "#906"
+msgid "Choose if IP1001 is assembled"
+msgstr "Elegir si IP1001 está ensamblado"
+
+msgctxt "#907"
+msgid "Switch between using the USB3 interface or the PCIE interface on m.2 connector"
+msgstr "Alternar entre el uso de la interfaz USB3 o la interfaz PCIE en el conector m.2"
+
+msgctxt "#908"
+msgid "Choose assembled Smartchip device"
+msgstr "Elegir el dispositivo Smartchip ensamblado"
+
+msgctxt "#909"
+msgid "Set to ON to enable service"
+msgstr "Activar para habilitar el servicio"
+
+msgctxt "#910"
+msgid "Set to ON to send invitation to the KodiELEC developers for remote debugging"
+msgstr "Activar para enviar una invitación a los desarrolladores de KodiELEC para depuración remota"
+
+msgctxt "#911"
+msgid "Select the SSH key used for access control"
+msgstr "Seleccionar la clave SSH utilizada para el control de acceso"
+
+msgctxt "#912"
+msgid "Forum username to identify the connection"
+msgstr "Nombre de usuario del foro para identificar la conexión"
+
+
+msgctxt "#32001"
+msgid "Services"
+msgstr "Servicios"
+
+msgctxt "#32002"
+msgid "System"
+msgstr "Sistema"
+
+msgctxt "#32003"
+msgid "Interface"
+msgstr "Interfaz"
+
+msgctxt "#32004"
+msgid "Hardware"
+msgstr "Hardware"
+
+msgctxt "#32005"
+msgid "Updates"
+msgstr "Actualizaciones"
+
+msgctxt "#32009"
+msgid "Keyboard"
+msgstr "Teclado"
+
+msgctxt "#32010"
+msgid "BusyBox Console Keyboard Layout"
+msgstr "Distribución de teclado de la consola BusyBox"
+
+msgctxt "#32012"
+msgid "Select Action"
+msgstr "Seleccionar acción"
+
+msgctxt "#32013"
+msgid "OS Updates"
+msgstr "Actualizaciones del SO"
+
+msgctxt "#32014"
+msgid "Automatic Updates"
+msgstr "Actualizaciones automáticas"
+
+msgctxt "#32015"
+msgid "Update Channel"
+msgstr "Canal de actualización"
+
+msgctxt "#32016"
+msgid "Show Custom Channels"
+msgstr "Mostrar canales personalizados"
+
+msgctxt "#32017"
+msgid "  - Custom Channel 1"
+msgstr "  - Canal personalizado 1"
+
+msgctxt "#32018"
+msgid "  - Custom Channel 2"
+msgstr "  - Canal personalizado 2"
+
+msgctxt "#32019"
+msgid "  - Custom Channel 3"
+msgstr "  - Canal personalizado 3"
+
+msgctxt "#32020"
+msgid "Available Versions"
+msgstr "Versiones disponibles"
+
+msgctxt "#32021"
+msgid "Submit Statistics"
+msgstr "Enviar estadísticas"
+
+msgctxt "#32022"
+msgid "Firmware Updates"
+msgstr "Actualizaciones de firmware"
+
+msgctxt "#32023"
+msgid "Updating will occur once the system is rebooted."
+msgstr "La actualización se realizará una vez que se reinicie el sistema."
+
+msgctxt "#32024"
+msgid "Bootloader EEPROM"
+msgstr "EEPROM del gestor de arranque"
+
+msgctxt "#32025"
+msgid "Update the Raspberry Pi Bootloader EEPROM to the latest version. This option is automatically disabled after rebooting. Reboot the system to apply the update."
+msgstr "Actualizar la EEPROM del gestor de arranque de Raspberry Pi a la última versión. Esta opción se desactiva automáticamente después de reiniciar. Reinicie el sistema para aplicar la actualización."
+
+msgctxt "#32026"
+msgid "VIA USB3 Firmware"
+msgstr "Firmware VIA USB3"
+
+msgctxt "#32027"
+msgid "Update the Raspberry Pi VIA USB3 firmware to the latest version. This option is automatically disabled after rebooting. Reboot the system to apply the update."
+msgstr "Actualizar el firmware VIA USB3 de Raspberry Pi a la última versión. Esta opción se desactiva automáticamente después de reiniciar. Reinicie el sistema para aplicar la actualización."
+
+msgctxt "#32028"
+msgid "update from %s to %s"
+msgstr "actualizar de %s a %s"
+
+msgctxt "#32029"
+msgid "up to date: %s"
+msgstr "actualizado: %s"
+
+msgctxt "#32030"
+msgid "Update To Next Stable"
+msgstr "Actualizar a la siguiente estable"
+
+msgctxt "#32100"
+msgid "Connections"
+msgstr "Conexiones"
+
+msgctxt "#32101"
+msgid "Network"
+msgstr "Red"
+
+msgctxt "#32102"
+msgid "Wireless Networks"
+msgstr "Redes inalámbricas"
+
+msgctxt "#32103"
+msgid "Wired Networks"
+msgstr "Redes cableadas"
+
+msgctxt "#32105"
+msgid "Active"
+msgstr "Activo"
+
+msgctxt "#32106"
+msgid "Username"
+msgstr "Nombre de usuario"
+
+msgctxt "#32107"
+msgid "Passphrase"
+msgstr "Contraseña"
+
+msgctxt "#32108"
+msgid "Enable 'tethered' Wireless Access Point"
+msgstr "Activar punto de acceso inalámbrico anclado"
+
+msgctxt "#32109"
+msgid "Connect Automatically"
+msgstr "Conectar automáticamente"
+
+msgctxt "#32110"
+msgid "Connection"
+msgstr "Conexión"
+
+msgctxt "#32111"
+msgid "IPv4"
+msgstr "IPv4"
+
+msgctxt "#32112"
+msgid "IPv6"
+msgstr "IPv6"
+
+msgctxt "#32113"
+msgid "IP Address Method"
+msgstr "Método de dirección IP"
+
+msgctxt "#32114"
+msgid "IP Address"
+msgstr "Dirección IP"
+
+msgctxt "#32115"
+msgid "Subnet Mask"
+msgstr "Máscara de subred"
+
+msgctxt "#32116"
+msgid "Default Gateway"
+msgstr "Puerta de enlace predeterminada"
+
+msgctxt "#32117"
+msgid "Prefix Length"
+msgstr "Longitud del prefijo"
+
+msgctxt "#32118"
+msgid "Privacy"
+msgstr "Privacidad"
+
+msgctxt "#32119"
+msgid "DNS Servers"
+msgstr "Servidores DNS"
+
+msgctxt "#32120"
+msgid "Nameserver #1"
+msgstr "Servidor de nombres 1"
+
+msgctxt "#32121"
+msgid "Nameserver #2"
+msgstr "Servidor de nombres 2"
+
+msgctxt "#32122"
+msgid "Nameserver #3"
+msgstr "Servidor de nombres 3"
+
+msgctxt "#32123"
+msgid "NTP Servers"
+msgstr "Servidores NTP"
+
+msgctxt "#32124"
+msgid "Timeserver #1"
+msgstr "Servidor #1"
+
+msgctxt "#32125"
+msgid "Timeserver #2"
+msgstr "Servidor #2"
+
+msgctxt "#32126"
+msgid "Timeserver #3"
+msgstr "Servidor #3"
+
+msgctxt "#32127"
+msgid "DNS Domains"
+msgstr "Dominios DNS"
+
+msgctxt "#32128"
+msgid "Domain #1"
+msgstr "Dominio 1"
+
+msgctxt "#32129"
+msgid "Domain #2"
+msgstr "Dominio 2"
+
+msgctxt "#32130"
+msgid "Domain #3"
+msgstr "Dominio 3"
+
+msgctxt "#32140"
+msgid "Save"
+msgstr "Guardar"
+
+msgctxt "#32141"
+msgid "Delete"
+msgstr "Eliminar"
+
+msgctxt "#32142"
+msgid "Refresh"
+msgstr "Actualizar"
+
+msgctxt "#32143"
+msgid "Disconnect"
+msgstr "Desconectar"
+
+msgctxt "#32144"
+msgid "Connect"
+msgstr "Conectar"
+
+msgctxt "#32145"
+msgid "Pair"
+msgstr "Emparejar"
+
+msgctxt "#32146"
+msgid "Hidden Network Name"
+msgstr "Nombre de red oculta"
+
+msgctxt "#32147"
+msgid "Wireless Network Passphrase"
+msgstr "Contraseña de la red inalámbrica"
+
+msgctxt "#32148"
+msgid "Wireless Network Username"
+msgstr "Nombre de usuario de la red inalámbrica"
+
+msgctxt "#32150"
+msgid "Edit"
+msgstr "Editar"
+
+msgctxt "#32180"
+msgid "Would you like to update KodiELEC now?"
+msgstr "¿Desea actualizar KodiELEC ahora?"
+
+msgctxt "#32181"
+msgid "Filename"
+msgstr "Nombre de archivo"
+
+msgctxt "#32182"
+msgid "Download speed"
+msgstr "Velocidad de descarga"
+
+msgctxt "#32183"
+msgid "Time remaining"
+msgstr "Tiempo restante"
+
+msgctxt "#32184"
+msgid "Extract file"
+msgstr "Extrayendo archivo"
+
+msgctxt "#32185"
+msgid "Extract speed"
+msgstr "Velocidad de extracción"
+
+msgctxt "#32186"
+msgid "Initialize Archive File"
+msgstr "Inicializar archivo"
+
+msgctxt "#32187"
+msgid "New Version"
+msgstr "Nueva versión"
+
+msgctxt "#32188"
+msgid "Current Version"
+msgstr "Versión actual"
+
+msgctxt "#32189"
+msgid "Identification"
+msgstr "Identificación"
+
+msgctxt "#32190"
+msgid "System Name"
+msgstr "Nombre del sistema"
+
+msgctxt "#32191"
+msgid "Invalid URL"
+msgstr "URL no válida"
+
+msgctxt "#32192"
+msgid "PIN lock"
+msgstr "Bloqueo por PIN"
+
+msgctxt "#32193"
+msgid "Enable KodiELEC Settings PIN Lock"
+msgstr "Activar bloqueo por PIN de los Ajustes de KodiELEC"
+
+msgctxt "#32194"
+msgid "Change KodiELEC Settings PIN Lock"
+msgstr "Cambiar PIN de bloqueo de los Ajustes de KodiELEC"
+
+msgctxt "#32196"
+msgid "About"
+msgstr "Acerca de"
+
+msgctxt "#32198"
+msgid "SSID"
+msgstr "SSID"
+
+msgctxt "#32200"
+msgid "Samba"
+msgstr "Samba"
+
+msgctxt "#32201"
+msgid "SSH"
+msgstr "SSH"
+
+msgctxt "#32202"
+msgid "Use Samba Password Authentication"
+msgstr "Usar autenticación por contraseña de Samba"
+
+msgctxt "#32203"
+msgid "Disable SSH Password"
+msgstr "Desactivar contraseña de SSH"
+
+msgctxt "#32204"
+msgid "Enable Samba"
+msgstr "Activar Samba"
+
+msgctxt "#32205"
+msgid "Enable SSH"
+msgstr "Activar SSH"
+
+msgctxt "#32206"
+msgid "Enable Avahi (Zeroconf)"
+msgstr "Activar Avahi (Zeroconf)"
+
+msgctxt "#32207"
+msgid "Avahi"
+msgstr "Avahi"
+
+msgctxt "#32208"
+msgid "Hidden Wlan"
+msgstr "WLAN oculta"
+
+msgctxt "#32209"
+msgid "SSH Password"
+msgstr "Contraseña de SSH"
+
+msgctxt "#32210"
+msgid "The default SSH password is widely known and considered insecure.[CR][CR]Setting a personal password is recommended."
+msgstr "La contraseña SSH predeterminada es ampliamente conocida y se considera insegura.[CR][CR]Se recomienda establecer una contraseña personal."
+
+msgctxt "#32212"
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgctxt "#32213"
+msgid "Keep Existing"
+msgstr "Mantener existente"
+
+msgctxt "#32214"
+msgid "Set Password"
+msgstr "Establecer contraseña"
+
+msgctxt "#32215"
+msgid "Workgroup name"
+msgstr "Nombre del grupo de trabajo"
+
+msgctxt "#32216"
+msgid "Auto-Share External Drives"
+msgstr "Compartir automáticamente unidades externas"
+
+msgctxt "#32217"
+msgid "Minimum supported protocol"
+msgstr "Protocolo mínimo admitido"
+
+msgctxt "#32218"
+msgid "Maximum supported protocol"
+msgstr "Protocolo máximo admitido"
+
+msgctxt "#32220"
+msgid "Bad password!"
+msgstr "¡Contraseña incorrecta!"
+
+msgctxt "#32221"
+msgid "The entered password is too weak.[CR]SSH password is unchanged."
+msgstr "La contraseña introducida es demasiado débil.[CR]La contraseña de SSH no ha cambiado."
+
+msgctxt "#32222"
+msgid "Password changed!"
+msgstr "¡Contraseña cambiada!"
+
+msgctxt "#32223"
+msgid "The SSH password has been successfully changed."
+msgstr "La contraseña de SSH se ha cambiado correctamente."
+
+msgctxt "#32224"
+msgid "Unknown error!"
+msgstr "¡Error desconocido!"
+
+msgctxt "#32225"
+msgid "There was an error during the process.[CR]SSH password is unchanged."
+msgstr "Se ha producido un error durante el proceso.[CR]La contraseña de SSH no ha cambiado."
+
+msgctxt "#32226"
+msgid "Enter new 4 digit PIN"
+msgstr "Introduzca el nuevo PIN de 4 dígitos"
+
+msgctxt "#32227"
+msgid "Re-enter PIN"
+msgstr "Vuelva a introducir el PIN"
+
+msgctxt "#32228"
+msgid "Error - PIN codes did not match!"
+msgstr "Error - ¡Los códigos PIN no coinciden!"
+
+msgctxt "#32229"
+msgid "KodiELEC Settings PIN lock not set.[CR][CR]Please try again."
+msgstr "No se ha establecido el bloqueo por PIN de los Ajustes de KodiELEC.[CR][CR]Por favor, inténtelo de nuevo."
+
+msgctxt "#32230"
+msgid "KodiELEC Settings PIN lock set."
+msgstr "Establecido el bloqueo por PIN de los Ajustes de KodiELEC."
+
+msgctxt "#32231"
+msgid "Your KodiELEC Settings PIN lock has been set to:"
+msgstr "El PIN de bloqueo de los Ajustes de KodiELEC se ha establecido en:"
+
+msgctxt "#32232"
+msgid "Error - PIN code not 4 digits!"
+msgstr "Error - ¡El código PIN no tiene 4 dígitos!"
+
+msgctxt "#32233"
+msgid "KodiELEC Settings Locked[CR]Enter 4 digit PIN"
+msgstr "Ajustes de KodiELEC bloqueados[CR]Introduzca el PIN de 4 dígitos"
+
+msgctxt "#32234"
+msgid "Incorrect PIN!"
+msgstr "¡PIN incorrecto!"
+
+msgctxt "#32235"
+msgid " attempts remaining."
+msgstr " intentos restantes."
+
+msgctxt "#32236"
+msgid "You have entered an incorrect PIN too many times.[CR][CR]You will need to wait 5 minutes before trying again."
+msgstr "Ha introducido un PIN incorrecto demasiadas veces.[CR][CR]Tendrá que esperar 5 minutos antes de volver a intentarlo."
+
+msgctxt "#32237"
+msgid "KodiELEC Settings Locked!"
+msgstr "¡Ajustes de KodiELEC bloqueados!"
+
+msgctxt "#32238"
+msgid "Time remaining before PIN can be entered: %02d:%02d[CR][CR]Too many previous failed attempts."
+msgstr "Tiempo restante antes de poder introducir el PIN: %02d:%02d[CR][CR]Demasiados intentos fallidos previos."
+
+msgctxt "#32240"
+msgid "Wireless Regulatory Domain"
+msgstr "Dominio regulador inalámbrico"
+
+msgctxt "#32240"
+msgid "Wireless Regulatory Domain"
+msgstr "Dominio regulador inalámbrico"
+
+msgctxt "#32300"
+msgid "Welcome to KodiELEC"
+msgstr "Bienvenido a KodiELEC"
+
+msgctxt "#32301"
+msgid "Welcome"
+msgstr "Bienvenido"
+
+msgctxt "#32302"
+msgid "This wizard will guide you through the process of setting up your new KodiELEC installation - setting your location, timezone and connecting you to the internet.[CR][CR]These settings can be changed later by navigating to Programs > KodiELEC Settings."
+msgstr "Este asistente le guiará a través del proceso de configuración de su nueva instalación de KodiELEC: estableciendo su ubicación, zona horaria y conectándole a Internet.[CR][CR]Estos ajustes se pueden cambiar más tarde navegando a Programas > Ajustes de KodiELEC."
+
+msgctxt "#32303"
+msgid "Next"
+msgstr "Siguiente"
+
+msgctxt "#32304"
+msgid "To be identified easily on the network, your new KodiELEC machine needs a name.[CR][CR]Try to choose something meaningful - like the room it's in - so you'll know what it is when you see it on the network.[CR][CR]This name is used when configuring network services, like file sharing using samba."
+msgstr "Para ser identificado fácilmente en la red, su nuevo equipo KodiELEC necesita un nombre.[CR][CR]Intente elegir algo significativo, como la habitación en la que se encuentra, para que sepa qué es cuando lo vea en la red.[CR][CR]Este nombre se utiliza al configurar los servicios de red, como la compartición de archivos mediante Samba."
+
+msgctxt "#32305"
+msgid "Networking"
+msgstr "Redes"
+
+msgctxt "#32306"
+msgid "In order to download backdrops, banners and thumbnails for your movies and TV shows and to stream online content from sites like YouTube, KodiELEC needs to be connected the Internet.[CR][CR]An Internet connection is also required for KodiELEC to automatically update itself."
+msgstr "Para descargar fondos, carteles y miniaturas de sus películas y series de televisión y para transmitir contenido en línea de sitios como YouTube, KodiELEC necesita estar conectado a Internet.[CR][CR]También se requiere una conexión a Internet para que KodiELEC se actualice automáticamente."
+
+msgctxt "#32307"
+msgid "Previous"
+msgstr "Anterior"
+
+msgctxt "#32308"
+msgid "Hostname:"
+msgstr "Nombre de host:"
+
+msgctxt "#32309"
+msgid "The following Networks are currently available:"
+msgstr "Las siguientes redes están disponibles actualmente:"
+
+msgctxt "#32310"
+msgid "Language:"
+msgstr "Idioma:"
+
+msgctxt "#32311"
+msgid "Sharing and Remote Access"
+msgstr "Compartición y acceso remoto"
+
+msgctxt "#32312"
+msgid "KodiELEC also supports SSH for remote access. This is for advanced users who wish to interact with KodiELEC's underlying operating system. The default user is [COLOR blue]root[/COLOR] and the default password is [COLOR blue]coreelec[/COLOR]."
+msgstr "KodiELEC también es compatible con SSH para el acceso remoto. Esto es para usuarios avanzados que deseen interactuar con el sistema operativo subyacente de KodiELEC. El usuario predeterminado es [COLOR blue]root[/COLOR] y la contraseña predeterminada es [COLOR blue]coreelec[/COLOR]."
+
+msgctxt "#32313"
+msgid "In order to share your files between your computers KodiELEC has incorporated a samba server. This samba server can be integrated into your local network by accessing it in a familiar way with Finder or Windows Explorer."
+msgstr "Para compartir sus archivos entre sus ordenadores, KodiELEC ha incorporado un servidor Samba. Este servidor Samba se puede integrar en su red local accediendo a él de forma familiar con el Finder o el Explorador de Windows."
+
+msgctxt "#32316"
+msgid "Configure Services:"
+msgstr "Configurar servicios:"
+
+msgctxt "#32317"
+msgid "Thank you"
+msgstr "Gracias"
+
+msgctxt "#32318"
+msgid "Your KodiELEC installation is now complete and you are about to enter Kodi where you can set up your media libraries. For help with this, there is a guide available at wiki.kodi.tv[CR][CR]KodiELEC is developed by a dedicated team of developers who work purely in their spare time.[CR][CR]Finally, we hope you enjoy using KodiELEC as much as we've enjoyed building it. If you need any more help, you can find links to our support forum along with latest news at our website."
+msgstr "La instalación de KodiELEC ha finalizado y está a punto de entrar en Kodi, donde podrá configurar sus bibliotecas multimedia. Para obtener ayuda con esto, hay una guía disponible en wiki.kodi.tv[CR][CR]KodiELEC está desarrollado por un equipo de desarrolladores dedicados que trabajan exclusivamente en su tiempo libre.[CR][CR]Finalmente, esperamos que disfrute usando KodiELEC tanto como nosotros hemos disfrutado creándolo. Si necesita más ayuda, puede encontrar enlaces a nuestro foro de soporte junto con las últimas noticias en nuestro sitio web."
+
+msgctxt "#32319"
+msgid "Cron"
+msgstr "Cron"
+
+msgctxt "#32320"
+msgid "Enable Cron"
+msgstr "Activar Cron"
+
+msgctxt "#32323"
+msgid "Reset to Defaults"
+msgstr "Restablecer valores predeterminados"
+
+msgctxt "#32324"
+msgid "Reset System Settings to defaults"
+msgstr "Restablecer los ajustes del sistema a los valores predeterminados"
+
+msgctxt "#32325"
+msgid "Reset KodiELEC to defaults"
+msgstr "Restablecer KodiELEC a los valores predeterminados"
+
+msgctxt "#32326"
+msgid "Are you sure?"
+msgstr "¿Está seguro?"
+
+msgctxt "#32328"
+msgid "The system must reboot."
+msgstr "El sistema debe reiniciarse."
+
+msgctxt "#32329"
+msgid "Rebooting in %d seconds"
+msgstr "Reiniciando en %d segundos"
+
+msgctxt "#32330"
+msgid "Keyboard Type"
+msgstr "Tipo de teclado"
+
+msgctxt "#32331"
+msgid "Bluetooth"
+msgstr "Bluetooth"
+
+msgctxt "#32333"
+msgid "Connected: "
+msgstr "Conectado: "
+
+msgctxt "#32334"
+msgid "Yes"
+msgstr "Sí"
+
+msgctxt "#32335"
+msgid "No"
+msgstr "No"
+
+msgctxt "#32338"
+msgid "No Bluetooth adapter found."
+msgstr "No se ha encontrado ningún adaptador Bluetooth."
+
+msgctxt "#32339"
+msgid "No Bluetooth device found. Please put your Bluetooth device into discovery mode[CR]and start the scan"
+msgstr "No se ha encontrado ningún dispositivo Bluetooth. Por favor, ponga su dispositivo Bluetooth en modo de descubrimiento[CR]e inicie la búsqueda"
+
+msgctxt "#32343"
+msgid "Enter the following Key on your Device."
+msgstr "Introduzca la siguiente clave en su dispositivo."
+
+msgctxt "#32344"
+msgid "Enable Bluetooth"
+msgstr "Activar Bluetooth"
+
+msgctxt "#32346"
+msgid "Bluetooth is disabled"
+msgstr "Bluetooth está desactivado"
+
+msgctxt "#32358"
+msgid "Trust and Connect"
+msgstr "Confiar y conectar"
+
+msgctxt "#32362"
+msgid "Check for updates now:"
+msgstr "Buscar actualizaciones ahora:"
+
+msgctxt "#32363"
+msgid "KodiELEC"
+msgstr "KodiELEC"
+
+msgctxt "#32364"
+msgid "Update available"
+msgstr "Actualización disponible"
+
+msgctxt "#32365"
+msgid "Show Update Notifications"
+msgstr "Mostrar notificaciones de actualización"
+
+msgctxt "#32366"
+msgid "Update Download Completed"
+msgstr "Descarga de la actualización completada"
+
+msgctxt "#32367"
+msgid "Update Extract Complete"
+msgstr "Extracción de la actualización completada"
+
+msgctxt "#32368"
+msgid "Advanced Network Settings"
+msgstr "Ajustes de red avanzados"
+
+msgctxt "#32369"
+msgid "Wait for network before starting Kodi"
+msgstr "Esperar a la red antes de iniciar Kodi"
+
+msgctxt "#32370"
+msgid "Maximum Wait Time (Sec.)"
+msgstr "Tiempo máximo de espera (seg.)"
+
+msgctxt "#32371"
+msgid "Backup"
+msgstr "Copia de seguridad"
+
+msgctxt "#32372"
+msgid "Create System and Kodi Backup"
+msgstr "Crear copia de seguridad del sistema y de Kodi"
+
+msgctxt "#32373"
+msgid "Restore Backup"
+msgstr "Restaurar copia de seguridad"
+
+msgctxt "#32374"
+msgid "Restore file cannot be accessed by the system, it must be located on the local filesystem"
+msgstr "El sistema no puede acceder al archivo de restauración, debe estar ubicado en el sistema de archivos local"
+
+msgctxt "#32375"
+msgid "Backup Progress"
+msgstr "Progreso de la copia de seguridad"
+
+msgctxt "#32376"
+msgid "Submit Log"
+msgstr "Enviar registro"
+
+msgctxt "#32377"
+msgid "Upload latest Kodi log and configs, and view the short URL"
+msgstr "Subir el último registro y las configuraciones de Kodi, y ver la URL corta"
+
+msgctxt "#32378"
+msgid "Upload latest Kodi crash log and configs, and view the short URL"
+msgstr "Subir el último registro de error y las configuraciones de Kodi, y ver la URL corta"
+
+msgctxt "#32379"
+msgid "There is not enough free storage space to continue!"
+msgstr "¡No hay suficiente espacio de almacenamiento libre para continuar!"
+
+msgctxt "#32380"
+msgid "Restoring system settings requires a reboot. Are you sure you want to restore?"
+msgstr "La restauración de los ajustes del sistema requiere un reinicio. ¿Está seguro de que desea restaurar?"
+
+msgctxt "#32381"
+msgid "Accept incoming Bluetooth Filetransfer ?"
+msgstr "¿Aceptar la transferencia de archivos Bluetooth entrante?"
+
+msgctxt "#32382"
+msgid "Speed"
+msgstr "Velocidad"
+
+msgctxt "#32383"
+msgid "Play Files ?"
+msgstr "¿Reproducir archivos?"
+
+msgctxt "#32384"
+msgid "OBEX Enabled"
+msgstr "OBEX activado"
+
+msgctxt "#32385"
+msgid "OBEX Upload Folder"
+msgstr "Carpeta de subida de OBEX"
+
+msgctxt "#32386"
+msgid "Keyboard Layout Variant #1"
+msgstr "Variante de distribución de teclado 1"
+
+msgctxt "#32387"
+msgid "Keyboard Layout Variant #2"
+msgstr "Variante de distribución de teclado 2"
+
+msgctxt "#32388"
+msgid "Enable Standby"
+msgstr "Activar modo de espera"
+
+msgctxt "#32389"
+msgid "Disable Standby"
+msgstr "Desactivar modo de espera"
+
+msgctxt "#32390"
+msgid "Settings addon is not yet ready, please try again later."
+msgstr "El addon de ajustes aún no está listo, por favor, inténtelo de nuevo más tarde."
+
+msgctxt "#32391"
+msgid "Upload configs and other debug info without logs, and view the short URL"
+msgstr "Subir configuraciones y otra información de depuración sin registros, y ver la URL corta"
+
+msgctxt "#32393"
+msgid "** SAFE MODE! ** SAFE MODE! ** SAFE MODE! **"
+msgstr "** ¡MODO SEGURO! ** ¡MODO SEGURO! ** ¡MODO SEGURO! **"
+
+msgctxt "#32394"
+msgid "KodiELEC has temporarily started in safe mode due to repeated Kodi crashes.[CR][CR]You may now investigate the cause of the crashes by enabling ssh or Samba.[CR][CR]Your original Kodi installation can be accessed via \"/storage/.kodi.FAILED\" and the Samba \"Kodi-Failed\" share.[CR][CR]Rebooting will return to your original Kodi installation.[CR][CR]Go to https://discourse.coreelec.org if you require further assistance. When posting to the forum include the link to your crash log which can be viewed by clicking the crash log option in Settings > KodiELEC > System > Submit Log."
+msgstr "KodiELEC se ha iniciado temporalmente en modo seguro debido a repetidos fallos de Kodi.[CR][CR]Ahora puede investigar la causa de los fallos activando SSH o Samba.[CR][CR]Se puede acceder a su instalación original de Kodi a través de \"/storage/.kodi.FAILED\" y el recurso compartido de Samba \"Kodi-Failed\".[CR][CR]Al reiniciar, volverá a su instalación original de Kodi.[CR][CR]Vaya a https://discourse.coreelec.org si necesita más ayuda. Cuando publique en el foro, incluya el enlace a su registro de errores, que puede ver haciendo clic en la opción de registro de errores en Ajustes > KodiELEC > Sistema > Enviar registro."
+
+msgctxt "#32395"
+msgid "Firewall"
+msgstr "Cortafuegos"
+
+msgctxt "#32396"
+msgid "Custom"
+msgstr "Personalizado"
+
+msgctxt "#32397"
+msgid "Off"
+msgstr "Desactivado"
+
+msgctxt "#32398"
+msgid "Home"
+msgstr "Inicio"
+
+msgctxt "#32399"
+msgid "Public"
+msgstr "Público"
+
+msgctxt "#32400"
+msgid "Idle Timeout"
+msgstr "Tiempo de inactividad"
+
+msgctxt "#32401"
+msgid "Connect paired devices"
+msgstr "Conectar dispositivos emparejados"
+
+msgctxt "#32402"
+msgid "Switch audio device on connection"
+msgstr "Cambiar dispositivo de audio al conectar"
+
+msgctxt "#32500"
+msgid "Fan"
+msgstr "Ventilador"
+
+msgctxt "#32501"
+msgid "Power"
+msgstr "Alimentación"
+
+msgctxt "#32502"
+msgid "Display"
+msgstr "Pantalla"
+
+msgctxt "#32503"
+msgid "Performance"
+msgstr "Rendimiento"
+
+msgctxt "#32504"
+msgid "CEC"
+msgstr "CEC"
+
+msgctxt "#32505"
+msgid "HDD"
+msgstr "Disco duro"
+
+msgctxt "#32506"
+msgid "Device Tree"
+msgstr "Árbol de dispositivos"
+
+msgctxt "#32510"
+msgid "Fan Mode"
+msgstr "Modo del ventilador"
+
+msgctxt "#32511"
+msgid "Speed Level"
+msgstr "Nivel de velocidad"
+
+msgctxt "#32515"
+msgid "Inject BL301 Blob"
+msgstr "Inyectar BL301 Blob"
+
+msgctxt "#32516"
+msgid "IR Remote Power Code"
+msgstr "Código de encendido del mando IR"
+
+msgctxt "#32517"
+msgid "Wake-on-LAN"
+msgstr "Wake-on-LAN"
+
+msgctxt "#32518"
+msgid "USB Power"
+msgstr "Alimentación USB"
+
+msgctxt "#32519"
+msgid "System LED"
+msgstr "LED del sistema"
+
+msgctxt "#32520"
+msgid "VESA modes"
+msgstr "Modos VESA"
+
+msgctxt "#32521"
+msgid "CPU governor"
+msgstr "Regulador de la CPU"
+
+msgctxt "#32522"
+msgid "Parking"
+msgstr "Apagar disco"
+
+msgctxt "#32523"
+msgid "Parking Time"
+msgstr "Apagar disco duro tras"
+
+msgctxt "#32524"
+msgid "Idle Time"
+msgstr "Tiempo de inactividad"
+
+msgctxt "#32525"
+msgid "eMMC Speed Mode"
+msgstr "Modo de velocidad de eMMC"
+
+msgctxt "#32526"
+msgid "WiFi SoC SDIO Speed"
+msgstr "Velocidad SDIO del SoC WiFi"
+
+msgctxt "#32527"
+msgid "Red LED"
+msgstr "LED rojo"
+
+msgctxt "#32528"
+msgid "SPI Interface"
+msgstr "Interfaz SPI"
+
+msgctxt "#32529"
+msgid "IR Protocol Type"
+msgstr "Tipo de protocolo IR"
+
+msgctxt "#32530"
+msgid "DVB GPIO Support"
+msgstr "Soporte DVB GPIO"
+
+msgctxt "#32531"
+msgid "Wired Network Interface"
+msgstr "Interfaz de red cableada"
+
+msgctxt "#32532"
+msgid "Green LED"
+msgstr "LED verde"
+
+msgctxt "#32533"
+msgid "IP1001 Ethernet Transceiver"
+msgstr "Transceptor Ethernet IP1001"
+
+msgctxt "#32534"
+msgid "VIM3 USB3/PCIE Switch"
+msgstr "Conmutador USB3/PCIE de VIM3"
+
+msgctxt "#32535"
+msgid "Smartchip WiFi Driver"
+msgstr "Controlador WiFi Smartchip"
+
+
+msgctxt "#33510"
+msgid "Warning!"
+msgstr "¡Advertencia!"
+
+msgctxt "#33511"
+msgid "Continue"
+msgstr "Continuar"
+
+msgctxt "#33512"
+msgid "Finished!"
+msgstr "¡Finalizado!"
+
+msgctxt "#33513"
+msgid "Notice!"
+msgstr "¡Aviso!"
+
+msgctxt "#33514"
+msgid "Error!"
+msgstr "¡Error!"
+
+msgctxt "#33515"
+msgid "Inject Bootloader BL301 Blob..."
+msgstr "Inyectando el Blob del gestor de arranque BL301..."
+
+msgctxt "#33516"
+msgid "[B][COLOR red]Note: This will modify the firmware on your device.[/COLOR][/B][CR]The BL301 bootloader blob has been customized by the KodiELEC Team to support all features used to wake a device from a suspend or power off state!"
+msgstr "[B][COLOR red]Nota: Esto modificará el firmware de su dispositivo.[/COLOR][/B][CR]¡El blob del gestor de arranque BL301 ha sido personalizado por el equipo de KodiELEC para admitir todas las funciones utilizadas para reactivar un dispositivo desde un estado de suspensión o apagado!"
+
+msgctxt "#33517"
+msgid "Finished update of the BL301 on internal eMMC.[CR]A reboot is now required!"
+msgstr "Finalizada la actualización del BL301 en la eMMC interna.[CR]¡Se requiere un reinicio!"
+
+msgctxt "#33518"
+msgid "Error [%d] has occurred while using the 'inject_bl301' tool![CR]See '/storage/inject_bl301.log' for details."
+msgstr "¡Se ha producido el error [%d] al utilizar la herramienta 'inject_bl301'![CR]Consulte '/storage/inject_bl301.log' para más detalles."
+
+msgctxt "#33519"
+msgid "System is not supported by BL301 injection![CR]See '/storage/inject_bl301.log' for details."
+msgstr "¡El sistema no es compatible con la inyección de BL301![CR]Consulte '/storage/inject_bl301.log' para más detalles."
+
+msgctxt "#33520"
+msgid "Update of BL301 on eMMC is not needed."
+msgstr "No es necesario actualizar el BL301 en la eMMC."
+
+msgctxt "#33521"
+msgid "[B][COLOR red]Note: This will remove the bl301 injection on your device.[/COLOR][CR]The injected BL301 bootloader blob will be removed by the backup done automatically before injection.[/B]"
+msgstr "[B][COLOR red]Nota: Esto eliminará la inyección de bl301 en su dispositivo.[/COLOR][CR]El blob del gestor de arranque BL301 inyectado se eliminará mediante la copia de seguridad realizada automáticamente antes de la inyección.[/B]"
+
+msgctxt "#33522"
+msgid "Finished remove of the BL301 on internal eMMC.[CR]A reboot is now required!"
+msgstr "Finalizada la eliminación del BL301 en la eMMC interna.[CR]¡Se requiere un reinicio!"
+
+msgctxt "#33523"
+msgid "Finished update of /flash/dtb.img.[CR]A reboot is now required!"
+msgstr "Finalizada la actualización de /flash/dtb.img.[CR]¡Se requiere un reinicio!"
+
+msgctxt "#33524"
+msgid "[COLOR red]Are you sure to change this value?[/COLOR][CR]Please enter confirmation code '%s'"
+msgstr "[COLOR red]¿Está seguro de que desea cambiar este valor?[/COLOR][CR]Por favor, introduzca el código de confirmación '%s'"
+
+
+msgctxt "#33525"
+msgid "Terminal sharing"
+msgstr "Compartición de terminal"
+
+msgctxt "#33526"
+msgid "Enable terminal sharing"
+msgstr "Activar compartición de terminal"
+
+msgctxt "#33527"
+msgid "Send invitation to KodiELEC developers"
+msgstr "Enviar invitación a los desarrolladores de KodiELEC"
+
+msgctxt "#33528"
+msgid "Hint: enable this option only when requested by team KodiELEC"
+msgstr "Sugerencia: active esta opción solo cuando se lo solicite el equipo de KodiELEC"
+
+msgctxt "#33529"
+msgid "Access control key"
+msgstr "Clave de control de acceso"
+
+msgctxt "#33530"
+msgid "Connection name"
+msgstr "Nombre de la conexión"
