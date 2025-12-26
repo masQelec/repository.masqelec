@@ -61,8 +61,8 @@ def _cleanup_path(p: str):
             shutil.rmtree(p, ignore_errors=True)
         elif os.path.exists(p):
             os.remove(p)
-    except Exception:
-        pass
+    except Exception as e:
+        log_utils.write_log(f"Excepción ignorada en cloud_storage: {e}", "DEBUG")
 
 
 def _atomic_write_bytes(dst_path: str, data: bytes, mode: int = None):
@@ -84,14 +84,14 @@ def _atomic_write_bytes(dst_path: str, data: bytes, mode: int = None):
         try:
             if os.path.exists(tmp_out):
                 os.remove(tmp_out)
-        except Exception:
-            pass
+        except Exception as e:
+            log_utils.write_log(f"Excepción ignorada en cloud_storage: {e}", "DEBUG")
 
     if mode is not None:
         try:
             os.chmod(dst_path, mode)
-        except Exception:
-            pass
+        except Exception as e:
+            log_utils.write_log(f"Excepción ignorada en cloud_storage: {e}", "DEBUG")
 
 
 # ==============================
@@ -163,13 +163,17 @@ def _systemctl_is_active(unit: str) -> bool:
 def _systemctl_enable_now(unit: str):
     if not _has_systemctl():
         return
-    subprocess.call(["systemctl", "enable", "--now", _unit_name(unit)])
+    rc, out, err = utils.run_cmd(["systemctl", "enable", "--now", _unit_name(unit)], timeout=10)
+    if rc != 0:
+        log_utils.write_log(f"systemctl enable --now falló para {unit}: {err or out}", "WARNING")
 
 
 def _systemctl_try_restart(unit: str):
     if not _has_systemctl():
         return
-    subprocess.call(["systemctl", "try-restart", _unit_name(unit)])
+    rc, out, err = utils.run_cmd(["systemctl", "try-restart", _unit_name(unit)], timeout=10)
+    if rc != 0:
+        log_utils.write_log(f"systemctl try-restart falló para {unit}: {err or out}", "WARNING")
 
 
 def handle_service_file(service_name: str, base_url: str, systemd_dir: str) -> bool:
@@ -251,6 +255,16 @@ def start_cloud_storage():
       5) Si una unidad cambió, aplicar con try-restart (solo esas unidades).
       6) Verificar servicios rclone/zerotier y activarlos si no están activos.
     """
+
+    # Circuit breaker (persistente): evita bucles de error y spam de red/FS
+    if not utils.cb_should_run("cloud_storage"):
+        msg = "cloud_storage en cooldown por fallos repetidos; se omite este ciclo."
+        if utils.cb_should_log_cooldown("cloud_storage"):
+            log_utils.write_log(msg, "INFO")
+        else:
+            log_utils.write_log(msg, "DEBUG")
+        return
+
     enc_tmp = os.path.join(tmp_dir, ".rclone.conf.enc.tmp")
     dec_tmp = os.path.join(tmp_dir, ".rclone.conf.dec.tmp")
 
@@ -299,7 +313,9 @@ def start_cloud_storage():
 
         if changed_units and _has_systemctl():
             log_utils.write_log("Cambios en unidades detectados. Recargando daemon de systemd…")
-            subprocess.call(["systemctl", "daemon-reload"])
+            rc, out, err = utils.run_cmd(["systemctl", "daemon-reload"], timeout=10)
+            if rc != 0:
+                log_utils.write_log(f"systemctl daemon-reload falló: {err or out}", "WARNING")
 
             # 5) Aplicar cambios: si el servicio está activo, try-restart (solo los que cambiaron)
             for unit in changed_units:
@@ -307,17 +323,20 @@ def start_cloud_storage():
                     log_utils.write_log(f"Unidad '{unit}' cambió y está activa: aplicando try-restart…")
                     _systemctl_try_restart(unit)
                 else:
-                    # si no está activo, que la parte de ensure lo habilite y arranque
+                    # Si no está activo, que la parte de ensure lo habilite y arranque
                     log_utils.write_log(f"Unidad '{unit}' cambió pero no está activa: se arrancará si procede.")
 
         # 6) Asegurar que los servicios estén activos
         _ensure_services_active(services)
 
         log_utils.write_log("Almacenamiento en la nube configurado/verificado exitosamente.")
+        utils.cb_note_success("cloud_storage")
 
     except FileNotFoundError as e:
+        utils.cb_note_failure("cloud_storage", fail_threshold=3, cooldown_sec=3600)
         log_utils.write_log(f"Error: {e}. Asegúrese de que la clave de cifrado existe.", "ERROR")
     except Exception as e:
+        utils.cb_note_failure("cloud_storage", fail_threshold=3, cooldown_sec=3600)
         log_utils.write_log(f"Error en start_cloud_storage: {e}\n{traceback.format_exc()}", "ERROR")
     finally:
         # 🧹 Limpieza de temporales

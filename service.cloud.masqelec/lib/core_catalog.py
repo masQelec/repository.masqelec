@@ -13,6 +13,7 @@ import urllib.request
 import urllib.error
 
 from lib import log_utils
+from lib import utils
 import xbmc
 
 # ==========================
@@ -414,10 +415,11 @@ def _http_get_text(url):
         return r.read().decode("utf-8", "replace").strip()
 
 def _http_download(url, dest):
+    """Descarga HTTP reutilizando la función común atómica (tmp + replace)."""
     os.makedirs(os.path.dirname(dest), exist_ok=True)
-    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT) as r, open(dest, "wb") as f:
-        shutil.copyfileobj(r, f)
+    ok = utils.download_atomic(url, dest, retries=2, timeout=HTTP_TIMEOUT, tmp_suffix=".part")
+    if not ok:
+        raise RuntimeError(f"No se pudo descargar {url}")
 
 def _sha256(path):
     h = hashlib.sha256()
@@ -480,8 +482,8 @@ def _atomic_copy(src, dst):
     if src_mtime is not None:
         try:
             os.utime(dst, (src_mtime, src_mtime))
-        except Exception:
-            pass
+        except Exception as e:
+            log_utils.write_log(f"No se pudo clonar mtime en {dst}: {e}", "DEBUG")
 
 def _extract_zip_with_mtime(zip_path: str, dest_dir: str) -> int:
     """
@@ -523,27 +525,49 @@ def _cleanup_empty_dirs(root):
             except Exception:
                 pass
 
-def _read_local_version():
+def _read_local_version() -> str:
+    """
+    Devuelve el texto completo de catalog.version (string).
+    Si no existe, devuelve "".
+    """
     try:
+        if not os.path.isfile(LOCAL_VER_PATH):
+            return ""
         with open(LOCAL_VER_PATH, "r", encoding="utf-8", errors="replace") as f:
-            return f.read().strip()
+            return (f.read() or "").strip()
     except Exception:
         return ""
 
-def _write_local_version(txt):
+def _write_local_version(ver_text: str):
     """
-    Escritura ATÓMICA (evita catalog.version corrupto a medias).
+    Escribe atómico el texto completo de catalog.version (string).
     """
+    ver_text = (ver_text or "").strip()
     try:
         os.makedirs(os.path.dirname(LOCAL_VER_PATH), exist_ok=True)
-        tmp = LOCAL_VER_PATH + ".tmp"
-        with open(tmp, "w", encoding="utf-8", newline="\n") as f:
-            f.write((txt or "").rstrip("\n") + "\n")
-            f.flush()
-            os.fsync(f.fileno())
-        os.replace(tmp, LOCAL_VER_PATH)
-    except Exception as e:
-        log_utils.write_log(f"No se pudo escribir catalog.version local (atómico): {e}", "ERROR")
+    except Exception:
+        pass
+
+    tmp = LOCAL_VER_PATH + ".tmp"
+    with open(tmp, "w", encoding="utf-8", newline="\n") as f:
+        f.write(ver_text + "\n")
+        f.flush()
+        os.fsync(f.fileno())
+
+    os.replace(tmp, LOCAL_VER_PATH)
+
+    # Opcional: verificación ligera
+    try:
+        with open(LOCAL_VER_PATH, "r", encoding="utf-8", errors="replace") as f:
+            chk = (f.read() or "").strip()
+        if chk != ver_text:
+            log_utils.write_log(
+                f"WARNING: catalog.version no coincide tras escritura (len={len(ver_text)} vs len={len(chk)})",
+                "WARNING",
+            )
+    except Exception:
+        pass
+
 
 def _cleanup_tmp_best_effort():
     try:
@@ -639,6 +663,14 @@ def sync_catalog_https() -> bool:
       - True  => se aplicaron cambios en disco (copias y/o borrados) y se guardó version local
       - False => no se aplicó nada (al día / error / lock / remoto inválido)
     """
+    # Circuit breaker (evita bucles cuando el remoto está caído o corrupto)
+    if not utils.cb_should_run("catalog"):
+        if utils.cb_should_log_cooldown("catalog"):
+            log_utils.write_log("Catalog sync en cooldown: se omite ejecución", "WARNING")
+        return False
+
+    start_ts = time.time()
+
     if not acquire_lock():
         return False
 
@@ -652,9 +684,13 @@ def sync_catalog_https() -> bool:
             remote_ver = _http_get_text(ver_url)
         except urllib.error.HTTPError as e:
             log_utils.write_log(f"HTTP error leyendo version: {e}", "ERROR")
+            utils.cb_note_failure("catalog", max_fails=3, cooldown_sec=3600)
+            utils.metrics_note("catalog", False, time.time() - start_ts, {"reason": "http_version"})
             return False
         except Exception as e:
             log_utils.write_log(f"Error leyendo version remota: {e}", "ERROR")
+            utils.cb_note_failure("catalog", max_fails=3, cooldown_sec=3600)
+            utils.metrics_note("catalog", False, time.time() - start_ts, {"reason": "read_version"})
             return False
 
         local_ver = _read_local_version()
@@ -663,6 +699,8 @@ def sync_catalog_https() -> bool:
             log_utils.write_log(
                 f"Catálogo al día. local_utc={_parse_utc(local_ver)} remoto_utc={_parse_utc(remote_ver)}"
             )
+            utils.cb_note_success("catalog")
+            utils.metrics_note("catalog", True, time.time() - start_ts, {"applied": 0, "reason": "up_to_date"})
             return False
 
         remote_hash = _version_hash(remote_ver)
@@ -682,6 +720,8 @@ def sync_catalog_https() -> bool:
             os.makedirs(STAGING_DIR, exist_ok=True)
         except Exception as e:
             log_utils.write_log(f"No se pudo preparar staging: {e}", "ERROR")
+            utils.cb_note_failure("catalog", max_fails=3, cooldown_sec=3600)
+            utils.metrics_note("catalog", False, time.time() - start_ts, {"reason": "prepare_staging"})
             return False
 
         # Descargar ZIP
@@ -690,6 +730,8 @@ def sync_catalog_https() -> bool:
             _http_download(zip_url, TMP_ZIP)
         except Exception as e:
             log_utils.write_log(f"Error descargando ZIP: {e}", "ERROR")
+            utils.cb_note_failure("catalog", max_fails=3, cooldown_sec=3600)
+            utils.metrics_note("catalog", False, time.time() - start_ts, {"reason": "download_zip"})
             return False
 
         # Extraer ZIP en staging + fijar mtime desde ZipInfo
@@ -698,10 +740,15 @@ def sync_catalog_https() -> bool:
             n = _extract_zip_with_mtime(TMP_ZIP, STAGING_DIR)
             if not n:
                 log_utils.write_log("ZIP no contiene .strm válidos (videos/ o tvshows/).", "ERROR")
+                utils.cb_note_failure("catalog", threshold=3, cooldown_sec=3600)
+                utils.metrics_note("catalog", False, time.time() - start_ts, {"reason": "zip_no_strm"})
                 return False
+
             log_utils.write_log(f"ZIP extraído: {n} archivos .strm")
         except Exception as e:
             log_utils.write_log(f"Error extrayendo ZIP: {e}", "ERROR")
+            utils.cb_note_failure("catalog", max_fails=3, cooldown_sec=3600)
+            utils.metrics_note("catalog", False, time.time() - start_ts, {"reason": "extract_zip"})
             return False
 
         # Calcular estado staging
@@ -788,6 +835,8 @@ def sync_catalog_https() -> bool:
             f"Sincronización completada: aplicados={changed}, eliminados={deleted}, total_remoto={len(staged)}"
         )
 
+        utils.cb_note_success("catalog")
+        utils.metrics_note("catalog", True, time.time() - start_ts, {"applied": int(changed), "deleted": int(deleted)})
         return applied_any
 
     finally:

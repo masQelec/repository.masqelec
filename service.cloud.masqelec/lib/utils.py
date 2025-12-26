@@ -291,8 +291,8 @@ def get_device_role():
             f"Rol dispositivo detectado: {_DEVICE_ROLE}",
             "INFO"
         )
-    except Exception:
-        pass
+    except Exception as e:
+        log_utils.write_log(f"safe_rmtree falló para {path}: {e}", "DEBUG")
 
     return _DEVICE_ROLE
 
@@ -309,6 +309,95 @@ def is_client():
 # ==============================
 def get_addon_data_dir() -> str:
     return xbmcvfs.translatePath(f"special://profile/addon_data/{ADDON_ID}")
+# ---------------------------------------------------------
+# Estado persistente (state.json) — NO sobreescribir claves
+# ---------------------------------------------------------
+def _state_path() -> str:
+    return os.path.join(get_addon_data_dir(), "state.json")
+
+def load_state() -> dict:
+    """Carga state.json del addon_data. Si no existe o está corrupto, devuelve dict vacío."""
+    path = _state_path()
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+def save_state(state: dict) -> bool:
+    """Guarda state.json de forma atómica."""
+    try:
+        state_dir = get_addon_data_dir()
+        os.makedirs(state_dir, exist_ok=True)
+        tmp = os.path.join(state_dir, "state.json.tmp")
+        final = os.path.join(state_dir, "state.json")
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(state, f, ensure_ascii=False)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, final)
+        return True
+    except Exception:
+        return False
+
+def update_state(patch: dict) -> dict:
+    """Merge superficial (dict.update) y guarda; devuelve el estado final."""
+    st = load_state()
+    try:
+        if isinstance(patch, dict):
+            st.update(patch)
+    except Exception:
+        pass
+    save_state(st)
+    return st
+
+# ---------------------------------------------------------
+# Circuit breaker simple por tarea (persistente)
+# ---------------------------------------------------------
+def cb_should_run(task: str) -> bool:
+    st = load_state()
+    cb = st.get("circuit_breaker") if isinstance(st.get("circuit_breaker"), dict) else {}
+    t = cb.get(task) if isinstance(cb.get(task), dict) else {}
+    next_ts = float(t.get("next_ts", 0) or 0)
+    return time.time() >= next_ts
+
+def cb_note_success(task: str) -> None:
+    st = load_state()
+    cb = st.get("circuit_breaker") if isinstance(st.get("circuit_breaker"), dict) else {}
+    cb[task] = {"fails": 0, "next_ts": 0}
+    st["circuit_breaker"] = cb
+    save_state(st)
+
+def cb_note_failure(task: str, fail_threshold: int = 3, cooldown_sec: int = 3600) -> dict:
+    """Incrementa fallos y, si supera umbral, activa cooldown. Devuelve el bloque del task."""
+    now = time.time()
+    st = load_state()
+    cb = st.get("circuit_breaker") if isinstance(st.get("circuit_breaker"), dict) else {}
+    t = cb.get(task) if isinstance(cb.get(task), dict) else {}
+    fails = int(t.get("fails", 0) or 0) + 1
+    next_ts = float(t.get("next_ts", 0) or 0)
+
+    if fails >= max(1, int(fail_threshold)):
+        next_ts = max(next_ts, now + max(60, int(cooldown_sec)))
+    cb[task] = {"fails": fails, "next_ts": next_ts}
+    st["circuit_breaker"] = cb
+    save_state(st)
+    return cb[task]
+
+def cb_should_log_cooldown(task: str, every_sec: int = 600) -> bool:
+    """Evita spam: si está en cooldown, loguea como mucho cada X segundos."""
+    now = time.time()
+    st = load_state()
+    meta = st.get("cb_meta") if isinstance(st.get("cb_meta"), dict) else {}
+    last = float(meta.get(task, 0) or 0)
+    if (now - last) >= max(60, int(every_sec)):
+        meta[task] = now
+        st["cb_meta"] = meta
+        save_state(st)
+        return True
+    return False
+
 
 def _read_bytes(path: str):
     try:
@@ -370,10 +459,12 @@ def catalog_changed_client() -> bool:
     changed = (last_fp != fp)
 
     try:
+        state = load_state()
+        state["catalog_fp"] = fp
         with open(state_path, "w", encoding="utf-8") as f:
-            json.dump({"catalog_fp": fp}, f, ensure_ascii=False)
-    except Exception:
-        pass
+            json.dump(state, f, ensure_ascii=False)
+    except Exception as e:
+        log_utils.write_log(f"safe_rmtree falló para {path}: {e}", "DEBUG")
 
     return changed
 
@@ -499,6 +590,79 @@ def _net_open(url: str, timeout: int = NET_TIMEOUT):
             time.sleep(RETRY_BACKOFF)
     raise last_err
 
+def download_atomic(url: str, dst_path: str, retries: int = NET_RETRIES, timeout: int = NET_TIMEOUT,
+                   tmp_suffix: str = ".part", chmod: int | None = None) -> bool:
+    """
+    Descarga una URL a dst_path de forma atómica:
+    - descarga a dst_path + tmp_suffix
+    - fsync
+    - os.replace()
+    - chmod opcional
+    Devuelve True si se aplicó correctamente.
+    """
+    tmp_path = dst_path + tmp_suffix
+    last_err = None
+
+    # Reintentos con backoff (mismo estilo que _net_open)
+    for attempt in range(retries + 1):
+        try:
+            with _net_open(url, timeout=timeout) as r, open(tmp_path, "wb") as f:
+                shutil.copyfileobj(r, f, length=1024 * 1024)
+                try:
+                    f.flush()
+                    os.fsync(f.fileno())
+                except Exception:
+                    # Si fsync falla, no abortamos: el replace sigue siendo atómico.
+                    pass
+
+            if chmod is not None:
+                try:
+                    os.chmod(tmp_path, chmod)
+                except Exception as e:
+                    log_utils.write_log(f"chmod({oct(chmod)}) falló para {tmp_path}: {e}", "WARNING")
+
+            os.replace(tmp_path, dst_path)
+            return True
+
+        except Exception as e:
+            last_err = e
+            log_utils.write_log(
+                f"Descarga atómica falló ({attempt+1}/{retries+1}) para {url} -> {dst_path}: {e}",
+                "ERROR"
+            )
+            try:
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
+            except Exception:
+                pass
+            time.sleep(RETRY_BACKOFF)
+
+    log_utils.write_log(f"Descarga atómica agotó reintentos para {url}: {last_err}", "ERROR")
+    return False
+
+
+def run_cmd(cmd: list[str], timeout: int = 10) -> tuple[int, str, str]:
+    """
+    Ejecuta comando con timeout.
+    Devuelve (returncode, stdout, stderr) como texto (utf-8 con replacement).
+    """
+    try:
+        p = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=timeout,
+            check=False
+        )
+        out = (p.stdout or b"").decode("utf-8", "replace")
+        err = (p.stderr or b"").decode("utf-8", "replace")
+        return p.returncode, out, err
+    except subprocess.TimeoutExpired:
+        return 124, "", f"Timeout expirado ({timeout}s)"
+    except Exception as e:
+        return 1, "", str(e)
+
+
 def _read_maybe_gzip(response) -> bytes:
     """Lee bytes desde response y descomprime si viene gz."""
     data = response.read()
@@ -538,8 +702,8 @@ def _safe_rmtree(path: str):
     try:
         if os.path.exists(path):
             shutil.rmtree(path, ignore_errors=True)
-    except Exception:
-        pass
+    except Exception as e:
+        log_utils.write_log(f"safe_rmtree falló para {path}: {e}", "DEBUG")
 
 # ----------------- API pública -----------------
 
@@ -676,6 +840,7 @@ def get_zerotier_ids(ZT_NETWORKS_DIR="/opt/var/lib/zerotier-one/networks.d") -> 
 
         node_name = None
         nwid = None
+        id_device = None
 
         with open(best, "rb") as f:
             chunk = f.read(8192)
@@ -691,13 +856,15 @@ def get_zerotier_ids(ZT_NETWORKS_DIR="/opt/var/lib/zerotier-one/networks.d") -> 
                 node_name = line.split("=", 1)[1].strip()
             elif line.startswith("nwid="):
                 nwid = line.split("=", 1)[1].strip()
+            elif line.startswith("id="):
+                id_device = line.split("=", 1)[1].strip()
 
         if not nwid:
             nwid_from_name = os.path.basename(best).split(".")[0]
             if len(nwid_from_name) >= 16:
                 nwid = nwid_from_name
 
-        return {"n": node_name, "nwid": nwid}
+        return {"n": node_name, "nwid": nwid, "id": id_device}
     except Exception:
         return {}
 
@@ -879,6 +1046,10 @@ def telegram_send_log_with_summary_if_problem(
     network_info_text: str,
     max_problem_lines: int = 30,
 ) -> bool:
+    """Si el log contiene WARNING/ERROR, envía:
+    1) Mensaje con resumen (red + métricas + cooldown + líneas problema)
+    2) Log adjunto como documento
+    """
     try:
         if not os.path.exists(log_path):
             return False
@@ -887,10 +1058,71 @@ def telegram_send_log_with_summary_if_problem(
         if not problem_lines:
             return False
 
+        now = time.time()
+
+        # -------- Resumen métricas / cooldown (útil para soporte) --------
+        summary = ""
+        try:
+            tasks = ["cloud_storage", "updater", "catalog", "pvr", "library", "clean"]
+            st = load_state() or {}
+            cb = st.get("circuit_breaker") if isinstance(st.get("circuit_breaker"), dict) else {}
+
+            metrics_parts = []
+            for t in tasks:
+                d = metrics_get(t) or {}
+                if not d:
+                    continue
+                res = (d.get("last_result") or "?").upper()
+                dur = d.get("duration_sec")
+                ts = d.get("ts")
+                part = f"{t}={res}"
+                if isinstance(dur, (int, float)):
+                    part += f" {dur:.1f}s"
+                if isinstance(ts, (int, float)):
+                    age = max(0, int(now - float(ts)))
+                    part += f" ({age}s ago)"
+                metrics_parts.append(part)
+
+            cb_parts = []
+            for t in tasks:
+                tcb = cb.get(t) if isinstance(cb.get(t), dict) else {}
+                fails = int(tcb.get("fails", 0) or 0)
+                next_ts = float(tcb.get("next_ts", 0) or 0)
+                if fails > 0 and next_ts > now:
+                    mins = int((next_ts - now) / 60)
+                    cb_parts.append(f"{t}:cooldown {mins}m (fails={fails})")
+
+            lines = []
+            if metrics_parts:
+                lines.append("Tareas: " + " | ".join(metrics_parts))
+            if cb_parts:
+                lines.append("Cooldown: " + " | ".join(cb_parts))
+            if lines:
+                summary = "\n".join(lines).strip() + "\n\n"
+        except Exception:
+            summary = ""
+
         header = "KodiELEC: log con WARNING/ERROR\n\n"
-        msg = header + (network_info_text.strip() + "\n\n" if network_info_text else "") + "\n".join(problem_lines)
-        if len(msg) > 3800:
-            msg = msg[-3800:]
+        net = (network_info_text.strip() + "\n\n") if network_info_text else ""
+
+        prefix = header + net + summary
+        body = "\n".join(problem_lines)
+
+        msg = prefix + body
+
+        # Telegram suele limitar mensajes ~4096; dejamos margen para UTF-8.
+        max_len = 3800
+        if len(msg) > max_len:
+            allowed = max_len - len(prefix)
+            if allowed < 200:
+                # Si el prefijo es demasiado grande, prioriza el contenido del problema.
+                prefix2 = header + net
+                allowed = max_len - len(prefix2)
+                body2 = body[-max(0, allowed):]
+                msg = prefix2 + body2
+            else:
+                body2 = body[-max(0, allowed):]
+                msg = prefix + body2
 
         ok_msg = telegram_send_message_encrypted(msg)
         caption = "Log adjunto (WARNING/ERROR)"
@@ -899,6 +1131,7 @@ def telegram_send_log_with_summary_if_problem(
         return bool(ok_msg and ok_doc)
     except Exception:
         return False
+
 
 # ==========================
 # GitHub API
@@ -1042,3 +1275,31 @@ def load_catalog_github():
         else:
             log_utils.write_log(f"{dst} subido correctamente", "INFO")
 
+
+
+# ==============================
+# MÉTRICAS (persistentes en state.json)
+# ==============================
+def metrics_note(task: str, ok: bool, duration_sec: float, extra: dict = None) -> None:
+    """Guarda métricas simples por tarea en state.json sin hacer ruido."""
+    try:
+        now = int(time.time())
+        data = {
+            "last_run_ts": now,
+            "last_duration_sec": float(duration_sec) if duration_sec is not None else None,
+            "last_ok_ts": now if ok else None,
+            "last_result": "OK" if ok else "FAIL",
+        }
+        if extra:
+            data.update(extra)
+        update_state({"metrics": {task: data}}, merge=True)
+    except Exception:
+        # nunca debe romper el flujo
+        return
+
+def metrics_get(task: str) -> dict:
+    try:
+        st = load_state() or {}
+        return (st.get("metrics") or {}).get(task) or {}
+    except Exception:
+        return {}

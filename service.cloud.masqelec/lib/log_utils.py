@@ -42,8 +42,12 @@ def write_log(message: str, level: str = "INFO"):
     line_kodi = f"[{ADDON_NAME}] {message}"
     try:
         xbmc.log(line_kodi, kodi_loglevel(level))
-    except Exception:
-        pass
+    except Exception as e:
+        try:
+            print(f"[{ADDON_NAME}] log_utils: fallo escribiendo log: {e}")
+        except Exception:
+            # Último recurso: no hacemos nada
+            return
 
     if not is_enabled():
         return
@@ -60,8 +64,11 @@ def write_log(message: str, level: str = "INFO"):
 
         with open(LOG_FILE, mode, encoding="utf-8") as f:
             f.write(line_file)
-    except Exception:
-        pass
+    except Exception as e:
+        try:
+            print(f"[{ADDON_NAME}] log_utils: fallo escribiendo a fichero: {e}")
+        except Exception:
+            return
 
 def notify(message: str, icon=xbmcgui.NOTIFICATION_INFO, time_ms=4000, also_log=True, level="INFO"):
     """Muestra una notificación y opcionalmente la registra."""

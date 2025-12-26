@@ -52,6 +52,7 @@ def get_text_from_url(url: str):
         with _net_open(url) as resp:
             return resp.read().decode("utf-8", errors="replace")
     except Exception as e:
+        utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
         log_utils.write_log(f"Error al obtener datos de la URL: {e}", "ERROR")
         return None
 
@@ -86,6 +87,7 @@ def get_version_from_file(filename: str, identifier: str):
     except FileNotFoundError:
         log_utils.write_log(f"No se encontró el archivo {filename}", "ERROR")
     except Exception as e:
+        utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
         log_utils.write_log(f"Error leyendo {filename}: {e}", "ERROR")
     return None
 
@@ -106,6 +108,7 @@ def _cleanup_dir(path: str):
             shutil.rmtree(path, ignore_errors=True)
             log_utils.write_log(f"[cleanup] Eliminado staging temporal: {path}")
     except Exception as e:
+        utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
         log_utils.write_log(f"[cleanup] Error al eliminar {path}: {e}", "ERROR")
 
 def _sync_update_to_staging(version_file_base: str) -> tuple[str | None, str | None]:
@@ -122,6 +125,7 @@ def _sync_update_to_staging(version_file_base: str) -> tuple[str | None, str | N
             shutil.rmtree(staging, ignore_errors=True)
         os.makedirs(staging, exist_ok=True)
     except Exception as e:
+        utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
         log_utils.write_log(f"[staging] No se pudo preparar {staging}: {e}", "ERROR")
         return None, None
 
@@ -179,6 +183,7 @@ def _sync_update_to_staging(version_file_base: str) -> tuple[str | None, str | N
         return staging, pkg_path
 
     except Exception as e:
+        utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
         log_utils.write_log(f"[sync] Error inspeccionando staging: {e}", "ERROR")
         _cleanup_dir(staging)
         return None, None
@@ -202,6 +207,7 @@ def _place_update_package(pkg_local_path: str, target_dir: str = "/storage/.upda
         log_utils.write_log(f"[update] Copia inválida a {final_path}", "ERROR")
         return None
     except Exception as e:
+        utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
         log_utils.write_log(f"[update] Error copiando paquete a {target_dir}: {e}", "ERROR")
         return None
 
@@ -212,6 +218,16 @@ def _place_update_package(pkg_local_path: str, target_dir: str = "/storage/.upda
 def update_system():
     """Verifica si hay una actualización disponible e inicia el proceso."""
     monitor = xbmc.Monitor()
+
+    # Circuit breaker (persistente): evita bucles si el remoto falla continuamente
+    if not utils.cb_should_run("updater"):
+        msg = "updater en cooldown por fallos repetidos; se omite este ciclo."
+        if utils.cb_should_log_cooldown("updater"):
+            log_utils.write_log(msg, "INFO")
+        else:
+            log_utils.write_log(msg, "DEBUG")
+        return
+
     try:
         log_utils.write_log("Iniciando verificación de sistema para actualización.")
 
@@ -219,6 +235,7 @@ def update_system():
         local_version = get_version_from_file('/etc/os-release', 'VERSION_ID')
         if not local_version:
             log_utils.write_log("No se pudo obtener la versión local.", "WARNING")
+            utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
             return
 
         # 2) Versión remota (fichero de control)
@@ -227,6 +244,7 @@ def update_system():
         )
         if not url_content:
             log_utils.write_log("No se pudo obtener la versión remota.", "WARNING")
+            utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
             return
 
         remote_version = get_version_from_text(url_content, 'VERSION_ID')
@@ -302,6 +320,7 @@ def update_system():
                 log_utils.write_log("La versión remota es MENOR que la local. No hay actualización.")
 
     except Exception as e:
+        utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
         log_utils.write_log(f"Error en update_system: {e}\n{traceback.format_exc()}", "ERROR")
         try:
             log_utils.notify("Error en el proceso de actualización", xbmcgui.NOTIFICATION_ERROR)

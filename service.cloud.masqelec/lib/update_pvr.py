@@ -13,6 +13,8 @@ import time
 import urllib.request
 import traceback
 import json
+import gzip
+import zlib
 
 from lib import log_utils
 from lib import rclone_utils
@@ -34,40 +36,16 @@ def _restart_tvheadend() -> bool:
         return False
 
 def _download_to(path_dst: str, url: str, retries: int = 2, timeout: int = 20) -> bool:
-    """
-    Descarga URL a path_dst de forma atómica usando path_dst + '.part' como temporal.
-    """
-    tmp = path_dst + ".part"
-    last_err = None
-
-    for attempt in range(retries + 1):
-        try:
-            req = urllib.request.Request(url, headers={"User-Agent": "Kodi-addon/1.0"})
-            with urllib.request.urlopen(req, timeout=timeout) as r, open(tmp, "wb") as f:
-                f.write(r.read())
-            os.replace(tmp, path_dst)
-            return True
-        except Exception as e:
-            last_err = e
-            time.sleep(1.2 * (attempt + 1))
-
-    log_utils.write_log(f"[pvr] Descarga fallida {url}: {last_err}", level="ERROR")
-    try:
-        if os.path.exists(tmp):
-            os.remove(tmp)
-    except Exception:
-        pass
-    return False
-
-# ------------------------------
-# Playlist (m3u) con USER_CODE/PASS_CODE
-# ------------------------------
+    """Compat: descarga atómica reutilizando lib.utils.download_atomic()."""
+    return bool(utils.download_atomic(url, path_dst, retries=retries, timeout=timeout))
 
 def update_playlist() -> tuple[bool, bool]:
     user_dir = "/storage/.user"
     playlist_file = os.path.join(user_dir, "playlist.m3u")
     user_file = os.path.join(user_dir, "user")
-    base_url = "https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/pvr/playlist.m3u"
+    BASE_URLS = [
+        "https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/pvr/playlist.m3u",
+    ]
 
     def _read_text(path: str) -> str:
         with open(path, "r", encoding="utf-8", errors="replace") as f:
@@ -101,8 +79,8 @@ def update_playlist() -> tuple[bool, bool]:
             try:
                 ni = utils.get_net_info() or {}
                 eth0 = (ni.get("eth0") or "").strip().replace(":", "").lower() or eth0
-            except Exception:
-                pass
+            except Exception as e:
+                log_utils.write_log(f"Excepción ignorada en update_pvr: {e}", "DEBUG")
 
             remote = "masqelec"
             remote_path = f"masqelec/user/{eth0}"
@@ -168,18 +146,65 @@ def update_playlist() -> tuple[bool, bool]:
                 log_utils.write_log("Archivo /storage/.user/user no disponible.", level="ERROR")
                 return False, False
 
-        remote_tpl_path = playlist_file + ".remote"
-        if not _download_to(remote_tpl_path, base_url):
-            log_utils.write_log("Fallo al descargar plantilla de playlist.", level="ERROR")
+        # Descarga/validación EN MEMORIA para evitar falsos negativos por escritura truncada.
+        # Además, loguea URL real, bytes y primera línea para diagnosticar HTML/403/vacío.
+        remote_tpl = None
+        used_url = None
+        last_candidate = ""
+        last_bytes = 0
+        last_firstline = ""
+
+        for url in BASE_URLS:
+            try:
+                with utils._net_open(url, timeout=20) as r:
+                    data = r.read()
+                last_bytes = len(data or b"")
+                # Algunos servidores (GitHub raw) pueden responder comprimido si se anuncia Accept-Encoding.
+                try:
+                    enc = (getattr(r, "headers", None).get("Content-Encoding") or "").lower()
+                except Exception:
+                    enc = ""
+                try:
+                    if ("gzip" in enc) or (data[:3] == b"\x1f\x8b\x08"):
+                        data = gzip.decompress(data)
+                    elif "deflate" in enc:
+                        data = zlib.decompress(data)
+                except Exception as _de:
+                    # Si no podemos descomprimir, seguimos con bytes crudos (se diagnosticará con first line).
+                    pass
+                last_bytes = len(data or b"")
+                txt = (data or b"").decode("utf-8", "replace")
+            except Exception as e:
+                log_utils.write_log(f"[update_playlist] Descarga plantilla falló para {url}: {e}", level="DEBUG")
+                continue
+
+            candidate_norm = _norm_newlines(txt)
+            last_candidate = candidate_norm
+            try:
+                last_firstline = (candidate_norm.strip().splitlines()[0] if candidate_norm.strip() else "")[:200]
+            except Exception:
+                last_firstline = ""
+
+            # Filtrado básico de respuestas HTML/errores comunes de GitHub.
+            # Si es HTML o demasiado pequeño, lo tratamos como descarga inválida (no como 'faltan tokens').
+            low = (candidate_norm.lstrip()[:120] or "").lower()
+            if last_bytes < 64 or low.startswith("<!doctype html") or low.startswith("<html") or "rate limit" in low or "access denied" in low:
+                continue
+
+            if "USER_CODE" in candidate_norm and "PASS_CODE" in candidate_norm:
+                remote_tpl = candidate_norm
+                used_url = url
+                break
+
+        if not remote_tpl:
+            log_utils.write_log(
+                "Plantilla playlist remota no contiene tokens USER_CODE/PASS_CODE o llegó inválida. "
+                f"URLs probadas={len(BASE_URLS)}; última url bytes={last_bytes}; primera='{last_firstline}'",
+                level="ERROR",
+            )
             return False, False
 
-        try:
-            remote_tpl = _read_text(remote_tpl_path)
-        finally:
-            try:
-                os.remove(remote_tpl_path)
-            except Exception:
-                pass
+        log_utils.write_log(f"[update_playlist] Plantilla cargada desde: {used_url} (bytes={len(remote_tpl.encode('utf-8','replace'))})", level="INFO")
 
         content = _read_text(user_file)
         if not _has_valid_creds(content):
@@ -344,6 +369,7 @@ def update_pvr():
     """
     Actualización completa de PVR
     """
+    start_ts = time.time()
     update_tv_grab_file()
     ensure_tvh_http_user_agent()
 

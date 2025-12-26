@@ -647,6 +647,7 @@ def _do_update_with_progress(local_db_dir: str) -> bool:
 
 # ---------- Flujo principal ----------
 def update_library():
+    start_ts = time.time()
     _wait_until_ready(10)
 
     try:

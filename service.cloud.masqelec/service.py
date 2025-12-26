@@ -59,6 +59,61 @@ _last_pvrcheck_ts = None
 _LIBRARY_LOCK = threading.Lock()
 _PVR_LOCK     = threading.Lock()
 
+# ---------- Circuit breaker / cooldown por tarea ----------
+_TASK_FAILS = {"pvr": 0, "update": 0, "clean": 0}
+_TASK_COOLDOWN_UNTIL = {"pvr": 0.0, "update": 0.0, "clean": 0.0}
+
+_TASK_FAIL_THRESHOLD = 3          # fallos consecutivos antes de enfriar
+_TASK_COOLDOWN_SECS  = 60 * 60    # 60 min de enfriamiento
+
+
+def _task_is_in_cooldown(name: str) -> bool:
+    until = float(_TASK_COOLDOWN_UNTIL.get(name, 0.0) or 0.0)
+    return time.time() < until
+
+
+def _task_mark_success(name: str):
+    _TASK_FAILS[name] = 0
+    _TASK_COOLDOWN_UNTIL[name] = 0.0
+
+
+def _task_mark_failure(name: str, where: str, exc_text: str):
+    _TASK_FAILS[name] = int(_TASK_FAILS.get(name, 0) or 0) + 1
+    fails = _TASK_FAILS[name]
+    log(f"{where}: fallo #{fails} en tarea '{name}'.\n{exc_text}", "ERROR")
+
+    if fails >= _TASK_FAIL_THRESHOLD:
+        _TASK_COOLDOWN_UNTIL[name] = time.time() + _TASK_COOLDOWN_SECS
+        log(
+            f"Tarea '{name}' entra en cooldown {int(_TASK_COOLDOWN_SECS/60)} min tras {fails} fallos consecutivos.",
+            "WARNING"
+        )
+
+
+
+
+
+def _log_metrics_snapshot() -> None:
+    """Vuelca un resumen corto de métricas (sin spam)."""
+    try:
+        tasks = ["cloud_storage", "updater", "catalog", "library", "pvr", "clean"]
+        parts = []
+        for t in tasks:
+            m = utils.metrics_get(t)
+            if not m:
+                continue
+            lr = m.get("last_result")
+            dt = m.get("last_duration_sec")
+            ts = m.get("last_run_ts")
+            if ts:
+                ago = int(time.time() - int(ts))
+                parts.append(f"{t}={lr} ({ago}s, {dt:.1f}s)" if isinstance(dt,(int,float)) else f"{t}={lr} ({ago}s)")
+            else:
+                parts.append(f"{t}={lr}")
+        if parts:
+            log_utils.write_log("Estado tareas: " + " | ".join(parts), "INFO")
+    except Exception:
+        return
 
 class StoppableWorker(threading.Thread):
     """Hilo que ejecuta una función y respeta abortRequested()."""
@@ -118,8 +173,8 @@ def _get_bool_setting(key: str, default: bool) -> bool:
     if callable(fn):
         try:
             return bool(fn(key, default))
-        except Exception:
-            pass
+        except Exception as e:
+            log_utils.write_log(f"Excepción ignorada en service.py: {e}", "DEBUG")
     try:
         import xbmcaddon
         addon = xbmcaddon.Addon()
@@ -133,8 +188,8 @@ def _get_int_setting(key: str, default: int) -> int:
     if callable(fn):
         try:
             return int(fn(key, default))
-        except Exception:
-            pass
+        except Exception as e:
+            log_utils.write_log(f"Excepción ignorada en service.py: {e}", "DEBUG")
     try:
         import xbmcaddon
         addon = xbmcaddon.Addon()
@@ -385,7 +440,7 @@ def _client_verify_db_vs_fs() -> dict:
 
 
 # ---------- Subida de log post-workers ----------
-def _upload_log(n: str, nwid: str, eth0: str, wlan0: str):
+def _upload_log(n: str, nwid: str, id_device: str, eth0: str, wlan0: str):
     try:
         error_or_warning_found = False
         if os.path.exists(LOG_FILE):
@@ -395,7 +450,7 @@ def _upload_log(n: str, nwid: str, eth0: str, wlan0: str):
                         error_or_warning_found = True
                         break
 
-        destination_filename = f"{n}_{nwid}_{eth0}_{wlan0}_service.log"
+        destination_filename = f"{n}_{nwid}_{id_device}_{eth0}_{wlan0}_service.log"
         log("Subiendo log al remoto: " f"log:masqelec/log/{destination_filename}")
         ok = rclone_utils.copy_to_tmp_then_move_remote(
             LOG_FILE, "log", f"masqelec/log/{destination_filename}"
@@ -406,7 +461,7 @@ def _upload_log(n: str, nwid: str, eth0: str, wlan0: str):
             log("No se pudo subir el log a través de rclone.", "ERROR")
 
         if error_or_warning_found:
-            network_info = f"Dispositivo: {n}_{nwid}_{eth0}_{wlan0}"
+            network_info = f"Dispositivo: {n}_{nwid}_{id_device}_{eth0}_{wlan0}"
             ok = utils.telegram_send_log_with_summary_if_problem(
                 LOG_FILE, destination_filename, network_info
             )
@@ -459,9 +514,14 @@ def _update_library_wrapper():
         prefs = _load_library_prefs()
         if prefs["update_enabled"] and prefs["update_on_start"]:
             log("Actualizando biblioteca al inicio mediante update_library()")
-            with _LIBRARY_LOCK:
-                update_library()
-                _last_update_ts = time.time()
+            if _LIBRARY_LOCK.acquire(blocking=False):
+                try:
+                    update_library()
+                    _last_update_ts = time.time()
+                finally:
+                    _LIBRARY_LOCK.release()
+            else:
+                log("Omitiendo update_library al inicio: ya hay una operación de biblioteca en curso.", "DEBUG")
         else:
             log("Actualización de biblioteca al inicio desactivada por ajustes")
     except Exception:
@@ -609,14 +669,19 @@ def _periodic_pvr_worker():
         log("Omitiendo revisión PVR: montajes rclone no listos.", "WARNING")
         return
 
+    if _task_is_in_cooldown("pvr"):
+        log("Omitiendo revisión PVR: en cooldown por fallos recientes.", "WARNING")
+        return
+
     if _PVR_LOCK.acquire(blocking=False):
         try:
             log("Revisión periódica de canales PVR -> inicio")
             update_playlist()
+            _task_mark_success("pvr")
             _last_pvrcheck_ts = time.time()
             log("Revisión periódica de canales PVR -> finalizado")
         except Exception:
-            log("Error en revisión periódica de canales PVR:\n" f"{traceback.format_exc()}", "ERROR")
+            _task_mark_failure("pvr", "Error en revisión periódica de canales PVR", traceback.format_exc())
         finally:
             _PVR_LOCK.release()
     else:
@@ -647,7 +712,12 @@ def _periodic_update_worker():
         log("Omitiendo UpdateLibrary: montajes rclone no listos.", "WARNING")
         return
 
+    if _task_is_in_cooldown("update"):
+        log("Omitiendo UpdateLibrary: en cooldown por fallos recientes.", "WARNING")
+        return
+
     if _LIBRARY_LOCK.acquire(blocking=False):
+        success = True
         try:
             if utils.is_client():
                 log("Cliente: comprobando/sincronizando catálogo remoto…")
@@ -690,8 +760,11 @@ def _periodic_update_worker():
                 utils.load_catalog_github()
 
         except Exception:
-            log(f"Error en UpdateLibrary periódico:\n{traceback.format_exc()}", "ERROR")
+            success = False
+            _task_mark_failure("update", "Error en UpdateLibrary periódico", traceback.format_exc())
         finally:
+            if success:
+                _task_mark_success("update")
             _LIBRARY_LOCK.release()
     else:
         log("Omitiendo UpdateLibrary: ya hay una operación de biblioteca en curso.", "INFO")
@@ -726,7 +799,12 @@ def _periodic_clean_worker():
         log("Omitiendo CleanLibrary: montajes rclone no listos.", "WARNING")
         return
 
+    if _task_is_in_cooldown("clean"):
+        log("Omitiendo CleanLibrary: en cooldown por fallos recientes.", "WARNING")
+        return
+
     if _LIBRARY_LOCK.acquire(blocking=False):
+        success = True
         try:
             if utils.is_client():
                 log("Cliente: comprobando/sincronizando catálogo remoto…")
@@ -771,8 +849,11 @@ def _periodic_clean_worker():
                 _last_clean_ts = time.time()
                 log("CleanLibrary periódica (silenciosa) -> finalizado")
         except Exception:
-            log(f"Error en CleanLibrary periódica:\n{traceback.format_exc()}", "ERROR")
+            success = False
+            _task_mark_failure("clean", "Error en CleanLibrary periódica", traceback.format_exc())
         finally:
+            if success:
+                _task_mark_success("clean")
             _LIBRARY_LOCK.release()
     else:
         log("Omitiendo CleanLibrary: ya hay una operación de biblioteca en curso.", "INFO")
@@ -810,16 +891,18 @@ def run_service():
         minor = kodi_version.get("minor", minor)
         log(f"Versión detectada: {name} {major}.{minor}")
 
-    n       = "no_name"
-    nwid    = "no_networks"
-    eth0    = "unknown_mac"
-    wlan0   = "unknown_mac"
+    n         = "no_name"
+    nwid      = "no_networks"
+    id_device = "no_device_id"
+    eth0      = "unknown_mac"
+    wlan0     = "unknown_mac"
 
     zerotier_ids = utils.get_zerotier_ids()
     if isinstance(zerotier_ids, dict):
-        n       = zerotier_ids.get("n",   n)
-        nwid    = zerotier_ids.get("nwid",   nwid)
-        log(f"Red Zerotier detectada: Name: {n} NetworkID: {nwid}")
+        n          = zerotier_ids.get("n", n)
+        nwid       = zerotier_ids.get("nwid", nwid)
+        id_device  = zerotier_ids.get("id", id_device)
+        log(f"Red Zerotier detectada: Name: {n} NetworkID: {nwid} ID: {id_device}")
 
     net_info = utils.get_net_info()
     if net_info:
@@ -897,10 +980,11 @@ def run_service():
 
     try:
         _upload_log(
-            n or       "no_name",
-            nwid or    "no_networks",
-            eth0 or    "unknown_mac",
-            wlan0 or   "unknown_mac",
+            n or         "no_name",
+            nwid or      "no_networks",
+            id_device or "no_device_id",
+            eth0 or      "unknown_mac",
+            wlan0 or     "unknown_mac",
         )
     except Exception:
         log("upload_log (post-one-shots) falló:\n" f"{traceback.format_exc()}", "ERROR")
@@ -924,8 +1008,8 @@ def run_service():
     for w in workers_periodic:
         try:
             w.join(timeout=10)
-        except Exception:
-            pass
+        except Exception as e:
+            log_utils.write_log(f"Excepción ignorada en service.py: {e}", "DEBUG")
     log("Servicio detenido correctamente")
 
 
