@@ -193,7 +193,7 @@ def decrypt_file_to_file(src_path: str, key: bytes, dst_path: str, rounds: int =
         return False
 
 # ==============================
-# SYSTEMD helpers (SIN CAMBIOS)
+# SYSTEMD helpers
 # ==============================
 def _has_systemctl() -> bool:
     from shutil import which
@@ -229,6 +229,62 @@ def _systemctl_try_restart(unit: str):
     rc, out, err = utils.run_cmd(["systemctl", "try-restart", _unit_name(unit)], timeout=10)
     if rc != 0:
         log_utils.write_log(f"systemctl try-restart falló para {unit}: {err or out}", "WARNING")
+
+def handle_service_file(service_name: str, base_url: str, systemd_dir: str) -> bool:
+    """
+    Descarga y compara un archivo de servicio.
+    Devuelve True si el fichero CAMBIÓ (requiere daemon-reload y aplicar con try-restart).
+    """
+    service_unit = _unit_name(service_name)
+    dest = os.path.join(systemd_dir, service_unit)
+    url = f"{base_url}{service_unit}"
+
+    tmp_path = os.path.join(tmp_dir, f".{service_unit}.tmp")
+    changed = False
+
+    try:
+        ok = download_to_file(url, tmp_path)
+        if not ok:
+            log_utils.write_log(f"No se pudo descargar '{service_unit}'. Saltando.", "WARNING")
+            return False
+
+        with open(tmp_path, "rb") as tf:
+            remote_content = tf.read().replace(b"\r\n", b"\n")
+
+        if os.path.exists(dest):
+            with open(dest, "rb") as lf:
+                local_content = lf.read().replace(b"\r\n", b"\n")
+
+            if local_content != remote_content:
+                log_utils.write_log(f"El archivo '{service_unit}' local difiere. Reemplazando (atómico).")
+                _atomic_write_bytes(dest, remote_content, mode=0o644)
+                changed = True
+            else:
+                log_utils.write_log(f"'{service_unit}' coincide con la versión remota.")
+        else:
+            log_utils.write_log(f"Archivo '{service_unit}' no encontrado. Creándolo (atómico).")
+            os.makedirs(systemd_dir, exist_ok=True)
+            _atomic_write_bytes(dest, remote_content, mode=0o644)
+            changed = True
+
+    finally:
+        _cleanup_path(tmp_path)
+
+    return changed
+
+def _ensure_services_active(services):
+    """Verifica y activa servicios si no están activos; no los detiene."""
+    if not _has_systemctl():
+        log_utils.write_log("systemctl no disponible; no puedo verificar/activar servicios.", "WARNING")
+        return
+
+    for unit in services:
+        unit = _unit_name(unit)
+        if _systemctl_is_active(unit):
+            log_utils.write_log(f"Servicio '{unit}' activo.")
+        else:
+            log_utils.write_log(f"Servicio '{unit}' inactivo. Habilitando e iniciando…")
+            _systemctl_enable_now(unit)
 
 # ==============================
 # CLOUD STORAGE
@@ -281,16 +337,24 @@ def start_cloud_storage():
                     f"rclone.conf difiere: sha_local={_sha256(local_norm)} sha_remote={_sha256(remote_norm)}",
                     "DEBUG",
                 )
+            else:
+                log_utils.write_log(
+                    f"rclone.conf local no legible/no existe; sha_remote={_sha256(remote_norm)}",
+                    "DEBUG",
+                )
 
+            # Escribimos estable: LF + newline final (PERO escribimos el RAW, no el norm filtrado)
             stable = b"\n".join(remote_raw.splitlines()).rstrip(b"\n") + b"\n"
             _atomic_write_bytes(
                 rclone_conf_path,
                 stable,
-                mode=(stat.S_IRUSR | stat.S_IWUSR),
+                mode=(stat.S_IRUSR | stat.S_IWUSR),  # 0600
             )
             log_utils.write_log("rclone.conf actualizado (cambios detectados).")
 
-        # Servicios
+        # ==========================
+        # Units systemd desde remoto
+        # ==========================
         services = [
             "rclone_tvshows_1.service",
             "rclone_tvshows_2.service",
@@ -299,9 +363,32 @@ def start_cloud_storage():
             "zerotier.service",
         ]
 
-        for unit in services:
-            if not _systemctl_is_active(unit):
-                _systemctl_enable_now(unit)
+        systemd_dir = "/storage/.config/system.d/"
+        os.makedirs(systemd_dir, exist_ok=True)
+
+        base_units_url = "https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/system.d/"
+
+        changed_units = []
+        for svc in services:
+            if handle_service_file(svc, base_units_url, systemd_dir):
+                changed_units.append(_unit_name(svc))
+
+        if changed_units and _has_systemctl():
+            log_utils.write_log("Cambios en unidades detectados. Recargando daemon de systemd…")
+            rc, out, err = utils.run_cmd(["systemctl", "daemon-reload"], timeout=10)
+            if rc != 0:
+                log_utils.write_log(f"systemctl daemon-reload falló: {err or out}", "WARNING")
+
+            # Aplica cambios sólo a las unidades que cambiaron (si están activas)
+            for unit in changed_units:
+                if _systemctl_is_active(unit):
+                    log_utils.write_log(f"Unidad '{unit}' cambió y está activa: aplicando try-restart…")
+                    _systemctl_try_restart(unit)
+                else:
+                    log_utils.write_log(f"Unidad '{unit}' cambió pero no está activa.")
+
+        # Asegurar servicios activos
+        _ensure_services_active(services)
 
         utils.cb_note_success("cloud_storage")
 
