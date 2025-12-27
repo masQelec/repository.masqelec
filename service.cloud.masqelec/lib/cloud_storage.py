@@ -15,6 +15,7 @@ import shutil
 import socket
 import re
 import hashlib
+import gzip
 
 from lib import log_utils
 from lib import utils
@@ -31,8 +32,6 @@ tmp_dir = "/tmp"
 # ==============================
 # Hash helpers
 # ==============================
-def _sha256(b: bytes) -> str:
-    return hashlib.sha256(b or b"").hexdigest()
 
 # ==============================
 # Normalización rclone.conf
@@ -69,44 +68,6 @@ def _normalize_rclone_conf_bytes(data: bytes) -> bytes:
 # ==============================
 # Red
 # ==============================
-def _net_open(url: str, timeout: int = NET_TIMEOUT):
-    try:
-        host = urllib.parse.urlparse(url).hostname or ""
-    except Exception:
-        host = ""
-
-    if host:
-        if not utils.wait_for_dns(host, timeout=15, interval=1.0):
-            log_utils.write_log(f"[net] DNS no listo para {host}. Omito descarga.", "WARNING")
-            raise urllib.error.URLError("DNS not ready")
-
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    last_err = None
-
-    for attempt in range(NET_RETRIES + 1):
-        try:
-            return urllib.request.urlopen(req, timeout=timeout)
-
-        except urllib.error.URLError as e:
-            last_err = e
-            reason = getattr(e, "reason", None)
-
-            if isinstance(reason, socket.gaierror):
-                log_utils.write_log(
-                    f"[net] DNS fallo para {host or url}: {reason}. Se reintentará más tarde.",
-                    "WARNING",
-                )
-                raise
-
-            log_utils.write_log(
-                f"[net] intento {attempt+1}/{NET_RETRIES+1} falló para {url}: {reason or e}",
-                "ERROR",
-            )
-
-            if attempt < NET_RETRIES:
-                time.sleep(2)
-
-    raise last_err
 
 # ==============================
 # FS helpers
@@ -152,7 +113,7 @@ def _atomic_write_bytes(dst_path: str, data: bytes, mode: int = None):
 def download_to_file(url: str, dst_path: str) -> bool:
     try:
         log_utils.write_log(f"Descargando: {url} -> {dst_path}")
-        with _net_open(url) as resp, open(dst_path, "wb") as f:
+        with utils._net_open(url) as resp, open(dst_path, "wb") as f:
             shutil.copyfileobj(resp, f, length=256 * 1024)
             f.flush()
             os.fsync(f.fileno())
@@ -175,8 +136,15 @@ def download_to_file(url: str, dst_path: str) -> bool:
 
 def decrypt_file_to_file(src_path: str, key: bytes, dst_path: str, rounds: int = 8) -> bool:
     try:
-        with open(src_path, "r", encoding="utf-8", errors="strict") as f:
-            encrypted_text = f.read()
+        with open(src_path, "rb") as f:
+            blob = f.read() or b""
+
+        # Si el fichero viene gzip (1F 8B), lo descomprimimos
+        if len(blob) >= 2 and blob[0] == 0x1F and blob[1] == 0x8B:
+            blob = gzip.decompress(blob)
+
+        # El cipher esperado por decrypt() es base64 en texto ASCII
+        encrypted_text = blob.decode("ascii", "strict")
 
         decrypted = utils.decrypt(encrypted_text, key, rounds=rounds)
         if decrypted is None:
@@ -334,12 +302,12 @@ def start_cloud_storage():
         else:
             if local_norm is not None:
                 log_utils.write_log(
-                    f"rclone.conf difiere: sha_local={_sha256(local_norm)} sha_remote={_sha256(remote_norm)}",
+                    f"rclone.conf difiere: sha_local={utils._sha256(local_norm)} sha_remote={utils._sha256(remote_norm)}",
                     "DEBUG",
                 )
             else:
                 log_utils.write_log(
-                    f"rclone.conf local no legible/no existe; sha_remote={_sha256(remote_norm)}",
+                    f"rclone.conf local no legible/no existe; sha_remote={utils._sha256(remote_norm)}",
                     "DEBUG",
                 )
 

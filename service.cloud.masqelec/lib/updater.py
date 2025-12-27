@@ -140,14 +140,6 @@ def get_text_from_rclone(remote: str, remote_path: str):
 # HELPERS UPDATE
 # ------------------------------
 
-def _cleanup_dir(path: str):
-    try:
-        if path and os.path.exists(path):
-            shutil.rmtree(path, ignore_errors=True)
-            log_utils.write_log("[cleanup] Eliminado staging temporal: {}".format(path))
-    except Exception as e:
-        utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
-        log_utils.write_log("[cleanup] Error al eliminar {}: {}".format(path, e), "ERROR")
 
 def _sync_update_to_staging(version_file_base: str, remote_update_dir: str):
     """
@@ -185,7 +177,7 @@ def _sync_update_to_staging(version_file_base: str, remote_update_dir: str):
     )
     if not ok:
         log_utils.write_log("[sync] rclone sync selectivo de update falló", "ERROR")
-        _cleanup_dir(staging)
+        utils._cleanup_dir(staging)
         return None, None
 
     try:
@@ -193,7 +185,7 @@ def _sync_update_to_staging(version_file_base: str, remote_update_dir: str):
         candidates = [f for f in entries if f == "{}.tar".format(version_file_base) or f.startswith(version_file_base + ".")]
         if not candidates:
             log_utils.write_log("[sync] No se encontró artefacto para {} en staging.".format(version_file_base), "ERROR")
-            _cleanup_dir(staging)
+            utils._cleanup_dir(staging)
             return None, None
 
         pref_order = []
@@ -210,7 +202,7 @@ def _sync_update_to_staging(version_file_base: str, remote_update_dir: str):
         pkg_path = os.path.join(staging, chosen)
         if not (os.path.exists(pkg_path) and os.path.getsize(pkg_path) > 0):
             log_utils.write_log("[sync] Artefacto no válido: {}".format(pkg_path), "ERROR")
-            _cleanup_dir(staging)
+            utils._cleanup_dir(staging)
             return None, None
 
         log_utils.write_log("[sync] Artefacto listo en staging: {}".format(pkg_path))
@@ -219,7 +211,7 @@ def _sync_update_to_staging(version_file_base: str, remote_update_dir: str):
     except Exception as e:
         utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
         log_utils.write_log("[sync] Error inspeccionando staging: {}".format(e), "ERROR")
-        _cleanup_dir(staging)
+        utils._cleanup_dir(staging)
         return None, None
 
 def _place_update_package(pkg_local_path: str, target_dir: str = "/storage/.update"):
@@ -353,7 +345,7 @@ def update_system():
 
             finally:
                 if staging:
-                    _cleanup_dir(staging)
+                    utils._cleanup_dir(staging)
 
         else:
             if local_t == remote_t:

@@ -261,15 +261,12 @@ def ensure_guisettings_bulk(
 
 def fix_cache() -> Dict[str, List[str]]:
     """
-    Ajustes cache/buffer:
-    - memorysize = 128 MB (bytes)
-    - readfactor moderado
-    - chunksize estándar
+    Ajustes cache/buffer (VALORES LITERALES):
     """
     settings = {
         "filecache.buffermode": 1,
-        "filecache.memorysize": 128 * 1024 * 1024,  # 128 MB
-        "filecache.readfactor": 4,
+        "filecache.memorysize": 128,
+        "filecache.readfactor": 0,
         "filecache.chunksize": 131072,
     }
 
@@ -280,4 +277,3 @@ def fix_cache() -> Dict[str, List[str]]:
         notify=False,
         log_summary=True,
     )
-

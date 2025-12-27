@@ -417,16 +417,10 @@ def _http_get_text(url):
 def _http_download(url, dest):
     """Descarga HTTP reutilizando la función común atómica (tmp + replace)."""
     os.makedirs(os.path.dirname(dest), exist_ok=True)
-    ok = utils.download_atomic(url, dest, retries=2, timeout=HTTP_TIMEOUT, tmp_suffix=".part")
+    ok = utils.download_atomic(dest, url, retries=2, timeout=HTTP_TIMEOUT, tmp_suffix=".part")
     if not ok:
         raise RuntimeError(f"No se pudo descargar {url}")
 
-def _sha256(path):
-    h = hashlib.sha256()
-    with open(path, "rb") as f:
-        for chunk in iter(lambda: f.read(1024 * 256), b""):
-            h.update(chunk)
-    return h.hexdigest()
 
 def _collect_strm(root):
     """
@@ -441,7 +435,7 @@ def _collect_strm(root):
             if fn.endswith(".strm"):
                 full = os.path.join(base, fn)
                 rel = os.path.relpath(full, root).replace("\\", "/")
-                out[rel] = _sha256(full)
+                out[rel] = utils._sha256(full)
     return out
 
 def _safe_zip_members(zf):

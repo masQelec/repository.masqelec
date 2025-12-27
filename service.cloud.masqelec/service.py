@@ -16,7 +16,6 @@ import threading
 import traceback
 import json
 import time
-import threading
 
 import xbmc
 import xbmcgui
@@ -66,16 +65,13 @@ _TASK_COOLDOWN_UNTIL = {"pvr": 0.0, "update": 0.0, "clean": 0.0}
 _TASK_FAIL_THRESHOLD = 3          # fallos consecutivos antes de enfriar
 _TASK_COOLDOWN_SECS  = 60 * 60    # 60 min de enfriamiento
 
-
 def _task_is_in_cooldown(name: str) -> bool:
     until = float(_TASK_COOLDOWN_UNTIL.get(name, 0.0) or 0.0)
     return time.time() < until
 
-
 def _task_mark_success(name: str):
     _TASK_FAILS[name] = 0
     _TASK_COOLDOWN_UNTIL[name] = 0.0
-
 
 def _task_mark_failure(name: str, where: str, exc_text: str):
     _TASK_FAILS[name] = int(_TASK_FAILS.get(name, 0) or 0) + 1
@@ -88,10 +84,6 @@ def _task_mark_failure(name: str, where: str, exc_text: str):
             f"Tarea '{name}' entra en cooldown {int(_TASK_COOLDOWN_SECS/60)} min tras {fails} fallos consecutivos.",
             "WARNING"
         )
-
-
-
-
 
 def _log_metrics_snapshot() -> None:
     """Vuelca un resumen corto de métricas (sin spam)."""
@@ -149,10 +141,8 @@ class StoppableWorker(threading.Thread):
         finally:
             log(f"Hilo '{self.name}' finalizado")
 
-
 def log(msg, level="INFO"):
     log_utils.write_log(msg, level)
-
 
 def view_log():
     """Abre el log en un cuadro de texto."""
@@ -165,7 +155,6 @@ def view_log():
         xbmcgui.Dialog().textviewer(utils.addon.getLocalizedString(30007), contenido)
     except Exception as e:
         xbmcgui.Dialog().ok(utils.ADDON_NAME, f"Error al abrir log: {e}")
-
 
 # ---------- Lectura segura de ajustes ----------
 def _get_bool_setting(key: str, default: bool) -> bool:
@@ -182,7 +171,6 @@ def _get_bool_setting(key: str, default: bool) -> bool:
     except Exception:
         return default
 
-
 def _get_int_setting(key: str, default: int) -> int:
     fn = getattr(utils, "get_int", None)
     if callable(fn):
@@ -198,7 +186,6 @@ def _get_int_setting(key: str, default: int) -> int:
     except Exception:
         return default
 
-
 def _hours_to_secs(h: int) -> int:
     try:
         h = max(0, int(h))
@@ -206,13 +193,11 @@ def _hours_to_secs(h: int) -> int:
         h = 0
     return h * 3600
 
-
 def _load_pvr_prefs() -> dict:
     return {
         "update_enabled":      _get_bool_setting("pvr_update_enabled", True),
         "update_period_hours": max(0, _get_int_setting("pvr_update_period_hours", 12)),
     }
-
 
 def _load_library_prefs() -> dict:
     """
@@ -250,7 +235,6 @@ def _safe_listdir(path: str, timeout: float = LIST_TIMEOUT):
 
     return result["items"]
 
-
 def _unescape_mount(s: str) -> str:
     """
     /proc/mounts escapa algunos caracteres (espacio, tab, newline, backslash).
@@ -263,7 +247,6 @@ def _unescape_mount(s: str) -> str:
          .replace("\\012", "\n")
          .replace("\\134", "\\")
     )
-
 
 def _mounts_ready() -> bool:
     """
@@ -327,7 +310,6 @@ def _mounts_ready() -> bool:
         log(f"_mounts_ready: excepción inesperada: {e}", "ERROR")
         return False
 
-
 # ------------- Tareas silenciosas JSON-RPC -------------
 def clean_library_silent(timeout_start=5, timeout_total=30*30):
     payload = {
@@ -376,7 +358,6 @@ def clean_library_silent(timeout_start=5, timeout_total=30*30):
 
     return True
 
-
 def update_library_silent(timeout_start=5, timeout_total=30*30):
     payload = {
         "jsonrpc": "2.0",
@@ -424,7 +405,6 @@ def update_library_silent(timeout_start=5, timeout_total=30*30):
 
     return True
 
-
 # --- NUEVO: Verificación DB vs FS (solo clientes) ---
 def _client_verify_db_vs_fs() -> dict:
     try:
@@ -437,7 +417,6 @@ def _client_verify_db_vs_fs() -> dict:
     except Exception:
         log(f"Cliente: fallo verificación DB↔FS:\n{traceback.format_exc()}", "ERROR")
         return {"total": {"missing": 0, "extra": 0}}
-
 
 # ---------- Subida de log post-workers ----------
 def _upload_log(n: str, nwid: str, id_device: str, eth0: str, wlan0: str):
@@ -475,7 +454,6 @@ def _upload_log(n: str, nwid: str, id_device: str, eth0: str, wlan0: str):
     except Exception:
         log(f"upload_log fallido:\n{traceback.format_exc()}", "ERROR")
 
-
 # ------------- FASES -------------
 def _phase1_cloud_storage_blocking(monitor: xbmc.Monitor):
     log("Fase 1: cloud_storage (start_cloud_storage) -> inicio")
@@ -486,7 +464,6 @@ def _phase1_cloud_storage_blocking(monitor: xbmc.Monitor):
     log("Fase 1: cloud_storage -> finalizado")
     if monitor.abortRequested():
         raise SystemExit
-
 
 # ---------- WRAPPERS ONE-SHOT (FASE 2) ----------
 def _update_system_wrapper():
@@ -507,7 +484,6 @@ def _update_system_wrapper():
     except Exception:
         log(f"Fallo en update_system:\n{traceback.format_exc()}", "ERROR")
 
-
 def _update_library_wrapper():
     global _last_update_ts
     try:
@@ -527,7 +503,6 @@ def _update_library_wrapper():
     except Exception:
         log(f"Fallo en update_library:\n{traceback.format_exc()}", "ERROR")
 
-
 def _update_pvr_wrapper():
     try:
         enabled = _get_bool_setting("update_pvr", True)
@@ -538,7 +513,6 @@ def _update_pvr_wrapper():
             log("Actualización de PVR desactivada")
     except Exception:
         log(f"Fallo en update_pvr:\n{traceback.format_exc()}", "ERROR")
-
 
 def _startup_maintenance_wrapper():
     global _last_clean_ts, _last_update_ts
@@ -638,7 +612,6 @@ def _startup_maintenance_wrapper():
             "ERROR",
         )
 
-
 # ---------- Workers periódicos ----------
 def _periodic_pvr_worker():
     global _last_pvrcheck_ts
@@ -686,7 +659,6 @@ def _periodic_pvr_worker():
             _PVR_LOCK.release()
     else:
         log("Omitiendo revisión de canales PVR: ya hay una operación PVR en curso.", "INFO")
-
 
 def _periodic_update_worker():
     global _last_update_ts
@@ -756,8 +728,8 @@ def _periodic_update_worker():
                 _last_update_ts = time.time()
                 log("UpdateLibrary periódico (silencioso) -> finalizado")
                 log("Iniciando carga del catalogo")
-                core_catalog.generate_catalog()
-                utils.load_catalog_github()
+                #core_catalog.generate_catalog()
+                #utils.load_catalog_github()
 
         except Exception:
             success = False
@@ -768,7 +740,6 @@ def _periodic_update_worker():
             _LIBRARY_LOCK.release()
     else:
         log("Omitiendo UpdateLibrary: ya hay una operación de biblioteca en curso.", "INFO")
-
 
 def _periodic_clean_worker():
     global _last_clean_ts, _last_update_ts
@@ -858,7 +829,6 @@ def _periodic_clean_worker():
     else:
         log("Omitiendo CleanLibrary: ya hay una operación de biblioteca en curso.", "INFO")
 
-
 def _nz(x, idx=None, key=None):
     """Devuelve x[key] si dict, x[idx] si secuencia, o None."""
     if isinstance(x, dict):
@@ -867,7 +837,6 @@ def _nz(x, idx=None, key=None):
         if idx is not None and len(x) > idx:
             return x[idx]
     return None
-
 
 # ------------- MAIN SERVICE -------------
 def run_service():
@@ -1011,7 +980,6 @@ def run_service():
         except Exception as e:
             log_utils.write_log(f"Excepción ignorada en service.py: {e}", "DEBUG")
     log("Servicio detenido correctamente")
-
 
 if __name__ == "__main__":
     run_service()

@@ -208,61 +208,6 @@ def get_installed_addons():
     """
     Devuelve lista de addons con: id, nombre, versión y si está habilitado.
     """
-    query = {
-        "jsonrpc": "2.0",
-        "method": "Addons.GetAddons",
-        "params": {
-            # Solo addons instalados, activos e inactivos
-            "enabled": "all",
-            "installed": True,
-            "properties": ["name", "version", "enabled"]
-        },
-        "id": 1
-    }
-
-    raw = send_json_rpc(query)
-
-    # Normalizar respuesta: puede ser str o dict
-    if raw is None:
-        log_utils.write_log("get_installed_addons: respuesta JSON-RPC vacía", level="ERROR")
-        return []
-
-    try:
-        if isinstance(raw, str):
-            result = json.loads(raw)
-        else:
-            result = raw
-    except Exception as e:
-        log_utils.write_log(f"get_installed_addons: error parseando JSON: {e} - raw={raw}", level="ERROR")
-        return []
-
-    # Comprobar errores JSON-RPC
-    if isinstance(result, dict) and "error" in result:
-        log_utils.write_log(f"get_installed_addons: JSON-RPC error: {result['error']}", level="ERROR")
-        return []
-
-    if not isinstance(result, dict) or "result" not in result:
-        log_utils.write_log(f"get_installed_addons: formato inesperado: {result}", level="ERROR")
-        return []
-
-    addons_raw = result["result"].get("addons", [])
-    addons = []
-
-    for item in addons_raw:
-        addons.append({
-            "id": item.get("addonid"),
-            "name": item.get("name"),
-            "version": item.get("version"),
-            "enabled": item.get("enabled"),
-        })
-
-    log_utils.write_log(f"get_installed_addons: encontrados {len(addons)} addons", level="INFO")
-    return addons
-
-def get_installed_addons():
-    """
-    Devuelve lista de addons con: id, nombre, versión y si está habilitado.
-    """
     payload = {
         "jsonrpc": "2.0",
         "method": "Addons.GetAddons",

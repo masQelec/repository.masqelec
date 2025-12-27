@@ -143,18 +143,13 @@ def _is_scanning() -> bool:
         return False
 
 
-def _has_network() -> bool:
-    try:
-        return xbmc.getCondVisibility("System.HasNetwork")
-    except Exception:
-        return True
 
 
 def _wait_until_ready(max_wait=60):
     mon = xbmc.Monitor()
     start = time.time()
     while time.time() - start < max_wait and not mon.abortRequested():
-        if _has_network() and not _is_scanning():
+        if utils._has_network() and not _is_scanning():
             return True
         mon.waitForAbort(0.5)
     return True
@@ -176,13 +171,6 @@ def _thumbnails_dir_os(default_dir="/storage/.kodi/userdata/Thumbnails/") -> str
         return default_dir
 
 
-def _cleanup_dir(path: str):
-    try:
-        if path and os.path.exists(path):
-            shutil.rmtree(path, ignore_errors=True)
-            log_utils.write_log(f"[cleanup] Eliminado staging temporal: {path}")
-    except Exception as e:
-        log_utils.write_log(f"[cleanup] Error al eliminar {path}: {e}", "ERROR")
 
 
 def _remove_textures_dbs(local_db_dir: str):
@@ -455,6 +443,11 @@ def _install_myvideos_from_staging(
     # 4) Swap atómico al final (muy rápido)
     _dp_update_safe(dp, 99, "Aplicando swap atómico de la base de datos…")
     try:
+        for suffix in ["-wal", "-shm", "-journal"]:
+            journal_file = mv_dst + suffix
+            if os.path.exists(journal_file):
+                try: os.remove(journal_file)
+                except: pass
         os.replace(tmp_dst, mv_dst)
     except Exception as e:
         log_utils.write_log(f"[videos-db] Error en swap atómico {tmp_dst} -> {mv_dst}: {e}", "ERROR")
@@ -630,7 +623,7 @@ def _do_update_with_progress(local_db_dir: str) -> bool:
             pass
 
         if staging:
-            _cleanup_dir(staging)
+            utils._cleanup_dir(staging)
 
         if canceled:
             try:

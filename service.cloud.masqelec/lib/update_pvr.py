@@ -37,7 +37,7 @@ def _restart_tvheadend() -> bool:
 
 def _download_to(path_dst: str, url: str, retries: int = 2, timeout: int = 20) -> bool:
     """Compat: descarga atómica reutilizando lib.utils.download_atomic()."""
-    return bool(utils.download_atomic(url, path_dst, retries=retries, timeout=timeout))
+    return bool(utils.download_atomic(path_dst, url, retries=retries, timeout=timeout))
 
 def update_playlist() -> tuple[bool, bool]:
     user_dir = "/storage/.user"
@@ -273,9 +273,6 @@ def update_tv_grab_file() -> bool:
     remote_url = "https://raw.githubusercontent.com/masQelec/cloud.masqelec/master/pvr/tv_grab_file"
     remote_tmp = local_path + ".remote"
 
-    def _read_bytes(path: str) -> bytes:
-        with open(path, "rb") as f:
-            return f.read()
 
     try:
         os.makedirs(os.path.dirname(local_path), exist_ok=True)
@@ -284,8 +281,8 @@ def update_tv_grab_file() -> bool:
             log_utils.write_log("[tv_grab_file] Descarga fallida.", level="ERROR")
             return False
 
-        remote_data = _read_bytes(remote_tmp)
-        local_data = _read_bytes(local_path) if os.path.exists(local_path) else None
+        remote_data = utils._read_bytes(remote_tmp)
+        local_data = utils._read_bytes(local_path) if os.path.exists(local_path) else None
 
         if local_data == remote_data:
             log_utils.write_log("[tv_grab_file] Sin cambios.")
