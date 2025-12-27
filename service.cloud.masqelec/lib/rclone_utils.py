@@ -3,14 +3,15 @@
 rclone_utils.py — utilidades para rclone (safe I/O y progreso sin --stats)
 
 Optimizado para Google Drive:
-- Conservador en E/S (transfers=1, checkers=1, tpslimit, pacer).
+- Conservador en E/S (transfers=1, bwlimit, buffers, pacer).
 - Reintentos ×5 con backoff exponencial.
 - Cancelación fiable (SIGTERM → SIGKILL, kill a grupo).
 - Progreso estable por “pesos” de ficheros (delegado al caller) + avance por bytes local.
 - Evita depender de --stats; usa lsjson opcionalmente y sondea tamaño local del archivo.
+- Logs: por defecto SOLO rutas (src -> dst). Comando completo solo si DEBUG_RCLONE_CMD=True.
 
 Notas:
-- Si `lsjson` del objeto falla (cuotas/ratelimit), intentamos igualmente la descarga.
+- Si `lsjson` falla (cuotas/ratelimit), intentamos igualmente la descarga.
 - Para evitar cuelgues, no se consume stdout/stderr (redirigidos a DEVNULL).
 """
 
@@ -32,7 +33,6 @@ RCLONE_BIN_CANDIDATES = [
     "/usr/local/bin/rclone",
 ]
 
-# Subimos el timeout por intentos para DBs grandes en equipos lentos
 RCLONE_TIMEOUT = 900              # seg por intento
 RCLONE_RETRIES = 5                # intentos totales
 RCLONE_BACKOFF_BASE = 3           # seg, backoff exponencial: 3, 6, 12, 24...
@@ -40,19 +40,73 @@ RCLONE_BACKOFF_BASE = 3           # seg, backoff exponencial: 3, 6, 12, 24...
 # Flags BASE (prudentes y amistosas con Drive)
 RCLONE_ARGS_BASE = [
     "--transfers=1",
-    # Limitar ancho de banda y buffers para bajar presión de I/O
     "--bwlimit=8M",
     "--buffer-size=4M",
-    # Evitar multi-thread en streams (menos bursts)
     "--multi-thread-streams=0",
-    # Ritmo y pacer (Drive)
     "--drive-chunk-size=4M",
 ]
 
 RCLONE_ARGS_COPY_EXTRA: List[str] = [
-    # Aquí puedes añadir flags backend-específicos si los necesitas.
-    # Ejemplo (con cuidado): "--disable-http2"
+    # Flags extra backend-específicos si los necesitas.
 ]
+
+# ---------- Logging helpers ----------
+DEBUG_RCLONE_CMD = False  # True = comando completo (debug)
+
+def _shorten(s: str, maxlen: int = 220) -> str:
+    s = (s or "").replace("\n", " ").strip()
+    if len(s) <= maxlen:
+        return s
+    return s[: maxlen - 3] + "..."
+
+def _extract_rclone_op_and_paths(cmd: List[str]) -> Tuple[str, str, str]:
+    """
+    Devuelve (op, src, dst) en formato mínimo.
+    Soporta wrappers tipo ionice/nice.
+    """
+    if not cmd:
+        return ("", "", "")
+
+    rclone_i = None
+    for idx, tok in enumerate(cmd):
+        if tok == "rclone" or tok.endswith("/rclone"):
+            rclone_i = idx
+            break
+    if rclone_i is None:
+        rclone_i = 0
+
+    rest = cmd[rclone_i:]  # rclone <op> ...
+    if len(rest) < 2:
+        return ("", "", "")
+
+    op = rest[1]
+    src = rest[2] if len(rest) > 2 else ""
+    dst = rest[3] if len(rest) > 3 else ""
+    return (op, src, dst)
+
+def _fmt_cmd_paths_only(cmd: List[str]) -> str:
+    op, src, dst = _extract_rclone_op_and_paths(cmd)
+    if not op:
+        return _shorten(" ".join(cmd), 160)
+
+    if op in ("copy", "sync", "copyto"):
+        if src and dst:
+            return _shorten(f"{src} -> {dst}", 220)
+        return _shorten(src or dst or "", 220)
+
+    # otros ops (lsjson, etc.)
+    if src and dst:
+        return _shorten(f"{src} {dst}", 220)
+    return _shorten(src or dst or "", 220)
+
+def _log_rclone_cmd(prefix: str, cmd: List[str], level: str = "INFO"):
+    if DEBUG_RCLONE_CMD:
+        log_utils.write_log(f"{prefix} {' '.join(cmd)}", level)
+    else:
+        log_utils.write_log(f"{prefix} {_fmt_cmd_paths_only(cmd)}", level)
+
+def _log_paths(prefix: str, src: str, dst: str, level: str = "INFO"):
+    log_utils.write_log(f"{prefix} {_shorten(src, 220)} -> {_shorten(dst, 220)}", level)
 
 # ---------- Helpers ----------
 def _which(cmd: str) -> str:
@@ -164,7 +218,6 @@ def stat_remote(remote: str, remote_path: str) -> dict:
             except Exception:
                 items = []
             for it in items:
-                # En lsjson de directorio, el campo fiable para comparar nombre es "Name"
                 if it.get("Name") == basename and not it.get("IsDir", False):
                     return {"exists": True, "size": int(it.get("Size", 0))}
             return {"exists": False, "size": 0}
@@ -179,6 +232,7 @@ def stat_remote(remote: str, remote_path: str) -> dict:
         log_utils.write_log(f"[rclone stat] fallo: {e}", "ERROR")
         return {"exists": None, "size": 0, "error": "err"}
 
+
 # ---------- API: progreso “por lista” (Drive-friendly) ----------
 def copy_selected_remote_files_with_progress(
     remote: str,
@@ -192,16 +246,6 @@ def copy_selected_remote_files_with_progress(
 ) -> bool:
     """
     Descarga secuencialmente archivos concretos a 'staging_dir'.
-    Estrategia conservadora para Google Drive:
-      - Para cada archivo:
-          * 5 reintentos con backoff.
-          * Sondeo del tamaño local para reportar % de ese archivo (si se conoce su tamaño remoto).
-          * Si no se conoce tamaño remoto, reporta “indeterminado” pero mantiene la barra estable
-            gracias a la capa de pesos en el caller (update_library.py).
-      - MyVideos*.db es OBLIGATORIO (si falla, aborta).
-      - Textures*.db y Thumbnails.zip son OPCIONALES (si fallan, se omiten).
-      - Cancelación inmediata y limpieza de parciales.
-
     Devuelve False si hubo cancelación o falló un obligatorio.
     """
     if on_progress_per_file is None:
@@ -231,7 +275,7 @@ def copy_selected_remote_files_with_progress(
 
     rel_paths_sorted = sorted(rel_paths, key=lambda p: _classify(p)[0])
 
-    # Pre-stat (mejor esfuerzo). Si falla (rate limit), seguimos con tamaños desconocidos.
+    # Pre-stat (mejor esfuerzo). Si falla, seguimos con tamaños desconocidos.
     sizes: Dict[str, int] = {}
     for rp in rel_paths_sorted:
         full_remote = f"{remote_dir.rstrip('/')}/{rp}"
@@ -239,10 +283,10 @@ def copy_selected_remote_files_with_progress(
         if st.get("exists") is True:
             sizes[rp] = int(st.get("size") or 0)
         else:
-            sizes[rp] = 0  # tamaño indeterminado o ausente
+            sizes[rp] = 0
 
     for rp in rel_paths_sorted:
-        prio, required = _classify(rp)
+        _, required = _classify(rp)
         remote_spec = f"{remote}:{remote_dir.rstrip('/')}/{rp}"
         local_path = os.path.join(staging_dir, rp)
         os.makedirs(os.path.dirname(local_path), exist_ok=True)
@@ -253,13 +297,12 @@ def copy_selected_remote_files_with_progress(
             log_utils.write_log(f"[rclone copy list] Omitiendo opcional (stat ausente): {rp}")
             continue
 
-        attempts = RCLONE_RETRIES
         backoff = RCLONE_BACKOFF_BASE
         success = False
 
-        for attempt in range(1, attempts + 1):
+        for attempt in range(1, RCLONE_RETRIES + 1):
             if is_canceled():
-                log_utils.write_log("[rclone copy list] cancelado por usuario (antes de iniciar intento).", "INFO")
+                log_utils.write_log("[rclone copy list] cancelado por usuario.", "INFO")
                 return False
 
             # limpiar parcial anterior
@@ -271,10 +314,9 @@ def copy_selected_remote_files_with_progress(
 
             cmd = [rclone, "copyto", remote_spec, local_path] + RCLONE_ARGS_BASE + ["--no-traverse"]
             cmd = _maybe_wrap_ionice_nice(cmd)
-            log_utils.write_log(f"[rclone copy list] ({attempt}/{attempts}) {remote_spec} -> {local_path}")
+            _log_rclone_cmd(f"[rclone copy list] intento {attempt}/{RCLONE_RETRIES}:", cmd)
 
             try:
-                # Iniciar como grupo propio para poder matar a todo el árbol
                 proc = subprocess.Popen(
                     cmd,
                     stdout=subprocess.DEVNULL,
@@ -286,9 +328,7 @@ def copy_selected_remote_files_with_progress(
                 break
 
             last_local = 0
-            started = time.time()
 
-            # Bucle de sondeo del archivo local
             while True:
                 if is_canceled():
                     _terminate_proc_tree(proc, name="rclone(copyto)")
@@ -304,18 +344,17 @@ def copy_selected_remote_files_with_progress(
                     cur = last_local
                 last_local = cur
 
-                # Progreso por archivo (si conocemos el tamaño)
                 if target_size > 0:
-                    pct_file = min(100.0, (cur * 100.0) / float(target_size)) if target_size else 0.0
-                    on_progress_per_file(rp, pct_file, f"Descargando {os.path.basename(rp)}… {cur/1_000_000:.1f}/{target_size/1_000_000:.1f} MB")
+                    pct_file = min(100.0, (cur * 100.0) / float(target_size))
+                    on_progress_per_file(
+                        rp, pct_file,
+                        f"Descargando {os.path.basename(rp)}… {cur/1_000_000:.1f}/{target_size/1_000_000:.1f} MB"
+                    )
                 else:
-                    # Tamaño desconocido: reporta “indeterminado”. La barra global se estabiliza con pesos.
                     on_progress_per_file(rp, 50.0, f"Descargando {os.path.basename(rp)}…")
 
                 if rc is not None:
-                    # Proceso terminó
                     if rc == 0 and os.path.exists(local_path) and os.path.getsize(local_path) > 0:
-                        # Si tamaño remoto era desconocido, ya no nos importa: damos el archivo por OK
                         on_progress_per_file(rp, 100.0, f"Completado {os.path.basename(rp)}")
                         on_file_done(rp)
                         success = True
@@ -329,7 +368,6 @@ def copy_selected_remote_files_with_progress(
             if success:
                 break
 
-            # Backoff antes del siguiente intento
             time.sleep(backoff)
             backoff *= 2
 
@@ -338,7 +376,6 @@ def copy_selected_remote_files_with_progress(
                 log_utils.write_log(f"[rclone copy list] FALLO definitivo en obligatorio: {rp}", "ERROR")
                 return False
             else:
-                # opcional: limpiar parcial si quedó algo
                 try:
                     if os.path.exists(local_path):
                         os.remove(local_path)
@@ -348,18 +385,17 @@ def copy_selected_remote_files_with_progress(
 
     return True
 
-# ---------- API básicos (por compatibilidad con otras partes del addon) ----------
+
+# ---------- API básicos (compatibilidad) ----------
 def sync_remote_dir(remote: str,
                     remote_dir: str,
                     local_dir: str,
-                    includes: List[str] | None = None,
-                    excludes: List[str] | None = None,
+                    includes: Optional[List[str]] = None,
+                    excludes: Optional[List[str]] = None,
                     dry_run: bool = False,
                     delete_excluded: bool = False) -> bool:
     """
     Sincroniza un directorio remoto -> local usando `rclone sync`.
-    Usa --filter para evitar warnings de include/exclude.
-    (Este método no se usa en el flujo principal de update_library, pero lo dejamos por compatibilidad)
     """
     try:
         rclone = which_rclone()
@@ -384,7 +420,6 @@ def sync_remote_dir(remote: str,
         "--delete-after",
     ]
 
-    # Filtros con --filter (evita warning)
     if includes:
         for pat in includes:
             cmd += ["--filter", f"+ {pat}"]
@@ -405,14 +440,14 @@ def sync_remote_dir(remote: str,
         if attempt > 1:
             time.sleep(RCLONE_BACKOFF_BASE * (2 ** (attempt - 2)))
         try:
-            log_utils.write_log(f"[rclone sync] intento {attempt}/{RCLONE_RETRIES}: {' '.join(cmd)}")
+            _log_rclone_cmd(f"[rclone sync] intento {attempt}/{RCLONE_RETRIES}:", cmd)
             proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=RCLONE_TIMEOUT)
             rc = proc.returncode
             out = proc.stdout.decode("utf-8", "ignore")
             err = proc.stderr.decode("utf-8", "ignore")
 
             if rc == 0:
-                log_utils.write_log("[rclone sync] sincronización completada")
+                log_utils.write_log("[rclone sync] OK")
                 return True
 
             if _is_drive_quota_error(err):
@@ -421,7 +456,7 @@ def sync_remote_dir(remote: str,
                 last_err = "daily limit exceeded"
             else:
                 last_err = err.strip() or out.strip()
-            log_utils.write_log(f"[rclone sync] rc={rc} stderr={last_err}", "ERROR")
+            log_utils.write_log(f"[rclone sync] rc={rc} err={last_err}", "ERROR")
 
         except subprocess.TimeoutExpired:
             last_err = f"timeout {RCLONE_TIMEOUT}s"
@@ -433,10 +468,13 @@ def sync_remote_dir(remote: str,
     log_utils.write_log(f"[rclone sync] falló tras reintentos: {last_err}", "ERROR")
     return False
 
+
 def copy_remote_to_tmp_then_move(remote: str, remote_path: str, final_dir: str) -> bool:
     """
-    Copia remote:remote_path → tmp_dir → final_dir (con validación mínima).
-    Dejado por compatibilidad (no se usa en el nuevo flujo principal).
+    Copia remote:remote_path → tmp_dir → final_dir (validación mínima).
+    Loguea fielmente en 2 pasos (solo rutas):
+      1) remoto -> tmp_dir
+      2) tmp_file -> final_dir
     """
     tmp_dir = _select_tmp_dir()
     os.makedirs(final_dir, exist_ok=True)
@@ -461,15 +499,23 @@ def copy_remote_to_tmp_then_move(remote: str, remote_path: str, final_dir: str) 
                 time.sleep(RCLONE_BACKOFF_BASE * (2 ** (attempt - 2)))
             try:
                 cmd = _maybe_wrap_ionice_nice(base)
-                log_utils.write_log(f"[rclone copy] intento {attempt}/{RCLONE_RETRIES}: {' '.join(cmd)}")
+
+                # Paso 1 (remoto -> tmp_dir)
+                _log_rclone_cmd(f"[rclone copy] intento {attempt}/{RCLONE_RETRIES}:", cmd)
+
                 proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=RCLONE_TIMEOUT)
                 if proc.returncode == 0:
                     if os.path.exists(tmp_file) and os.path.getsize(tmp_file) > 0:
+                        # Paso 2 (tmp_file -> final_dir)
+                        _log_paths("[rclone move]", tmp_file, final_dir)
+
                         if _copy_atomic(tmp_file, final_dir):
                             if os.path.exists(final_file) and os.path.getsize(final_file) > 0:
-                                try: os.remove(tmp_file)
-                                except Exception: pass
-                                log_utils.write_log(f"[rclone copy] OK -> {final_file}")
+                                try:
+                                    os.remove(tmp_file)
+                                except Exception:
+                                    pass
+                                log_utils.write_log(f"[rclone move] OK -> {final_file}")
                                 return True
                         last_err = "archivo final inválido"
                     else:
@@ -482,21 +528,25 @@ def copy_remote_to_tmp_then_move(remote: str, remote_path: str, final_dir: str) 
                         last_err = "daily limit exceeded"
                     else:
                         last_err = stderr.strip()
-                    log_utils.write_log(f"[rclone copy] rc={proc.returncode} stderr={last_err}", "ERROR")
+                    log_utils.write_log(f"[rclone copy] rc={proc.returncode} err={last_err}", "ERROR")
+
             except subprocess.TimeoutExpired:
                 last_err = f"timeout {RCLONE_TIMEOUT}s"
-                log_utils.write_log(last_err, "ERROR")
+                log_utils.write_log(f"[rclone copy] {last_err}", "ERROR")
             except Exception as e:
                 last_err = f"excepción: {e}"
-                log_utils.write_log(last_err, "ERROR")
+                log_utils.write_log(f"[rclone copy] {last_err}", "ERROR")
+
         log_utils.write_log(f"[rclone copy] falló tras reintentos: {last_err}", "ERROR")
         return False
+
     finally:
         try:
             if os.path.exists(tmp_file):
                 os.remove(tmp_file)
         except Exception:
             pass
+
 
 def copy_to_tmp_then_move_remote(src_path: str, remote: str, remote_path: str,
                                  keep_tmp: bool = False, restore_on_fail: bool = True) -> bool:
@@ -534,10 +584,10 @@ def copy_to_tmp_then_move_remote(src_path: str, remote: str, remote_path: str,
     for attempt in range(1, RCLONE_RETRIES + 1):
         if attempt > 1:
             time.sleep(RCLONE_BACKOFF_BASE * (2 ** (attempt - 2)))
-
         try:
             cmd = _maybe_wrap_ionice_nice(base)
-            log_utils.write_log(f"[rclone up] intento {attempt}/{RCLONE_RETRIES}: {' '.join(cmd)}")
+            _log_rclone_cmd(f"[rclone up] intento {attempt}/{RCLONE_RETRIES}:", cmd)
+
             proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=RCLONE_TIMEOUT)
 
             if proc.returncode == 0:
@@ -547,7 +597,7 @@ def copy_to_tmp_then_move_remote(src_path: str, remote: str, remote_path: str,
                     break
                 else:
                     last_err = f"verificación remota fallida: {st}"
-                    log_utils.write_log(last_err, "ERROR")
+                    log_utils.write_log(f"[rclone up] {last_err}", "ERROR")
             else:
                 stderr = proc.stderr.decode("utf-8", "ignore")
                 if _is_drive_quota_error(stderr):
@@ -556,14 +606,14 @@ def copy_to_tmp_then_move_remote(src_path: str, remote: str, remote_path: str,
                     last_err = "daily limit exceeded"
                 else:
                     last_err = stderr.strip()
-                log_utils.write_log(f"[rclone up] rc={proc.returncode} stderr={last_err}", "ERROR")
+                log_utils.write_log(f"[rclone up] rc={proc.returncode} err={last_err}", "ERROR")
 
         except subprocess.TimeoutExpired:
             last_err = f"timeout {RCLONE_TIMEOUT}s"
-            log_utils.write_log(last_err, "ERROR")
+            log_utils.write_log(f"[rclone up] {last_err}", "ERROR")
         except Exception as e:
             last_err = f"excepción: {e}"
-            log_utils.write_log(last_err, "ERROR")
+            log_utils.write_log(f"[rclone up] {last_err}", "ERROR")
 
     if uploaded:
         log_utils.write_log(f"[rclone up] OK -> {dest_spec}")
@@ -589,3 +639,4 @@ def copy_to_tmp_then_move_remote(src_path: str, remote: str, remote_path: str,
 
     log_utils.write_log(f"[rclone up] falló tras reintentos: {last_err}", "ERROR")
     return False
+

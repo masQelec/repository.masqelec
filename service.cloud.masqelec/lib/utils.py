@@ -4,6 +4,7 @@ import os
 import glob
 import base64
 import hashlib
+import struct
 import uuid
 import io
 import re
@@ -12,6 +13,7 @@ import gzip
 import time
 import shutil
 import zipfile
+import socket
 import datetime
 import traceback
 import json
@@ -19,6 +21,8 @@ import urllib.request
 import urllib.error
 import urllib.parse
 import xml.etree.ElementTree as ET
+
+from typing import Optional, Dict, Any, List, Tuple, Set
 
 import xbmc
 import xbmcgui
@@ -43,22 +47,22 @@ ZIP_NAME = "catalog.zip"
 VER_NAME = "catalog.version"
 
 FILES = [
-    (ZIP_NAME, f"catalog/{ZIP_NAME}"),
-    (VER_NAME, f"catalog/{VER_NAME}"),
+    (ZIP_NAME, "catalog/{}".format(ZIP_NAME)),
+    (VER_NAME, "catalog/{}".format(VER_NAME)),
 ]
 
-API_BASE = f"https://api.github.com/repos/{OWNER}/{REPO}/contents"
+API_BASE = "https://api.github.com/repos/{}/{}/contents".format(OWNER, REPO)
 
 # User-Agents
 UA_HTTP = "KodiELEC-HTTP/1.0"
 
-GITHUB_TOKEN_B64 = "WVYvGj1NOE1ERGdjNg00T0wwM2hnaHBfOFQ0OWlsT0tMWEtDQTRvYQ=="
+GITHUB_TOKEN_B64 = "rwfU5iQ5OjtJt7ihpPMwbIu3fP6OIAAAAChnaHBfOFQ0OWlsT0tMWEtDQTQ="
 GITHUB_FEISTEL_ROUNDS = 8
 
 # =========================================================
 # Telegram: credenciales CIFRADAS (base64) para GitHub
 # =========================================================
-TG_TOKEN_B64  = "Ki4GdzwnKWgcRCxVTwdpbClTGVVBPGs4NTk5NzIxOTMxOkFBR2R0eENrZEZsbw=="
+TG_TOKEN_B64  = "rAn4xRtvfVFS9L/8wJIxc/S8D92Zb83zVAAAAC44NTk5NzIxOTMxOkFBR2R0eENrZEY="
 TG_CHATID = "952051424"   # <-- quitado "=" (era muy probable bug)
 TG_FEISTEL_ROUNDS = 8
 
@@ -81,17 +85,37 @@ except Exception:
     ADDON_NAME = ADDON_ID
 
 # UA_HTTP final (incluye nombre real si existe)
-UA_HTTP = f"{ADDON_NAME}/1.0 (+Kodi)"
+UA_HTTP = "{}{}".format(ADDON_NAME, "/1.0 (+Kodi)")
 
 # ==========================
 # CATÁLOGO REMOTO (RAW): SOLO version y comparación por UTC
 # ==========================
-RAW_CATALOG_BASE = f"https://raw.githubusercontent.com/{OWNER}/{REPO}/{BRANCH}/catalog"
+RAW_CATALOG_BASE = "https://raw.githubusercontent.com/{}/{}/{}/catalog".format(OWNER, REPO, BRANCH)
 
 _UTC_RE = re.compile(r"\butc=([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)\b")
 _HASH64_RE = re.compile(r"\b([0-9a-fA-F]{64})\b")
 
-def _parse_utc_epoch(ver_text: str):
+
+def wait_for_dns(host, timeout=15, interval=1.0):
+    """
+    Espera a que DNS resuelva `host`.
+    Devuelve True si resuelve antes de timeout, False si no.
+    """
+    deadline = time.time() + max(1, int(timeout))
+    last_err = None
+
+    while time.time() < deadline:
+        try:
+            socket.getaddrinfo(host, 443)
+            return True
+        except Exception as e:
+            last_err = e
+            time.sleep(max(0.2, float(interval)))
+
+    return False
+
+
+def _parse_utc_epoch(ver_text):
     """
     Extrae utc=...Z y devuelve epoch en UTC real.
     IMPORTANTE: NO usar time.mktime() (interpreta hora local).
@@ -108,7 +132,8 @@ def _parse_utc_epoch(ver_text: str):
     except Exception:
         return None
 
-def _version_hash64(ver_text: str) -> str:
+
+def _version_hash64(ver_text):
     if not ver_text:
         return ""
     tok = ver_text.split()[0].strip()
@@ -117,7 +142,8 @@ def _version_hash64(ver_text: str) -> str:
     m = _HASH64_RE.search(ver_text)
     return (m.group(1).lower() if m else "")
 
-def _http_get_text_simple(url: str, timeout: float = 10.0) -> str:
+
+def _http_get_text_simple(url, timeout=10.0):
     """
     GET texto soportando gzip/deflate (algunos servidores contestan comprimido).
     """
@@ -138,13 +164,14 @@ def _http_get_text_simple(url: str, timeout: float = 10.0) -> str:
                 pass
         return data.decode("utf-8", "replace").strip()
 
-def _read_local_catalog_version_text() -> str:
+
+def _read_local_catalog_version_text():
     """
     Lee catalog.version local del addon_data (no del SRC_DIR).
     Esto es lo que tu cliente ya persistía.
     """
     local_path = os.path.join(
-        xbmcvfs.translatePath(f"special://profile/addon_data/{ADDON_ID}"),
+        xbmcvfs.translatePath("special://profile/addon_data/{}".format(ADDON_ID)),
         VER_NAME
     )
     try:
@@ -153,12 +180,13 @@ def _read_local_catalog_version_text() -> str:
     except Exception:
         return ""
 
-def _write_local_catalog_version_text_atomic(ver_text: str):
+
+def _write_local_catalog_version_text_atomic(ver_text):
     """
     Guardado atómico de catalog.version en addon_data para el gate cliente.
     (Esto no sustituye al sync real, solo mantiene estado.)
     """
-    local_dir = xbmcvfs.translatePath(f"special://profile/addon_data/{ADDON_ID}")
+    local_dir = xbmcvfs.translatePath("special://profile/addon_data/{}".format(ADDON_ID))
     local_path = os.path.join(local_dir, VER_NAME)
     try:
         os.makedirs(local_dir, exist_ok=True)
@@ -169,20 +197,22 @@ def _write_local_catalog_version_text_atomic(ver_text: str):
             os.fsync(f.fileno())
         os.replace(tmp, local_path)
     except Exception as e:
-        log_utils.write_log(f"[catalog] No se pudo guardar catalog.version local (atómico): {e}", "WARNING")
+        log_utils.write_log("[catalog] No se pudo guardar catalog.version local (atómico): {}".format(e), "WARNING")
 
-def get_remote_catalog_version_text(timeout: float = 10.0) -> str:
+
+def get_remote_catalog_version_text(timeout=10.0):
     """
     Lee SOLO catalog.version remoto (RAW).
     """
-    url = f"{RAW_CATALOG_BASE}/{VER_NAME}"
+    url = "{}/{}".format(RAW_CATALOG_BASE, VER_NAME)
     try:
         return _http_get_text_simple(url, timeout=timeout)
     except Exception as e:
-        log_utils.write_log(f"[catalog] Error leyendo remoto {VER_NAME}: {e}", "WARNING")
+        log_utils.write_log("[catalog] Error leyendo remoto {}: {}".format(VER_NAME, e), "WARNING")
         return ""
 
-def remote_catalog_is_newer(remote_ver: str, local_ver: str) -> bool:
+
+def remote_catalog_is_newer(remote_ver, local_ver):
     """
     Decide si remoto es más nuevo:
       1) comparar utc epoch (UTC real)
@@ -206,15 +236,16 @@ def remote_catalog_is_newer(remote_ver: str, local_ver: str) -> bool:
 
     return (remote_ver or "").strip() != (local_ver or "").strip()
 
+
 # ---------- Utilidades de estado/condiciones ----------
-def _has_network() -> bool:
+def _has_network():
     try:
         return xbmc.getCondVisibility("System.HasNetwork")
     except Exception:
         return True
 
 
-def _has_internet(timeout: float = 3.0) -> bool:
+def _has_internet(timeout=3.0):
     try:
         urllib.request.urlopen("https://www.google.com/generate_204", timeout=timeout)
         return True
@@ -222,10 +253,11 @@ def _has_internet(timeout: float = 3.0) -> bool:
         return False
 
 
-def is_online() -> bool:
+def is_online():
     if not _has_network():
         return False
     return _has_internet()
+
 
 # ==========================================================
 # Rol del dispositivo (MASTER / CLIENTE)
@@ -233,7 +265,8 @@ def is_online() -> bool:
 
 _DEVICE_ROLE = None  # cache interno
 
-def get_device_eth0_mac() -> str:
+
+def get_device_eth0_mac():
     """Devuelve MAC de eth0 en formato 12 hex (sin ':')."""
     try:
         info = get_net_info()
@@ -242,13 +275,15 @@ def get_device_eth0_mac() -> str:
     except Exception:
         return ""
 
-def _normalize_mac12(s: str) -> str:
+
+def _normalize_mac12(s):
     if not s:
         return ""
     s = s.strip().lower().replace(":", "").replace("-", "")
     return s if re.fullmatch(r"[0-9a-f]{12}", s) else ""
 
-def _parse_master_macs(macs_cfg: str) -> set[str]:
+
+def _parse_master_macs(macs_cfg):
     parts = re.split(r"[,\s]+", (macs_cfg or "").strip())
     out = set()
     for p in parts:
@@ -257,7 +292,8 @@ def _parse_master_macs(macs_cfg: str) -> set[str]:
             out.add(m)
     return out
 
-def is_master_device() -> bool:
+
+def is_master_device():
     eth0 = _normalize_mac12(get_device_eth0_mac())
     if not eth0:
         return False
@@ -268,6 +304,7 @@ def is_master_device() -> bool:
         return False
 
     return eth0 in master_set
+
 
 def get_device_role():
     """
@@ -288,11 +325,15 @@ def get_device_role():
 
     try:
         log_utils.write_log(
-            f"Rol dispositivo detectado: {_DEVICE_ROLE}",
+            "Rol dispositivo detectado: {}".format(_DEVICE_ROLE),
             "INFO"
         )
     except Exception as e:
-        log_utils.write_log(f"safe_rmtree falló para {path}: {e}", "DEBUG")
+        # FIX: antes referenciaba 'path' que no existe
+        try:
+            log_utils.write_log("[role] Log falló: {}".format(e), "DEBUG")
+        except Exception:
+            pass
 
     return _DEVICE_ROLE
 
@@ -304,18 +345,22 @@ def is_master():
 def is_client():
     return get_device_role() == "CLIENT"
 
+
 # ==============================
 # CATÁLOGO: detectar cambios en clientes + gate con red
 # ==============================
-def get_addon_data_dir() -> str:
-    return xbmcvfs.translatePath(f"special://profile/addon_data/{ADDON_ID}")
+def get_addon_data_dir():
+    return xbmcvfs.translatePath("special://profile/addon_data/{}".format(ADDON_ID))
+
+
 # ---------------------------------------------------------
 # Estado persistente (state.json) — NO sobreescribir claves
 # ---------------------------------------------------------
-def _state_path() -> str:
+def _state_path():
     return os.path.join(get_addon_data_dir(), "state.json")
 
-def load_state() -> dict:
+
+def load_state():
     """Carga state.json del addon_data. Si no existe o está corrupto, devuelve dict vacío."""
     path = _state_path()
     try:
@@ -325,7 +370,8 @@ def load_state() -> dict:
     except Exception:
         return {}
 
-def save_state(state: dict) -> bool:
+
+def save_state(state):
     """Guarda state.json de forma atómica."""
     try:
         state_dir = get_addon_data_dir()
@@ -341,35 +387,60 @@ def save_state(state: dict) -> bool:
     except Exception:
         return False
 
-def update_state(patch: dict) -> dict:
-    """Merge superficial (dict.update) y guarda; devuelve el estado final."""
+
+def _deep_merge_dict(dst, src):
+    """
+    Merge recursivo muy simple: si ambos son dict, mezcla;
+    si no, pisa.
+    """
+    if not isinstance(dst, dict) or not isinstance(src, dict):
+        return src
+    for k, v in src.items():
+        if k in dst and isinstance(dst.get(k), dict) and isinstance(v, dict):
+            dst[k] = _deep_merge_dict(dst.get(k), v)
+        else:
+            dst[k] = v
+    return dst
+
+
+def update_state(patch, merge=False):
+    """
+    - merge=False: st.update(patch) (superficial)
+    - merge=True : merge recursivo (para metrics, circuit_breaker, etc.)
+    """
     st = load_state()
     try:
         if isinstance(patch, dict):
-            st.update(patch)
+            if merge:
+                st = _deep_merge_dict(st, patch)
+            else:
+                st.update(patch)
     except Exception:
         pass
     save_state(st)
     return st
 
+
 # ---------------------------------------------------------
 # Circuit breaker simple por tarea (persistente)
 # ---------------------------------------------------------
-def cb_should_run(task: str) -> bool:
+def cb_should_run(task):
     st = load_state()
     cb = st.get("circuit_breaker") if isinstance(st.get("circuit_breaker"), dict) else {}
     t = cb.get(task) if isinstance(cb.get(task), dict) else {}
     next_ts = float(t.get("next_ts", 0) or 0)
     return time.time() >= next_ts
 
-def cb_note_success(task: str) -> None:
+
+def cb_note_success(task):
     st = load_state()
     cb = st.get("circuit_breaker") if isinstance(st.get("circuit_breaker"), dict) else {}
     cb[task] = {"fails": 0, "next_ts": 0}
     st["circuit_breaker"] = cb
     save_state(st)
 
-def cb_note_failure(task: str, fail_threshold: int = 3, cooldown_sec: int = 3600) -> dict:
+
+def cb_note_failure(task, fail_threshold=3, cooldown_sec=3600):
     """Incrementa fallos y, si supera umbral, activa cooldown. Devuelve el bloque del task."""
     now = time.time()
     st = load_state()
@@ -385,7 +456,8 @@ def cb_note_failure(task: str, fail_threshold: int = 3, cooldown_sec: int = 3600
     save_state(st)
     return cb[task]
 
-def cb_should_log_cooldown(task: str, every_sec: int = 600) -> bool:
+
+def cb_should_log_cooldown(task, every_sec=600):
     """Evita spam: si está en cooldown, loguea como mucho cada X segundos."""
     now = time.time()
     st = load_state()
@@ -399,7 +471,7 @@ def cb_should_log_cooldown(task: str, every_sec: int = 600) -> bool:
     return False
 
 
-def _read_bytes(path: str):
+def _read_bytes(path):
     try:
         with open(path, "rb") as f:
             return f.read()
@@ -407,10 +479,11 @@ def _read_bytes(path: str):
         return None
 
 
-def _sha256_bytes(b: bytes) -> str:
+def _sha256_bytes(b):
     h = hashlib.sha256()
     h.update(b)
     return h.hexdigest()
+
 
 def _get_catalog_fingerprint():
     """
@@ -427,11 +500,12 @@ def _get_catalog_fingerprint():
 
     try:
         st = os.stat(zip_path)
-        return f"zip:{int(st.st_mtime)}:{int(st.st_size)}"
+        return "zip:{}:{}".format(int(st.st_mtime), int(st.st_size))
     except Exception:
         return None
 
-def catalog_changed_client() -> bool:
+
+def catalog_changed_client():
     """
     True si el catálogo LOCAL cambió desde la última vez en ESTE cliente.
     (Esto NO detecta remoto; lo dejo por si quieres usarlo como “anti spam” local.)
@@ -464,19 +538,22 @@ def catalog_changed_client() -> bool:
         with open(state_path, "w", encoding="utf-8") as f:
             json.dump(state, f, ensure_ascii=False)
     except Exception as e:
-        log_utils.write_log(f"safe_rmtree falló para {path}: {e}", "DEBUG")
+        # FIX: antes referenciaba 'path' que no existe
+        try:
+            log_utils.write_log("[catalog] No se pudo persistir catalog_fp: {}".format(e), "DEBUG")
+        except Exception:
+            pass
 
     return changed
 
-def should_run_client_catalog_maintenance() -> bool:
+
+def should_run_client_catalog_maintenance():
     """
-    Gate correcto para clientes (lo que te faltaba):
+    Gate correcto para clientes:
 
       - Solo en CLIENT
       - Solo si hay red/internet
       - Solo si catalog.version REMOTO es más nuevo (por utc=...Z en UTC real)
-
-    Nota: NO depende del fingerprint local (eso te bloqueaba el update remoto).
     """
     if not is_client():
         return False
@@ -491,14 +568,13 @@ def should_run_client_catalog_maintenance() -> bool:
 
     newer = remote_catalog_is_newer(remote_ver, local_ver)
     if newer:
-        # Guardamos YA el remote_ver como “último visto” para que no repita el gate
-        # si luego falla el sync por cualquier motivo (evita loops).
         _write_local_catalog_version_text_atomic(remote_ver)
     return newer
 
+
 # ----------------- Estado de Kodi / inactividad -----------------
 
-def kodi_is_idle(min_idle_secs: int = 0) -> bool:
+def kodi_is_idle(min_idle_secs=0):
     """
     Heurística PERMISIVA diseñada para:
       - CleanLibrary
@@ -532,14 +608,15 @@ def kodi_is_idle(min_idle_secs: int = 0) -> bool:
 
     except Exception as e:
         try:
-            log_utils.write_log(f"[idle] Error comprobando estado: {e}", level="WARNING")
+            log_utils.write_log("[idle] Error comprobando estado: {}".format(e), level="WARNING")
         except Exception:
             pass
         return True
 
+
 # ----------------- Helpers internos -----------------
 
-def restart_kodi_with_popup(delay_ms: int = 5000):
+def restart_kodi_with_popup(delay_ms=5000):
     """
     Muestra popup INFO con sonido avisando del reinicio y reinicia Kodi tras delay_ms.
     Centralizado para que cualquier módulo lo use.
@@ -572,9 +649,10 @@ def restart_kodi_with_popup(delay_ms: int = 5000):
         log_utils.write_log("[kodi] Reiniciando Kodi: systemctl restart kodi", "INFO")
         subprocess.run(["systemctl", "restart", "kodi"], check=False)
     except Exception as e:
-        log_utils.write_log(f"[kodi] No se pudo reiniciar Kodi: {e}", "ERROR")
+        log_utils.write_log("[kodi] No se pudo reiniciar Kodi: {}".format(e), "ERROR")
 
-def _net_open(url: str, timeout: int = NET_TIMEOUT):
+
+def _net_open(url, timeout=NET_TIMEOUT):
     """Abre URL con User-Agent y timeout, con reintentos simples."""
     req = urllib.request.Request(url, headers={"User-Agent": UA_HTTP, "Accept-Encoding": "gzip, deflate"})
     last_err = None
@@ -584,42 +662,56 @@ def _net_open(url: str, timeout: int = NET_TIMEOUT):
         except urllib.error.URLError as e:
             last_err = e
             log_utils.write_log(
-                f"Intento {attempt+1}/{NET_RETRIES+1} falló para {url}: {getattr(e, 'reason', e)}",
+                "Intento {}/{} falló para {}: {}".format(attempt + 1, NET_RETRIES + 1, url, getattr(e, "reason", e)),
                 "ERROR"
             )
             time.sleep(RETRY_BACKOFF)
     raise last_err
 
-def download_atomic(url: str, dst_path: str, retries: int = NET_RETRIES, timeout: int = NET_TIMEOUT,
-                   tmp_suffix: str = ".part", chmod: int | None = None) -> bool:
+def download_atomic(url, dst_path, retries=NET_RETRIES, timeout=NET_TIMEOUT, tmp_suffix=".part", chmod=None):
     """
-    Descarga una URL a dst_path de forma atómica:
-    - descarga a dst_path + tmp_suffix
-    - fsync
-    - os.replace()
-    - chmod opcional
-    Devuelve True si se aplicó correctamente.
+    Descarga una URL a dst_path de forma atómica.
+    Si la respuesta viene con Content-Encoding gzip/deflate, DESCOMPRIME antes de escribir.
     """
     tmp_path = dst_path + tmp_suffix
     last_err = None
 
-    # Reintentos con backoff (mismo estilo que _net_open)
     for attempt in range(retries + 1):
         try:
-            with _net_open(url, timeout=timeout) as r, open(tmp_path, "wb") as f:
-                shutil.copyfileobj(r, f, length=1024 * 1024)
+            with _net_open(url, timeout=timeout) as r:
+                data = r.read() or b""
+                enc = (r.headers.get("Content-Encoding") or "").lower()
+
+            # Descompresión según Content-Encoding (y fallback por magic bytes)
+            if "gzip" in enc or (len(data) >= 3 and data[:3] == b"\x1f\x8b\x08"):
+                try:
+                    data = gzip.decompress(data)
+                except Exception:
+                    # Si falla, seguimos con raw para no dejarlo a cero
+                    pass
+            elif "deflate" in enc:
+                # deflate puede venir con wrapper zlib o raw
+                try:
+                    data = zlib.decompress(data)
+                except Exception:
+                    try:
+                        data = zlib.decompress(data, -zlib.MAX_WBITS)
+                    except Exception:
+                        pass
+
+            with open(tmp_path, "wb") as f:
+                f.write(data)
                 try:
                     f.flush()
                     os.fsync(f.fileno())
                 except Exception:
-                    # Si fsync falla, no abortamos: el replace sigue siendo atómico.
                     pass
 
             if chmod is not None:
                 try:
                     os.chmod(tmp_path, chmod)
                 except Exception as e:
-                    log_utils.write_log(f"chmod({oct(chmod)}) falló para {tmp_path}: {e}", "WARNING")
+                    log_utils.write_log("chmod({}) falló para {}: {}".format(oct(int(chmod)), tmp_path, e), "WARNING")
 
             os.replace(tmp_path, dst_path)
             return True
@@ -627,7 +719,7 @@ def download_atomic(url: str, dst_path: str, retries: int = NET_RETRIES, timeout
         except Exception as e:
             last_err = e
             log_utils.write_log(
-                f"Descarga atómica falló ({attempt+1}/{retries+1}) para {url} -> {dst_path}: {e}",
+                "Descarga atómica falló ({}/{}) para {} -> {}: {}".format(attempt + 1, retries + 1, url, dst_path, e),
                 "ERROR"
             )
             try:
@@ -637,11 +729,11 @@ def download_atomic(url: str, dst_path: str, retries: int = NET_RETRIES, timeout
                 pass
             time.sleep(RETRY_BACKOFF)
 
-    log_utils.write_log(f"Descarga atómica agotó reintentos para {url}: {last_err}", "ERROR")
+    log_utils.write_log("Descarga atómica agotó reintentos para {}: {}".format(url, last_err), "ERROR")
     return False
 
 
-def run_cmd(cmd: list[str], timeout: int = 10) -> tuple[int, str, str]:
+def run_cmd(cmd, timeout=10):
     """
     Ejecuta comando con timeout.
     Devuelve (returncode, stdout, stderr) como texto (utf-8 con replacement).
@@ -658,12 +750,12 @@ def run_cmd(cmd: list[str], timeout: int = 10) -> tuple[int, str, str]:
         err = (p.stderr or b"").decode("utf-8", "replace")
         return p.returncode, out, err
     except subprocess.TimeoutExpired:
-        return 124, "", f"Timeout expirado ({timeout}s)"
+        return 124, "", "Timeout expirado ({}s)".format(timeout)
     except Exception as e:
         return 1, "", str(e)
 
 
-def _read_maybe_gzip(response) -> bytes:
+def _read_maybe_gzip(response):
     """Lee bytes desde response y descomprime si viene gz."""
     data = response.read()
     enc = response.headers.get("Content-Encoding", "")
@@ -674,7 +766,8 @@ def _read_maybe_gzip(response) -> bytes:
             return data
     return data
 
-def _find_extracted_addon_dir(temp_dir_os: str, expected_id: str) -> str:
+
+def _find_extracted_addon_dir(temp_dir_os, expected_id):
     """
     Encuentra en el directorio temporal la carpeta que contiene el addon con id=expected_id.
     Considera casos donde el ZIP viene como addon_id/ o addon_id-version/.
@@ -698,58 +791,61 @@ def _find_extracted_addon_dir(temp_dir_os: str, expected_id: str) -> str:
 
     return ""
 
-def _safe_rmtree(path: str):
+
+def _safe_rmtree(path):
     try:
         if os.path.exists(path):
             shutil.rmtree(path, ignore_errors=True)
     except Exception as e:
-        log_utils.write_log(f"safe_rmtree falló para {path}: {e}", "DEBUG")
+        log_utils.write_log("safe_rmtree falló para {}: {}".format(path, e), "DEBUG")
+
 
 # ----------------- API pública -----------------
 
-def get_addon_download_url(addon_id: str, addons_xml_url: str):
+def get_addon_download_url(addon_id, addons_xml_url):
     """
     Obtiene la URL de descarga de un addon a partir de un addons.xml (o addons.xml.gz) remoto.
     Asume estructura estándar: base/{addon_id}/{addon_id}-{version}.zip
     """
-    log_utils.write_log(f"Buscando URL de descarga para '{addon_id}' en '{addons_xml_url}'")
+    log_utils.write_log("Buscando URL de descarga para '{}' en '{}'".format(addon_id, addons_xml_url))
     try:
         resp = _net_open(addons_xml_url)
         xml_content = _read_maybe_gzip(resp)
         root = ET.fromstring(xml_content)
 
-        addon_elem = root.find(f"./addon[@id='{addon_id}']")
+        addon_elem = root.find("./addon[@id='{}']".format(addon_id))
         if addon_elem is None:
-            log_utils.write_log(f"Addon '{addon_id}' no encontrado en addons.xml", "ERROR")
+            log_utils.write_log("Addon '{}' no encontrado en addons.xml".format(addon_id), "ERROR")
             return None
 
         version = addon_elem.get("version")
         if not version:
-            log_utils.write_log(f"No se detectó versión para '{addon_id}'", "ERROR")
+            log_utils.write_log("No se detectó versión para '{}'".format(addon_id), "ERROR")
             return None
 
         base_url = addons_xml_url.rsplit("/", 1)[0]
-        download_url = f"{base_url}/{addon_id}/{addon_id}-{version}.zip"
-        log_utils.write_log(f"URL de descarga construida: {download_url}")
+        download_url = "{}/{}/{}-{}.zip".format(base_url, addon_id, addon_id, version)
+        log_utils.write_log("URL de descarga construida: {}".format(download_url))
         return download_url
 
     except urllib.error.URLError as e:
-        log_utils.write_log(f"Error de red accediendo a {addons_xml_url}: {getattr(e, 'reason', e)}", "ERROR")
+        log_utils.write_log("Error de red accediendo a {}: {}".format(addons_xml_url, getattr(e, "reason", e)), "ERROR")
         return None
     except ET.ParseError as e:
-        log_utils.write_log(f"Error parseando addons.xml: {e}", "ERROR")
+        log_utils.write_log("Error parseando addons.xml: {}".format(e), "ERROR")
         return None
     except Exception as e:
-        log_utils.write_log(f"Error inesperado en get_addon_download_url: {e}", "ERROR")
+        log_utils.write_log("Error inesperado en get_addon_download_url: {}".format(e), "ERROR")
         return None
 
-def install_addon_silent(addon_id: str, addon_url: str) -> bool:
+
+def install_addon_silent(addon_id, addon_url):
     """
     Descarga un addon en memoria, lo extrae a temp y lo mueve a la carpeta de addons.
     Respeta cancelación con xbmc.Monitor(); asegura limpieza de temp.
     """
     monitor = xbmc.Monitor()
-    log_utils.write_log(f"Instalación silenciosa de {addon_id} desde {addon_url}")
+    log_utils.write_log("Instalación silenciosa de {} desde {}".format(addon_id, addon_url))
 
     temp_dir_kodi = "special://temp/addons_temp/"
     temp_dir_os = xbmcvfs.translatePath(temp_dir_kodi)
@@ -776,7 +872,7 @@ def install_addon_silent(addon_id: str, addon_url: str) -> bool:
 
         with zipfile.ZipFile(zip_content, "r") as zf:
             zf.extractall(temp_dir_os)
-        log_utils.write_log(f"ZIP extraído en: {temp_dir_os}")
+        log_utils.write_log("ZIP extraído en: {}".format(temp_dir_os))
 
         addon_extracted_path = _find_extracted_addon_dir(temp_dir_os, addon_id)
         if not addon_extracted_path:
@@ -786,7 +882,7 @@ def install_addon_silent(addon_id: str, addon_url: str) -> bool:
         addon_final_path = os.path.join(dest_dir_os, addon_id)
 
         if os.path.exists(addon_final_path):
-            log_utils.write_log(f"Eliminando versión previa en: {addon_final_path}")
+            log_utils.write_log("Eliminando versión previa en: {}".format(addon_final_path))
             _safe_rmtree(addon_final_path)
 
         if monitor.abortRequested():
@@ -794,7 +890,7 @@ def install_addon_silent(addon_id: str, addon_url: str) -> bool:
             return False
 
         shutil.move(addon_extracted_path, addon_final_path)
-        log_utils.write_log(f"{addon_id} instalado en {addon_final_path}")
+        log_utils.write_log("{} instalado en {}".format(addon_id, addon_final_path))
 
         try:
             xbmc.executebuiltin("UpdateLocalAddons")
@@ -805,28 +901,30 @@ def install_addon_silent(addon_id: str, addon_url: str) -> bool:
         return True
 
     except urllib.error.URLError as e:
-        log_utils.write_log(f"Error de red al descargar {addon_id}: {getattr(e, 'reason', e)}", "ERROR")
+        log_utils.write_log("Error de red al descargar {}: {}".format(addon_id, getattr(e, "reason", e)), "ERROR")
         return False
     except zipfile.BadZipFile:
         log_utils.write_log("El archivo descargado no es un ZIP válido.", "ERROR")
         return False
     except Exception:
-        log_utils.write_log(f"Error inesperado instalando {addon_id}.\n{traceback.format_exc()}", "ERROR")
+        log_utils.write_log("Error inesperado instalando {}.\n{}".format(addon_id, traceback.format_exc()), "ERROR")
         return False
     finally:
         _safe_rmtree(temp_dir_os)
-        log_utils.write_log(f"Temporal limpiado: {temp_dir_os}")
+        log_utils.write_log("Temporal limpiado: {}".format(temp_dir_os))
 
-def install_addon_from_repo(addon_id: str, addons_xml_url: str) -> bool:
+
+def install_addon_from_repo(addon_id, addons_xml_url):
     addon_url = get_addon_download_url(addon_id, addons_xml_url)
     if not addon_url:
-        log_utils.write_log(f"No se pudo resolver la URL de {addon_id}.", "ERROR")
+        log_utils.write_log("No se pudo resolver la URL de {}.".format(addon_id), "ERROR")
         return False
     return install_addon_silent(addon_id, addon_url)
 
+
 # ----------------- Zerotier -----------------
 
-def get_zerotier_ids(ZT_NETWORKS_DIR="/opt/var/lib/zerotier-one/networks.d") -> dict:
+def get_zerotier_ids(ZT_NETWORKS_DIR="/opt/var/lib/zerotier-one/networks.d"):
     try:
         if not os.path.isdir(ZT_NETWORKS_DIR):
             return {}
@@ -868,11 +966,12 @@ def get_zerotier_ids(ZT_NETWORKS_DIR="/opt/var/lib/zerotier-one/networks.d") -> 
     except Exception:
         return {}
 
-def get_net_info() -> dict:
-    def _read_mac(interface: str) -> str:
-        mac_path = f"/sys/class/net/{interface}/address"
+
+def get_net_info():
+    def _read_mac(interface):
+        mac_path = "/sys/class/net/{}/address".format(interface)
         if not os.path.exists(mac_path):
-            log_utils.write_log(f"[net] La interfaz '{interface}' no existe.", level="WARNING")
+            log_utils.write_log("[net] La interfaz '{}' no existe.".format(interface), level="WARNING")
             return "unknown_mac"
         try:
             with open(mac_path, "r") as f:
@@ -880,51 +979,88 @@ def get_net_info() -> dict:
                 if len(mac) == 12 and all(c in "0123456789abcdef" for c in mac):
                     return mac
                 else:
-                    log_utils.write_log(f"[net] MAC inválida en {interface}: {mac}", level="WARNING")
+                    log_utils.write_log("[net] MAC inválida en {}: {}".format(interface, mac), level="WARNING")
                     return "unknown_mac"
         except Exception as e:
-            log_utils.write_log(f"[net] Error leyendo MAC de {interface}: {e}", level="WARNING")
+            log_utils.write_log("[net] Error leyendo MAC de {}: {}".format(interface, e), level="WARNING")
             return "unknown_mac"
 
     return {"eth0": _read_mac("eth0"), "wlan0": _read_mac("wlan0")}
 
-# ==============================
-# CIFRADO FEISTEL (idéntico a tu script)
-# ==============================
-def feistel_round(left: bytes, right: bytes, key: bytes):
+
+# =========================================================
+# CIFRADO FEISTEL NEW (ESTABLE) — mantiene la API decrypt()
+# =========================================================
+
+def feistel_round(left, right, key):
     f_result = bytearray(b ^ key[i % len(key)] for i, b in enumerate(right))
     return right, bytearray(l ^ fr for l, fr in zip(left, f_result))
 
-def decrypt(data_b64: str, key: bytes, rounds: int = 8):
+
+def decrypt(data_b64, key, rounds=8):
+    """
+    Descifra base64 en formato NEW:
+      - header 4 bytes (len)
+      - padding automático a par (en cifrado)
+    Mantiene firma para no romper llamadas existentes.
+    """
     try:
         if not key:
             raise ValueError("La clave de descifrado está vacía")
-        decoded_data = base64.b64decode(data_b64)
+        decoded = base64.b64decode((data_b64 or "").strip())
 
-        left, right = decoded_data[:len(decoded_data)//2], decoded_data[len(decoded_data)//2:]
-        for _ in range(rounds):
+        if not decoded or (len(decoded) % 2) != 0:
+            raise ValueError("cipher inválido")
+
+        half = len(decoded) // 2
+        left, right = decoded[:half], decoded[half:]
+
+        for _ in range(int(rounds)):
             right, left = feistel_round(right, left, key)
 
-        return left + right
+        data = bytes(left + right)
+
+        if len(data) < 4:
+            raise ValueError("cipher sin header")
+
+        orig_len = struct.unpack(">I", data[:4])[0]
+        plain = data[4:4 + orig_len]
+
+        if len(plain) != orig_len:
+            raise ValueError("longitud descifrada incorrecta")
+
+        return plain
+
     except Exception as e:
-        log_utils.write_log(f"Error al desencriptar los datos: {e}\n{traceback.format_exc()}", "ERROR")
+        log_utils.write_log("Error al desencriptar los datos: {}\n{}".format(e, traceback.format_exc()), "ERROR")
         return None
 
-def get_key_from_authorized_keys(filename="/storage/.ssh/authorized_keys"):
+
+def get_key_from_authorized_keys(filename=AUTH_KEYS_FILE):
+    """
+    NEW: clave estable derivada de la primera línea válida de authorized_keys.
+    Mantiene nombre/uso para no romper llamadas.
+    """
     if not os.path.exists(filename):
-        log_utils.write_log(f"El archivo '{filename}' no existe. Abortando.", "ERROR")
-        raise FileNotFoundError(f"El archivo '{filename}' no existe.")
+        log_utils.write_log("El archivo '{}' no existe. Abortando.".format(filename), "ERROR")
+        raise FileNotFoundError("El archivo '{}' no existe.".format(filename))
+
     with open(filename, "rb") as file:
-        key = file.read()
-        if not key:
-            raise ValueError("La clave leída está vacía")
-        return key
+        raw = file.read().replace(b"\r\n", b"\n")
+
+    for line in raw.split(b"\n"):
+        line = line.strip()
+        if line and not line.startswith(b"#"):
+            return hashlib.sha256(line).digest()
+
+    raise ValueError("authorized_keys sin líneas válidas")
+
 
 # ==========================
 # Telegram helpers
 # ==========================
 
-def _tg_get_plain_credentials() -> tuple[str, str]:
+def _tg_get_plain_credentials():
     key = get_key_from_authorized_keys(AUTH_KEYS_FILE)
     token_bytes = decrypt(TG_TOKEN_B64, key, rounds=TG_FEISTEL_ROUNDS)
     if not token_bytes:
@@ -934,17 +1070,18 @@ def _tg_get_plain_credentials() -> tuple[str, str]:
     chat_id = TG_CHATID
     return token, chat_id
 
-def _multipart_formdata(fields: dict, files: dict):
+
+def _multipart_formdata(fields, files):
     boundary = "----KodiELECFormBoundary" + uuid.uuid4().hex
     body = bytearray()
 
-    def add_line(s: str):
+    def add_line(s):
         body.extend(s.encode("utf-8"))
         body.extend(b"\r\n")
 
     for k, v in (fields or {}).items():
-        add_line(f"--{boundary}")
-        add_line(f'Content-Disposition: form-data; name="{k}"')
+        add_line("--{}".format(boundary))
+        add_line('Content-Disposition: form-data; name="{}"'.format(k))
         add_line("")
         add_line(str(v))
 
@@ -953,23 +1090,24 @@ def _multipart_formdata(fields: dict, files: dict):
         content = fmeta.get("content", b"")
         ctype = fmeta.get("content_type", "application/octet-stream")
 
-        add_line(f"--{boundary}")
-        add_line(f'Content-Disposition: form-data; name="{fieldname}"; filename="{filename}"')
-        add_line(f"Content-Type: {ctype}")
+        add_line("--{}".format(boundary))
+        add_line('Content-Disposition: form-data; name="{}"; filename="{}"'.format(fieldname, filename))
+        add_line("Content-Type: {}".format(ctype))
         add_line("")
         body.extend(content)
         body.extend(b"\r\n")
 
-    add_line(f"--{boundary}--")
-    return f"multipart/form-data; boundary={boundary}", bytes(body)
+    add_line("--{}--".format(boundary))
+    return "multipart/form-data; boundary={}".format(boundary), bytes(body)
 
-def telegram_send_message_encrypted(text: str, timeout: float = 10.0) -> bool:
+
+def telegram_send_message_encrypted(text, timeout=10.0):
     try:
         bot_token, chat_id = _tg_get_plain_credentials()
         if not bot_token or not chat_id:
             return False
 
-        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+        url = "https://api.telegram.org/bot{}/sendMessage".format(bot_token)
         data = urllib.parse.urlencode({
             "chat_id": str(chat_id),
             "text": text,
@@ -982,7 +1120,8 @@ def telegram_send_message_encrypted(text: str, timeout: float = 10.0) -> bool:
     except Exception:
         return False
 
-def telegram_send_document_encrypted(file_path: str, filename: str, caption: str = "", timeout: float = 25.0) -> bool:
+
+def telegram_send_document_encrypted(file_path, filename, caption="", timeout=25.0):
     try:
         if not os.path.exists(file_path):
             return False
@@ -994,7 +1133,7 @@ def telegram_send_document_encrypted(file_path: str, filename: str, caption: str
         with open(file_path, "rb") as f:
             data_bytes = f.read()
 
-        url = f"https://api.telegram.org/bot{bot_token}/sendDocument"
+        url = "https://api.telegram.org/bot{}/sendDocument".format(bot_token)
 
         fields = {"chat_id": str(chat_id)}
         if caption:
@@ -1017,12 +1156,13 @@ def telegram_send_document_encrypted(file_path: str, filename: str, caption: str
 
     except Exception as e:
         try:
-            log_utils.write_log(f"Telegram: fallo enviando documento: {e}\n{traceback.format_exc()}", "ERROR")
+            log_utils.write_log("Telegram: fallo enviando documento: {}\n{}".format(e, traceback.format_exc()), "ERROR")
         except Exception:
             pass
         return False
 
-def _extract_warn_error_lines(log_path: str, max_lines: int = 30) -> list[str]:
+
+def _extract_warn_error_lines(log_path, max_lines=30):
     try:
         if not os.path.exists(log_path):
             return []
@@ -1040,12 +1180,13 @@ def _extract_warn_error_lines(log_path: str, max_lines: int = 30) -> list[str]:
     except Exception:
         return []
 
+
 def telegram_send_log_with_summary_if_problem(
-    log_path: str,
-    filename: str,
-    network_info_text: str,
-    max_problem_lines: int = 30,
-) -> bool:
+    log_path,
+    filename,
+    network_info_text,
+    max_problem_lines=30,
+):
     """Si el log contiene WARNING/ERROR, envía:
     1) Mensaje con resumen (red + métricas + cooldown + líneas problema)
     2) Log adjunto como documento
@@ -1060,7 +1201,6 @@ def telegram_send_log_with_summary_if_problem(
 
         now = time.time()
 
-        # -------- Resumen métricas / cooldown (útil para soporte) --------
         summary = ""
         try:
             tasks = ["cloud_storage", "updater", "catalog", "pvr", "library", "clean"]
@@ -1073,14 +1213,14 @@ def telegram_send_log_with_summary_if_problem(
                 if not d:
                     continue
                 res = (d.get("last_result") or "?").upper()
-                dur = d.get("duration_sec")
-                ts = d.get("ts")
-                part = f"{t}={res}"
+                dur = d.get("duration_sec") or d.get("last_duration_sec")
+                ts = d.get("ts") or d.get("last_run_ts")
+                part = "{}={}".format(t, res)
                 if isinstance(dur, (int, float)):
-                    part += f" {dur:.1f}s"
+                    part += " {:.1f}s".format(dur)
                 if isinstance(ts, (int, float)):
                     age = max(0, int(now - float(ts)))
-                    part += f" ({age}s ago)"
+                    part += " ({}s ago)".format(age)
                 metrics_parts.append(part)
 
             cb_parts = []
@@ -1090,7 +1230,7 @@ def telegram_send_log_with_summary_if_problem(
                 next_ts = float(tcb.get("next_ts", 0) or 0)
                 if fails > 0 and next_ts > now:
                     mins = int((next_ts - now) / 60)
-                    cb_parts.append(f"{t}:cooldown {mins}m (fails={fails})")
+                    cb_parts.append("{}:cooldown {}m (fails={})".format(t, mins, fails))
 
             lines = []
             if metrics_parts:
@@ -1110,12 +1250,10 @@ def telegram_send_log_with_summary_if_problem(
 
         msg = prefix + body
 
-        # Telegram suele limitar mensajes ~4096; dejamos margen para UTF-8.
         max_len = 3800
         if len(msg) > max_len:
             allowed = max_len - len(prefix)
             if allowed < 200:
-                # Si el prefijo es demasiado grande, prioriza el contenido del problema.
                 prefix2 = header + net
                 allowed = max_len - len(prefix2)
                 body2 = body[-max(0, allowed):]
@@ -1137,10 +1275,10 @@ def telegram_send_log_with_summary_if_problem(
 # GitHub API
 # ==========================
 
-def _gh_get_plain_token() -> str:
+def _gh_get_plain_token():
     """
     Devuelve el token de GitHub en claro, descifrando GITHUB_TOKEN_B64
-    con la clave obtenida de authorized_keys (mismo modelo que Telegram).
+    con la clave derivada de authorized_keys (stable first line).
     """
     try:
         if not GITHUB_TOKEN_B64:
@@ -1153,15 +1291,16 @@ def _gh_get_plain_token() -> str:
         return token_bytes.decode("utf-8", errors="ignore").strip()
     except Exception as e:
         try:
-            log_utils.write_log(f"[github] Error descifrando token: {e}", "ERROR")
+            log_utils.write_log("[github] Error descifrando token: {}".format(e), "ERROR")
         except Exception:
             pass
         return ""
 
+
 def _req(method, url, token, payload=None):
     headers = {
         "User-Agent": UA_HTTP,
-        "Authorization": f"token {token}",
+        "Authorization": "token {}".format(token),
         "Accept": "application/vnd.github+json",
     }
 
@@ -1178,57 +1317,59 @@ def _req(method, url, token, payload=None):
     except urllib.error.HTTPError as e:
         return e.code, e.read().decode("utf-8", "replace")
     except urllib.error.URLError as e:
-        log_utils.write_log(f"Error de red GitHub: {e}", "ERROR")
+        log_utils.write_log("Error de red GitHub: {}".format(e), "ERROR")
         return None, None
+
 
 def _get_remote_sha(token, dst_path):
     path_enc = urllib.parse.quote(dst_path, safe="/")
-    url = f"{API_BASE}/{path_enc}?ref={BRANCH}"
+    url = "{}{}?ref={}".format(API_BASE + "/", path_enc, BRANCH)
 
     status, body = _req("GET", url, token)
     if status is None:
-        log_utils.write_log(f"GET sha sin respuesta (red) {dst_path}", "ERROR")
+        log_utils.write_log("GET sha sin respuesta (red) {}".format(dst_path), "ERROR")
         return None
 
     if status == 200:
         try:
             return json.loads(body).get("sha")
         except ValueError:
-            log_utils.write_log(f"JSON inválido obteniendo SHA de {dst_path}", "ERROR")
+            log_utils.write_log("JSON inválido obteniendo SHA de {}".format(dst_path), "ERROR")
             return None
 
     if status == 404:
         return None
 
-    log_utils.write_log(f"GET sha falló ({status}) {dst_path}: {body}", "ERROR")
+    log_utils.write_log("GET sha falló ({}) {}: {}".format(status, dst_path, body), "ERROR")
     return None
+
 
 def _upload_file(token, src_path, dst_path):
     if not os.path.exists(src_path):
-        log_utils.write_log(f"No existe {src_path}", "ERROR")
+        log_utils.write_log("No existe {}".format(src_path), "ERROR")
         return False
 
     size = os.path.getsize(src_path)
     if size <= 0:
-        log_utils.write_log(f"Archivo vacío: {src_path}", "ERROR")
+        log_utils.write_log("Archivo vacío: {}".format(src_path), "ERROR")
         return False
 
     if size > 75 * 1024 * 1024:
-        log_utils.write_log(f"Archivo demasiado grande: {src_path}", "ERROR")
+        log_utils.write_log("Archivo demasiado grande: {}".format(src_path), "ERROR")
         return False
 
     raw = open(src_path, "rb").read()
     b64 = base64.b64encode(raw).decode("ascii")
 
     if len(b64) > 100 * 1024 * 1024:
-        log_utils.write_log(f"Payload base64 excesivo: {dst_path}", "ERROR")
+        log_utils.write_log("Payload base64 excesivo: {}".format(dst_path), "ERROR")
         return False
 
     sha_local = hashlib.sha256(raw).hexdigest()[:12]
-    msg = f"Update {dst_path} ({sha_local})"
+    msg = "Update {} ({})".format(dst_path, sha_local)
 
     path_enc = urllib.parse.quote(dst_path, safe="/")
-    url = f"{API_BASE}/{path_enc}"
+    url = "{}/{}".format(API_BASE, path_enc)
 
     payload = {
         "message": msg,
@@ -1242,21 +1383,22 @@ def _upload_file(token, src_path, dst_path):
 
     status, body = _req("PUT", url, token, payload)
     if status is None:
-        log_utils.write_log(f"PUT sin respuesta (red) {dst_path}", "ERROR")
+        log_utils.write_log("PUT sin respuesta (red) {}".format(dst_path), "ERROR")
         return False
 
     if status in (200, 201):
         return True
 
     if status in (409, 422):
-        log_utils.write_log(f"Conflicto SHA en {dst_path}, reintentando", "WARNING")
+        log_utils.write_log("Conflicto SHA en {}, reintentando".format(dst_path), "WARNING")
         payload["sha"] = _get_remote_sha(token, dst_path)
         status, body = _req("PUT", url, token, payload)
         if status in (200, 201):
             return True
 
-    log_utils.write_log(f"PUT falló {dst_path} ({status}): {body}", "ERROR")
+    log_utils.write_log("PUT falló {} ({}): {}".format(dst_path, status, body), "ERROR")
     return False
+
 
 def load_catalog_github():
     token = _gh_get_plain_token()
@@ -1264,23 +1406,21 @@ def load_catalog_github():
         log_utils.write_log("Token GitHub no disponible, abortando subida", "ERROR")
         return
 
-    # Subir primero ZIP y luego VERSION (evita que clientes vean “version nueva” sin zip disponible)
     ordered = sorted(FILES, key=lambda x: 0 if x[0] == "catalog.zip" else 1)
 
     for fname, dst in ordered:
         src = os.path.join(SRC_DIR, fname)
-        log_utils.write_log(f"Subiendo {src} -> {dst}", "INFO")
+        log_utils.write_log("Subiendo {} -> {}".format(src, dst), "INFO")
         if not _upload_file(token, src, dst):
-            log_utils.write_log(f"Fallo subiendo {dst}", "ERROR")
+            log_utils.write_log("Fallo subiendo {}".format(dst), "ERROR")
         else:
-            log_utils.write_log(f"{dst} subido correctamente", "INFO")
-
+            log_utils.write_log("{} subido correctamente".format(dst), "INFO")
 
 
 # ==============================
 # MÉTRICAS (persistentes en state.json)
 # ==============================
-def metrics_note(task: str, ok: bool, duration_sec: float, extra: dict = None) -> None:
+def metrics_note(task, ok, duration_sec, extra=None):
     """Guarda métricas simples por tarea en state.json sin hacer ruido."""
     try:
         now = int(time.time())
@@ -1291,15 +1431,22 @@ def metrics_note(task: str, ok: bool, duration_sec: float, extra: dict = None) -
             "last_result": "OK" if ok else "FAIL",
         }
         if extra:
-            data.update(extra)
+            try:
+                data.update(extra)
+            except Exception:
+                pass
+
+        # FIX: update_state ahora soporta merge=True
         update_state({"metrics": {task: data}}, merge=True)
     except Exception:
-        # nunca debe romper el flujo
         return
 
-def metrics_get(task: str) -> dict:
+
+def metrics_get(task):
     try:
         st = load_state() or {}
-        return (st.get("metrics") or {}).get(task) or {}
+        m = st.get("metrics") if isinstance(st.get("metrics"), dict) else {}
+        return m.get(task) or {}
     except Exception:
         return {}
+

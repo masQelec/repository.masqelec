@@ -2,17 +2,15 @@
 """
 update.py — Comprobación y aplicación de actualización de sistema
 - Lee versión local y remota (VERSION/VERSION_ID) y compara correctamente
-- Usa rclone_utils para sincronizar artefactos de forma robusta (sync selectivo a staging en RAM)
-- Descarga temporal en RAM (/dev/shm) y movimiento a /storage/.update
-- Manejo de cuota de Google Drive (no bloquea lsjson por rate limit)
+- Control remoto (os-release) vía rclone: masqelec/update/<DEVICE>/os-release
+- Selecciona carpeta remota SEGÚN COREELEC_DEVICE (Amlogic-ng / Amlogic-ce)
+- Usa rclone_utils para sync selectivo a staging + movimiento a /storage/.update
 - Diálogo al usuario y reinicio seguro
 """
 
 import os
 import re
 import time
-import urllib.request
-import urllib.error
 import shutil
 import xbmc
 import xbmcgui
@@ -23,38 +21,13 @@ from lib import utils
 from lib import rclone_utils as rc
 
 # ------------------------------
-# CONFIG RED (para control remoto de versión)
+# CONFIG
 # ------------------------------
 
-NET_TIMEOUT = 20
-NET_RETRIES = 2
-UA = "masQelec/1.0 (+Kodi)"
-
 REMOTE_UPDATE_REMOTE = "masqelec"
-REMOTE_UPDATE_DIR    = "masqelec/update"   # carpeta remota donde están los paquetes
+REMOTE_UPDATE_BASEDIR = "masqelec/update"   # dentro hay subcarpetas por DEVICE: Amlogic-ng, Amlogic-ce, ...
+REMOTE_CONTROL_NAME = "os-release"          # fichero remoto por device: .../<DEVICE>/os-release
 
-def _net_open(url: str, timeout: int = NET_TIMEOUT):
-    """Abre una URL con UA y reintentos básicos."""
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    last_err = None
-    for attempt in range(NET_RETRIES + 1):
-        try:
-            return urllib.request.urlopen(req, timeout=timeout)
-        except urllib.error.URLError as e:
-            last_err = e
-            log_utils.write_log(f"[net] intento {attempt+1}/{NET_RETRIES+1} falló para {url}: {getattr(e, 'reason', e)}", "ERROR")
-            time.sleep(2)
-    raise last_err
-
-def get_text_from_url(url: str):
-    """Descarga el contenido de texto desde una URL, con timeout y reintentos."""
-    try:
-        with _net_open(url) as resp:
-            return resp.read().decode("utf-8", errors="replace")
-    except Exception as e:
-        utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
-        log_utils.write_log(f"Error al obtener datos de la URL: {e}", "ERROR")
-        return None
 
 # ------------------------------
 # PARSEO DE VERSIONES
@@ -76,71 +49,134 @@ def parse_version(v: str):
             break
     return tuple(parts) if parts else (0,)
 
-def get_version_from_file(filename: str, identifier: str):
-    """Obtiene la versión desde un archivo local buscando un identificador."""
+# ------------------------------
+# LECTURA KV (os-release style)
+# ------------------------------
+
+def get_kv_from_file(filename: str, key: str):
+    """
+    Lee un KEY=VALUE desde un archivo tipo os-release.
+    Admite VALUE con o sin comillas.
+    """
     try:
         with open(filename, 'r', encoding="utf-8", errors="ignore") as f:
             for line in f:
-                if identifier in line:
-                    m = re.search(r'"([^"]+)"', line)
-                    return m.group(1) if m else None
-    except FileNotFoundError:
-        log_utils.write_log(f"No se encontró el archivo {filename}", "ERROR")
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                if not line.startswith(key + "="):
+                    continue
+                v = line.split("=", 1)[1].strip()
+                if len(v) >= 2 and ((v[0] == '"' and v[-1] == '"') or (v[0] == "'" and v[-1] == "'")):
+                    return v[1:-1]
+                return v
     except Exception as e:
-        utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
-        log_utils.write_log(f"Error leyendo {filename}: {e}", "ERROR")
-    return None
+        log_utils.write_log("[kv] Error leyendo {}: {}".format(filename, e), "ERROR")
+        return None
 
-def get_version_from_text(text: str, identifier: str):
-    """Obtiene la versión desde un texto en memoria."""
+def get_kv_from_text(text: str, key: str):
+    """
+    Lee un KEY=VALUE desde texto en memoria.
+    Admite VALUE con o sin comillas.
+    """
     if not text:
         return None
     for line in text.splitlines():
-        if identifier in line:
-            m = re.search(r'"([^"]+)"', line)
-            return m.group(1) if m else None
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if not line.startswith(key + "="):
+            continue
+        v = line.split("=", 1)[1].strip()
+        if len(v) >= 2 and ((v[0] == '"' and v[-1] == '"') or (v[0] == "'" and v[-1] == "'")):
+            return v[1:-1]
+        return v
     return None
 
+# ------------------------------
+# CONTROL REMOTO VÍA RCLONE
+# ------------------------------
+
+def get_text_from_rclone(remote: str, remote_path: str):
+    """
+    Descarga un fichero pequeño vía rclone a /tmp y lo lee como texto.
+    Requiere rc.copy_remote_to_tmp_then_move(remote, remote_path, final_dir).
+    """
+    tmp_dir = "/tmp/update_control"
+    try:
+        if os.path.exists(tmp_dir):
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+        os.makedirs(tmp_dir, exist_ok=True)
+    except Exception:
+        pass
+
+    try:
+        ok = rc.copy_remote_to_tmp_then_move(remote=remote, remote_path=remote_path, final_dir=tmp_dir)
+        if not ok:
+            log_utils.write_log("[control] No se pudo copiar control remoto via rclone: {}:{}".format(remote, remote_path), "ERROR")
+            utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
+            return None
+
+        local_file = os.path.join(tmp_dir, os.path.basename(remote_path))
+        if not os.path.exists(local_file) or os.path.getsize(local_file) <= 0:
+            log_utils.write_log("[control] Control copiado pero no válido: {}".format(local_file), "ERROR")
+            utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
+            return None
+
+        with open(local_file, "r", encoding="utf-8", errors="replace") as f:
+            return f.read()
+
+    except Exception as e:
+        utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
+        log_utils.write_log("[control] Error leyendo control remoto: {}".format(e), "ERROR")
+        return None
+    finally:
+        try:
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+        except Exception:
+            pass
+
+# ------------------------------
+# HELPERS UPDATE
+# ------------------------------
+
 def _cleanup_dir(path: str):
-    """Elimina un directorio recursivamente sin romper el flujo."""
     try:
         if path and os.path.exists(path):
             shutil.rmtree(path, ignore_errors=True)
-            log_utils.write_log(f"[cleanup] Eliminado staging temporal: {path}")
+            log_utils.write_log("[cleanup] Eliminado staging temporal: {}".format(path))
     except Exception as e:
         utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
-        log_utils.write_log(f"[cleanup] Error al eliminar {path}: {e}", "ERROR")
+        log_utils.write_log("[cleanup] Error al eliminar {}: {}".format(path, e), "ERROR")
 
-def _sync_update_to_staging(version_file_base: str) -> tuple[str | None, str | None]:
+def _sync_update_to_staging(version_file_base: str, remote_update_dir: str):
     """
-    Sincroniza desde el remoto SOLO el/los artefacto(s) que matcheen version_file_base.*
-    a un staging temporal en RAM. Devuelve (staging_dir, local_pkg_path) o (None,None) en error.
-
-    Se admiten extensiones habituales: .tar, .tar.gz, .tar.xz, .zip
+    Sincroniza desde remote_update_dir SOLO el/los artefacto(s) que matcheen version_file_base.*
+    a un staging temporal. Devuelve (staging_dir, local_pkg_path) o (None,None) en error.
     """
-    base_tmp = "/tmp"
-    staging  = os.path.join(base_tmp, "staging_update")
+    staging = "/tmp/staging_update"
     try:
         if os.path.exists(staging):
             shutil.rmtree(staging, ignore_errors=True)
         os.makedirs(staging, exist_ok=True)
     except Exception as e:
         utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
-        log_utils.write_log(f"[staging] No se pudo preparar {staging}: {e}", "ERROR")
+        log_utils.write_log("[staging] No se pudo preparar {}: {}".format(staging, e), "ERROR")
         return None, None
 
-    # includes cerrando todo lo demás (staging minimal)
-    # NOTA: usamos patrones para cubrir distintas extensiones
     includes = [
-        f"/{version_file_base}.tar",
-        f"/{version_file_base}.tar.*",
-        f"/{version_file_base}.zip",
+        "/{}.tar".format(version_file_base),
+        "/{}.tar.*".format(version_file_base),
+        "/{}.zip".format(version_file_base),
     ]
-    log_utils.write_log(f"[sync] rclone sync selectivo {REMOTE_UPDATE_REMOTE}:{REMOTE_UPDATE_DIR} -> {staging} (includes={includes})")
+
+    log_utils.write_log("[sync] rclone sync selectivo {}:{} -> {} (includes={})".format(
+        REMOTE_UPDATE_REMOTE, remote_update_dir, staging, includes
+    ))
 
     ok = rc.sync_remote_dir(
         remote=REMOTE_UPDATE_REMOTE,
-        remote_dir=REMOTE_UPDATE_DIR,
+        remote_dir=remote_update_dir,
         local_dir=staging,
         includes=includes,
         excludes=["**"],
@@ -152,47 +188,41 @@ def _sync_update_to_staging(version_file_base: str) -> tuple[str | None, str | N
         _cleanup_dir(staging)
         return None, None
 
-    # Elegir el artefacto descargado (prioridad: .tar, .tar.gz/.tar.xz, .zip, otros)
     try:
         entries = [f for f in os.listdir(staging) if os.path.isfile(os.path.join(staging, f))]
-        # Filtra por prefijo version_file_base + '.'
-        candidates = [f for f in entries if f == f"{version_file_base}.tar" or f.startswith(f"{version_file_base}.")]
+        candidates = [f for f in entries if f == "{}.tar".format(version_file_base) or f.startswith(version_file_base + ".")]
         if not candidates:
-            log_utils.write_log(f"[sync] No se encontró artefacto para {version_file_base} en staging.", "ERROR")
+            log_utils.write_log("[sync] No se encontró artefacto para {} en staging.".format(version_file_base), "ERROR")
             _cleanup_dir(staging)
             return None, None
 
-        # Orden de preferencia
         pref_order = []
-        if f"{version_file_base}.tar" in candidates:
-            pref_order.append(f"{version_file_base}.tar")
+        t_plain = "{}.tar".format(version_file_base)
+        if t_plain in candidates:
+            pref_order.append(t_plain)
         pref_order += sorted([c for c in candidates if c.endswith(".tar.gz") or c.endswith(".tar.xz")])
-        if f"{version_file_base}.zip" in candidates:
-            pref_order.append(f"{version_file_base}.zip")
-        # completa con el resto (por si acaso)
+        z_plain = "{}.zip".format(version_file_base)
+        if z_plain in candidates:
+            pref_order.append(z_plain)
         pref_order += [c for c in candidates if c not in pref_order]
 
         chosen = pref_order[0]
         pkg_path = os.path.join(staging, chosen)
         if not (os.path.exists(pkg_path) and os.path.getsize(pkg_path) > 0):
-            log_utils.write_log(f"[sync] Artefacto no válido: {pkg_path}", "ERROR")
+            log_utils.write_log("[sync] Artefacto no válido: {}".format(pkg_path), "ERROR")
             _cleanup_dir(staging)
             return None, None
 
-        log_utils.write_log(f"[sync] Artefacto listo en staging: {pkg_path}")
+        log_utils.write_log("[sync] Artefacto listo en staging: {}".format(pkg_path))
         return staging, pkg_path
 
     except Exception as e:
         utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
-        log_utils.write_log(f"[sync] Error inspeccionando staging: {e}", "ERROR")
+        log_utils.write_log("[sync] Error inspeccionando staging: {}".format(e), "ERROR")
         _cleanup_dir(staging)
         return None, None
 
-def _place_update_package(pkg_local_path: str, target_dir: str = "/storage/.update") -> str | None:
-    """
-    Copia el paquete desde staging al directorio de actualización.
-    Devuelve la ruta final o None si falla.
-    """
+def _place_update_package(pkg_local_path: str, target_dir: str = "/storage/.update"):
     try:
         os.makedirs(target_dir, exist_ok=True)
     except Exception:
@@ -202,13 +232,13 @@ def _place_update_package(pkg_local_path: str, target_dir: str = "/storage/.upda
         final_path = os.path.join(target_dir, os.path.basename(pkg_local_path))
         shutil.copy2(pkg_local_path, final_path)
         if os.path.exists(final_path) and os.path.getsize(final_path) > 0:
-            log_utils.write_log(f"[update] Artefacto colocado en {final_path}")
+            log_utils.write_log("[update] Artefacto colocado en {}".format(final_path))
             return final_path
-        log_utils.write_log(f"[update] Copia inválida a {final_path}", "ERROR")
+        log_utils.write_log("[update] Copia inválida a {}".format(final_path), "ERROR")
         return None
     except Exception as e:
         utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
-        log_utils.write_log(f"[update] Error copiando paquete a {target_dir}: {e}", "ERROR")
+        log_utils.write_log("[update] Error copiando paquete a {}: {}".format(target_dir, e), "ERROR")
         return None
 
 # ------------------------------
@@ -216,10 +246,9 @@ def _place_update_package(pkg_local_path: str, target_dir: str = "/storage/.upda
 # ------------------------------
 
 def update_system():
-    """Verifica si hay una actualización disponible e inicia el proceso."""
     monitor = xbmc.Monitor()
 
-    # Circuit breaker (persistente): evita bucles si el remoto falla continuamente
+    # Circuit breaker
     if not utils.cb_should_run("updater"):
         msg = "updater en cooldown por fallos repetidos; se omite este ciclo."
         if utils.cb_should_log_cooldown("updater"):
@@ -231,46 +260,60 @@ def update_system():
     try:
         log_utils.write_log("Iniciando verificación de sistema para actualización.")
 
-        # 1) Versión local
-        local_version = get_version_from_file('/etc/os-release', 'VERSION_ID')
+        # 1) Versión local y DEVICE local
+        local_osr = "/etc/os-release"
+        local_version = get_kv_from_file(local_osr, "VERSION_ID")
         if not local_version:
             log_utils.write_log("No se pudo obtener la versión local.", "WARNING")
             utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
             return
 
-        # 2) Versión remota (fichero de control)
-        url_content = get_text_from_url(
-            'https://docs.google.com/uc?export=download&id=1jYfAGe_peaZJvhhTgXhDWBrQIX8yeAPv'
-        )
-        if not url_content:
-            log_utils.write_log("No se pudo obtener la versión remota.", "WARNING")
+        device = get_kv_from_file(local_osr, "COREELEC_DEVICE")
+        if not device:
+            log_utils.write_log("[update] No se pudo determinar COREELEC_DEVICE. Abort por seguridad.", "ERROR")
+            return
+
+        # 2) Control remoto por DEVICE: masqelec/update/<DEVICE>/os-release
+        remote_update_dir = "{}/{}".format(REMOTE_UPDATE_BASEDIR, device)
+        remote_control_path = "{}/{}".format(remote_update_dir, REMOTE_CONTROL_NAME)
+
+        log_utils.write_log("[update] DEVICE local: {} | Control remoto: {}:{}".format(
+            device, REMOTE_UPDATE_REMOTE, remote_control_path
+        ))
+
+        remote_text = get_text_from_rclone(REMOTE_UPDATE_REMOTE, remote_control_path)
+        if not remote_text:
+            log_utils.write_log("No se pudo obtener el control remoto (os-release) vía rclone.", "WARNING")
             utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
             return
 
-        remote_version = get_version_from_text(url_content, 'VERSION_ID')
+        remote_version = get_kv_from_text(remote_text, "VERSION_ID")
         if not remote_version:
-            log_utils.write_log("No se encontró VERSION_ID en el archivo remoto.", "WARNING")
+            log_utils.write_log("No se encontró VERSION_ID en el os-release remoto.", "WARNING")
             return
 
-        version_file = get_version_from_text(url_content, 'VERSION')  # nombre base del paquete sin extensión
-        log_utils.write_log(f"Local: {local_version} | Remota: {remote_version} | Archivo base: {version_file or 'N/D'}")
+        version_file = get_kv_from_text(remote_text, "VERSION")  # nombre base del paquete sin extensión
+        log_utils.write_log("Local: {} | Remota: {} | Archivo base: {}".format(
+            local_version, remote_version, version_file or "N/D"
+        ))
 
-        # 3) Comparar versiones correctamente
+        # 3) Comparar versiones
         local_t  = parse_version(local_version)
         remote_t = parse_version(remote_version)
-        log_utils.write_log(f"Comparación de versión: local={local_version} -> {local_t} | remoto={remote_version} -> {remote_t}")
+        log_utils.write_log("Comparación de versión: local={} -> {} | remoto={} -> {}".format(
+            local_version, local_t, remote_version, remote_t
+        ))
 
         if local_t < remote_t:
-            log_utils.write_log(f"Nueva actualización disponible: {remote_version} > {local_version}")
+            log_utils.write_log("Nueva actualización disponible: {} > {}".format(remote_version, local_version))
 
             if not version_file:
-                log_utils.write_log("El archivo remoto no especifica VERSION (nombre base del paquete).", "ERROR")
+                log_utils.write_log("El os-release remoto no especifica VERSION (nombre base del paquete).", "ERROR")
                 return
 
-            # 4) Sincronizar artefacto de actualización a STAGING (selectivo) y colocarlo en /storage/.update
             staging = None
             try:
-                staging, pkg_path = _sync_update_to_staging(version_file)
+                staging, pkg_path = _sync_update_to_staging(version_file, remote_update_dir)
                 if not pkg_path:
                     log_utils.write_log("No se pudo preparar el artefacto en staging.", "ERROR")
                     return
@@ -286,7 +329,7 @@ def update_system():
                 dialog = xbmcgui.Dialog()
                 ret = dialog.yesno(
                     "Actualización disponible",
-                    f"Se encontró la versión {remote_version}.\n¿Deseas actualizar ahora o en el próximo reinicio?",
+                    "Se encontró la versión {}.\n¿Deseas actualizar ahora o en el próximo reinicio?".format(remote_version),
                     nolabel="Posponer",
                     yeslabel="Actualizar"
                 )
@@ -296,7 +339,7 @@ def update_system():
                         log_utils.notify("Iniciando proceso de actualización…", xbmcgui.NOTIFICATION_INFO)
                     except Exception:
                         pass
-                    log_utils.write_log(f"Reiniciando para actualizar (paquete: {final_pkg})")
+                    log_utils.write_log("Reiniciando para actualizar (paquete: {})".format(final_pkg))
                     time.sleep(2)
                     try:
                         xbmc.executebuiltin("Reboot")
@@ -309,7 +352,6 @@ def update_system():
                         pass
 
             finally:
-                # 🧹 Limpieza de staging en cualquier caso
                 if staging:
                     _cleanup_dir(staging)
 
@@ -321,8 +363,9 @@ def update_system():
 
     except Exception as e:
         utils.cb_note_failure("updater", fail_threshold=3, cooldown_sec=3600)
-        log_utils.write_log(f"Error en update_system: {e}\n{traceback.format_exc()}", "ERROR")
+        log_utils.write_log("Error en update_system: {}\n{}".format(e, traceback.format_exc()), "ERROR")
         try:
             log_utils.notify("Error en el proceso de actualización", xbmcgui.NOTIFICATION_ERROR)
         except Exception:
             pass
+
