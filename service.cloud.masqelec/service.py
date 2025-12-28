@@ -728,8 +728,8 @@ def _periodic_update_worker():
                 _last_update_ts = time.time()
                 log("UpdateLibrary periódico (silencioso) -> finalizado")
                 log("Iniciando carga del catalogo")
-                #core_catalog.generate_catalog()
-                #utils.load_catalog_github()
+                core_catalog.generate_catalog()
+                utils.load_catalog_github()
 
         except Exception:
             success = False

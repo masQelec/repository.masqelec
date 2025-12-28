@@ -62,8 +62,11 @@ def cb_note_success(task):
     st["circuit_breaker"] = cb
     save_state(st)
 
-def cb_note_failure(name, threshold=3, cooldown_sec=3600, max_fails=None):
-    if max_fails is not None:
+def cb_note_failure(name, threshold=3, cooldown_sec=3600, max_fails=None, fail_threshold=None):
+    # Compat aliases
+    if fail_threshold is not None:
+        threshold = int(fail_threshold)
+    elif max_fails is not None:
         threshold = int(max_fails)
     try:
         st = load_state()
