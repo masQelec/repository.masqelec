@@ -55,7 +55,6 @@ def is_master_device():
     """
     master_node = (DEFAULT_MASTER_NODE_NAME_ZEROTIER or "").strip()
     if not master_node:
-        log_utils.write_log("[role] CLIENTE: DEFAULT_MASTER_NODE_NAME_ZEROTIER vacío", "INFO")
         return False
 
     # 1) MAC match
@@ -73,18 +72,8 @@ def is_master_device():
     node_match = bool(node_name and node_name == master_node)
 
     if mac_match and node_match:
-        log_utils.write_log(
-            "[role] MASTER: mac_match=True y node_name='{}'".format(node_name),
-            "INFO",
-        )
         return True
 
-    log_utils.write_log(
-        "[role] CLIENTE: mac_match={} (eth0={}) node_match={} (node_name='{}' master='{}')".format(
-            mac_match, eth0 or "-", node_match, node_name or "-", master_node
-        ),
-        "INFO",
-    )
     return False
 
 

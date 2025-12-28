@@ -364,9 +364,36 @@ def ensure_tvh_http_user_agent() -> bool:
 
 def update_pvr():
     """
-    Actualización completa de PVR
+    Punto de entrada PVR (mínimo):
+      - Actualiza tv_grab_file (si cambia)
+      - Asegura http_user_agent en Tvheadend
+    NOTA: update_playlist() se gestiona fuera de aquí (o se llama desde otro flujo).
     """
     start_ts = time.time()
-    update_tv_grab_file()
-    ensure_tvh_http_user_agent()
+
+    # 1) bin tv_grab_file
+    try:
+        update_tv_grab_file()
+    except Exception as e:
+        try:
+            log_utils.write_log("[pvr] update_tv_grab_file error: {}".format(e), level="WARNING")
+        except Exception:
+            pass
+
+    # 2) user-agent tvheadend
+    try:
+        ensure_tvh_http_user_agent()
+    except Exception as e:
+        try:
+            log_utils.write_log("[pvr] ensure_tvh_http_user_agent error: {}".format(e), level="WARNING")
+        except Exception:
+            pass
+
+    # 3) log final
+    try:
+        dt = time.time() - start_ts
+        log_utils.write_log("[pvr] update_pvr terminado en {:.1f}s".format(dt), level="INFO")
+    except Exception:
+        pass
+
 
