@@ -18,6 +18,7 @@ _DEVICE_ROLE = None
 
 # Compat: valor por defecto (puedes sobreescribirlo desde settings si ya lo haces)
 DEFAULT_MASTER_ETH0_MACS = "066230512670"
+DEFAULT_MASTER_NODE_NAME_ZEROTIER = "CS905X330500169"
 
 AUTH_KEYS_FILE = "/storage/.ssh/authorized_keys"
 
@@ -46,16 +47,46 @@ def _parse_master_macs(macs_cfg):
     return out
 
 def is_master_device():
+    """
+    Regla estricta:
+    - Si no hay master_node configurado -> CLIENTE
+    - MASTER solo si se cumplen *ambas*:
+        (MAC eth0 en lista) AND (ZeroTier node_name coincide)
+    """
+    master_node = (DEFAULT_MASTER_NODE_NAME_ZEROTIER or "").strip()
+    if not master_node:
+        log_utils.write_log("[role] CLIENTE: DEFAULT_MASTER_NODE_NAME_ZEROTIER vacío", "INFO")
+        return False
+
+    # 1) MAC match
     eth0 = _normalize_mac12(get_device_eth0_mac())
-    if not eth0:
-        return False
-
     master_set = _parse_master_macs(DEFAULT_MASTER_ETH0_MACS)
-    if not master_set:
-        log_utils.write_log("[role] DEFAULT_MASTER_ETH0_MACS vacío o inválido", "WARNING")
-        return False
+    mac_match = bool(eth0 and master_set and eth0 in master_set)
 
-    return eth0 in master_set
+    # 2) node_name match (debe existir y coincidir)
+    try:
+        zt = get_zerotier_ids() or {}
+        node_name = (zt.get("n") or "").strip()
+    except Exception:
+        node_name = ""
+
+    node_match = bool(node_name and node_name == master_node)
+
+    if mac_match and node_match:
+        log_utils.write_log(
+            "[role] MASTER: mac_match=True y node_name='{}'".format(node_name),
+            "INFO",
+        )
+        return True
+
+    log_utils.write_log(
+        "[role] CLIENTE: mac_match={} (eth0={}) node_match={} (node_name='{}' master='{}')".format(
+            mac_match, eth0 or "-", node_match, node_name or "-", master_node
+        ),
+        "INFO",
+    )
+    return False
+
 
 def get_device_role():
     """
@@ -109,9 +140,9 @@ def get_key_from_authorized_keys(filename=AUTH_KEYS_FILE):
                 return hashlib.sha256(line).digest()
 
     except Exception:
-        log_utils.log(
+        log_utils.write_log(
             "[device] error leyendo authorized_keys:\n{}".format(traceback.format_exc()),
-            level="WARNING",
+            "WARNING",
         )
 
     return None
