@@ -336,21 +336,31 @@ def generate_catalog():
 
     new_hash, count = compute_version_hash(CATALOG_ROOT)
 
-    if old_hash and old_hash == new_hash.lower():
-        log_utils.write_log(f"Hash idéntico al anterior; NO se actualiza {VER_NAME} (hash={new_hash})")
+    changed = not (old_hash and old_hash == new_hash.lower())
+
+    if not changed:
+        log_utils.write_log(f"Hash idéntico al anterior; NO se actualiza {VER_NAME} ni se crea ZIP (hash={new_hash})")
+        # Si existe un ZIP viejo, opcionalmente bórralo para evitar que alguien lo suba por error
+        try:
+            old_zip = os.path.join(EXPORT_DIR, ZIP_NAME)
+            if os.path.exists(old_zip):
+                os.remove(old_zip)
+        except Exception:
+            pass
     else:
         stamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
         ver_txt = f"{new_hash}  strm_files={count}  utc={stamp}\n"
         write_text(ver_path, ver_txt)
         log_utils.write_log(f"Version actualizada: {ver_path} (hash={new_hash})")
 
-    if MAKE_ZIP:
-        zip_path = os.path.join(EXPORT_DIR, ZIP_NAME)
-        log_utils.write_log("Creando ZIP (.strm)…")
-        make_zip(CATALOG_ROOT, zip_path)
-        log_utils.write_log(f"ZIP: {zip_path}")
+        if MAKE_ZIP:
+            zip_path = os.path.join(EXPORT_DIR, ZIP_NAME)
+            log_utils.write_log("Creando ZIP (.strm)…")
+            make_zip(CATALOG_ROOT, zip_path)
+            log_utils.write_log(f"ZIP: {zip_path}")
 
-    log_utils.write_log(f"OK. hash={new_hash} strm_files={count}")
+    log_utils.write_log(f"OK. hash={new_hash} strm_files={count} changed={int(changed)}")
+
 
 # ==========================
 # LOCK

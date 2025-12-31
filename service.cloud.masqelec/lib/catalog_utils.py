@@ -214,20 +214,43 @@ def _upload_file(token, src_path, dst_path):
 def load_catalog_github():
     """
     Sube catálogo a GitHub:
+    - SOLO si existen catalog.zip y catalog.version en SRC_DIR
     - Primero catalog.zip
     - Luego catalog.version
     """
+    zip_path = os.path.join(SRC_DIR, "catalog.zip")
+    ver_path = os.path.join(SRC_DIR, "catalog.version")
+
+    have_zip = os.path.isfile(zip_path)
+    have_ver = os.path.isfile(ver_path)
+
+    # Regla: si NO hay ZIP => no hay cambios (generate_catalog lo omitió)
+    if not have_zip:
+        log_utils.write_log("[catalog_uploader] Sin cambios: no existe catalog.zip -> NO se sube.", "INFO")
+        return True
+
+    # Si hay ZIP pero no version => eso sí es inconsistente
+    if not have_ver:
+        log_utils.write_log("[catalog_uploader] Estado inconsistente: zip=True version=False. Abortando subida.", "ERROR")
+        return False
+
+    # Ya sabemos que hay algo real que subir -> ahora sí exigimos token
     token = _gh_get_plain_token()
     if not token:
         log_utils.write_log("Token GitHub no disponible, abortando subida", "ERROR")
         return False
 
-    # Orden: ZIP primero
-    ordered = sorted(FILES, key=lambda x: 0 if x[0] == "catalog.zip" else 1)
-
     ok_all = True
-    for fname, dst in ordered:
+
+    # Orden fijo: ZIP primero, VERSION después
+    for fname, dst in FILES:
         src = os.path.join(SRC_DIR, fname)
+
+        # Aquí debería existir sí o sí; si no, error real
+        if not os.path.isfile(src):
+            log_utils.write_log("[catalog_uploader] Falta fichero requerido: {}".format(src), "ERROR")
+            return False
+
         log_utils.write_log("Subiendo {} -> {}".format(src, dst), "INFO")
         if not _upload_file(token, src, dst):
             log_utils.write_log("Fallo subiendo {}".format(dst), "ERROR")
@@ -236,4 +259,5 @@ def load_catalog_github():
             log_utils.write_log("{} subido correctamente".format(dst), "INFO")
 
     return ok_all
+
 

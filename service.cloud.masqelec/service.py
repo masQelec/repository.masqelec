@@ -30,7 +30,7 @@ from lib.cloud_storage import start_cloud_storage
 from lib.updater import update_system
 from lib.update_library import update_library
 from lib.update_pvr import update_pvr, update_playlist
-from lib.jsonrpc_utils import get_library_stats, get_installed_addons
+from lib.jsonrpc_utils import get_library_stats, get_installed_addons_filtered, format_addons_for_log
 from lib import utils
 from lib import core_catalog
 
@@ -638,9 +638,6 @@ def _periodic_pvr_worker():
     if not utils.kodi_is_idle():
         log("Omitiendo revisión PVR: Kodi no está inactivo.", "INFO")
         return
-    if not _mounts_ready():
-        log("Omitiendo revisión PVR: montajes rclone no listos.", "WARNING")
-        return
 
     if _task_is_in_cooldown("pvr"):
         log("Omitiendo revisión PVR: en cooldown por fallos recientes.", "WARNING")
@@ -941,9 +938,16 @@ def run_service():
         log(f"No se pudieron obtener las estadísticas de biblioteca para añadir al log: {e}", "ERROR")
 
     try:
-        addons = get_installed_addons()
-        for a in addons:
-            log(f"{a['id']} | {a['name']} | v{a['version']} | enabled={a['enabled']}", "INFO")
+        ALLOW = [
+            "service.tvheadend43",
+            "pvr.hts",
+            "service.cloud.masqelec",
+        ]
+
+        addons = get_installed_addons_filtered(ALLOW, include_missing=True)
+        for line in format_addons_for_log(addons):
+            log(line, "INFO")
+
     except Exception:
         log("No se pudo obtener el listado de addons para añadir al log", "ERROR")
 
