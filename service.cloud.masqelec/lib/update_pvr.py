@@ -25,6 +25,7 @@ import sqlite3
 import subprocess
 import traceback
 import base64
+import uuid
 import urllib.request
 import urllib.parse
 import urllib.error
@@ -46,6 +47,7 @@ except Exception:
 # Constantes
 # ------------------------------
 PVR_ADDON_ID = "pvr.hts"
+TVH_TAGDIR = "/storage/.kodi/userdata/addon_data/service.tvheadend43/channel/tag"
 TVH_SERVICE  = "service.tvheadend43"
 
 TVH_HTTP_PORT = 9981
@@ -963,6 +965,156 @@ def ensure_tvh_http_user_agent() -> bool:
 # ------------------------------
 # Playlist updater
 # ------------------------------
+def _tvh_tag_norm(s):
+    # comparación exacta (texto completo), case-insensitive y espacios normalizados
+    s = (s or "").strip()
+    s = re.sub(r"\s+", " ", s)
+    return s.casefold()
+
+
+def _tvh_parse_groups_from_m3u(m3u_path):
+    groups = set()
+    try:
+        with open(m3u_path, "r", encoding="utf-8", errors="replace") as f:
+            for line in f:
+                if not line.lstrip().startswith("#EXTINF"):
+                    continue
+                m = _RE_GRP_TITLE.search(line)
+                if not m:
+                    continue
+                g = (m.group(2) or "").strip()
+                if g:
+                    groups.add(g)
+    except Exception:
+        return set()
+    return groups
+
+
+def _tvh_load_json(path):
+    try:
+        with open(path, "r", encoding="utf-8", errors="replace") as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+
+def _tvh_save_json_atomic(path, data):
+    tmp = path + ".tmp"
+    try:
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+            f.write("\n")
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+        return True
+    except Exception:
+        try:
+            if os.path.exists(tmp):
+                os.remove(tmp)
+        except Exception:
+            pass
+        return False
+
+
+def sync_tvh_channel_tags_from_playlist(playlist_m3u_path):
+    """
+    Sincroniza TVH_TAGDIR con los group-title del M3U (comparación exacta: casefold + espacios).
+      - Crea tags que falten
+      - Borra tags no-internal que no estén en la lista IPTV
+    Recomendado ejecutarlo con Tvheadend parado (soft reset) para evitar lecturas concurrentes.
+    Devuelve: (ok:bool, created:int, deleted:int)
+    """
+    tagdir = TVH_TAGDIR
+
+    if not os.path.isdir(tagdir):
+        log_utils.write_log("[pvr][tags] tagdir no existe: {}".format(tagdir), level="WARNING")
+        return False, 0, 0
+
+    desired_raw = _tvh_parse_groups_from_m3u(playlist_m3u_path)
+    if not desired_raw:
+        log_utils.write_log("[pvr][tags] playlist sin group-title; no sincronizo tags.", level="WARNING")
+        return False, 0, 0
+
+    desired_norm = set(_tvh_tag_norm(g) for g in desired_raw)
+
+    entries = []
+    max_index = -1
+
+    try:
+        for fn in os.listdir(tagdir):
+            if fn.startswith("."):
+                continue
+            path = os.path.join(tagdir, fn)
+            if not os.path.isfile(path):
+                continue
+
+            d = _tvh_load_json(path)
+            if not isinstance(d, dict):
+                continue
+
+            name = (d.get("name") or "").strip()
+            if not name:
+                continue
+
+            internal = bool(d.get("internal"))
+            idx = d.get("index")
+            if isinstance(idx, int):
+                max_index = max(max_index, idx)
+
+            entries.append({
+                "file": path,
+                "norm": _tvh_tag_norm(name),
+                "internal": internal,
+            })
+    except Exception as e:
+        log_utils.write_log("[pvr][tags] error leyendo tagdir: {}".format(e), level="ERROR")
+        return False, 0, 0
+
+    # Crear los que falten (nombre EXACTO del M3U)
+    existing_norm = set(e["norm"] for e in entries if not e["internal"])
+    to_create = [g for g in sorted(desired_raw) if _tvh_tag_norm(g) not in existing_norm]
+
+    # Borrar los que sobran (solo no-internal)
+    to_delete = [e for e in entries if (not e["internal"]) and (e["norm"] not in desired_norm)]
+
+    created = 0
+    deleted = 0
+
+    # Borrado
+    for e in to_delete:
+        try:
+            os.remove(e["file"])
+            deleted += 1
+        except Exception:
+            pass
+
+    # Creación
+    next_index = max_index + 1
+    for g in to_create:
+        try:
+            tag_id = uuid.uuid4().hex
+            path = os.path.join(tagdir, tag_id)
+            data = {
+                "enabled": True,
+                "index": next_index,
+                "name": g,  # EXACTO
+                "internal": False,
+                "private": False,
+                "icon": "",
+                "titled_icon": False,
+                "comment": "auto-sync from IPTV playlist",
+            }
+            if _tvh_save_json_atomic(path, data):
+                created += 1
+                next_index += 1
+        except Exception:
+            pass
+
+    log_utils.write_log("[pvr][tags] sync OK: created={} deleted={} (groups={})".format(created, deleted, len(desired_raw)), level="INFO")
+    return True, created, deleted
+
+
 def update_playlist() -> tuple[bool, bool]:
     """
     Devuelve: (ok, did_something)
@@ -1190,7 +1342,18 @@ def update_playlist() -> tuple[bool, bool]:
         else:
             log_utils.write_log("[pvr] No se encontró TVxx.db para reconciliar.", level="WARNING")
 
-        # 5) start tvheadend + wait ports
+        
+        # 4.5) Sync tags de Tvheadend (solo en soft reset / con tvheadend parado)
+        try:
+            ok_tags, n_created, n_deleted = sync_tvh_channel_tags_from_playlist(playlist_file)
+            if ok_tags:
+                log_utils.write_log("[pvr][tags] sincronizados: +{} -{}".format(n_created, n_deleted), level="INFO")
+            else:
+                log_utils.write_log("[pvr][tags] sync NO aplicada.", level="WARNING")
+        except Exception as e:
+            log_utils.write_log("[pvr][tags] sync error: {}".format(e), level="WARNING")
+
+# 5) start tvheadend + wait ports
         _start_tvheadend()
         if not _wait_tvheadend_ready(timeout_s=70):
             log_utils.write_log("[pvr] Tvheadend no listo; NO habilito pvr.hts (evito 0%).", level="WARNING")
@@ -1270,10 +1433,6 @@ def update_pvr():
         ensure_tvh_http_user_agent()
     except Exception as e:
         log_utils.write_log("[pvr] ensure_tvh_http_user_agent error: {}".format(e), level="WARNING")
-
-    # IMPORTANTE: si quieres que este módulo haga el flujo completo PVR,
-    # aquí debería llamarse a update_playlist(). No lo añado porque tu snippet original
-    # solo finalizaba con logs (y no me has pedido cambiar el comportamiento).
     try:
         dt = time.time() - start_ts
         log_utils.write_log("[pvr] update_pvr terminado en {:.1f}s".format(dt), level="INFO")
