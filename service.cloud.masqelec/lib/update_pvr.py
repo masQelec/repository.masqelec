@@ -1016,12 +1016,11 @@ def _tvh_save_json_atomic(path, data):
             pass
         return False
 
-
 def sync_tvh_channel_tags_from_playlist(playlist_m3u_path):
     """
     Sincroniza TVH_TAGDIR con los group-title del M3U (comparación exacta: casefold + espacios).
-      - Crea tags que falten
-      - Borra tags no-internal que no estén en la lista IPTV
+      - SOLO BORRA tags no-internal que no estén en la lista IPTV
+      - NO crea tags faltantes (modo "cleanup only")
     Recomendado ejecutarlo con Tvheadend parado (soft reset) para evitar lecturas concurrentes.
     Devuelve: (ok:bool, created:int, deleted:int)
     """
@@ -1039,8 +1038,6 @@ def sync_tvh_channel_tags_from_playlist(playlist_m3u_path):
     desired_norm = set(_tvh_tag_norm(g) for g in desired_raw)
 
     entries = []
-    max_index = -1
-
     try:
         for fn in os.listdir(tagdir):
             if fn.startswith("."):
@@ -1058,9 +1055,6 @@ def sync_tvh_channel_tags_from_playlist(playlist_m3u_path):
                 continue
 
             internal = bool(d.get("internal"))
-            idx = d.get("index")
-            if isinstance(idx, int):
-                max_index = max(max_index, idx)
 
             entries.append({
                 "file": path,
@@ -1071,17 +1065,10 @@ def sync_tvh_channel_tags_from_playlist(playlist_m3u_path):
         log_utils.write_log("[pvr][tags] error leyendo tagdir: {}".format(e), level="ERROR")
         return False, 0, 0
 
-    # Crear los que falten (nombre EXACTO del M3U)
-    existing_norm = set(e["norm"] for e in entries if not e["internal"])
-    to_create = [g for g in sorted(desired_raw) if _tvh_tag_norm(g) not in existing_norm]
-
-    # Borrar los que sobran (solo no-internal)
+    # SOLO borrar lo que sobra (no-internal)
     to_delete = [e for e in entries if (not e["internal"]) and (e["norm"] not in desired_norm)]
 
-    created = 0
     deleted = 0
-
-    # Borrado
     for e in to_delete:
         try:
             os.remove(e["file"])
@@ -1089,29 +1076,11 @@ def sync_tvh_channel_tags_from_playlist(playlist_m3u_path):
         except Exception:
             pass
 
-    # Creación
-    next_index = max_index + 1
-    for g in to_create:
-        try:
-            tag_id = uuid.uuid4().hex
-            path = os.path.join(tagdir, tag_id)
-            data = {
-                "enabled": True,
-                "index": next_index,
-                "name": g,  # EXACTO
-                "internal": False,
-                "private": False,
-                "icon": "",
-                "titled_icon": False,
-                "comment": "auto-sync from IPTV playlist",
-            }
-            if _tvh_save_json_atomic(path, data):
-                created += 1
-                next_index += 1
-        except Exception:
-            pass
-
-    log_utils.write_log("[pvr][tags] sync OK: created={} deleted={} (groups={})".format(created, deleted, len(desired_raw)), level="INFO")
+    created = 0  # explícito: no se crean tags
+    log_utils.write_log(
+        "[pvr][tags] cleanup OK: created={} deleted={} (groups={})".format(created, deleted, len(desired_raw)),
+        level="INFO"
+    )
     return True, created, deleted
 
 
