@@ -38,10 +38,11 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host  + 'most-popular/' ))
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host  + 'top-rated/' ))
 
-    itemlist.append(item.clone( title = 'Por categoría', action = 'listas', url = host + 'categories/?sort_by=title' ))
+    itemlist.append(item.clone( title = 'Por colección', action = 'listas', url = host + 'playlists/' ))
+
     itemlist.append(item.clone( title = 'Por canal', action = 'listas', url = host + 'channels/' ))
+    itemlist.append(item.clone( title = 'Por categoría', action = 'listas', url = host + 'categories/?sort_by=title' ))
     itemlist.append(item.clone( title = 'Por estrella', action = 'listas', url = host + 'models/?sort_by=avg_videos_popularity' ))
-    itemlist.append(item.clone( title = 'Por lista', action = 'listas', url = host + 'playlists/' ))
 
     return itemlist
 
@@ -121,13 +122,11 @@ def listas(item):
         if not thumb.startswith("https"): thumb = "https:" + thumb
 
         if videos:
-            videos = videos.replace('videos', '').replace('video', '').strip()
-
             title = title.replace('__', '').strip()
 
             title = title.capitalize()
 
-            title = "%s (%s)" % (title, videos)
+        thumb = thumb.replace(' ', '%20')
 
         itemlist.append(item.clone(action="list_all", title = title, url = url, thumbnail = thumb,
                                    text_color = text_color, contentType = 'movie', contentTitle = title ))

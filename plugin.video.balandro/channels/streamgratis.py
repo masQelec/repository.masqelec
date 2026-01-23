@@ -7,16 +7,10 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.streamgratis.lol/'
+host = 'https://www.miraonline.cc/'
 
 
 def do_downloadpage(url, post=None, headers=None):
-    # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://streamgratis.lol/']
-
-    for ant in ant_hosts:
-        url = url.replace(ant, host)
-
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
@@ -43,6 +37,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas.html', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
     return itemlist
@@ -398,10 +393,19 @@ def play(item):
     return itemlist
 
 
+def _epis(item):
+    logger.info()
+
+    item.url = host
+    item.search_type = 'tvshow'
+
+    return last_epis(item)
+
+
 def search(item, texto):
     logger.info()
     try:
-        item.url = host + 'recherche?_token=cenrejecfAcyS1cqSWfaAaM6K9fs1H2s9dHi0cNs&q=' + texto.replace(" ", "+")
+        item.url = host + 'recherche?_token=ncMgC1WBnq1vMjKGBSTHgz2OyR231meZa32FOB7v&q=' + texto.replace(" ", "+")
         return list_all(item)
     except:
         import sys

@@ -3,7 +3,7 @@
   "name": "PGratisHd",
   "thumbnail": "pgratishd.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -11,7 +11,7 @@
   "categories": [ "movie", "tvshow" ],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["crypto", "current", "notice", "kids", "docs", "vos", "amime", "bibles"],
+  "clusters": ["kids", "docs", "vos", "amime", "bibles"],
 
-  "notes": "Películas por géneros. Series por Géneros.. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Web ANULADA. Películas por géneros. Series por Géneros."
 }

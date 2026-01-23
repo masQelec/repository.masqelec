@@ -60,7 +60,7 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '/buscar/?q=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('TubePelis', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('TubePelis', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -238,6 +238,18 @@ def findvideos(item):
             return
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    url = host + 'pelicula/ultimas-peliculas/'
+
+    item.url = url
+    item.grp = url
+    item.search_type = 'movie'
+
+    return list_all(item)
 
 
 def search(item, texto):

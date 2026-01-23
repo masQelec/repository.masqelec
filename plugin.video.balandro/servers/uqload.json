@@ -3,6 +3,7 @@
   "name": "Uqload",
  
   "active": true,
+  "notes": "Alternative vía: Script.Module.ResolveUrl",
 
   "find_videos": {
     "ignore_urls": [],
@@ -64,18 +65,21 @@
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.cx-embed-([A-z0-9]+).html",
-        "url": "https://uqload.com/embed-\\1.html"
-      },
-      {
         "pattern": "uqload.cx/(?:embed-|)([A-z0-9]+)",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
         "pattern": "uqload.cx/(?:embed-|)([A-z0-9]+).html",
         "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.bz/(?:embed-|)([A-z0-9]+)",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.bz/(?:embed-|)([A-z0-9]+).html",
+        "url": "https://uqload.com/embed-\\1.html"
       }
-
     ]
   }
 

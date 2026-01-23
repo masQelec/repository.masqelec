@@ -42,9 +42,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Long play', action = 'list_all', url = host  + 'search/?sort_by=duration&from_videos=1' ))
 
+    itemlist.append(item.clone( title = 'Por canal', action = 'listas', url = host + 'porn-review' ))
+
     itemlist.append(item.clone( title = 'Por categoría', action = 'listas', url = host + 'categories/' ))
 
-    itemlist.append(item.clone( title = 'Por canal', action = 'listas', url = host + 'porn-review' ))
     itemlist.append(item.clone( title = 'Por estrella', action = 'listas', url = host + 'pornstars?gender_id=0&sort_by=total_videos&from=1' ))
 
     return itemlist

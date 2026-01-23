@@ -3,7 +3,8 @@
   "name": "Kinoger",
 
   "active": true,
- 
+  "notes": "Alternative vía: Script.Module.ResolveUrl",
+
   "find_videos": {
     "ignore_urls": [],
     "patterns": [
@@ -12,7 +13,11 @@
         "url": "https://\\1/api/v1/video?id=\\2"
       },
       {
-        "pattern": "https://(p.easyvidplayer.com)/#([A-z0-9]+)",
+        "pattern": "https://([a-z]+.easyvidplayer.com)/#([A-z0-9]+)",
+        "url": "https://\\1/api/v1/video?id=\\2"
+      },
+      {
+        "pattern": "https://(bigbuttshubvideos.com)/#([A-z0-9]+)",
         "url": "https://\\1/api/v1/video?id=\\2"
       }
     ]

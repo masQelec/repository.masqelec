@@ -13,7 +13,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www38.mejortorrent.eu'
+host = 'https://www40.mejortorrent.eu'
 
 
 # ~ por si viene de enlaces guardados
@@ -29,7 +29,8 @@ ant_hosts = ['https://mejortorrent.app', 'https://mejortorrent.wtf', 'https://ww
              'https://www26.mejortorrent.eu', 'https://www27.mejortorrent.eu', 'https://www28.mejortorrent.eu',
              'https://www29.mejortorrent.eu', 'https://www30.mejortorrent.eu', 'https://www31.mejortorrent.eu',
              'https://www32.mejortorrent.eu', 'https://www33.mejortorrent.eu','https://www34.mejortorrent.eu',
-             'https://www35.mejortorrent.eu', 'https://www36.mejortorrent.eu', 'https://www37.mejortorrent.eu']
+             'https://www35.mejortorrent.eu', 'https://www36.mejortorrent.eu', 'https://www37.mejortorrent.eu',
+             'https://www38.mejortorrent.eu', 'https://www39.mejortorrent.eu']
 
 
 domain = config.get_setting('dominio', 'mejortorrentapp', default='')
@@ -96,7 +97,7 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '/busqueda?q=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('MejorTorrentApp', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('MejorTorrentApp', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 

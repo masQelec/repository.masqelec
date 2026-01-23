@@ -10,6 +10,20 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://estrenosanime.net/'
 
 
+def do_downloadpage(url, post=None, headers=None):
+    data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    if not data:
+        if not '/search?keyword=' in url:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('EstrenosAnime', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
+
+            timeout = config.get_setting('channels_repeat', default=30)
+
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+
+    return data
+
+
 def mainlist(item):
     return mainlist_animes(item)
 
@@ -76,7 +90,7 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(host + 'home').data
+    data = do_downloadpage(host + 'home')
 
     bloque = scrapertools.find_single_match(data, '>Genero<(.*?)</ul>')
 
@@ -126,7 +140,7 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = scrapertools.find_multiple_matches(data, '<div class="tick ltr">(.*?)<div class="clearfix"></div>')
@@ -258,7 +272,7 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     da_id = scrapertools.find_single_match(data, 'data-anime-id="(.*?)"')
 
@@ -268,7 +282,7 @@ def episodios(item):
 
     headers = {'Referer': item.url, 'X-Requested-With': 'XMLHttpRequest'}
 
-    data = httptools.downloadpage(host + 'ajax/v2/episode/list/' + da_id + '?order=asc', headers = headers).data
+    data = do_downloadpage(host + 'ajax/v2/episode/list/' + da_id + '?order=asc', headers = headers)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     data = data.replace('\\/', '/')
@@ -365,7 +379,7 @@ def findvideos(item):
 
         config.set_setting('ses_pin', True)
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     depi_id = scrapertools.find_single_match(data, 'data-episode-id="(.*?)"')
 
@@ -373,7 +387,7 @@ def findvideos(item):
 
     headers = {'Referer': item.url, 'X-Requested-With': 'XMLHttpRequest' }
 
-    data = httptools.downloadpage(host + 'ajax/v2/episode/servers?episodeId=' + depi_id, headers = headers).data
+    data = do_downloadpage(host + 'ajax/v2/episode/servers?episodeId=' + depi_id, headers = headers)
 
     data = data.replace('\\/', '/')
 
@@ -383,13 +397,13 @@ def findvideos(item):
 
     if not d_id: return itemlist
 
-    data = httptools.downloadpage(host + 'ajax/v2/episode/sources?id=' + d_id, headers = headers).data
+    data = do_downloadpage(host + 'ajax/v2/episode/sources?id=' + d_id, headers = headers)
 
     new_url = scrapertools.find_single_match(data, '"link":.*?"(.*?)"')
 
     if not new_url: return itemlist
 
-    data = httptools.downloadpage(new_url).data
+    data = do_downloadpage(new_url)
 
     videos = scrapertools.find_multiple_matches(data, '<li onclick="go_to_player.*?' + "'(.*?)'.*?<span>(.*?)</span>.*?<p>(.*?)</p>.*?</li>")
 
@@ -439,7 +453,7 @@ def play(item):
     url = item.url
 
     if url:
-        data = httptools.downloadpage('https://multiserver.icu/embed/api/decrypt-stream', post = {'encrypted': url}).data
+        data = do_downloadpage('https://multiserver.icu/embed/api/decrypt-stream', post = {'encrypted': url})
 
         new_url = scrapertools.find_single_match(data, '"url":.*?"(.*?)"')
 

@@ -36,10 +36,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + '/0/', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Los mejores', action = 'list_all', url = host + 'best-videos/', text_color = 'tan' ))
-
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'most-viewed/' ))
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'top-rated/' ))
+
+    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'best-videos/' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + 'cats/', group = 'cats' ))
 

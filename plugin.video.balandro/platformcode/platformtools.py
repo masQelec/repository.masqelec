@@ -18,7 +18,7 @@ if PY3:
     from urllib.parse import quote_plus
 else:
     translatePath = xbmc.translatePath
-	
+
     from urllib import quote_plus
 
 
@@ -280,7 +280,7 @@ def set_infolabels(listitem, item, player=False):
     """
     Metodo para pasar la informacion al listitem (ver tmdb.set_InfoLabels() )
     item.infoLabels es un dicionario con los pares de clave/valor descritos en:
-    http://mirrors.xbmc.org/docs/python-docs/14.x-helix/xbmcgui.html#ListItem-setInfo
+    http://mirrors.xbmc.org/docs/python-docs/14.x-helix/xbmcgui.html
     @param listitem: objeto xbmcgui.ListItem
     @type listitem: xbmcgui.ListItem
     @param item: objeto Item que representa a una pelicula, serie o capitulo
@@ -462,7 +462,7 @@ def set_context_commands(item, parent_item, colores):
 
         context_commands.append( ('[B][COLOR darksalmon]Buscar Tráiler en YouTube[/COLOR][/B]', config.build_RunPlugin(item.clone(channel="actions", action="search_trailers_youtube"))) )
 
-    # ~ # Mostrar info haciendo una nueva llamada a tmdb para recuperar más datos
+    # ~ Mostrar info haciendo una nueva llamada a tmdb para recuperar más datos
     # ~ if item.contentType in ['movie', 'tvshow', 'season', 'episode'] and item.contentExtra != 'documentary':
         # ~ context_commands.append( ('[B][COLOR yellow]Información TMDB[/COLOR][/B]', config.build_RunPlugin(
             # ~ item.clone(channel="actions", action="more_info",
@@ -591,10 +591,10 @@ def developer_mode_check_findvideos(itemlist, parent_item):
 
         # ~ Server Various y anulados/controlados
         if apuntar:
-            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'hexload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'yadi.', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'stbturbo', 'turbovidhls', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidroba', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhide', 'hxfile', 'drop', 'embedv', 'vgplayer', 'userload', 'uploadraja', 'cdnwish', 'goodstream', 'asnwish', 'flastwish', 'jodwish', 'fmoonembed', 'embedmoon', 'moonjscdn', 'rumble', 'bembed', 'javlion', 'streamruby', 'sruby', 'rubystream', 'stmruby', 'rubystm', 'rubyvid', 'rubyvidhub', 'swhoi', 'listeamed', 'go-streamer.net', 'fsdcmo', 'fdewsdc', 'peytonepre', 'ryderjet', 'smoothpre' , 'qiwi', 'swdyu', 'streamhihi', 'luluvdoo', 'lulu', 'ponmi', 'wishonly', 'streamsilk', 'playerwish', 'hlswish', 'iplayerhls', 'hlsflast', 'ghbrisk', 'cybervynx', 'streamhg', 'stbhg', 'dhcplay', 'wish', 'stblion', 'terabox', 'dhtpre', 'dramacool', 'l1afav', 'hlsflex', 'swiftplayers', 'movearnpre', 'seraphinap', 'seraphinapl', 'gradehgplus', 'tryzendm', 'hglink', 'hailindihg', 'guxhag', 'habetar', 'yuguaab', 'mivalyo', 'taylorplayer', 'xenolyzb', 'hgplaycdn', 'videoland', 'bingezove', 'dinisglows', 'dingtezuni', 'dintezuvio', 'd00ds.site', 'davioad', 'haxloppd', 'dumbalag', 'kravaxxa', 'hgbazooka', 'cavanhabg']:
+            if it.server in ['dropload', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'hexload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'yadi.', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'stbturbo', 'turbovidhls', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidroba', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhide', 'hxfile', 'drop', 'embedv', 'vgplayer', 'userload', 'uploadraja', 'cdnwish', 'goodstream', 'asnwish', 'flastwish', 'jodwish', 'fmoonembed', 'embedmoon', 'moonjscdn', 'rumble', 'bembed', 'javlion', 'streamruby', 'sruby', 'rubystream', 'stmruby', 'rubystm', 'rubyvid', 'rubyvidhub', 'swhoi', 'listeamed', 'go-streamer.net', 'fsdcmo', 'fdewsdc', 'peytonepre', 'ryderjet', 'smoothpre' , 'qiwi', 'swdyu', 'streamhihi', 'luluvdoo', 'lulu', 'ponmi', 'wishonly', 'streamsilk', 'playerwish', 'hlswish', 'iplayerhls', 'hlsflast', 'ghbrisk', 'cybervynx', 'streamhg', 'stbhg', 'dhcplay', 'wish', 'stblion', 'terabox', 'dhtpre', 'dramacool', 'l1afav', 'byseqekaho', 'bysedikamoum', 'bysevepoin', 'byseraguci', 'byse', 'hlsflex', 'swiftplayers', 'movearnpre', 'seraphinap', 'seraphinapl', 'gradehgplus', 'tryzendm', 'hglink', 'hailindihg', 'guxhag', 'habetar', 'yuguaab', 'mivalyo', 'taylorplayer', 'xenolyzb', 'hgplaycdn', 'videoland', 'bingezove', 'dinisglows', 'dingtezuni', 'dintezuvio', 'callistanise', 'minochinos', 'earnvids', 'd00ds.site', 'davioad', 'haxloppd', 'dumbalag', 'kravaxxa', 'hgbazooka', 'cavanhabg', 'uasopt']:
                 apuntar = False
 
-            elif it.server in ['allviid', 'cloudfile', 'cloudmail', 'dailyuploads', 'darkibox', 'dembed', 'downace', 'fastdrive', 'filegram', 'gostream', 'letsupload', 'liivideo', 'myupload', 'neohd', 'oneupload', 'pandafiles', 'rovideo', 'send', 'streamable', 'streamdav', 'streamgzzz', 'streamoupload', 'turbovid', 'tusfiles', 'uploadba', 'uploadflix', '1uploadflix', 'uploadhub', 'uploady', 'upvid', 'veev', 'doods', 'veoh', 'vidbob', 'vidlook', 'vidmx', 'vido.', 'vidpro', 'vidstore', 'vipss', 'vkprime', 'worlduploads', 'ztreamhub' 'amdahost', 'updown', 'videa', 'asianplay', 'swiftload', 'udrop', 'vidtube',  'bigwarp', 'bgwp', 'wecima', 'asianload', 'savefiles', 'streamhls', 'vidbasic', 'streamup', 'strmup', 'vimeos']:
+            elif it.server in ['allviid', 'cloudfile', 'cloudmail', 'dailyuploads', 'darkibox', 'dembed', 'downace', 'fastdrive', 'filegram', 'gostream', 'letsupload', 'liivideo', 'myupload', 'neohd', 'oneupload', 'pandafiles', 'rovideo', 'send', 'streamable', 'streamdav', 'streamgzzz', 'streamoupload', 'turbovid', 'tusfiles', 'uploadba', 'uploadflix', '1uploadflix', 'uploadhub', 'uploady', 'upvid', 'veev', 'doods', 'veoh', 'vidbob', 'vidlook', 'vidmx', 'vidnest', 'vido.', 'vidpro', 'vidstore', 'vipss', 'vkprime', 'worlduploads', 'ztreamhub' 'amdahost', 'updown', 'videa', 'asianplay', 'swiftload', 'udrop', 'vidtube',  'bigwarp', 'bgwp', 'wecima', 'asianload', 'savefiles', 'streamhls', 'vidbasic', 'streamup', 'strmup', 'vimeos', 'bigshare']:
                 apuntar = False
 
             elif it.server in ['fembed', 'fembed-hd', 'fembeder', 'divload', 'ilovefembed', 'myurlshort', 'jplayer', 'feurl', 'fembedisthebest', 'femax20', 'fcdn', 'fembad', 'pelispng', 'hlshd', 'embedsito', 'mrdhan', 'dutrag', 'fplayer', 'diasfem', 'suzihaza', 'vanfem', 'youtvgratis', 'oceanplay', 'gotovideo.kiev.ua', 'owodeuwu', 'sypl', 'fembed9hd', 'watchse', 'vcdn', 'femoload', 'cubeembed']:
@@ -620,8 +620,11 @@ def developer_mode_check_findvideos(itemlist, parent_item):
             txt_log_servers += os.linesep
 
         # ~ Verificar calidades
-        if it.quality == '' or it.quality_num == '': continue # ~ Si no hay calidad o el canal no ha fijado el orden de calidades, nada a comprobar
-        if it.quality_num == 0: # ~ Orden de calidad no contemplado en el canal, apuntar para añadirlo
+        # ~ Si no hay calidad o el canal no ha fijado el orden de calidades, nada a comprobar
+        if it.quality == '' or it.quality_num == '': continue
+
+        # ~ Orden de calidad no contemplado en el canal, apuntar para añadirlo
+        if it.quality_num == 0:
             txt_log_qualities += 'Calidad: %s Canal: %s Server: %s Url: %s' % (it.quality, it.channel, it.server, it.url)
             if parent_item.contentType == 'movie':
                 txt_log_qualities += ' Película: %s' % (parent_item.contentTitle)
@@ -653,6 +656,7 @@ def developer_mode_check_findvideos(itemlist, parent_item):
 
         if avisar: dialog_notification(config.__addon_name, '[B][COLOR %s]Revisar Logs Servers y/ó Qualities[/COLOR][/B]' % color_exec)
 
+        # ~ Tests Reproducción
         if config.get_setting('developer_mode', default=False):
             if config.get_setting('developer_team'):
                 try:
@@ -716,8 +720,11 @@ def play_from_itemlist(itemlist, parent_item):
 
     itemlist = formatear_enlaces_servidores(itemlist)
 
-    erroneos = [] # ~ para marcar los enlaces que fallan
-    esperar_seleccion = True # ~ indica si hay que mostrar el diálogo de selección al usuario. Sí a menos que haya autoplay.
+    # ~ para marcar los enlaces que fallan
+    erroneos = []
+
+    # ~ indica si hay que mostrar el diálogo de selección al usuario. Sí a menos que haya autoplay.
+    esperar_seleccion = True
 
     autoplay = config.get_setting('autoplay', default=False)
 
@@ -774,7 +781,8 @@ def play_from_itemlist(itemlist, parent_item):
 
         p_dialog.close()
         if not ok_play:
-            if esperar_seleccion: # ~ si se ha llegado al límite de enlaces a intentar y todavía quedan, se muestra diálogo para selección del usuario
+            # ~ si se ha llegado al límite de enlaces a intentar y todavía quedan, se muestra diálogo para selección del usuario
+            if esperar_seleccion:
                 dialog_notification('Auto Play sin éxito', 'Fallaron los %d primeros enlaces' % autoplay_max_links, time=3000)
             else:
                 play_fake()
@@ -785,7 +793,10 @@ def play_from_itemlist(itemlist, parent_item):
                     el_txt = ('[B][COLOR %s]No se pudo reproducir ' + txt) % color_exec
                     dialog_notification(config.__addon_name, el_txt + '[/COLOR][/B]')
         else:
-            if len(itemlist) == 1: dialog_notification('Auto Play resuelto', it.title, time=2000, sound=False)
+            if len(itemlist) == 1:
+                if config.get_setting('autoplay_one_link', default=True):
+                    dialog_notification(config.__addon_name + ' [B][COLOR fuchsia]Auto Play[/COLOR][/B]', '[B][COLOR %s]Solo Un Servidor[/COLOR][/B]' % color_exec)
+                else: dialog_notification('Auto Play resuelto', it.title, time=2000, sound=False)
             else: dialog_notification('Auto Play resuelto', it.title)
 
     # ~ Diálogo hasta que el usuario cancele o play ok
@@ -858,6 +869,10 @@ def setInputstreamProp(addon_name, xlistitem, prop, val):
 def play_video(item, parent_item, autoplay=False):
     notification_d_ok = config.get_setting('notification_d_ok', default=True)
 
+    kver = config.get_setting('kver')
+
+    if not kver: kver = 0
+
     if item.video_urls:
         video_urls, puedes, motivo = item.video_urls, True, ""
     else:
@@ -912,7 +927,8 @@ def play_video(item, parent_item, autoplay=False):
         if not autoplay: 
             seleccion = dialog_select("Seleccione una opción para [B][COLOR fuchsia]" + item.server.capitalize() + '[/B][/COLOR]', opciones)
         else:
-            seleccion = len(opciones) - 1 # la última es la de más calidad !?
+            # ~ la última es la de más calidad !?
+            seleccion = len(opciones) - 1
     else:
         seleccion = 0
 
@@ -930,17 +946,19 @@ def play_video(item, parent_item, autoplay=False):
                     dialog_notification(config.__addon_name, '[B][COLOR %s]Vídeo no encontrado[/COLOR][/B]' % color_exec)
             return False
 
-        if mpd and not is_mpd_enabled():
-            if not autoplay:
-                avisar = False
-                if config.get_setting('developer_mode', default=False):
-                    if config.get_setting('developer_team'): avisar = True
+        if mpd:
+            if xbmc.getCondVisibility('System.HasAddon("inputstream.adaptive")'):
+                if not autoplay:
+                    if not kver >=21:
+                        avisar = False
+                        if config.get_setting('developer_mode', default=False):
+                            if config.get_setting('developer_team'): avisar = True
 
-                if avisar:
-                    dialog_notification(config.__addon_name, '[B][COLOR %s]Falta Inputstream Adaptive[/COLOR][/B]' % color_exec)
-                else:
-                    dialog_ok(config.__addon_name, '[COLOR yellow][B]Para ver el formato MPD se require el AddOn[/B][/COLOR] [COLOR cyan][B]Inputstream Adaptive[/B][/COLOR]')
-            return False
+                        if avisar:
+                            dialog_notification(config.__addon_name, '[B][COLOR %s]Falta Inputstream Adaptive[/COLOR][/B]' % color_exec)
+                        else:
+                            dialog_ok(config.__addon_name, '[COLOR yellow][B]Para ver el formato MPD se require el AddOn[/B][/COLOR] [COLOR cyan][B]Inputstream Adaptive[/B][/COLOR]')
+                return False
 
         if item.server == 'torrent':
             return play_torrent(mediaurl, parent_item)
@@ -958,17 +976,6 @@ def play_video(item, parent_item, autoplay=False):
             xlistitem.setProperty('inputstreamaddon', 'inputstream.adaptive')
             xlistitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
 
-        # ~ si se trata de un vídeo en formato mpd, se configura el listitem para reproducirlo
-        # ~ con el addon Inputstreamaddon implementado en Kodi 18
-        # ~ el itemlist debe enviarse de esta manera:
-        # ~ video_urls.append(['.mpd', url, 0, "", "mpd"])
-        # ~ donde el quinto parámetro debe existir (tipo: str o int) para que sea reconocido como un mpd
-        # ~ https://github.com/xbmc/inputstream.adaptive/wiki/Integration
-
-        kver = config.get_setting('kver')
-
-        if not kver: kver = 0
-
         _stream_sets = False
 
         if kver >= 18:
@@ -979,22 +986,23 @@ def play_video(item, parent_item, autoplay=False):
             addon_name = 'inputstream.adaptive'
 
             if not xbmc.getCondVisibility("System.HasAddon({})".format(addon_name)):
-                avisar = False
-                if config.get_setting('developer_mode', default=False):
-                    if config.get_setting('developer_team'): avisar = True
+                if not autoplay:
+                    if not kver >=21:
+                        avisar = False
+                        if config.get_setting('developer_mode', default=False):
+                            if config.get_setting('developer_team'): avisar = True
 
-                if avisar:
-                    dialog_notification(config.__addon_name, '[B][COLOR %s]Falta Inputstream Adaptive[/COLOR][/B]' % color_exec)
-                else:
-                    dialog_ok(config.__addon_name, '[COLOR yellow][B]Para Reproducir formato MPD ó M3U se require el AddOn[/B][/COLOR] [COLOR cyan][B]Inputstream Adaptive[/B][/COLOR]')
+                        if avisar:
+                            dialog_notification(config.__addon_name, '[B][COLOR %s]Falta Inputstream Adaptive[/COLOR][/B]' % color_exec)
+                        else:
+                            dialog_ok(config.__addon_name, '[COLOR yellow][B]Para Reproducir formato MPD ó M3U se require el AddOn[/B][/COLOR] [COLOR cyan][B]Inputstream Adaptive[/B][/COLOR]')
 
             else:
 
                 if mpd: mime = 'application/dash+xml'
                 else: mime = 'application/vnd.apple.mpegurl'
 
-                xlistitem.setMimeType(mime)
- 
+                xlistitem.setMimeType(mime) 
                 xlistitem.setContentLookup(False)
 
                 if kver == 18: setaddon = "inputstreamaddon"
@@ -1006,8 +1014,7 @@ def play_video(item, parent_item, autoplay=False):
                     mediaurl, headers = mediaurl.split("|", 1)
                     setInputstreamProp(addon_name, xlistitem, "stream_headers", headers)
 
-                    if kver >= 20:
-                        setInputstreamProp(addon_name, xlistitem, "manifest_headers", headers)
+                    if kver >= 20: setInputstreamProp(addon_name, xlistitem, "manifest_headers", headers)
 
                 if kver >= 20:
                     if "?" in mediaurl:
@@ -1015,8 +1022,7 @@ def play_video(item, parent_item, autoplay=False):
                         setInputstreamProp(addon_name, xlistitem, "manifest_params", params)
                         setInputstreamProp(addon_name, xlistitem, "stream_params", params)
 
-                if kver <= 21:
-                    setInputstreamProp(addon_name, xlistitem, "manifest_type", "mpd" if mpd else "hls")
+                if kver <= 21: setInputstreamProp(addon_name, xlistitem, "manifest_type", "mpd" if mpd else "hls")
 
                 if kver >= 21:
                     setInputstreamProp(addon_name, xlistitem, "manifest_config",
@@ -1024,60 +1030,51 @@ def play_video(item, parent_item, autoplay=False):
                     setInputstreamProp(addon_name, xlistitem, "config",
                                        '{"internal_cookies": true, "ssl_verify_peer": false}')
 
-                if config.get_setting('developer_mode', default=False):
-                    if config.get_setting('developer_team'):
-                        dialog_notification(config.__addon_name, '[B][COLOR cyan]' + setaddon.capitalize() + '[/COLOR][/B]')
+                if not autoplay:
+                    if config.get_setting('developer_mode', default=False):
+                        if config.get_setting('developer_team'):
+                            if not kver >=21:
+                                dialog_notification(config.__addon_name + ' [B][COLOR darkorange]Desarrollo[/COLOR][/B]', '[B][COLOR cyan]' + setaddon.capitalize() + '[/COLOR][/B]')
 
         if not _stream_sets:
             if not kver == 0:
-                if kver > 18:
+                if kver >= 18:
                     if ".mp4" in mediaurl or ".m3u8" in mediaurl: _stream_sets = True
 
             if _stream_sets:
                 addon_name = 'inputstream.ffmpegdirect'
 
                 if not xbmc.getCondVisibility("System.HasAddon({})".format(addon_name)):
-                    avisar = False
-                    if config.get_setting('developer_mode', default=False):
-                        if config.get_setting('developer_team'): avisar = True
+                    if not autoplay:
+                        if not kver >=21:
+                            avisar = False
+                            if config.get_setting('developer_mode', default=False):
+                                if config.get_setting('developer_team'): avisar = True
 
-                    if avisar:
-                        dialog_notification(config.__addon_name, '[B][COLOR %s]Falta Inputstream Ffmpegdirect[/COLOR][/B]' % color_exec)
-                    else:
-                        dialog_ok(config.__addon_name, '[COLOR yellow][B]Para Reproducir el formato MP4 ó M3U se require el AddOn[/B][/COLOR] [COLOR cyan][B]Inputstream Ffmpegdirect[/B][/COLOR]')
+                            if avisar:
+                                dialog_notification(config.__addon_name, '[B][COLOR %s]Falta Inputstream Ffmpegdirect[/COLOR][/B]' % color_exec)
+                            else:
+                                dialog_ok(config.__addon_name, '[COLOR yellow][B]Para Reproducir el formato MP4 ó M3U se require el AddOn[/B][/COLOR] [COLOR cyan][B]Inputstream Ffmpegdirect[/B][/COLOR]')
 
                 else:
 
                     xlistitem.setMimeType('application/x-mpegURL')
-
                     xlistitem.setContentLookup(False)
 
-                    setaddon = "inputstream"
+                    if kver == 18: setaddon = "inputstreamaddon"
+                    else: setaddon = "inputstream"
 
                     xlistitem.setProperty(setaddon, addon_name)
-
-                    # ~ https://github.com/xbmc/inputstream.ffmpegdirect
                     setInputstreamProp(addon_name, xlistitem, "is_realtime_stream", 'false')
-
-                    # ~ open_mode: If the value ffmpeg is supplied the inputstream will be opened with AVFormat.
-                    # ~ If the value curl is supplied the inputstream will be opened with cURL. If neither value
-                    # ~ is supplied the default is to open HLS, Dash and Smooth Streaming with AVFormat and anything else
-                    # ~ as a kodi file. Note that a mimetype or manifest_type property is required to be able to tell
-                    # ~ if a stream is HLS or Dash. If using Smooth streaming only a manifest_type property will work as
-                    # ~ Smooth Streaming does not have a mimetype.
                     setInputstreamProp(addon_name, xlistitem, "open_mode", 'ffmpeg')
-
-                    # ~ manifest_type: Allowed values are hls for HLS, mpd for Dash and ism for Smooth Streaming.
                     setInputstreamProp(addon_name, xlistitem, "manifest_type", 'hls')
-
-                    # ~ playback_as_live: Should the playback be considerd as live tv, 
-                    # ~ allowing skipping from one programme to the next over the entire catchup window, 
-                    # ~ if so set to true. Otherwise set to false to treat all programmes as videos.
                     setInputstreamProp(addon_name, xlistitem, "playback_as_live", 'false')
 
-                    if config.get_setting('developer_mode', default=False):
-                        if config.get_setting('developer_team'):
-                            dialog_notification(config.__addon_name, '[B][COLOR cyan]' + setaddon.capitalize() + '[/COLOR][/B]')
+                    if not autoplay:
+                        if config.get_setting('developer_mode', default=False):
+                            if config.get_setting('developer_team'):
+                                if not kver >=21:
+                                    dialog_notification(config.__addon_name + ' [B][COLOR darkorange]Desarrollo[/COLOR][/B]', '[B][COLOR cyan]' + setaddon.capitalize() + '[/COLOR][/B]')
 
         xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, xlistitem)
         # ~ xbmcplugin.setResolvedUrl(int(sys.argv[1]), False, xlistitem) # para probar forzando como si fallara
@@ -1091,7 +1088,7 @@ def play_video(item, parent_item, autoplay=False):
         return True
 
 
-# ~ video_urls: [0]:título [1]:url [2]:wait_time [3]:subtitle [4]:is_mpd
+# ~ video_urls: [0]:título [1]:url [2]:wait_time [3]:subtitle [4]: "inputstream.adaptive"
 def get_video_seleccionado(item, seleccion, video_urls):
     logger.info()
     mediaurl = ""
@@ -1221,9 +1218,6 @@ def play_torrent(mediaurl, parent_item):
 
 def is_playing():
     return xbmc.Player().isPlaying()
-
-def is_mpd_enabled():
-    return xbmc.getCondVisibility('System.HasAddon("inputstream.adaptive")')
 
 
 # ~ Diálogos internos

@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import re
+import re, base64
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.ver-online.info/'
+from lib.pyberishaes import GibberishAES
+from lib import decrypters
+
+
+host = 'https://verseriegratis.cc/'
 
 
 def item_configurar_proxies(item):
@@ -44,12 +48,12 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www.ver-online.cc/']
+    ant_hosts = ['https://www.ver-online.cc/', 'https://www.ver-online.info/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    if '/series-gratis/año/' in url: raise_weberror = False
+    if '/series-castellano/año/' in url: raise_weberror = False
 
     hay_proxies = False
     if config.get_setting('channel_star_proxies', default=''): hay_proxies = True
@@ -68,7 +72,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not 'recherche?q=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('Star', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('Star', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -108,7 +112,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series-gratis.html', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series-castellano.html', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
 
@@ -126,13 +130,20 @@ def paises(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'América', action = 'list_all', url = host + 'series-gratis/pais/usa.html', text_color='hotpink' ))
-    itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'series-gratis/pais/br.html', text_color='hotpink' ))
-    itemlist.append(item.clone( title = 'España', action = 'list_all', url = host + 'series-gratis/pais/es.html', text_color='hotpink' ))
-    itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'series-gratis/pais/co.html', text_color='hotpink' ))
-    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'series-gratis/pais/mx.html', text_color='hotpink' ))
-    itemlist.append(item.clone( title = 'Reino Unido', action = 'list_all', url = host + 'series-gratis/pais/gb.html', text_color='hotpink' ))
-    itemlist.append(item.clone( title = 'Turquía', action = 'list_all', url = host + 'series-gratis/pais/tr.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'América', action = 'list_all', url = host + 'series-castellano/pais/usa.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Argentina', action = 'list_all', url = host + 'series-castellano/pais/ar.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'series-castellano/pais/br.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'series-castellano/pais/co.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Corea', action = 'list_all', url = host + 'series-castellano/pais/kr.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Egipto', action = 'list_all', url = host + 'series-castellano/pais/eg.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'España', action = 'list_all', url = host + 'series-castellano/pais/es.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Francia', action = 'list_all', url = host + 'series-castellano/pais/fr.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Italia', action = 'list_all', url = host + 'series-castellano/pais/it.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Japón', action = 'list_all', url = host + 'series-castellano/pais/jp.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'series-castellano/pais/mx.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Reino Unido', action = 'list_all', url = host + 'series-castellano/pais/gb.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Suecia', action = 'list_all', url = host + 'series-castellano/pais/se.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Turquía', action = 'list_all', url = host + 'series-castellano/pais/tr.html', text_color='hotpink' ))
 
     return itemlist
 
@@ -163,7 +174,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1954, -1):
-        url = host + 'series-gratis/año/' + str(x) + '.html'
+        url = host + 'series-castellano/año/' + str(x) + '.html'
 
         itemlist.append(item.clone( title = str(x), url = url, action='list_all', text_color='hotpink' ))
 
@@ -175,7 +186,7 @@ def alfabetico(item):
     itemlist = []
 
     for letra in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789':
-        url = host + 'series-gratis/ordenadas/' + letra
+        url = host + 'series-castellano/alfabeto/' + letra
 
         itemlist.append(item.clone ( title = letra, url = url, action = 'list_all', text_color = 'hotpink' ))
 
@@ -189,15 +200,15 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<span>Ver-online.cc</span>(.*?)>mas vistas<')
+    bloque = scrapertools.find_single_match(data, '<span>Verseriegratis.cc</span>(.*?)>mas vistas<')
 
-    if not bloque: bloque = scrapertools.find_single_match(data, '<span>ver-online.cc</span>(.*?)>mas vistas<')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<span>verseriegratis.cc</span>(.*?)>mas vistas<')
 
-    if not bloque: bloque = scrapertools.find_single_match(data, '<span>ver-online</span>(.*?)>mas vistas<')
-    if not bloque: bloque = scrapertools.find_single_match(data, '<span>Ver-online</span>(.*?)>mas vistas<')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<span>verseriegratis</span>(.*?)>mas vistas<')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<span>Verseriegratis</span>(.*?)>mas vistas<')
 
-    if not bloque: bloque = scrapertools.find_single_match(data, '<span>ver-online.*?</span>(.*?)>mas vistas<')
-    if not bloque: bloque = scrapertools.find_single_match(data, '<span>Ver-online.*?</span>(.*?)>mas vistas<')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<span>verseriegratis.*?</span>(.*?)>mas vistas<')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<span>verseriegratis.*?</span>(.*?)>mas vistas<')
 
     if not bloque: bloque = scrapertools.find_single_match(data, '<span>Veronline.(.*?)>mas vistas<')
 
@@ -219,8 +230,8 @@ def list_all(item):
         title = title.replace('online gratis', '').replace('&#039;', "'").replace('&amp;', '&').replace(' online', '').strip()
 
         year = '-'
-        if '/series-gratis/año/' in item.url:
-            year = scrapertools.find_single_match(item.url, "/series-gratis/año/(.*?)$")
+        if '/series-castellano/año/' in item.url:
+            year = scrapertools.find_single_match(item.url, "/series-castellano/año/(.*?)$")
             if year:
                year = year.replace('.html', '')
 
@@ -453,6 +464,67 @@ def findvideos(item):
                 url = ''
 
             if url:
+                if '/nuuuppp.' in url: continue
+
+                elif '//embed69.' in url:
+                    ses += 1
+
+                    datae = do_downloadpage(url)
+                    datae = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', datae)
+
+                    dataLink = scrapertools.find_single_match(datae, 'const dataLink =(.*?);')
+                    if not dataLink: dataLink = dataLink = scrapertools.find_single_match(datae, 'let dataLink =(.*?);')
+                    if not dataLink: dataLink = scrapertools.find_single_match(datae, 'dataLink(.*?);')
+
+                    e_bytes = scrapertools.find_single_match(datae, "const bytes =.*?'(.*?)'")
+                    if not e_bytes: e_bytes = scrapertools.find_single_match(datae, "const safeServer =.*?'(.*?)'")
+
+                    e_links = dataLink.replace(']},', '"type":"file"').replace(']}]', '"type":"file"')
+
+                    age = ''
+                    if not dataLink or not e_bytes: age = 'crypto'
+
+                    links = scrapertools.find_multiple_matches(str(e_links), '"servername":"(.*?)","link":"(.*?)".*?"type":"video"')
+
+                    lang = '?'
+
+                    for srv, link in links:
+                        ses += 1
+
+                        srv = srv.lower().strip()
+
+                        if not srv: continue
+                        elif host in link: continue
+
+                        elif '1fichier.' in srv: continue
+                        elif 'plustream' in srv: continue
+                        elif 'embedsito' in srv: continue
+                        elif 'disable2' in srv: continue
+                        elif 'disable' in srv: continue
+                        elif 'xupalace' in srv: continue
+                        elif 'uploadfox' in srv: continue
+
+                        elif srv == 'download': continue
+                        elif srv == 'up2box': continue
+
+                        servidor = servertools.corregir_servidor(srv)
+
+                        if servertools.is_server_available(servidor):
+                            if not servertools.is_server_enabled(servidor): continue
+                        else:
+                            if not config.get_setting('developer_mode', default=False): continue
+
+                        other = ''
+
+                        if servidor == 'various': other = servertools.corregir_other(srv)
+
+                        if '.eyJs' in link: age = ''
+
+                        itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '',
+                                                         crypto=link, bytes=e_bytes, age=age, language=lang, other=other ))
+
+                    continue
+
                 url = url.replace('/younetu.com/player/', '/waaw.to/')
 
                 servidor = servertools.get_server_from_url(url)
@@ -463,7 +535,8 @@ def findvideos(item):
                 other = ''
                 if servidor == 'various': other = servertools.corregir_other(url)
 
-                itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = IDIOMAS.get(lang,lang), other = other ))
+                itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                                     language = IDIOMAS.get(lang,lang), other = other ))
 
     # ~ Descargas requieren registrarse
 
@@ -471,6 +544,67 @@ def findvideos(item):
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if item.crypto:
+        crypto = str(item.crypto)
+        bytes = str(item.bytes)
+
+        url = ''
+
+        if not bytes:
+            url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
+            url += '='
+
+            try:
+                url = base64.b64decode(url).decode()
+                url = scrapertools.find_single_match(url, '"link":"(.*?)"')
+            except:
+                url = ''
+
+        if not url:
+            if bytes:
+                try:
+                   url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
+                except:
+                    url = ''
+
+            if not url:
+                if bytes:
+                    url = decrypters.decode_decipher(crypto, bytes)
+
+            if not url:
+                if crypto.startswith("http"):
+                    url = crypto.replace('\\/', '/')
+
+                if not url:
+                    return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+
+            elif not url.startswith("http"):
+                return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+
+    if url:
+        if '/xupalace.' in url or '/uploadfox.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
+
+        itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 

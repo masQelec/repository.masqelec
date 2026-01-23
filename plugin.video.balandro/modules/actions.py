@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os, re, glob, xbmcgui, xbmc
+import os, re, glob, xbmcgui, xbmc, time
 
 from platformcode import config, logger, platformtools
 from core import filetools, jsontools, scrapertools
@@ -17,6 +17,9 @@ if PY3:
 else:
     import xbmc
     translatePath = xbmc.translatePath
+
+
+espera = config.get_setting('servers_waiting', default=6)
 
 
 color_alert = config.get_setting('notification_alert_color', default='red')
@@ -146,7 +149,7 @@ def clean_db_cache(item):
 
     platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Inspeccionado la Caché de Tmdb[/B][/COLOR]' % color_infor)
 
-    import sqlite3, time
+    import sqlite3
 
     fecha_caducidad = time.time() - (31 * 24 * 60 * 60)
 
@@ -193,6 +196,11 @@ def more_info(item):
 def search_trailers(item):
     logger.info()
 
+    if config.get_setting('servers_time', default=True):
+        platformtools.dialog_notification('Tráilers', '[COLOR cyan]Buscando en TMDB[/COLOR] ...')
+
+        time.sleep(int(espera))
+
     from core.tmdb import Tmdb
 
     tipo = 'movie' if item.contentType == 'movie' else 'tv'
@@ -221,13 +229,13 @@ def search_trailers(item):
 
             video_urls = youtubetrailers.mainlist(item)
 
-            if video_urls: xbmc.Player().play(video_urls[0][1])
+            if video_urls:
+                if not 'No se pudo Reproducir el Vídeo' in str(video_urls):
+                    xbmc.Player().play(video_urls[0][1])
     else:
         while not xbmc.Monitor().abortRequested():
             ret = xbmcgui.Dialog().select('Tráilers para [B][COLOR yellow]%s[/B][/COLOR]' % nombre, opciones, useDetails=True)
             if ret == -1: break
-
-            platformtools.dialog_notification(resultados[ret]['name'], '[COLOR cyan]Cargando Tráiler[/COLOR] ...', time=3000, sound=False)
 
             from core import servertools
 
@@ -247,12 +255,24 @@ def search_trailers(item):
                 la_notif = ('[B][COLOR %s]') % color_alert
                 la_notif += ('No se pudo reproducir el tráiler[/B][/COLOR]')
 
-                platformtools.dialog_notification(resultados[ret]['name'], la_notif, time=3000, sound=False)
+                txt_motivo = ''
+                if 'YouTube' in motivo or '[Youtube]': txt_motivo = '[COLOR yellow][B]YouTube[/B][/COLOR] '
+                elif 'ResolveUrl' in motivo or '[plugin.video.youtube]' in motivo: txt_motivo = '[COLOR yellow][B]ResolveUrl[/B][/COLOR] '
+
+                platformtools.dialog_notification(txt_motivo + resultados[ret]['name'], la_notif, time=3000, sound=False)
+
+            if xbmc.Player().isPlaying(): break
 
             if len(resultados) == 1: break
 
+
 def search_trailers_youtube(item):
     logger.info()
+
+    if config.get_setting('servers_time', default=True):
+        platformtools.dialog_notification('Tráilers', '[COLOR cyan]Buscando en YouTube[/COLOR] ...')
+
+        time.sleep(int(espera))
 
     nombre = item.contentTitle if item.contentType == 'movie' else item.contentSerieName
 
@@ -262,8 +282,10 @@ def search_trailers_youtube(item):
 
     video_urls = youtubetrailers.mainlist(item)
 
-    if video_urls: xbmc.Player().play(video_urls[0][1])
-
+    if video_urls:
+        if not 'No se pudo Reproducir el Vídeo' in str(video_urls):
+            xbmc.Player().play(video_urls[0][1])
+            
 
 def player_youtube(item):
     logger.info()
@@ -486,7 +508,6 @@ def manto_params(item):
         config.set_setting('channel_homecine_dominio', '')
 
         config.set_setting('channel_mejortorrentapp_dominio', '')
-        config.set_setting('channel_mejortorrentnz_dominio', '')
         config.set_setting('channel_mitorrent_dominio', '')
 
         config.set_setting('channel_peliculaspro_dominio', '')
@@ -497,8 +518,6 @@ def manto_params(item):
         config.set_setting('channel_pelisplushd_dominio', '')
         config.set_setting('channel_pelisplushdlat_dominio', '')
         config.set_setting('channel_pelisplushdnz_dominio', '')
-
-        config.set_setting('channel_pgratishd_dominio', '')
 
         config.set_setting('channel_poseidonhd2_dominio', '')
 
@@ -583,7 +602,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '143.0.7499.40')  # ~ 21/11/25
+        config.set_setting('chrome_last_version', '144.0.7559.60')  # ~ 20/1/26
 
         config.set_setting('debug', '0')
 
@@ -659,6 +678,47 @@ def manto_cookies(item):
     if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el fichero de Cookies ?[/B][/COLOR]'):
         filetools.remove(path)
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Fichero Cookies eliminado[/B][/COLOR]' % color_infor)
+
+
+def manto_crashes(item):
+    logger.info()
+
+    path = translatePath(os.path.join('special://home/', ''))
+
+    crashes = filetools.listdir(path)
+
+    hay_crashes = False
+
+    for _file in crashes:
+        if _file.endswith('.dmp') == True: pass
+        elif _file.endswith('.txt') == True: pass
+        else: continue
+
+        hay_crashes = True
+
+    if not hay_crashes:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay Ficheros de Crashes[/COLOR][/B]' % color_alert)
+        return
+
+    erase_crashes = False
+
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar los Ficheros de Crashes ?[/B][/COLOR]'):
+        path = translatePath(os.path.join('special://home/', ''))
+
+        crashes = filetools.listdir(path)
+
+        for _file in crashes:
+            if _file.endswith('.dmp') == True: pass
+            elif _file.endswith('.txt') == True: pass
+            else: continue
+
+            file = path + _file
+
+            filetools.remove(file)
+            erase_crashes = True
+
+        if erase_crashes:
+            platformtools.dialog_ok(config.__addon_name, '[B][COLOR pink]Ficheros de Crashes eliminados[/B][/COLOR]')
 
 
 def manto_advs(item):
@@ -771,6 +831,23 @@ def manto_limpiezas(item):
         procesado = False
 
         if ret == 0:
+            path = translatePath(os.path.join('special://home/', ''))
+
+            crashes = filetools.listdir(path)
+
+            hay_crashes = False
+
+            for _file in crashes:
+                if _file.endswith('.dmp') == True: pass
+                elif _file.endswith('.txt') == True: pass
+                else: continue
+
+                hay_crashes = True
+
+            if hay_crashes:
+                manto_crashes(item)
+                procesado = True
+
             path_advs = translatePath(os.path.join('special://home/userdata', ''))
             file_advs = 'advancedsettings.xml'
             file = path_advs + file_advs
@@ -1518,6 +1595,91 @@ def test_internet(item):
     return
 
 
+def resumen_fix(item):
+    logger.info()
+
+    from core import channeltools
+
+    path = os.path.join(config.get_runtime_path(), 'last_fix.json')
+
+    existe = filetools.exists(path)
+    if existe == False:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay fichero Fix[/COLOR][/B]' % color_infor)
+        return
+
+    txt = ''
+    res = ''
+
+    try:
+       with open(path, 'r') as f: txt=f.read(); f.close()
+    except:
+        try: txt = open(path, encoding="utf8").read()
+        except: pass
+
+    if txt:
+        tot_txt = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', txt)
+
+        blk_channels = scrapertools.find_single_match(tot_txt, '"channels":(.*?)]')
+
+        if blk_channels:
+            blk_channels = blk_channels.replace('{', '').replace('}', '').replace('[', '').replace(']', '').strip()
+
+            blk_channels = blk_channels + ','
+
+            res_channels = scrapertools.find_multiple_matches(str(blk_channels), '(.*?),')
+
+            res += '[COLOR goldenrod][B]Canales Modificados:[/B][/COLOR][CR]'
+
+            for channel in res_channels:
+                channel = channel.replace('"', '')
+
+                txt = ''
+
+                datos = channeltools.get_channel_parameters(channel)
+
+                if not datos['active']:
+                    txt = '  [COLOR red][B]Desactivado[/B][/COLOR]'
+
+                    if 'temporary' in datos['clusters']:
+                        txt += ' [COLOR yellow][B]Temporalmente[/B][/COLOR]'
+
+                res += '  [COLOR cyan][B]' + datos['name'] + '[/B][/COLOR]' + txt + '[CR]'
+
+            res += '[CR]'
+
+        blk_servers = scrapertools.find_single_match(tot_txt, '"servers":(.*?)]')
+
+        if blk_servers:
+            blk_servers = blk_servers.replace('{', '').replace('}', '').replace('[', '').replace(']', '').strip()
+
+            blk_servers = blk_servers + ','
+
+            res_servers = scrapertools.find_multiple_matches(str(blk_servers), '(.*?),')
+
+            res += '[COLOR goldenrod][B]Servidores Modificados:[/B][/COLOR][CR]'
+
+            for server in res_servers:
+                server = server.replace('"', '')
+
+                txt = ''
+
+                path_server = os.path.join(config.get_runtime_path(), 'servers', server)
+
+                data = filetools.read(path_server + '.json')
+                dict_server = jsontools.load(data)
+
+                if dict_server['active'] == False:
+                    txt = '  [COLOR red][B]Desactivado[/B][/COLOR]'
+
+                res += '  [COLOR cyan][B]' + dict_server['name'] + '[/B][/COLOR]' + txt + '[CR]'
+
+        if not blk_channels and not blk_servers:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay Resumen del Fix[/COLOR][/B]' % color_infor)
+            return
+
+        platformtools.dialog_textviewer('Resumen Fix Instalado', res)
+
+
 def opciones_animeflv(item):
     item.from_channel = 'animeflv'
     opciones_domains_common(item)
@@ -1618,10 +1780,6 @@ def opciones_mejortorrentapp(item):
     item.from_channel = 'mejortorrentapp'
     opciones_domains_common(item)
 
-def opciones_mejortorrentnz(item):
-    item.from_channel = 'mejortorrentnz'
-    opciones_domains_common(item)
-
 def opciones_mitorrent(item):
     item.from_channel = 'mitorrent'
     opciones_domains_common(item)
@@ -1656,10 +1814,6 @@ def opciones_pelisplushdlat(item):
 
 def opciones_pelisplushdnz(item):
     item.from_channel = 'pelisplushdnz'
-    opciones_domains_common(item)
-
-def opciones_pgratishd(item):
-    item.from_channel = 'pgratishd'
     opciones_domains_common(item)
 
 def opciones_poseidonhd2(item):
@@ -1802,8 +1956,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'mejortorrentapp': domains.manto_domain_mejortorrentapp(item)
 
-            elif item.from_channel == 'mejortorrentnz': domains.manto_domain_mejortorrentnz(item)
-
             elif item.from_channel == 'mitorrent': domains.manto_domain_mitorrent(item)
 
             elif item.from_channel == 'peliculaspro': domains.manto_domain_peliculaspro(item)
@@ -1821,8 +1973,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'pelisplushdlat': domains.manto_domain_pelisplushdlat(item)
 
             elif item.from_channel == 'pelisplushdnz': domains.manto_domain_pelisplushdnz(item)
-
-            elif item.from_channel == 'pgratishd': domains.manto_domain_pgratishd(item)
 
             elif item.from_channel == 'poseidonhd2': domains.manto_domain_poseidonhd2(item)
 
@@ -1896,8 +2046,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'mejortorrentapp': domains.test_domain_mejortorrentapp(item)
 
-            elif item.from_channel == 'mejortorrentnz': domains.test_domain_mejortorrentnz(item)
-
             elif item.from_channel == 'mitorrent': domains.test_domain_mitorrent(item)
 
             elif item.from_channel == 'peliculaspro': domains.test_domain_peliculaspro(item)
@@ -1915,8 +2063,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'pelisplushdlat': domains.test_domain_pelisplushdlat(item)
 
             elif item.from_channel == 'pelisplushdnz': domains.test_domain_pelisplushdnz(item)
-
-            elif item.from_channel == 'pgratishd': domains.test_domain_pgratishd(item)
 
             elif item.from_channel == 'poseidonhd2': domains.test_domain_poseidonhd2(item)
 
@@ -1965,8 +2111,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'peliculaspro': helper.show_help_peliculaspro(item)
 
             elif item.from_channel == 'pelisforte': helper.show_help_pelisforte(item)
-
-            elif item.from_channel == 'pgratishd': helper.show_help_(pgratishditem)
 
             elif item.from_channel == 'seriespapayato': helper.show_help_seriespapayato(item)
 

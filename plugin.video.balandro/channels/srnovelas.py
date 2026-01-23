@@ -84,7 +84,7 @@ def do_downloadpage(url, post=None, headers=None):
         if not data:
             if not '/?s=' in url:
                 if not '/temp/ajax/iframe.php?id=' in url:
-                    if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('SrNovelas', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                    if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('SrNovelas', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                     timeout = config.get_setting('channels_repeat', default=30)
 

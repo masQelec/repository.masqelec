@@ -62,7 +62,7 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '/?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('TioDonghua', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('TioDonghua', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -545,6 +545,8 @@ def findvideos(item):
                     if 'tioplayer.' in url: continue
                     elif 'tiodonghua.' in url: continue
 
+                    elif '/csst.online' in url: continue
+
                     if '/ok.ru' in url: servidor = 'okru'
 
                     elif '/terabox.' in url:
@@ -575,6 +577,7 @@ def findvideos(item):
         elif 'likessb.com' in url: continue
         elif '.animefenix.' in url: continue
         elif '/odysee.' in url: continue
+        elif '/csst.online' in url: continue
 
         if 'http:' in url: url = url.replace('http:', 'https:')
 
@@ -627,6 +630,8 @@ def findvideos(item):
 
         if 'tioplayer.' in url: url = ''
         elif 'tiodonghua.' in url: url = ''
+
+        elif '/csst.online' in url: url = ''
 
         if url:
             servidor = servertools.get_server_from_url(url)

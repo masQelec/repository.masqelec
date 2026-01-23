@@ -62,7 +62,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not '/?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('SoloLatino', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('SoloLatino', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -747,17 +747,23 @@ def play(item):
         if not bytes:
             url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
             url += '='
-            url = base64.b64decode(url).decode()
-            url = scrapertools.find_single_match(url, '"link":"(.*?)"')
 
-        if not url:
             try:
-                url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
+                url = base64.b64decode(url).decode()
+                url = scrapertools.find_single_match(url, '"link":"(.*?)"')
             except:
                 url = ''
 
+        if not url:
+            if bytes:
+                try:
+                   url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
+                except:
+                    url = ''
+
             if not url:
-                url = decrypters.decode_decipher(crypto, bytes)
+                if bytes:
+                    url = decrypters.decode_decipher(crypto, bytes)
 
             if not url:
                 if crypto.startswith("http"):

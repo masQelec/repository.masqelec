@@ -113,7 +113,7 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PeliculasPro', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PeliculasPro', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -627,6 +627,15 @@ def play(item):
         itemlist.append(item.clone( url=url, server=servidor ))
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'estrenos?type=movies'
+    item.search_type = 'movie'
+
+    return list_all(item)
 
 
 def search(item, texto):

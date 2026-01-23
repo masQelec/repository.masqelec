@@ -102,7 +102,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not '?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('SeriesRetro', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('SeriesRetro', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -685,7 +685,7 @@ def findvideos(item):
 
 
 def puntuar_calidad(txt):
-    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'Full HD', 'HD', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', 'HD', 'WEBRip 1080p', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
+    orden = ['CAMRip', 'Dual 720p', '720', 'HD 720p', 'DVDRip', 'WEBRip', 'Full HD', 'HD', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', 'HD', 'WEBRip 1080p', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
 
@@ -722,9 +722,32 @@ def play(item):
         elif '/gdriveplayer.io/' in url:
             return 'Servidor [COLOR plum]NO soportado[/COLOR]'
 
+        elif url.startswith("Sb"):
+            return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
+
+        elif 'streamsb' in url or 'playersb' in url:
+            return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
+
+        elif 'openload' in url or 'streamango' in url or 'vidlox' in url or 'jetload' in url or 'verystream' in url or 'streamcherry' in url or 'gounlimited' in url or 'streamix' in url or 'viewsb' in url or 'flix555' in url or '.stormo.' in url or '.spruto.' in url or '/biter.' in url or '/streamin.' in url or '/filebebo.' in url or '/streamcloud.' in url or '/videofiles.' in url or '/kingvid.' in url or '/allvid.' in url or '/goo.' in url:
+            return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
+
+        elif 'uptobox' in url:
+            return 'Servidor [COLOR goldenrod]Fuera de Servicio[/COLOR]'
+
+        elif '.fembed.' in url:
+            return 'Servidor [COLOR goldenrod]Fuera de Servicio[/COLOR]'
+
+        elif '/powv1deo.' in url or '/powvibeo.' in url or '/pouvideo.' in url or '/povw1deo.' in url or '/powvldeo.' in url or '/pomvideo.' in url or '/streamp1ay.' in url or '/slreamplay.' in url or '/stemplay.' in url or '/steamplay.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
+        elif '.rapidvideo.' in url or '.filefactory.' in url or '.owndrives.' in url or '/rapidcloud.' in url or '/ul.' in url or '/fileflares.' in url or '/rockfile.' in url or '/estream.' in url or '/uploadrocket.' in url or '/uploading.' in url or '/ddownload.' in url or '/uploadz.' in url or '/fikper.' in url or '/www.datafile.' in url or '/filerice.' in url or '/thevideo.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
         if '/acortalink.' in url:
             host_torrent = host[:-1]
             url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
+
+            url_base64 = url_base64.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
 
             if url_base64.startswith('magnet:'):
                 itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
@@ -736,6 +759,14 @@ def play(item):
 
             else:
                if url_base64:
+                   if '/?trdownload=' in url_base64:
+                       data = do_downloadpage(url_base64)
+
+                       new_url = scrapertools.find_single_match(data, 'var optFileURL = "(.*?)"')
+                       if not new_url: new_url = scrapertools.find_single_match(data, '<meta property="og:url" content="(.*?)"')
+
+                       if new_url: url_base64 = new_url
+
                    new_server = servertools.get_server_from_url(url_base64)
                    new_server = servertools.corregir_other(new_server)				   
 

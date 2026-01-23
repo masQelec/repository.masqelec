@@ -70,7 +70,7 @@ def list_all(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, 'by: <a href=.*?data-a2a-url="(.*?)".*?data-a2a-title="(.*?)".*?src="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, 'by: <a href=.*?data-a2a-url="(.*?)".*?data-a2a-title="(.*?)".*?<img.*?src="(.*?)"')
 
     for url, title, thumb in matches:
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
@@ -94,12 +94,17 @@ def findvideos(item):
 
     i = 0
 
-    url = scrapertools.find_single_match(data, '<iframe  id=".*?src="(.*?)"')
+    url = scrapertools.find_single_match(data, 'data-src-cmplz="(.*?)"')
 
     if url:
         i += 1
 
-        servidor = servertools.get_server_from_url(url)
+        url = scrapertools.find_single_match(url, '/embed/(.*?)enablejsapi')
+
+        if url:
+            url = 'https://www.youtube.com/watch?v=%s' % url.replace('?', '').strip()
+
+            servidor = servertools.get_server_from_url(url)
 
         if servidor and servidor != 'directo':
             itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', url = url, language = 'Esp' ))

@@ -7,10 +7,16 @@ from core.item import Item
 from core import httptools, scrapertools, servertools
 
 
-host = 'https://pandamovies.org/'
+host = 'https://pandamovies.pw/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://pandamovies.org/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     raise_weberror = True
     if '/release-year/' in url: raise_weberror = False
 
@@ -35,36 +41,23 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host  + 'movies' ))
+    itemlist.append(item.clone( title = '[B]Vídeos:[/B]', folder=False, text_color='moccasin' ))
 
-    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host  + 'most-viewed' ))
+    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host  + 'movies' ))
 
-    itemlist.append(item.clone( title = 'Escenas', action = 'escenas', text_color = 'pink' ))
+    itemlist.append(item.clone( title = ' - Más populares', action = 'list_all', url = host  + 'most-viewed' ))
 
-    itemlist.append(item.clone( title = 'Por canal', action = 'canales', url = host ))
-    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host))
-    itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars' ))
+    itemlist.append(item.clone( title = ' - Por canal', action = 'canales', url = host ))
+    itemlist.append(item.clone( title = ' - Por categoría', action = 'categorias', url = host))
+    itemlist.append(item.clone( title = ' - Por estrella', action = 'pornstars' ))
 
-    itemlist.append(item.clone( title = 'Por año', action='anios' ))
+    itemlist.append(item.clone( title = ' - Por año', action='anios' ))
 
-    return itemlist
-
-
-def escenas(item):
-    logger.info()
-    itemlist = []
-
-    itemlist.append(item.clone( title = 'ESCENAS:', action='', text_color = 'pink' ))
+    itemlist.append(item.clone( title = '[B]Escenas:[/B]', folder=False, text_color='moccasin' ))
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host  + 'xxxscenes/movies' ))
 
-    itemlist.append(item.clone( title = ' - [COLOR cyan]Últimas[/COLOR]', action = 'list_all', url = host  + 'xxxscenes/#movie-featured' ))
-
-    itemlist.append(item.clone( title = ' - Más vistas', action = 'list_all', url = host  + 'xxxscenes/#topview-today' ))
-    itemlist.append(item.clone( title = ' - Más valoradas', action = 'list_all', url = host  + 'xxxscenes/#top-rating' ))
-
-    itemlist.append(item.clone( title = ' - Por género', action = 'canales', url = host + 'xxxscenes/' ))
-    itemlist.append(item.clone( title = ' - Por estudio', action = 'categorias', url = host + 'xxxscenes/'))
+    itemlist.append(item.clone( title = ' - Por canal', action = 'canales', url = host + 'xxxscenes/' ))
 
     return itemlist
 
@@ -75,7 +68,10 @@ def canales(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '>Porn Studios<(.*?)</ul>')
+    if '/xxxscenes/' in item.url:
+        bloque = scrapertools.find_single_match(data, '>All Scenes<(.*?)</ul>')
+    else:
+        bloque = scrapertools.find_single_match(data, '>Studios<(.*?)</ul>')
 
     matches = re.compile('<a href="(.*?)">(.*?)</a>', re.DOTALL).findall(bloque)
 
@@ -126,7 +122,7 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    for x in range(current_year, 1999, -1):
+    for x in range(current_year, 1969, -1):
         url = host + 'release-year/' + str(x)
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = 'orange' ))
@@ -210,11 +206,15 @@ def findvideos(item):
         if not url: continue
 
         if '/frdl.' in url: continue
+        elif '/drivevideo.' in url: continue
         elif '/snowdayonline.' in url: continue
         elif '/freepopnews.' in url: continue
         elif '/filepv.' in url: continue
         elif '/vinovo.' in url: continue
         elif '/p.' in url: continue
+
+        elif '.player4me.' in url: continue
+        elif '.embedseek.' in url: continue
 
         elif '/nitroflare.' in url: continue
         elif 'rapidgator.' in url: continue

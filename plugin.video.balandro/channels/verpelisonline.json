@@ -1,0 +1,17 @@
+{
+  "id": "verpelisonline",
+  "name": "VerPelisOnline",
+  "thumbnail": "verpelisonline.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["onlyone", "news", "rankings", "years", "qualityes", "kids", "docs", "vos"],
+
+  "notes": "Películas por géneros."
+}

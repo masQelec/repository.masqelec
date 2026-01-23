@@ -12,39 +12,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-LINUX = False
-BR = False
-BR2 = False
-
-if PY3:
-    try:
-       import xbmc
-       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
-    except: pass
-
-try:
-   if LINUX:
-       try:
-          from lib import balandroresolver2 as balandroresolver
-          BR2 = True
-       except: pass
-   else:
-       if PY3:
-           from lib import balandroresolver
-           BR = true
-       else:
-          try:
-             from lib import balandroresolver2 as balandroresolver
-             BR2 = True
-          except: pass
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-      BR2 = True
-   except: pass
-
-
-host = 'https://www.zona-leros.com/'
+host = 'https://zona-leros.com/'
 
 
 def item_configurar_proxies(item):
@@ -80,6 +48,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://www.zona-leros.com/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     hay_proxies = False
     if config.get_setting('channel_zonaleros_proxies', default=''): hay_proxies = True
 
@@ -99,7 +73,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not 'search?q=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('ZonaLeros', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('ZonaLeros', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -107,23 +81,6 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                     data = httptools.downloadpage_proxy('zonaleros', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-
-                if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('zonaleros', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-            except:
-               pass
 
     if '<title>Just a moment...</title>' in data:
         if not 'search?q=' in url:

@@ -84,6 +84,8 @@ def categorias(item):
     matches = re.compile('<div class="th.*?href="(.*?)".*?title="(.*?)".*?src="(.*?)"', re.DOTALL).findall(bloque)
 
     for url, title, thumb in matches:
+         title = title.replace(' Porn Videos', '').strip()
+
          itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='moccasin' ))
 
     return sorted(itemlist, key=lambda x: x.title)

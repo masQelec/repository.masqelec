@@ -11,7 +11,7 @@ from lib.pyberishaes import GibberishAES
 from lib import decrypters
 
 
-host = 'https://cuevana3.vip'
+host = 'https://dh1.cuevana3.vip'
 
 
 # ~ por si viene de enlaces guardados
@@ -27,7 +27,7 @@ ant_hosts = ['https://wwa3.cuevana3.vip', 'https://wlw.cuevana3.vip', 'https://w
              'https://me3.cuevana3.vip', 'https://me4.cuevana3.vip', 'https://mia.cuevana3.vip',
              'https://max.cuevana3.vip', 'https://zx1.cuevana3.vip', 'https://zz.cuevana3.vip',
              'https://gx.cuevana3.vip', 'https://tv.cuevana3.vip', 'https://tv8.cuevana3.vip',
-             'https://b1.cuevana3.vip', 'https://sw.cuevana3.vip']
+             'https://b1.cuevana3.vip', 'https://sw.cuevana3.vip', 'https://cuevana3.vip']
 
 
 domain = config.get_setting('dominio', 'cuevana3pro', default='')
@@ -92,7 +92,7 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '/search?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('Cuevana3Pro', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('Cuevana3Pro', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -1081,17 +1081,23 @@ def play(item):
         if not bytes:
             url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
             url += '='
-            url = base64.b64decode(url).decode()
-            url = scrapertools.find_single_match(url, '"link":"(.*?)"')
 
-        if not url:
             try:
-                url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
+                url = base64.b64decode(url).decode()
+                url = scrapertools.find_single_match(url, '"link":"(.*?)"')
             except:
                 url = ''
 
+        if not url:
+            if bytes:
+                try:
+                   url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
+                except:
+                    url = ''
+
             if not url:
-                url = decrypters.decode_decipher(crypto, bytes)
+                if bytes:
+                    url = decrypters.decode_decipher(crypto, bytes)
 
             if not url:
                 if crypto.startswith("http"):

@@ -42,9 +42,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Long play', action = 'list_all', url = host  + 'search/?sort_by=duration&from_videos=1' ))
 
+    itemlist.append(item.clone( title = 'Por canal', action = 'listas', url = host + 'sites/?sort_by=total_videos&from=1' ))
+
     itemlist.append(item.clone( title = 'Por categoría', action = 'listas', url = host + 'categories/1/' ))
 
-    itemlist.append(item.clone( title = 'Por canal', action = 'listas', url = host + 'sites/?sort_by=total_videos&from=1' ))
     itemlist.append(item.clone( title = 'Por estrella', action = 'listas', url = host + 'models/?sort_by=total_videos&from=1' ))
 
     return itemlist
@@ -172,6 +173,9 @@ def listas(item):
 
         if thumb:
             if not 'http' in thumb: thumb = 'https:' +thumb
+
+        if '/sites/' in item.url:
+            thumb = config.get_thumb('whoreshub')
 
         itemlist.append(item.clone(action="list_all", title = title, url = url, thumbnail = thumb,
                                    text_color = text_color, contentType = 'movie', contentTitle = title ))

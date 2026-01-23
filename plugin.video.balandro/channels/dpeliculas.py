@@ -101,7 +101,7 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '/?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('DPeliculas', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('DPeliculas', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -145,8 +145,6 @@ def acciones(item):
     itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(item.clone( channel='helper', action='show_help_dpeliculas', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal' ))
-
-    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
 
     platformtools.itemlist_refresh()
 

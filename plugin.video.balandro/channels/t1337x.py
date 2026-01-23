@@ -13,6 +13,11 @@ host = 'https://www.1337x.to/'
 def do_downloadpage(url, post=None, headers=None):
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
+    if '<title>Just a moment...</title>' in data:
+        if not '/search/' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
     return data
 
 

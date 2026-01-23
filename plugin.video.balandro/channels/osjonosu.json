@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["cast"],
 
-  "clusters": ["suggested", "onlyone", "years", "infantil", "lists", "kids", "docs"],
+  "clusters": ["onlyone", "notice", "news", "lasts", "years", "infantil", "lists", "kids", "docs"],
 
   "notes": "Películas por géneros. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

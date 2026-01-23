@@ -7,12 +7,18 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-# ~ Las series no se tratan pq solo hay 17
+# ~ 9/12/25 Las series no se tratan pq solo hay 17
 
-host = 'https://www.pelis182.com/'
+host = 'https://pelis182.net/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://www.pelis182.com/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
@@ -70,6 +76,8 @@ def list_all(item):
 
         if '-temporada-' in url: continue
 
+        title = title.replace('&#8217;s', "'s").strip()
+
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         year = scrapertools.find_single_match(title, '(\d{4})')
@@ -101,8 +109,19 @@ def findvideos(item):
     matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)".*?</iframe>')
 
     for url in matches:
-        itemlist.append(Item(channel = item.channel, action = 'play', server='', title = '', url=url,
-                             language=item.languages, quality=item.qualities, other='M3u8'))
+        if url.startswith("//"): url = 'https:' + url
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        if servidor == 'directo':
+            itemlist.append(Item(channel = item.channel, action = 'play', server='', title = '', url=url,
+                                 language=item.languages, quality=item.qualities, other='M3u8'))
+        else:
+            itemlist.append(Item(channel = item.channel, action = 'play', server=servidor, title = '', url=url,
+                                 language=item.languages, quality=item.qualities))
 
     return itemlist
 
@@ -113,12 +132,21 @@ def play(item):
 
     url = item.url
 
-    new_url = get_video_url(url)
+    if item.other == 'M3u8':
+        new_url = get_video_url(url)
 
-    if new_url:
-        if new_url == 'error': return '[COLOR red]Archivo Inexistente ó eliminado[/COLOR]'
+        if new_url:
+            if new_url == 'error': return '[COLOR red]Archivo Inexistente ó eliminado[/COLOR]'
 
-        itemlist = new_url
+            itemlist = new_url
+    else:
+        if item.server == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
+
+        itemlist.append(item.clone(url = url, server = item.server))
 
     return itemlist
 
@@ -136,7 +164,7 @@ def get_video_url(url):
     if "NOT FOUND!" in data: return "error" 
 
     try:
-        headers = '|Referer=https://lauchacohete.top/'
+        headers = '|Referer=https://barmonrey.com/'
 
         video = scrapertools.find_single_match(data, 'sources:\s+\[\{"file":"([^"]+)')
 

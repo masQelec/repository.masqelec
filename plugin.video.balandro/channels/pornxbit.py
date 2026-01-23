@@ -50,7 +50,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host  + '/porn-videos/?filter=latest' ))
 
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host  + '/full-movie/' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host  + '/full-movie/', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host  + '/porn-videos/?filter=most-viewed' ))
 

@@ -80,7 +80,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not '/?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('SeriesPlus', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('SeriesPlus', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -88,6 +88,11 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                     data = httptools.downloadpage_proxy('seriesplus', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+    if '<title>Just a moment...</title>' in data:
+        if not '/?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
 
     return data
 
@@ -400,7 +405,7 @@ def episodios(item):
 
     data = do_downloadpage(item.url)
 
-    bloque: bloque = scrapertools.find_single_match(data, "<div class='se-q'>.*?<span class='title'>Temporada " + str(item.contentSeason) + "(.*?)</div></div></div></div>")
+    bloque: bloque = scrapertools.find_single_match(data, "<div class='se-q'>.*?<span class='title'>Temporada " + str(item.contentSeason) + "(.*?)</ul></div></div>")
 
     patron = "<div class='imagen'.*?src='(.*?)'.*?<div class='numerando'>(.*?)</div>.*?<a href='(.*?)'.*?" + 'class="local-link">' + "(.*?)</a>.*?</span>(.*?)</div></li>"
 

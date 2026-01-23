@@ -97,7 +97,7 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '/buscar/' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('JKAnime', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('JKAnime', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -480,6 +480,8 @@ def last_epis(item):
                if not season: season = 1
 
         SerieName = title
+
+        if ' - ' in SerieName: SerieName = SerieName.split(" - ")[0]
 
         SerieName = SerieName.strip()
 

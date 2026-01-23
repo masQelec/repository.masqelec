@@ -1,0 +1,17 @@
+{
+  "id": "verserieonline",
+  "name": "VerSerieOnline",
+  "thumbnail": "verserieonline.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["tvshow"],
+
+  "categories": ["tvshow"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["clone", "crypto", "lasts", "countries", "years", "kids", "docs", "vos"],
+
+  "notes": "Series por Géneros."
+}

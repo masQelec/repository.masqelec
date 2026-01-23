@@ -438,6 +438,8 @@ def findvideos(item):
 
                 continue
 
+            if '.beatz-anime.net/' in url: continue
+
             if url.endswith('.torrent'): servidor = 'torrent'
 
             elif url.endswith('.mp4') or url.endswith('%20MP4'): other = 'Mp4'

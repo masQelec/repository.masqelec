@@ -1,0 +1,17 @@
+{
+  "id": "peliculasonline",
+  "name": "PeliculasOnline",
+  "thumbnail": "peliculasonline.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": ["movie", "tvshow"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["years", "kids", "docs", "vos"],
+
+  "notes": "Películas por géneros. También Series."
+}

@@ -3,7 +3,7 @@
   "name": "PelisFlix",
   "thumbnail": "pelisflix.jpg",
 
-  "active": false,
+  "active": true,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["current", "producers", "vos"],
+  "clusters": ["news", "years", "infantil", "kids", "docs", "vos"],
 
-  "notes": "Web CERRADA. Películas por géneros. También Series. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Películas por géneros. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

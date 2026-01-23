@@ -40,11 +40,13 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Más valorados', action = 'bests', url = host + 'best/' ))
 
+    itemlist.append(item.clone( title = 'Por colección', action = 'webcams', url = host + 'webcam-models-index/from/worldwide/ever' ))
+
     itemlist.append(item.clone( title = 'Por canal', action = 'canales', url = host + 'channels-index/from/worldwide/top' ))
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', ))
+
     itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars', url = host + 'pornstars-index/from/worldwide/ever' ))
     itemlist.append(item.clone( title = 'Por modelo', action = 'modelos', url = host + 'erotic-models-index/from/worldwide/ever' ))
-    itemlist.append(item.clone( title = 'Por webcam', action = 'webcams', url = host + 'webcam-models-index/from/worldwide/ever' ))
 
     return itemlist
 
@@ -90,7 +92,7 @@ def list_bests(item):
 
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
-        title = scrapertools.find_single_match(match, '<div class="video-title">.*?>(.*?)</a>')
+        title = scrapertools.find_single_match(match, '<div class="title">.*?">(.*?)</a>')
 
         title = title.replace('&aacute;', 'a').replace('&eacute;', 'e').replace('&iacute;', 'e').replace('&oacute;', 'o').replace('&uacute;', 'u').strip()
         title = title.replace('Aaacute;', 'a').replace('&Eacute;', 'e').replace('&Iacute;', 'e').replace('&Oacute;', 'o').replace('&Uacute;', 'u').strip()
@@ -152,6 +154,8 @@ def list_canales(item):
         thumbnail =  vid["i"]
 
         title = title.replace('&ntilde;', 'ñ')
+
+        time = time.replace(' hrs.', 'h').replace(' mins.', 'm').replace(' min.', 'm').replace(' hrs', 'h').replace(' mins', 'm').replace(' min', 'm')
 
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
 
@@ -251,6 +255,8 @@ def list_stars(item):
 
         title = title.replace('&ntilde;', 'ñ')
 
+        time = time.replace(' hrs.', 'h').replace(' mins.', 'm').replace(' min.', 'm').replace(' hrs', 'h').replace(' mins', 'm').replace(' min', 'm')
+
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
 
         thumb = thumb.replace("\/", "/")
@@ -321,6 +327,8 @@ def list_models(item):
         thumb =  vid["i"]
 
         title = title.replace('&ntilde;', 'ñ')
+
+        time = time.replace(' hrs.', 'h').replace(' mins.', 'm').replace(' min.', 'm').replace(' hrs', 'h').replace(' mins', 'm').replace(' min', 'm')
 
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
 
@@ -395,6 +403,8 @@ def list_webcams(item):
             continue
 
         title = title.replace('&ntilde;', 'ñ')
+
+        time = time.replace(' hrs.', 'h').replace(' mins.', 'm').replace(' min.', 'm').replace(' hrs', 'h').replace(' mins', 'm').replace(' min', 'm')
 
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
 

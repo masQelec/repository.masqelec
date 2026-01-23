@@ -42,7 +42,7 @@ def configurar_proxies(item):
     return proxytools.configurar_proxies_canal(item.channel, host)
 
 
-def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['https://gnula.center/']
 
@@ -64,7 +64,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not '/?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('GnulaCenter', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('GnulaCenter', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -266,7 +266,9 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    episodes = scrapertools.find_multiple_matches(data, '<article(.*?)</article>')
+    bloque = scrapertools.find_single_match(data, "</h1>(.*?)</tbody>")
+
+    episodes = scrapertools.find_multiple_matches(bloque, '<td>(.*?)</article>')
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(episodes)
@@ -348,9 +350,6 @@ def episodios(item):
 
 
 def findvideos(item):
-    logger.info()
-    itemlist = []
-
     logger.info()
     itemlist = []
 

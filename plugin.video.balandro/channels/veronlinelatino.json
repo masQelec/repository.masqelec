@@ -1,0 +1,17 @@
+{
+  "id": "veronlinelatino",
+  "name": "VerOnlineLatino",
+  "thumbnail": "veronlinelatino.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["tvshow"],
+
+  "categories": ["tvshow"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["crypto", "lasts", "countries", "years", "kids", "docs", "vos"],
+
+  "notes": "Series por Géneros."
+}

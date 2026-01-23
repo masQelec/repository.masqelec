@@ -68,7 +68,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not '?s=' in url:
-                platformtools.dialog_notification('PelisySeries', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                platformtools.dialog_notification('PelisySeries', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
                 data = httptools.downloadpage_proxy('pelisyseries', url, post=post, headers=header, sraise_weberror=raise_weberror, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:

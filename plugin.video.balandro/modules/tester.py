@@ -10,38 +10,6 @@ PY3 = False
 if config.get_setting('PY3', default=''): PY3 = True
 
 
-LINUX = False
-BR = False
-BR2 = False
-
-if PY3:
-    try:
-       import xbmc
-       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
-    except: pass
-
-try:
-   if LINUX:
-       try:
-          from lib import balandroresolver2 as balandroresolver
-          BR2 = True
-       except: pass
-   else:
-       if PY3:
-           from lib import balandroresolver
-           BR = true
-       else:
-          try:
-             from lib import balandroresolver2 as balandroresolver
-             BR2 = True
-          except: pass
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-      BR2 = True
-   except: pass
-
-
 color_alert = config.get_setting('notification_alert_color', default='red')
 color_infor = config.get_setting('notification_infor_color', default='pink')
 color_adver = config.get_setting('notification_adver_color', default='violet')
@@ -246,7 +214,7 @@ def test_channel(channel_name):
 
     if 'Canal con enlaces Torrent exclusivamente.' in notes: notes = notes.replace('Canal con enlaces Torrent exclusivamente.', '').strip()
 
-    if 'Canal con enlaces Streaming y Torrent.' in notes: notes = notes.replace('Canal con enlaces Streaming y Torrent.', '').strip()
+    if 'Canal con enlaces Streaming y Torrent' in notes: notes = notes.replace('Canal con enlaces Streaming y Torrent.', '').strip()
 
     if 'Dispone de varios posibles dominios.' in notes: notes = notes.replace('Dispone de varios posibles dominios.', '').strip()
 
@@ -564,24 +532,24 @@ def test_channel(channel_name):
             txt_diag  += 'principal: ' + '[COLOR turquoise][B]Canal com Más Canales Clones Asociados[/B][/COLOR]'
 
             txt_clons = ''
+
             if channel_id == 'cuevana2esp': txt_clons = 'Cuevana2'
 
-            elif channel_id == 'dontorrents': txt_clons = 'DivxATope, DonTorrentsIn, EliteDivx, LilaTorrent, MejorTorrentApp, NaranjaTorrent, ReinvenTorrent, RojoTorrent, TomaDivx, TodoTorrents, VerdeTorrent'
+            elif channel_id == 'dontorrents': txt_clons = 'DivxATope, DonTorrent21, DonTorrentsIn, EliteDivx, LilaTorrent, MejorTorrentApp, MejorTorrentIn, NaranjaTorrent, ReinvenTorrent, RojoTorrent, TomaDivx, TodoTorrents, VerdeTorrent'
 
-            elif channel_id == 'detodo': txt_clons = 'DPeliculas'
+            elif channel_id == 'doramasflix': txt_clons = 'DoramasFlixIn, DoramasFlixIo'
 
             elif channel_id == 'homecine': txt_clons = 'PelisPediaIs, SeriesMetroN'
 
             elif channel_id == 'elitetorrent': txt_clons = 'EliteTorrentNz'
-            elif channel_id == 'entrepeliculasyseries': txt_clons = 'PelisGratisHd'
+            elif channel_id == 'entrepeliculasyseries': txt_clons = 'MegaDedeOficial, PelisGratisHd'
 
-            elif channel_id == 'gnula24': txt_clons = 'Gnula24h, Series24, SeriesPlus'
+            elif channel_id == 'series24': txt_clons = 'Gnula24, Gnula24h, SeriesPlus'
 
-            elif channel_id == 'joinclub': txt_clons = 'VerSeries'
             elif channel_id == 'mundodonghua': txt_clons = 'MundoDonghua'
             elif channel_id == 'serieskao': txt_clons = 'PelisPlusHdNz'
 
-            elif channel_id == 'veronline': txt_clons = 'OnlineTv, SeriesEs, SeriesOnline, Star, VerFlix'
+            elif channel_id == 'veronline': txt_clons = 'OnlineTv, SeriesOnline, Star, VerSerieOnline'
 
             if txt_clons:
                 txt_diag  += '[CR]clones: [COLOR gold][B]' + txt_clons + '[/B][/COLOR]'
@@ -591,15 +559,18 @@ def test_channel(channel_name):
 
             if channel_id == 'cuevana2': txt_clones = 'Cuevana2Esp'
             elif channel_id == 'divxatope': txt_clones = 'DonTorrents'
+            elif channel_id == 'dontorrent21': txt_clones = 'DonTorrents'
             elif channel_id == 'dontorrentsin': txt_clones = 'DonTorrents'
-            elif channel_id == 'dpeliculas': txt_clones = 'DeTodo'
+            elif channel_id == 'doramasflixin': txt_clones = 'DoramasFlix'
+            elif channel_id == 'doramasflixio': txt_clones = 'DoramasFlix'
             elif channel_id == 'elitedivx': txt_clones = 'DonTorrents'
             elif channel_id == 'elitetorrentnz': txt_clones = 'EliteTorrent'
-            elif channel_id == 'entrepeliculasyseries': txt_clones = 'PelisGratisHd'
-            elif channel_id == 'gnula24h': txt_clones = 'Gnula24'
-            elif channel_id == 'joinclub': txt_clones = 'VerSeries'
+            elif channel_id == 'gnula24': txt_clones = 'Series24'
+            elif channel_id == 'gnula24h': txt_clones = 'Series24'
             elif channel_id == 'lilatorrent': txt_clones = 'DonTorrents'
+            elif channel_id == 'megadedeoficial': txt_clones = 'EntrePeliculasySeries'
             elif channel_id == 'mejortorrentapp': txt_clones = 'DonTorrents'
+            elif channel_id == 'mejortorrentin': txt_clones = 'DonTorrents'
             elif channel_id == 'mundodonghuaxyz': txt_clones = 'MundoDonghua'
             elif channel_id == 'naranjatorrent': txt_clones = 'DonTorrents'
             elif channel_id == 'onlinetv': txt_clones = 'VerOnline'
@@ -608,17 +579,15 @@ def test_channel(channel_name):
             elif channel_id == 'pelisplushdnz': txt_clones = 'SeriesKao'
             elif channel_id == 'reinventorrent': txt_clones = 'DonTorrents'
             elif channel_id == 'rojotorrent': txt_clones = 'DonTorrents'
-            elif channel_id == 'series24': txt_clones = 'Gnula24'
-            elif channel_id == 'serieses': txt_clones = 'VerOnline'
+            elif channel_id == 'seriesplus': txt_clones = 'Series24'
             elif channel_id == 'serieskao': txt_clones = 'PelisPlusHdNz'
             elif channel_id == 'seriesmetron': txt_clones = 'HomeCine'
             elif channel_id == 'seriesonline': txt_clones = 'VerOnline'
             elif channel_id == 'star': txt_clones = 'VerOnline'
-            elif channel_id == 'verflix': txt_clones = 'VerOnline'
             elif channel_id == 'tomadivx': txt_clones = 'DonTorrents'
             elif channel_id == 'todotorrents': txt_clones = 'DonTorrents'
             elif channel_id == 'verdetorrent': txt_clones = 'DonTorrents'
-            elif channel_id == 'verseries': txt_clones = 'JoinClub'
+            elif channel_id == 'verserieonline': txt_clones = 'VerOnline'
 
             if txt_clones:
                 txt_diag  += '[CR]clone: ' + '[COLOR turquoise][B]Clon del Canal Principal[/COLOR][COLOR gold] ' + txt_clones + '[/B][/COLOR]'
@@ -1198,17 +1167,11 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             response = httptools.downloadpage(host_acces, headers=headers, follow_redirects=follow_redirects, timeout=timeout, raise_weberror=False, bypass_cloudflare=False)
 
         if '<title>You are being redirected...</title>' in response.data or '<title>Just a moment...</title>' in response.data or '<title>Just a moment please...</title>' in response.data:
-            if BR or BR2:
-                try:
-                    ck_name, ck_value = balandroresolver.get_sucuri_cookie(response.data)
-                    if ck_name and ck_value:
-                        httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                        response = httptools.downloadpage(host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
-                except:
-                    pass
+            response.data = '[COLOR orangered][B]CloudFlare Human Verify[/B][/COLOR]'
+            platformtools.dialog_notification(channel_name.capitalize(), '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
 
-        if not response.data:
-            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification(channel_name.capitalize(), '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+        elif not response.data:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification(channel_name.capitalize(), '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
             timeout = config.get_setting('channels_repeat', default=30)
 
@@ -1247,17 +1210,11 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             response = httptools.downloadpage_proxy(channel_id, host_acces, headers=headers, follow_redirects=follow_redirects, timeout=timeout, raise_weberror=False, bypass_cloudflare=False)
 
         if '<title>You are being redirected...</title>' in response.data or '<title>Just a moment...</title>' in response.data or '<title>Just a moment please...</title>' in response.data:
-            if BR or BR2:
-                try:
-                    ck_name, ck_value = balandroresolver.get_sucuri_cookie(response.data)
-                    if ck_name and ck_value:
-                        httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-                        response = httptools.downloadpage_proxy(channel_id, host_acces, headers=headers, follow_redirects=follow_redirects, raise_weberror=False, bypass_cloudflare=False)
-                except:
-                    pass
+            response.data = 'CloudFlare Human Verify'
+            platformtools.dialog_notification(channel_name.capitalize(), '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
 
-        if not response.data:
-            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification(channel_name.capitalize(), '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+        elif not response.data:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification(channel_name.capitalize(), '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
             timeout = config.get_setting('channels_repeat', default=30)
 
@@ -1410,6 +1367,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             elif '/images/trace/captcha/nojs/h/transparent.' in response.data: txt += '[CR]captcha: [COLOR orangered][B]Invisible Captcha[/B][/COLOR]'
             elif '<title>Access Denied</title>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
             elif 'se encuentra en mantenimiento' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+
             elif '<h1>Index of /</h1>' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Puede estar en mantenimiento[/B][/COLOR]'
             else:
                if len(response.data) > 0:
@@ -1431,6 +1389,11 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
         if len(response.data) >= 1000:
             if 'Estamos en mantenimiento, por favor inténtelo más tarde' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
             elif '<h1>Index of /</h1>' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Puede estar en mantenimiento[/B][/COLOR]'
+
+            elif 'This site is currently under construction' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+
+            elif '>MANTENIMIENTO<' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+            elif '¡ALGO ESTÁ PASANDO!' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
 
             elif '/cgi-sys/defaultwebpage.cgi' in str(response.data): txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
             elif '>This site is currently suspended<' in response.data: txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
@@ -1469,7 +1432,8 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                     no_http_host = host.replace('https://', '').replace('http://', '').strip()
 
                     if not no_http_host in str(response.data).lower():
-                        if '<title>Bot Verification</title>' in response.data: txt += "[CR]robot: [COLOR indianred][B]CloudFlare[/B][/COLOR] [COLOR orangered][B]reCAPTCHA[/B][/COLOR]"
+                        if '<title>Bot Verification</title>' in response.data: txt += "[CR]robot: [COLOR indianred][B]CloudFlare[/B][/COLOR] [COLOR orangered][B]hCAPTCHA[/B][/COLOR]"
+
                         elif '<title>One moment, please...</title>' in response.data: txt += "[CR]robot: [COLOR indianred][B]CloudFlare[/B][/COLOR] [COLOR orangered][B]Protection[/B][/COLOR] [COLOR plum][B]Level 2[/B][/COLOR]"
 
                         invalid = True
@@ -1542,6 +1506,11 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                 elif '>This site is currently suspended<' in response.data: txt += '[CR]status: [COLOR goldenrod][B]Suspendida[/B][/COLOR]'
                 elif 'The website is under maintenance' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
                 elif 'The server is temporarily busy' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+                elif 'This site is currently under construction' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+
+                elif '>MANTENIMIENTO<' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+                elif '¡ALGO ESTÁ PASANDO!' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+
                 elif '/cgi-sys/defaultwebpage.cgi' in response.data: txt += txt_sorry
                 elif '/www.alliance4creativity.com/' in new_web: txt += '[CR]legal: [COLOR springgreen][B]Copyright infringement[/B][/COLOR]'
                 elif '<h1>Index of /</h1>' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Puede estar en mantenimiento[/B][/COLOR]'

@@ -151,9 +151,10 @@ def findvideos(item):
     data = do_downloadpage(item.url)
 
     matches = re.compile('<iframe src="(.*?)"').findall(data)
-
+    if not matches: matches = re.compile('<source src="(.*?)"').findall(data)
+	
     for url in matches:
-        url = url.split('php?q=')
+        if 'php?q=' in url: url = url.split('php?q=')
 
         if url:
             url_decode = base64.b64decode(url[-1]).decode("utf8")
@@ -162,7 +163,7 @@ def findvideos(item):
             url = scrapertools.find_single_match(url, '<(?:iframe|source) src="([^"]+)"')
 
             if url:
-                itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = 'VO' ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = 'Vo' ))
 
     return itemlist
 

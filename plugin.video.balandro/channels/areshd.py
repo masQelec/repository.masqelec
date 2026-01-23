@@ -93,6 +93,8 @@ def list_all(item):
 
         if not url or not title: continue
 
+        title = title.replace('&#x27;m', "'m").replace('&#x27;s', "'s").strip()
+
         url = host[:-1] + url
 
         thumb = scrapertools.find_single_match(match, 'srcSet=".*?url=(.*?)&amp;')

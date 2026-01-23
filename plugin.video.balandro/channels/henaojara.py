@@ -118,8 +118,8 @@ def do_downloadpage(url, post=None, headers=None):
             data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
         if not data:
-            if not '?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('HenaOjara', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+            if not '/?s=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('HenaOjara', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -146,12 +146,12 @@ def do_downloadpage(url, post=None, headers=None):
                 pass
 
     if '<title>Just a moment...</title>' in data:
-        if not '?s=' in url:
+        if not '/?s=' in url:
             platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
         return ''
 
     if '>Sorry, you have been blocked<' in data:
-        if not '?s=' in url:
+        if not '/?s=' in url:
             platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]Access[COLOR orangered] Blocked[/B][/COLOR]')
         return ''
 
@@ -269,6 +269,11 @@ def generos(item):
 
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='springgreen' ))
 
+    if not itemlist:
+        if '>Crear cuenta<' in data:
+            platformtools.dialog_ok(config.__addon_name + ' HenaOjara', '[COLOR cyan][B]Para Acceder a los Contenidos, a partir del [COLOR yellow]1/12/2025[/B][/COLOR]', '[COLOR red][B]La Web Obliga a Registrarse.[/B][/COLOR]')
+            return
+
     return itemlist
 
 
@@ -337,6 +342,12 @@ def list_all(item):
         if next_page:
             itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color = 'coral' ))
 
+    if not itemlist:
+        if not '/?s=' in item.url:
+            if '>Crear cuenta<' in data:
+                platformtools.dialog_ok(config.__addon_name + ' HenaOjara', '[COLOR cyan][B]Para Acceder a los Contenidos, a partir del [COLOR yellow]1/12/2025[/B][/COLOR]', '[COLOR red][B]La Web Obliga a Registrarse.[/B][/COLOR]')
+                return
+
     return itemlist
 
 
@@ -398,6 +409,11 @@ def list_last(item):
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
                                         contentType='movie', contentTitle=PeliName, infoLabels={'year': year} ))
 
+    if not itemlist:
+        if '>Crear cuenta<' in data:
+            platformtools.dialog_ok(config.__addon_name + ' HenaOjara', '[COLOR cyan][B]Para Acceder a los Contenidos, a partir del [COLOR yellow]1/12/2025[/B][/COLOR]', '[COLOR red][B]La Web Obliga a Registrarse.[/B][/COLOR]')
+            return
+
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
@@ -453,6 +469,11 @@ def last_epis(item):
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb, infoLabels={'year': year},
                                     contentSerieName = SerieName, contentType = 'episode', contentSeason=temp, contentEpisodeNumber=epis))
+
+    if not itemlist:
+        if '>Crear cuenta<' in data:
+            platformtools.dialog_ok(config.__addon_name + ' HenaOjara', '[COLOR cyan][B]Para Acceder a los Contenidos, a partir del [COLOR yellow]1/12/2025[/B][/COLOR]', '[COLOR red][B]La Web Obliga a Registrarse.[/B][/COLOR]')
+            return
 
     tmdb.set_infoLabels(itemlist)
 
@@ -1027,6 +1048,15 @@ def corregir_SerieName(SerieName):
     SerieName = SerieName.strip()
 
     return SerieName
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host
+    item.search_type = 'tvshow'
+
+    return last_epis(item)
 
 
 def search(item, texto):

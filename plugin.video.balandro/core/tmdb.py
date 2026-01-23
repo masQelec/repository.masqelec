@@ -211,10 +211,7 @@ def set_infoLabels(source, seekTmdb=True, idioma_busqueda=tmdb_lang):
     @rtype: int, list
     """
 
-    if not config.get_setting("sqlite_enabled", default=True):
-        return []
-
-    elif config.get_setting('tmdb_disabled', default=False):
+    if config.get_setting('tmdb_disabled', default=False):
         return []
 
     start_time = time.time()

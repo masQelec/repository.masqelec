@@ -25,6 +25,48 @@ color_avis = config.get_setting('notification_avis_color', default='yellow')
 color_exec = config.get_setting('notification_exec_color', default='cyan')
 
 
+con_incidencias = ''
+no_accesibles = ''
+con_problemas = ''
+
+try:
+    with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
+except:
+    try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
+    except: txt_status = ''
+
+if txt_status:
+    # ~ Incidencias
+    bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_incidencias += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    # ~ No Accesibles
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    # ~ Con Problemas
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES CON PROBLEMAS(.*?)$')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_problemas += '[B' + match + '/I][/B][/COLOR][CR]'
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
@@ -164,6 +206,14 @@ def mainlist(item):
                    tit = '[COLOR springgreen][B]Test Login Cuenta[/B][/COLOR]'
                    context.append({'title': tit, 'channel': 'submnuctext', 'action': '_credenciales_' + ch['id']})
 
+        if 'clons' in ch['clusters']:
+            tit = '[COLOR turquoise][B]Clones[/B][/COLOR]'
+            context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_prales'})
+
+        if 'clone' in ch['clusters']:
+            tit = '[COLOR paleturquoise][B]Principal[/B][/COLOR]'
+            context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_principal'})
+
         tit = '[COLOR darkorange][B]Test Web Canal[/B][/COLOR]'
         context.append({'title': tit, 'channel': item.channel, 'action': '_tests'})
 
@@ -186,6 +236,8 @@ def mainlist(item):
         else:
             if ch['status'] == 1:
                titulo += '[I][B][COLOR wheat] (preferido)[/COLOR][/I][/B]'
+
+            if 'suggested' in ch['clusters']: titulo += '[I][B][COLOR olivedrab] (sugerido)[/COLOR][/I][/B]'
 
             if config.get_setting(cfg_proxies_channel, default=''):
                 if ch['status'] == 1: titulo += '[I][B][COLOR %s] (proxies)[/COLOR][/I][/B]' % color_list_proxies
@@ -223,18 +275,63 @@ def mainlist(item):
         elif 'clone' in ch['clusters']:
             titulo += '[I][B][COLOR turquoise] (clon)[/COLOR][/I][/B]'
 
+        elif 'clons' in ch['clusters']:
+            titulo += '[I][B][COLOR paleturquoise] (pral)[/COLOR][/I][/B]'
+
         if config.get_setting('mnu_simple', default=False):
             if 'movie' in ch['categories']:
-                if 'tvshow' in ch['categories']:
+                if 'torrent' in ch['categories']:
+                    if not 'Canal con enlaces Streaming y Torrent' in ch['notes']: titulo += '[B][I][COLOR blue] torrents[/COLOR][/I][/B]'
+
+                    if 'movie' in ch['categories']: titulo += '[B][I][COLOR deepskyblue] películas[/COLOR][/I][/B]'
+                    if 'tvshow' in ch['categories']: titulo += '[B][I][COLOR hotpink] series[/COLOR][/I][/B]'
+
+                    if 'Canal con enlaces Streaming y Torrent' in ch['notes']: titulo += '[B][I][COLOR magenta] streaming/torrent[/COLOR][/I][/B]'
+
+                elif 'tvshow' in ch['categories']:
                     titulo += '[B][I][COLOR deepskyblue] películas[/COLOR] [COLOR hotpink]series[/COLOR][/I][/B]'
+                    if 'infantil' in ch['clusters']: titulo += '[B][I][COLOR lightyellow] infantiles[/COLOR][/I][/B]'
                     if 'tales' in ch['clusters']: titulo += '[B][I][COLOR limegreen] novelas[/COLOR][/I][/B]'
+                    if 'dorama' in ch['clusters']: titulo += '[B][I][COLOR firebrick] doramas[/COLOR][/I][/B]'
+                    if 'anime' in ch['clusters']: titulo += '[B][I][COLOR springgreen] animes[/COLOR][/I][/B]'
+
                 else:
                     titulo += '[B][I][COLOR deepskyblue] películas[/COLOR][/I][/B]'
             else:
-                if 'tvshow' in ch['categories']:
+                if 'torrent' in ch['categories']:
+                    if not 'Canal con enlaces Streaming y Torrent' in ch['notes']: titulo += '[B][I][COLOR blue] torrents[/COLOR][/I][/B]'
+
                     titulo += '[B][I][COLOR hotpink] series[/COLOR][/I][/B]'
+
+                    if 'Canal con enlaces Streaming y Torrent' in ch['notes']: titulo += '[B][I][COLOR magenta] streaming/torrent[/COLOR][/I][/B]'
+
+                elif 'tvshow' in ch['categories']:
+                    titulo += '[B][I][COLOR hotpink] series[/COLOR][/I][/B]'
+                    if 'infantil' in ch['clusters']: titulo += '[B][I][COLOR lightyellow] infantiles[/COLOR][/I][/B]'
                     if 'tales' in ch['clusters']: titulo += '[B][I][COLOR limegreen] novelas[/COLOR][/I][/B]'
+                    if 'dorama' in ch['clusters']: titulo += '[B][I][COLOR firebrick] doramas[/COLOR][/I][/B]'
+                    if 'anime' in ch['clusters']: titulo += '[B][I][COLOR springgreen] animes[/COLOR][/I][/B]'
+
                 elif "documentary" in ch['categories']: titulo += '[B][I][COLOR cyan] documentales[/COLOR][/I][/B]'
+
+        if con_incidencias:
+            if ch['name'] in str(con_incidencias): titulo += '[I][B][COLOR tan] (incidencia)[/COLOR][/I][/B]'
+
+        if no_accesibles:
+            if ch['name'] in str(no_accesibles): titulo += '[I][B][COLOR indianred] (no accesible)[/COLOR][/I][/B]'
+
+        if con_problemas:
+            if ch['name'] in str(con_problemas):
+                hay_problemas = str(con_problemas).replace('[B][COLOR moccasin]', 'CHANNEL').replace('[COLOR lime]', '/CHANNEL')
+                channels_con_problemas = scrapertools.find_multiple_matches(hay_problemas, "CHANNEL(.*?)/CHANNEL")
+
+                for channel_con_problema in channels_con_problemas:
+                     channel_con_problema = channel_con_problema.strip()
+
+                     if not channel_con_problema == ch['name']: continue
+
+                     titulo += '[I][B][COLOR tomato] (con problema)[/COLOR][/I][/B]'
+                     break
 
         if item.extra == 'movies':
             if not 'movie' in ch['categories']: continue
@@ -245,6 +342,26 @@ def mainlist(item):
             elif ch['id'] == 'cuevana3run': continue
             elif ch['id'] == 'onlinetv': continue
             elif ch['id'] == 'retrotv': continue
+            elif ch['id'] == 'cinemundo': continue
+            elif ch['id'] == 'cineplay': continue
+            elif ch['id'] == 'cineteca': continue
+            elif ch['id'] == 'creyente': continue
+            elif ch['id'] == 'flizzmovies': continue
+            elif ch['id'] == 'genteclic': continue
+            elif ch['id'] == 'hdcinema': continue
+            elif ch['id'] == 'legalmentegratis': continue
+            elif ch['id'] == 'megaserie': continue
+            elif ch['id'] == 'pelis182': continue
+            elif ch['id'] == 'pelis28re': continue
+            elif ch['id'] == 'pelisforte': continue
+            elif ch['id'] == 'pelismart': continue
+            elif ch['id'] == 'pelispediaws': continue
+            elif ch['id'] == 'pelisplayhd': continue
+            elif ch['id'] == 'seriespapayato': continue
+            elif ch['id'] == 'streamgratis': continue
+            elif ch['id'] == 'tubeonline': continue
+            elif ch['id'] == 'verflix': continue
+            elif ch['id'] == 'zonaleros': continue
 
         elif item.extra == 'tvshows':
             if not 'tvshow' in ch['categories']: continue
@@ -252,9 +369,11 @@ def mainlist(item):
             elif ch['id'] == 'cinecalidad': continue
             elif ch['id'] == 'cuevana3pro': continue
             elif ch['id'] == 'cuevana3run': continue
+            elif ch['id'] == 'gnula24': continue
             elif ch['id'] == 'gnula24h': continue
+            elif ch['id'] == 'gnulacenter': continue
+
             elif ch['id'] == 'onlinetv': continue
-            elif ch['id'] == 'osjonosu': continue
             elif ch['id'] == 'retrotv': continue
             elif ch['id'] == 'series24': continue
             elif ch['id'] == 'seriesonline': continue
@@ -265,6 +384,8 @@ def mainlist(item):
             elif ch['id'] == 'verflix': continue
             elif ch['id'] == 'vernovelas': continue
             elif ch['id'] == 'veronline': continue
+            elif ch['id'] == 'veronlinelatino': continue
+            elif ch['id'] == 'verserieonline': continue
 
         elif item.extra == 'documentaries':
             if not 'documentary' in ch['categories']: continue
@@ -305,10 +426,12 @@ def mainlist(item):
 
             if ch['id'] == 'doramaexpress': pass
             elif ch['id'] == 'doramasflix': pass
+            elif ch['id'] == 'doramasflixin': pass
+            elif ch['id'] == 'doramasflixio': pass
+            elif ch['id'] == 'doramasorg': pass
             elif ch['id'] == 'doramasmp4dev': pass
             elif ch['id'] == 'doramasqueenin': pass
             elif ch['id'] == 'doramasyt': pass
-            elif ch['id'] == 'estrenosdoramases': pass
             elif ch['id'] == 'pandramaio': pass
             elif ch['id'] == 'yandispoiler': pass
 
@@ -324,7 +447,10 @@ def mainlist(item):
             elif ch['id'] == 'animeyt': pass
             elif ch['id'] == 'estrenosanime': pass
             elif ch['id'] == 'jkanime': pass
+            elif ch['id'] == 'henaojara': pass
+            elif ch['id'] == 'henaojaran': pass
             elif ch['id'] == 'latanime': pass
+            elif ch['id'] == 'monoschinos': pass
             elif ch['id'] == 'mundodonghua': pass
             elif ch['id'] == 'mundodonghuaxyz': pass
             elif ch['id'] == 'tioanime': pass
@@ -339,15 +465,32 @@ def mainlist(item):
             if not 'tvshow' in ch['categories']: continue
 
             elif ch['id'] == 'cinecalidad': continue
+            elif ch['id'] == 'cineplay': continue
+            elif ch['id'] == 'creyente': continue
             elif ch['id'] == 'gnula': continue
             elif ch['id'] == 'gnulacenter': continue
+            elif ch['id'] == 'hdcinema': continue
             elif ch['id'] == 'osjonosu': continue
+            elif ch['id'] == 'peliculaspro': continue
+            elif ch['id'] == 'pelis28re': continue
+            elif ch['id'] == 'pelisflix': continue
+            elif ch['id'] == 'pelismart': continue
+            elif ch['id'] == 'pelisplayhd': continue
             elif ch['id'] == 'pelisplushd': continue
             elif ch['id'] == 'pelisplushdlat': continue
+            elif ch['id'] == 'zonaleros': continue
 
         if not 'suggested' in ch['clusters']:
             if 'torrent' in ch['categories']:
-                if not item.extra == 'torrents': continue
+                if ch['id'] == 'zerowpanime': pass
+
+                elif not item.extra == 'torrents': continue
+
+            elif item.extra == 'movies':
+                if ch['id'] == 'gnulatv': pass
+
+            elif item.extra == 'episodes':
+                if ch['id'] == 'veronlinelatino': pass
 
             elif item.extra == 'doramas': pass
             elif item.extra == 'animes': pass
@@ -366,9 +509,10 @@ def mainlist(item):
         elif ch['id'] == 'cuevana3re': continue
         elif ch['id'] == 'estrenoscinesaa': continue
         elif ch['id'] == 'entrepeliculasyseries': continue
-        elif ch['id'] == 'joinclub': continue
         elif ch['id'] == 'lacartoons': continue
         elif ch['id'] == 'lamovie': continue
+        elif ch['id'] == 'megadedeoficial': continue
+        elif ch['id'] == 'peliculasflix': continue
         elif ch['id'] == 'pelisgratishd': continue
         elif ch['id'] == 'pelispediais': continue
         elif ch['id'] == 'pelisplushdnz': continue
@@ -378,7 +522,6 @@ def mainlist(item):
         elif ch['id'] == 'tucineclasico': continue
         elif ch['id'] == 'ultrapelis': continue
         elif ch['id'] == 'verpelis': continue
-        elif ch['id'] == 'verseries': continue
         elif ch['id'] == 'zoowomaniacos': continue
 
         accion = '_' + item.news

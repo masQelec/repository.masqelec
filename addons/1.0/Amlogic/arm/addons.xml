@@ -2092,7 +2092,7 @@ Puede clonar el proyecto y alojarlo en su propio servidor.
 	</extension>
 </addon>
 
-<addon id="plugin.video.balandro" name="Balandro" version="4.0.23" provider-name="Team Balandro">
+<addon id="plugin.video.balandro" name="Balandro" version="4.0.25" provider-name="Team Balandro">
   <requires>
      <import addon="script.module.requests"/>
   </requires>
@@ -2112,7 +2112,7 @@ Puede clonar el proyecto y alojarlo en su propio servidor.
       <screenshot>resources/screenshots/4.jpg</screenshot>
     </assets>
     <news>
-    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.23[/COLOR][COLOR chartreuse]  Noviembre de 2025[/B][/COLOR]
+    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.25[/COLOR][COLOR chartreuse]  Enero de 2026[/B][/COLOR]
 
     [COLOR goldenrod][B]Media Centers:[/B][/COLOR]
         [COLOR tan][B]Kodi Versiones Oficiales Soportadas:[/B][/COLOR]

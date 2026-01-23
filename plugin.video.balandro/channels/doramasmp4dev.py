@@ -94,9 +94,14 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#8217;', "'").replace('&#8220;', '').replace('&#8221;', '').replace('&#8211;', '').strip()
+        title = title.replace('&#8217;', "'").replace('&#8220;', '').replace('&#8221;', '').replace('&#8211;', '').replace('&#038;', '&').strip()
 
         SerieName = title
+
+        try:
+            if 'sub espanol' in SerieName: SerieName = SerieName.split("sub espanol")[1]
+        except:
+            pass
 
         if 'Capitulo' in SerieName: SerieName = SerieName.split("Capitulo")[0]
         if 'Capítulo' in SerieName: SerieName = SerieName.split("Capítulo")[0]

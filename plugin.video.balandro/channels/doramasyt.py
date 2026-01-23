@@ -62,7 +62,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not 'buscar?q=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('DoramasYt', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('DoramasYt', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -336,10 +336,13 @@ def last_epis(item):
         SerieName = title
 
         if "capitulo" in title:SerieName = title.split("capitulo")[0]
-        elif "Capitulo" in title:SerieName = title.split("Capitulo")[0]
-        elif "episodio" in title:SerieName = title.split("episodio")[0]
-        elif "Episodio" in title:SerieName = title.split("Episodio")[0]
-        else: titulo = SerieName
+        if "Capitulo" in title:SerieName = title.split("Capitulo")[0]
+
+        if "episodio" in title:SerieName = title.split("episodio")[0]
+        if "Episodio" in title:SerieName = title.split("Episodio")[0]
+
+        if "latino" in title:SerieName = title.split("latino")[0]
+        if "Latino" in title:SerieName = title.split("Latino")[0]
 
         SerieName = SerieName.strip()
 
@@ -526,7 +529,8 @@ def findvideos(item):
         if not servidor == 'directo':
             if not servidor == 'various': other = ''
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', d_play = d_play, language = 'Vose', other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', d_play = d_play,
+                              language = 'Vose', other = other ))
 
     # download
     bloque = scrapertools.find_single_match(data, '>Descargas<(.*?)</div>')
@@ -578,16 +582,15 @@ def play(item):
         itemlist.append(item.clone( url = item.url, server = item.server ))
         return itemlist
 
-    if 'http' in item.d_play:
-        url = item.d_play
-    else:
-        player = host + 'reproductor?video=' + item.d_play
+    item.d_play = item.d_play.replace('" data-usa-api="1', '&token=<?php echo Session::get(')
 
-        data = do_downloadpage(player)
-        data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+    player = host + 'reproductor?video=' + item.d_play
 
-        url = scrapertools.find_single_match(data, 'var redir = "(.*?)"')
-        if not url: url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)".*?</iframe>')
+    data = do_downloadpage(player)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    url = scrapertools.find_single_match(data, 'var redir = "(.*?)"')
+    if not url: url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)".*?</iframe>')
 
     if url:
         servidor = servertools.get_server_from_url(url)

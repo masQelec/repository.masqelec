@@ -206,6 +206,7 @@ def list_all(item):
             SerieName = corregir_SerieName(title)
 
             if " (" in SerieName: SerieName = SerieName.split(" (")[0]
+            elif " |" in SerieName: SerieName = SerieName.split(" |")[0]
 
             title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
@@ -312,12 +313,25 @@ def episodios(item):
                 else: item.perpage = 50
 
     for url, epis, in matches[item.page * item.perpage:]:
+        title = ''
+
+        if ': <span class="subtitulo">' in epis:
+            title = scrapertools.find_single_match(epis, ': <span class="subtitulo">(.*?)</span>').strip()
+            epis = epis.split(': <span class="subtitulo">')[0]
+        elif '<span class="final-label">' in epis:
+            title = scrapertools.find_single_match(epis, '<span class="final-label">(.*?)</span>').strip()
+            epis = epis.split('<span class="final-label">')[0]
+        elif '<span class="' in epis:
+            epis = epis.split('<span class="')[0]
+
         epis = scrapertools.find_single_match(epis, 'Episodio(.*?)$').strip()
         epis = epis.replace('FINAL', '').replace('Final', '').replace('final', '').strip()
 
         if not epis: epis = 1
 
-        if item.contentSerieName: titulo = item.contentSerieName
+        if item.contentSerieName:
+            if title: titulo = title
+            else: titulo = item.contentSerieName
         else: titulo = item.contentTitle
 
         if item.contentType == 'movie': item.contentSeason = 1

@@ -11,7 +11,7 @@
   "categories": ["documentary"],
   "language": ["cast"],
 
-  "clusters": ["onlyone", "suggested", "rankings", "lists", "docs"],
+  "clusters": ["onlyone", "rankings", "lists", "docs"],
 
   "notes": "Documentales en castellano."
 }
