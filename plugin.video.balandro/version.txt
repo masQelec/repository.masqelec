@@ -1,4 +1,4 @@
-[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.24 [/COLOR] [COLOR chartreuse] 22 de Diciembre de 2025[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.25 [/COLOR] [COLOR chartreuse] 21 de Enero de 2026[/B][/COLOR]
 
  [COLOR yellow][B]CONTACTO:[/B][/COLOR]
     Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Tutoriales, Sugerencias, etc.
@@ -30,6 +30,8 @@
        plugin.video.torrest
 
     [B][COLOR indianred]Otros Add-ons que pueden necesitarse:[/COLOR][/B]
+       inputstream.adaptive
+       inputstream.ffmpegdirect
        plugin.video.youtube
        script.module.resolveurl
 
@@ -48,7 +50,7 @@
        Servidores: Sin novedades
 
  [COLOR yellowgreen][B]CANALES QUE REQUIEREN REGISTRARSE (Cuenta):[/B][/COLOR]
-    HdFull, PlayDede
+    HdFull
 
  [COLOR greenyellow][B]CANALES PROBLEMATICOS:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
 
@@ -61,5 +63,7 @@
     [COLOR tomato]Vea la lista en la Ayuda [B]Ultimos Cambios de Dominios[/B][/COLOR]
 
  [COLOR gold][B]SERVIDORES VIAS ALTERNATIVAS/ADICIONALES QUE PUEDEN NECESITARSE:[/B][/COLOR]
+    inputstream.adaptive
+    inputstream.ffmpegdirect
     plugin.video.youtube
     script.module.resolveurl

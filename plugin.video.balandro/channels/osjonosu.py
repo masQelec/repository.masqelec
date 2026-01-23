@@ -50,7 +50,6 @@ def do_downloadpage(url, post=None, headers=None):
         url = url.replace(ant, host)
 
     raise_weberror = True
-
     if '/lanzamiento/' in url: raise_weberror = False
 
     hay_proxies = False
@@ -64,6 +63,22 @@ def do_downloadpage(url, post=None, headers=None):
         else:
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
+        if not data:
+            if not '/?s=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('OsjoNosu', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('osjonosu', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+    if '<title>Just a moment...</title>' in data:
+        if not '/?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
     return data
 
 
@@ -73,6 +88,8 @@ def acciones(item):
 
     itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
                                 from_channel='osjonosu', folder=False, text_color='chartreuse' ))
+
+    itemlist.append(Item( channel='helper', action='show_help_osjonosu', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('osjonosu') ))
 
     itemlist.append(item_configurar_proxies(item))
 
@@ -109,7 +126,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Infantil', action = 'list_all', url = host + 'genero/infantiles/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Sagas', action = 'sagas', url = host, search_type = 'movie', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Navidad', action = 'list_all', url = host + 'genero/navidenas/', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Sagas', action = 'sagas', url = host + 'sagas/', search_type = 'movie', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
@@ -135,30 +154,6 @@ def mainlist_series(item):
     return itemlist
 
 
-def sagas(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(item.url)
-
-    bloque = scrapertools.find_single_match(data, 'SAGAS<(.*?)</ul>')
-
-    matches = scrapertools.find_multiple_matches(bloque, '<li id="menu-item-(.*?)</li>')
-
-    for match in matches:
-        url = scrapertools.find_single_match(match, '<a href="([^"]+)"')
-
-        title = scrapertools.find_single_match(match, '<a href=".*?">(.*?)</a>')
-
-        if not url or not title: continue
-
-        title = title.replace('&#8217;', "'").replace('&#038;', '&')
-
-        itemlist.append(item.clone( action = 'list_all', url=url, title=title ))
-
-    return itemlist
-
-
 def generos(item):
     logger.info()
     itemlist = []
@@ -170,6 +165,7 @@ def generos(item):
         'accion': 'Acción',
         'animacion': 'Animación',
         'aventura': 'Aventura',
+        'belica': 'Bélica',
         'biografia': 'Biografía',
         'ciencia-ficcion': 'Ciencia ficción',
         'comedia': 'Comedia',
@@ -216,9 +212,9 @@ def list_all(item):
     data = do_downloadpage(item.url)
 
     if '>Añadido recientemente<' in data:
-        bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>RELACIONADOS<')
+        bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)<div class="copy">')
     elif '<h1' in data:
-        bloque = scrapertools.find_single_match(data, '<h1(.*?)>RELACIONADOS<')
+        bloque = scrapertools.find_single_match(data, '<h1(.*?)<div class="copy">')
     else:
         bloque = data
 
@@ -228,10 +224,11 @@ def list_all(item):
         url = scrapertools.find_single_match(match, '<a href="([^"]+)"')
 
         title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+        if not title: title = scrapertools.find_single_match(match, '<h3>(.*?)</h3>')
 
         if not url or not title: continue
 
-        title = title.replace('&#8217;', "'").replace('&#038;', '&').replace('&#8211;', '-')
+        title = title.replace('&#8217;', "'").replace('&#038;', '&').replace('&#8211;', '-').replace('&amp;', '&')
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
@@ -260,6 +257,34 @@ def list_all(item):
          if next_page:
              if '/page/' in next_page:
                  itemlist.append(item.clone( title = 'Siguientes ...', action='list_all', url = next_page, text_color='coral' ))
+
+    return itemlist
+
+
+def sagas(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+
+    bloque = scrapertools.find_single_match(data, '>Sagas</h1>(.*?)<div class="copy">')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, '<a href="([^"]+)"')
+
+        title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+
+        if not url or not title: continue
+
+        title = title.replace('&#8217;', "'").replace('&#038;', '&').replace('&amp;', '&')
+
+        title = title.lower()
+
+        title = title.capitalize()
+
+        itemlist.append(item.clone( action = 'list_all', url=url, title=title ))
 
     return itemlist
 
@@ -505,8 +530,17 @@ def get_video_url(url):
 def _news(item):
     logger.info()
 
-    item.url = host + 'genero/infantiles/'
+    item.url = host + 'tendencias/?get=movies'
     item.search_type = 'movie'
+
+    return list_all(item)
+
+
+def _lasts(item):
+    logger.info()
+
+    item.url = host + 'tendencias/?get=tv'
+    item.search_type = 'tvshow'
 
     return list_all(item)
 

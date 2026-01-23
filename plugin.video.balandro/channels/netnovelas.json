@@ -3,7 +3,7 @@
   "name": "NetNovelas",
   "thumbnail": "netnovelas.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["lasts", "years", "countries", "vos", "tales"],
 
-  "notes": "Web dedicada principalmente en Novelas."
+  "notes": "Web ANULADA. Web dedicada principalmente en Novelas."
 }

@@ -147,6 +147,13 @@ def youtube_play(ini_page_url):
 
                    hdata = httptools.downloadpage(new_page_url).data
 
+               else:
+                   if config.get_setting('developer_mode', default=False):
+                       if config.get_setting('developer_team'):
+                           platformtools.dialog_notification(config.__addon_name, '[B][COLOR yellow]Perditum Error Acceso[/B][/COLOR]')
+
+                   reintentar = True
+
                hvideo = scrapertools.find_single_match(hdata, '"formatStreams":.*?"url":"(.*?)"')
 
                if hvideo:

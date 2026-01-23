@@ -74,7 +74,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout, raise_weberror=raise_weberror).data
 
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data or '<title>One moment, please...</title>' in data:
         if not url.startswith(host):
             data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
         else:
@@ -91,6 +91,9 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
         elif '<title>One moment, please...</title>' in data:
             platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection [COLOR plum]Level 2[/B][/COLOR]')
 
+        elif '<title>Bot Verification</title>' in data:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]Boot[COLOR orangered] Protection [COLOR plum]hCAptcha[/B][/COLOR]')
+
     return data
 
 
@@ -104,6 +107,8 @@ def acciones(item):
     itemlist.append(item_configurar_proxies(item))
 
     itemlist.append(Item( channel='helper', action='show_help_cuevana3run', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('cuevana3run') ))
+
+    itemlist.append(item.clone( action='show_help_boot', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR yellowgreen][B]Bloqueo[/B][/COLOR] Canal', thumbnail=config.get_thumb('roadblock') ))
 
     platformtools.itemlist_refresh()
 
@@ -712,6 +717,22 @@ def _epis(item):
     item.search_type = 'tvshow'
 
     return last_epis(item)
+
+
+def show_help_boot(item):
+    logger.info()
+
+    txt = '[COLOR turquoise][B]VPN:[/B][/COLOR][CR]'
+
+    txt += '  [B][COLOR darkcyan]El Uso de una [/COLOR][COLOR yellowgreen]VPN[/COLOR][COLOR darkcyan] jamás se saltará el control del Canal por [/COLOR][COLOR red]Boot[/COLOR][COLOR orangered] Protection[/B][/COLOR][CR][CR]'
+
+    txt += '[B][COLOR cyan]El webmaster del [COLOR yellow]Canal[/COLOR] ha activado un nivel más de protección con [COLOR orangered]Boot Protection[/COLOR][/B][CR]'
+
+    txt += '[CR][COLOR goldenrod][B]  Desconocemos si será Temporal ó Definitivo.[/B][/COLOR][CR]'
+
+    txt += '[CR][COLOR plum][B]  Ya ocurrió alguna vez en el pasado y al cabo de un cierto tiempo lo retiró.[/B][/COLOR]'
+
+    platformtools.dialog_textviewer('Información Boot Protection', txt)
 
 
 def search(item, texto):

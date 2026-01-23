@@ -135,7 +135,7 @@ def acciones(item):
 
     itemlist.append(item.clone( channel='helper', action='show_help_gnula24', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal' ))
 
-    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cuales son sus Clones[/B]', text_color='turquoise' ))
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
 
     itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'gnula24' ))
 
@@ -673,6 +673,15 @@ def list_search(item):
                     itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_search', text_color='coral' ))
 
     return itemlist
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host + 'ver-episode/'
+    item.search_type = 'tvshow'
+
+    return last_epis(item)
 
 
 def search(item, texto):

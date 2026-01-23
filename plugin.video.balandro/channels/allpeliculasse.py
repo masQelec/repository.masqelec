@@ -251,6 +251,8 @@ def calidades(item):
 
         tit = tit.capitalize()
 
+        tit = tit.replace('-', ' ')
+
         itemlist.append(item.clone( title = tit, url = url, action = 'list_all', text_color = text_color ))
 
     return sorted(itemlist, key=lambda x: x.title)
@@ -282,6 +284,8 @@ def generos(item):
                 url = host + 'wp-api/v1/listing/any?filter={"genres":[' + value + ']}&orderBy=latest&order=desc&postType=tvshos&postsPerPage=' + per_page + '&page=1'
 
         tit = tit.capitalize()
+
+        tit = tit.replace('-', ' ')
 
         itemlist.append(item.clone( title = tit, url = url, action = 'list_all', text_color = text_color ))
 
@@ -339,6 +343,8 @@ def paises(item):
                 url = host + 'wp-api/v1/listing/any?filter={"countries":[' + value + ']}&orderBy=latest&order=desc&postType=tvshos&postsPerPage=' + per_page + '&page=1'
 
         tit = tit.capitalize()
+
+        tit = tit.replace('Espana', 'España').replace('-', ' ')
 
         itemlist.append(item.clone( title = tit, url = url, action = 'list_all', text_color = text_color ))
 
@@ -436,7 +442,8 @@ def list_all(item):
                 if item.search_type == 'movie': continue
 
             if item.tipo == 'Animes':
-                if not '/animes/' in url: continue
+                if '"type":"animes"' in str(match): pass
+                elif not '/animes/' in url: continue
 
                 url = host + 'animes/' + url
             else:
@@ -628,8 +635,8 @@ def findvideos(item):
 
         if '/1fichier.' in url: continue
         elif '/turbobit.' in url: continue
-
         elif '/fembed.' in url: continue
+        elif '.fireload.' in url: continue
 
         elif '/cloudemb.' in url or '.fembed.' in url or '/fembad.' in url or 'vanfem' in url: continue
         elif '/tubesb.' in url or '/sbsonic.' in url or '/sbrapid.' in url or '/lvturbo.' in url or '/sbface.' in url or '/sbbrisk.' in url or '/sblona.' in url: continue
@@ -654,6 +661,8 @@ def findvideos(item):
         elif 'inglés' in lng or 'ingles' in lng: lang = 'Ing'
         else: lang = '?'
 
+        qlty = scrapertools.find_single_match(rest, '"quality":"(.*?)"')
+
         age = ''
         if '/acortalink.' in url:
             servidor = 'directo'
@@ -668,13 +677,15 @@ def findvideos(item):
 
                     if '/1fichier.' in _raw: continue
                     elif '/turbobit.' in _raw: continue
+                    elif '/fembed.' in _raw: continue
+                    elif '.fireload.' in _raw: continue
 
                     _raw = _raw.replace('https://', '').replace('www.', '').replace('.com', '').replace('.net', '').replace('.nz', '').strip()
 
                     age = _raw
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url,
-                              language = lang, other = other.capitalize(), age = age.capitalize() ))
+                              language = lang, quality = qlty, other = other.capitalize(), age = age.capitalize() ))
 
     if not itemlist:
         if not ses == 0:

@@ -1,4 +1,4 @@
-[COLOR coral][B]Balandro [/COLOR][COLOR goldenrod] Situacion Dominios [/COLOR][COLOR aqua]  22 de Diciembre de 2025 [/COLOR][COLOR limegreen]  Hora  8:00  [/COLOR][COLOR yellow]Version 4.0.24[/B][/COLOR]
+[COLOR coral][B]Balandro [/COLOR][COLOR goldenrod] Situacion Dominios [/COLOR][COLOR aqua]  21 de Enero de 2026 [/COLOR][COLOR limegreen]  Hora  8:00  [/COLOR][COLOR yellow]Version 4.0.25[/B][/COLOR]
 
  [COLOR yellow][B]CONTACTO:[/B][/COLOR]
    Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Tutoriales, Sugerencias, etc.
@@ -27,7 +27,7 @@
         o menos saturados, o mas duraderos, ademas pueden ser gratuitos o de pago.[/B][/COLOR]
 
  [COLOR red][B]PROXIES[COLOR deepskyblue] GESTION LISTAS PERSONALIZADAS:[/B][/COLOR] 
-   [B][COLOR moccasin] Lista-proxies.zip [COLOR dodgerblue] Descarga desde el Foro [COLOR limegreen][I] Revision 21/12/25 [/I][/B][/COLOR]
+   [B][COLOR moccasin] Lista-proxies.zip [COLOR dodgerblue] Descarga desde el Foro [COLOR limegreen][I] Revision 20/1/26 [/I][/B][/COLOR]
 
  [COLOR sienna][B]SITUACION SERVIDORES:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
 
@@ -37,14 +37,10 @@
 
  [COLOR slateblue][B]CANALES PROBABLEMENTE NO ACCESIBLES:[/B][/COLOR]
    [B][COLOR moccasin] AnimeOnline [COLOR lime] ww3.animeonline.ninja [I][COLOR red] CloudFlare Human Verify [/I][/B][/COLOR]
-   [B][COLOR moccasin] AsiaLive [COLOR lime] asialiveaction.com [I][COLOR red] CloudFlare Human Verify [/I][/B][/COLOR]
-   [B][COLOR moccasin] EstrenosDoramasEs [COLOR lime] estrenosdoramas.es [I][COLOR red] Product Activation Error [/I][/B][/COLOR]
    [B][COLOR moccasin] FlixCorn [COLOR lime] www.flixcorn.com [I][COLOR red] CloudFlare Human Verify [/I][/B][/COLOR]
-   [B][COLOR moccasin] JoinClub [COLOR lime] veronline.club [I][COLOR red] Host Error [/I][/B][/COLOR]
    [B][COLOR moccasin] PapayaSeries [COLOR lime] papayaseries.com [I][COLOR red] CloudFlare Human Verify [/I][/B][/COLOR]
+   [B][COLOR moccasin] PlayPlus [COLOR lime] www1.playdede.ws [I][COLOR red] Host Not Found [/I][/B][/COLOR]
    [B][COLOR moccasin] PornXbit [COLOR lime] www.pornxbit.com [I][COLOR red] CloudFlare Human Verify [/I][/B][/COLOR]
-   [B][COLOR moccasin] TubePelis [COLOR lime] www.tubepelis.com [I][COLOR red] CloudFlare Human Verify [/I][/B][/COLOR]
-   [B][COLOR moccasin] XmFy [COLOR lime] xmoviesforyou.net [I][COLOR red] Host Error [/I][/B][/COLOR]
 
  [COLOR cyan][B]ULTIMOS CAMBIOS DE DOMINIOS:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
 

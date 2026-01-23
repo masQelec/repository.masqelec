@@ -117,6 +117,9 @@ def get_video_url(page_url, url_referer=''):
         elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
             return 'Archivo inexistente'
 
+        elif 'HTTP Error 403: Forbidden' in traceback.format_exc() or '403 Forbidden' in traceback.format_exc():
+            return 'Archivo bloqueado'
+
         elif '<urlopen error' in traceback.format_exc():
             return 'No se puede establecer la conexión'
 

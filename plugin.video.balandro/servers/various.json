@@ -57,6 +57,22 @@
         "url": "https://filemoon.sx/e/\\1"
       },
       {
+        "pattern": "https://bysedikamoum.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://bysevepoin.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://byseraguci.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://byse.sx/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
         "pattern": "(https://disk.yandex.(?:ru|com|sk|disk)/(?:d/|i/)[A-z0-9]+)",
         "url": "https://yadi.sk/i/\\2"
       },
@@ -441,6 +457,10 @@
         "url": "https://streamwish.to/f/\\1"
       },
       {
+        "pattern": "https://uasopt.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
         "pattern": "https://(?:wish.(.*))/(?:e/|f/|d/)([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },
@@ -546,6 +566,18 @@
       },
       {
         "pattern": "https://dintezuvio.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://callistanise.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://minochinos.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://earnvids.xyz/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
         "url": "https://filelions.to/f/\\1"
       },
       {
@@ -686,19 +718,27 @@
       },
       {
         "pattern": "https://www.vidspeeds.com/(?:embed-|)([0-9a-zA-Z]+)",
-        "url": "https://www.vidspeeds.com/\\1"
+        "url": "https://vidspeeds.com/\\1"
       },
       {
         "pattern": "https://vidspeeds.com/(?:embed-|)([0-9a-zA-Z]+)",
-        "url": "https://www.vidspeeds.com/\\1"
+        "url": "https://vidspeeds.com/\\1"
+      },
+      {
+        "pattern": "https://vidspeeds.com/(?:embed-|)([0-9a-zA-Z]+)",
+        "url": "https://vidspeeds.com/\\1"
       },
       {
         "pattern": "https://vidspeed.cc/(?:embed-|)([0-9a-zA-Z]+)",
-        "url": "https://vidspeed.cc/\\1"
+        "url": "https://vidspeeds.com/\\1"
+      },
+      {
+        "pattern": "https://vidspeed.org/(?:embed-|)([0-9a-zA-Z]+)",
+        "url": "https://vidspeeds.com/\\1"
       },
       {
         "pattern": "https://vidroba.com/(?:embed-|)([0-9a-zA-Z]+)",
-        "url": "https://vidroba.com/\\1"
+        "url": "https://vidspeeds.com/\\1"
       },
       {
         "pattern": "https://vkspeed.com/(?:embed-|)([0-9a-zA-Z]+)",

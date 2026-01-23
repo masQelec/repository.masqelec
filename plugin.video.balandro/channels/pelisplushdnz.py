@@ -844,17 +844,23 @@ def play(item):
         if not bytes:
             url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
             url += '='
-            url = base64.b64decode(url).decode()
-            url = scrapertools.find_single_match(url, '"link":"(.*?)"')
 
-        if not url:
             try:
-                url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
+                url = base64.b64decode(url).decode()
+                url = scrapertools.find_single_match(url, '"link":"(.*?)"')
             except:
                 url = ''
 
+        if not url:
+            if bytes:
+                try:
+                   url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
+                except:
+                    url = ''
+
             if not url:
-                url = decrypters.decode_decipher(crypto, bytes)
+                if bytes:
+                    url = decrypters.decode_decipher(crypto, bytes)
 
             if not url:
                 if crypto.startswith("http"):

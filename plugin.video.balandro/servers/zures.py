@@ -89,7 +89,7 @@ def get_video_url(page_url, url_referer=''):
     elif 'pandafiles' in page_url: txt_server = 'Pandafiles'
     elif 'rovideo' in page_url: txt_server = 'Rovideo'
 
-    elif 'savefiles' in page_url:
+    elif 'savefiles' in page_url or 'streamhls' in page_url:
           txt_server = 'Savefiles'
 
           page_url = page_url.replace('/savefiles.top/', '/savefiles.com/')
@@ -133,6 +133,7 @@ def get_video_url(page_url, url_referer=''):
     elif 'vidbob' in page_url: txt_server = 'Vidbob'
     elif 'vidlook' in page_url: txt_server = 'Vidlook'
     elif 'vidmx' in page_url: txt_server = 'Vidmx'
+    elif 'vidnest' in page_url: txt_server = 'Vidnest'
     elif 'vido' in page_url: txt_server = 'Vido'
     elif 'vidpro' in page_url: txt_server = 'Vidpro'
     elif 'vipss' in page_url: txt_server = 'Vipss'
@@ -146,6 +147,8 @@ def get_video_url(page_url, url_referer=''):
     elif 'wecima' in page_url: txt_server = 'Wecima'
     elif 'vidbasic' in page_url: txt_server = 'Vidbasic'
     elif 'vimeos' in page_url: txt_server = 'Vimeos'
+    elif 'bigshare' in page_url: txt_server = 'Bigshare'
+    elif 'vkvideo' in page_url: txt_server = 'Vk'
 
     elif txt_server == 'Unknow': return 'Desconocido'
 
@@ -174,7 +177,9 @@ def get_video_url(page_url, url_referer=''):
         resuelto = resolveurl.resolve(page_url)
 
         if resuelto:
-            if '.zip' in resuelto or '.rar' in resuelto: return "El archivo está en formato comprimido"
+            if resuelto.endswith('.zip') or resuelto.endswith('.rar'):
+                return "El archivo está en formato comprimido"
+
             elif '.m3u8' in resuelto: video_urls.append(['m3u8', resuelto])
             elif '.mp4' in resuelto: video_urls.append(['mp4', resuelto])
             else: video_urls.append(['', resuelto])
@@ -213,8 +218,10 @@ def get_video_url(page_url, url_referer=''):
         elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
             return 'Archivo inexistente'
 
+        elif 'HTTP Error 403: Forbidden' in traceback.format_exc() or '403 Forbidden' in traceback.format_exc():
+            return 'Archivo bloqueado'
+
         elif '<urlopen error' in traceback.format_exc():
             return 'No se puede establecer la conexión'
 
         return 'Sin Respuesta ' + txt_server
-

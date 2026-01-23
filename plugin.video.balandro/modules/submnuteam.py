@@ -415,6 +415,22 @@ def submnu_center(item):
 
     itemlist.append(item.clone( channel='actions', action = 'test_internet', title= '- Comprobar [COLOR goldenrod][B]Internet[/B][/COLOR]', thumbnail=config.get_thumb('crossroads') ))
 
+    path = translatePath(os.path.join('special://home/', ''))
+
+    crashes = filetools.listdir(path)
+
+    hay_crashes = False
+
+    for file in crashes:
+        if file.endswith('.dmp') == True or file.endswith('.txt') == True: hay_crashes = True
+
+    if hay_crashes:
+        itemlist.append(item.clone( action='', title='[B][I]CRASHES:[/I][/B]', text_color='pink' ))
+
+        itemlist.append(item.clone( channel='helper', action='show_crashes', title=' - Ver', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
+
+        itemlist.append(item.clone( channel='actions', action='manto_crashes', title=' - Eliminar', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
+
     path = translatePath(os.path.join('special://home/userdata', ''))
 
     file_advs = 'advancedsettings.xml'
@@ -662,12 +678,12 @@ def submnu_addons_info(item):
         try:
             repo_version = xbmcaddon.Addon('repository.balandro').getAddonInfo("version").strip()
 
-            tex_repo = 'Repositorio Balandro ' + repo_version
-            if repo_version in ant_repos: tex_repo = '[COLOR red]Desfasado ' + repo_version + '[/COLOR]'
+            tex_repo = 'Repositorio Balandro  ' + repo_version
+            if repo_version in ant_repos: tex_repo = '[COLOR red]Desfasado  ' + repo_version + '[/COLOR]'
         except:
-            tex_repo = 'Repositorio Balandro [COLOR gray]Desactivado[/COLOR]'
+            tex_repo = 'Repositorio Balandro  [COLOR gray]Desactivado[/COLOR]'
     else:
-        tex_repo = 'Repositorio Balandro [COLOR red]No Instalado[/COLOR]'
+        tex_repo = 'Repositorio Balandro  [COLOR red]No Instalado[/COLOR]'
 
     itemlist.append(item.clone( action='', title=' - [COLOR cyan][B]' + tex_repo + '[/B][/COLOR]', thumbnail=config.get_thumb('repo') ))
 
@@ -2407,7 +2423,6 @@ def show_help_players(item):
 
         txt += ' - [COLOR cyan][B]Repository Elementum[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
 
-
     platformtools.dialog_textviewer('Información Add-Ons y Repositorios Players', txt)
 
 
@@ -2438,23 +2453,25 @@ def show_sistema(item):
 
     if config.get_setting('chrome_last_version', default=''): txt += '[CR][COLOR yellow][B] - Versión Chrome/Chromium: [/COLOR][COLOR cyan]' + config.get_setting('chrome_last_version') + ' [/B][/COLOR][CR]'
 
-    txt += '[CR] - Confirmar con el Botón pulsar [OK] en ciertas Notificaciones: '
+    txt += '[CR] - Confirmar con el Botón pulsar [COLOR palevioletred][B][OK][/B][/COLOR] en ciertas Notificaciones: '
 
     if config.get_setting('notification_d_ok', default=False): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
     else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
 
-    txt += ' - Emitir un Sonido al mostrar Avisos/Notificaciones: '
+    txt += ' - Emitir un [COLOR paleturquoise][B]Sonido[/B][/COLOR] al mostrar Avisos/Notificaciones: '
 
     if config.get_setting('notification_beep', default=False): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
     else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
 
-    if config.get_setting('httptools_timeout', default='15'): txt += '[CR][COLOR yellow][B] - Time Out [/B](tiempo máximo de espera Accesos a CANALES, por defecto 15)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('httptools_timeout')) + ' [/B][/COLOR][CR]'
+    txt += '[CR][COLOR goldenrod][B]TIEMPOS DE ESPERA:[/B][/COLOR][CR]'
 
-    if config.get_setting('search_timeout', default='3'): txt += '[CR][COLOR yellow][B] - Time Out [/B](tiempo máximo de espera Accesos BUSCAR, por defecto 5)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('search_timeout')) + ' [/B][/COLOR][CR]'
+    if config.get_setting('httptools_timeout', default='15'): txt += ' - [COLOR red][B]Time Out   [/B][/COLOR](tiempo máximo Accesos a [COLOR gold][B]Canales[/B][/COLOR], por defecto 15): [COLOR cyan][B]' + str(config.get_setting('httptools_timeout')) + ' [/B][/COLOR][CR]'
 
-    if config.get_setting('channels_repeat', default='30'): txt += '[CR][COLOR yellow][B] - Time Out [/B](tiempo máximo de espera al Reintentar acceder a ciertos Canales, por defecto 30)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('channels_repeat')) + ' [/B][/COLOR][CR]'
+    if config.get_setting('search_timeout', default='3'): txt += ' - [COLOR red][B]Time Out   [/B][/COLOR](tiempo máximo Accesos [COLOR yellow][B]Buscar[/B][/COLOR], por defecto 5): [COLOR cyan][B]' + str(config.get_setting('search_timeout')) + ' [/B][/COLOR][CR]'
 
-    if config.get_setting('servers_waiting', default='6'): txt += '[CR][COLOR yellow][B] - Time[/B] Tiempo de espera (en el acceso a ciertos Servidores, por defecto 6)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('servers_waiting')) + ' [/B][/COLOR][CR]'
+    if config.get_setting('channels_repeat', default='30'): txt += ' - [COLOR red][B]Time Out   [/B][/COLOR](tiempo máximo al [COLOR darkcyan][B]Reintentar[/B][/COLOR] acceder a ciertos Canales, por defecto 30): [COLOR cyan][B]' + str(config.get_setting('channels_repeat')) + ' [/B][/COLOR][CR]'
+
+    if config.get_setting('servers_waiting', default='6'): txt += ' - [COLOR red][B]Time Wait[/B][/COLOR] (retardo máximo en el acceso a ciertos [COLOR fuchsia][B]Servidores[/B][/COLOR], por defecto 6): [COLOR cyan][B]' + str(config.get_setting('servers_waiting')) + ' [/B][/COLOR][CR]'
 
     txt += '[CR][COLOR goldenrod][B]PREFERENCIAS NOTIFICACIONES CANALES:[/B][/COLOR][CR]'
 
@@ -2502,7 +2519,7 @@ def show_sistema(item):
         if not avisar:
             txt += '- [COLOR crimson][B]Opción Desarrollo:[/B][/COLOR]  [COLOR yellow][B]Opción Habilitada[/B][/COLOR]'
         else:
-            txt += '- [COLOR crimson][B]Falso Desarrollo:[/B][/COLOR]  [COLOR yellow][B]Opción Habilitada/B][/COLOR]'
+            txt += '- [COLOR crimson][B]Falso Desarrollo:[/B][/COLOR]  [COLOR yellow][B]Opción Habilitada[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Información Ajustes del Sistema', txt)
 
@@ -2698,7 +2715,7 @@ def resumen_canales(item):
         if 'register' in ch['clusters']: registers += 1
         if 'dominios' in ch['notes'].lower(): dominios += 1
         if 'current' in ch['clusters']: currents += 1
-        if 'Canal con enlaces Streaming y Torrent.' in ch['notes']: streaminytorrent +=1
+        if 'Canal con enlaces Streaming y Torrent' in ch['notes']: streaminytorrent +=1
         if 'onlyone' in ch['clusters']: onlyones += 1
         if 'suggested' in ch['clusters']: suggesteds += 1
 
@@ -2899,61 +2916,51 @@ def resumen_canales(item):
 
     txt = '[COLOR yellow][B]RESUMEN SITUACIÓN CANALES:[/B][/COLOR][CR]'
 
-    txt += '  ' + str(total) + ' [COLOR darkorange][B]Canales[/B][/COLOR][CR]'
+    txt += '  ' + str(total) + ' [COLOR darkorange][B]CANALES[/B][/COLOR][CR]'
 
     if not inactives == 0:
-        txt += '          ' + str(inactives) + ' [COLOR coral][B]Inactivos[/B][/COLOR][CR]'
+        txt += '           ' + str(inactives) + ' [COLOR palevioletred][B]Inactivos[/B][/COLOR][CR]'
 
-    if not cerrados == 0:
-        txt += '                  ' + str(cerrados) + ' [COLOR coral]Cerrados[/COLOR][CR]'
+        if not cerrados == 0: txt += '                   [COLOR darkred][B]Cerrados[/B][/COLOR] ' + str(cerrados) + '[CR]'
+        if not anulados == 0: txt += '                   [COLOR darkviolet][B]Anulados[/B][/COLOR] ' + str(anulados) + '[CR]'
 
-    if not anulados == 0:
-        txt += '                  ' + str(anulados) + ' [COLOR coral]Anulados[/COLOR][CR]'
+        if not others == 0: txt += '                   [COLOR palegoldenrod][B]Otros[/B][/COLOR] ' + str(others) + '[CR]'
+        if not temporarys == 0: txt += '                   [COLOR mediumaquamarine][B]Temporalmente[/B][/COLOR] ' + str(temporarys) + '[CR]'
 
-    if not privates == 0: txt += '                    ' + str(privates) + '  [COLOR grey]Privados[/COLOR][CR]'
-
-    if not others == 0: txt += '                    ' + str(others) + ' [COLOR coral]Otros[/COLOR][CR]'
-
-    if not temporarys == 0: txt += '                    ' + str(temporarys) + ' [COLOR mediumaquamarine]Temporalmente[/COLOR][CR]'
+        if not privates == 0: txt += '                   [COLOR grey][B]Privados[/B][/COLOR] ' + str(privates) + '[CR]'
 
     activos = (total - inactives)
 
-    txt += '[CR]  ' + str(activos) + ' [COLOR cyan][B]Activos[/B][/COLOR][CR][CR]'
+    txt += '[CR]  ' + str(activos) + ' [COLOR cyan][B]ACTIVOS[/B][/COLOR][CR][CR]'
 
     if not PY3:
-        if not mismatcheds == 0: txt += '       ' + str(mismatcheds) + ' [COLOR violet]Posible Incompatibilidad[/COLOR][CR]'
+        if not mismatcheds == 0: txt += '       ' + str(mismatcheds) + ' [COLOR violet][B]Posible Incompatibilidad[/B][/COLOR][CR]'
 
-    if not inestables == 0: txt += '       ' + str(inestables) + ' [COLOR plum]Inestables[/COLOR][CR]'
+    if not inestables == 0: txt += '       ' + str(inestables) + ' [COLOR plum][B]Inestables[/B][/COLOR][CR]'
 
-    if not problematics == 0: txt += '       ' + str(problematics) + ' [COLOR darkgoldenrod]Problemáticos[/COLOR][CR]'
+    if not problematics == 0: txt += '       ' + str(problematics) + ' [COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR][CR]'
 
-    if not clons == 0:
-        txt += '     ' + str(clons) + ' [COLOR aquamarine]Principal con clones[/COLOR][CR]'
+    if not clons == 0:txt += '     ' + str(clons) + ' [COLOR aquamarine][B]Principal con clones[/B][/COLOR][CR]' 
 
-    if not clones == 0:
-        txt += '     ' + str(clones) + ' [COLOR turquoise]Clones[/COLOR][CR]'
+    if not clones == 0: txt += '     ' + str(clones) + ' [COLOR turquoise][B]Clones[/B][/COLOR][CR]'
 
-    if not notices == 0:
-        txt += '     ' + str(notices) + ' [COLOR olivedrab]Control CloudFlare Protection[/COLOR][CR]'
+    if not notices == 0: txt += '     ' + str(notices) + ' [COLOR olivedrab][B]Control CloudFlare Protection[/B][/COLOR][CR]'
 
-    if not cryptos == 0:
-        txt += '       ' + str(cryptos) + ' [COLOR darksalmon]Descifrar Enlaces[/COLOR][CR]'
+    if not cryptos == 0: txt += '     ' + str(cryptos) + ' [COLOR darksalmon][B]Descifrar Enlaces[/B][/COLOR][CR]' 
 
-    if not proxies == 0:
-        txt += '     ' + str(proxies) + ' [COLOR red]Pueden Usar Proxies[/COLOR][CR]'
+    if not proxies == 0: txt += '     ' + str(proxies) + ' [COLOR red][B]Pueden Usar Proxies[/B][/COLOR][CR]'
 
-    if not registers == 0: txt += '       ' + str(registers) + ' [COLOR teal]Requieren Cuenta[/COLOR][CR]'
+    if not registers == 0: txt += '       ' + str(registers) + ' [COLOR teal][B]Requieren Cuenta[/B][/COLOR][CR]'
 
-    if not dominios == 0: txt += '       ' + str(dominios) + ' [COLOR green]Varios Dominios[/COLOR][CR]'
+    if not dominios == 0: txt += '       ' + str(dominios) + ' [COLOR green][B]Con Varios Dominios[/B][/COLOR][CR]'
 
-    if not currents == 0:
-        txt += '     ' + str(currents) + ' [COLOR goldenrod]Gestión Dominio Vigente[/COLOR][CR]'
+    if not currents == 0: txt += '     ' + str(currents) + ' [COLOR goldenrod][B]Gestión Dominio Vigente[/B][/COLOR][CR]'
 
-    if not streaminytorrent == 0: txt += '     ' + str(streaminytorrent) + ' [COLOR magenta]Con enlaces Streamin y Torrent[/COLOR][CR]'
+    if not streaminytorrent == 0: txt += '     ' + str(streaminytorrent) + ' [COLOR magenta][B]Con enlaces Streaming y Torrent[/B][/COLOR][CR]'
 
-    if not onlyones == 0: txt += '     ' + str(onlyones) + ' [COLOR fuchsia]Con un Único Servidor[/COLOR][CR]'
+    if not onlyones == 0: txt += '     ' + str(onlyones) + ' [COLOR fuchsia][B]Con un Único Servidor[/B][/COLOR][CR]'
 
-    if not nosearchables == 0: txt += '     ' + str(nosearchables) + ' [COLOR aquamarine]No Actuan en Búsquedas[/COLOR][CR]'
+    if not nosearchables == 0: txt += '     ' + str(nosearchables) + ' [COLOR aquamarine][B]No Intervienen en Búsquedas[/B][/COLOR][CR]'
 
     if txt_status:
         if no_accesibles:
@@ -2968,7 +2975,7 @@ def resumen_canales(item):
             if matches:
                 status_problems = matches
 
-    txt += '[CR]  ' + str(disponibles) + ' [COLOR gold][B]Disponibles[/B][/COLOR][CR]'
+    txt += '[CR]  ' + str(disponibles) + ' [COLOR gold][B]DISPONIBLES[/B][/COLOR][CR]'
 
     if not status_access == 0: txt += '          [COLOR indianred][B]No Accesibles[/COLOR] '  + str(status_access) + '[/B][CR]'
     if not status_problems == 0: txt += '          [COLOR tomato][B]Con Problemas[/COLOR] '  + str(status_problems) + '[/B][CR]'
@@ -2976,7 +2983,7 @@ def resumen_canales(item):
     if not (status_access + status_problems) == 0:
         accesibles = (disponibles - status_access - status_problems)
 
-        txt += '[CR]         ' + ' [COLOR powderblue][B]Accesibles[/COLOR] ' + str(accesibles) + '[/B][CR]'
+        txt += '         ' + ' [COLOR powderblue][B]Accesibles[/COLOR] ' + str(accesibles) + '[/B][CR]'
 
     if txt_status:
         if con_incidencias:
@@ -3005,95 +3012,80 @@ def resumen_canales(item):
 
     txt += '[CR][COLOR dodgerblue][B]CANALES DISPONIBLES:[/B][/COLOR]'
 
-    if config.get_setting('mnu_sugeridos', default=True):
-        txt += '[CR]    ' + str(suggesteds) + ' [COLOR moccasin]Sugeridos[/COLOR][CR]'
+    if config.get_setting('mnu_sugeridos', default=True): txt += '[CR]    ' + str(suggesteds) + ' [COLOR moccasin][B]Sugeridos[/B][/COLOR][CR]'
 
     if config.get_setting('mnu_simple', default=False):
         canales = (disponibles - no_actives)
         txt += '[CR]  ' + str(canales) + ' [COLOR aqua][B]Canales[/B][/COLOR][CR]'
+
     else:
-        if config.get_setting('mnu_pelis', default=True):
-            txt += '[CR]  ' + str(peliculas) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
+        if config.get_setting('mnu_pelis', default=True):txt += '[CR]  ' + str(peliculas) + ' [COLOR deepskyblue][B]Películas[/B][/COLOR][CR]' 
 
-        if config.get_setting('mnu_series', default=True):
-            txt += '  ' + str(series) + ' [COLOR hotpink]Series[/COLOR][CR]'
+        if config.get_setting('mnu_series', default=True): txt += '  ' + str(series) + ' [COLOR hotpink][B]Series[/B][/COLOR][CR]'
 
-        if config.get_setting('channels_link_pyse', default=False):
-            txt += '    ' + str(pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
+        if config.get_setting('channels_link_pyse', default=False): txt += '    ' + str(pelisyseries) + ' [COLOR teal][B]Películas y Series[/B][/COLOR][CR]'
 
-        if config.get_setting('mnu_generos', default=True):
-            txt += '[CR]    ' + str(generos) + '  [COLOR thistle]Géneros[/COLOR][CR]'
+        if config.get_setting('mnu_generos', default=True): txt += '[CR]    ' + str(generos) + '  [COLOR thistle][B]Géneros[/B][/COLOR][CR]'
 
-        if config.get_setting('mnu_documentales', default=True):
-            txt += '    ' + str(documentarys) + '  [COLOR cyan]Documentales[/COLOR][CR]'
+        if config.get_setting('mnu_documentales', default=True): txt += '    ' + str(documentarys) + '  [COLOR cyan][B]Documentales[/B][/COLOR][CR]'
 
         if config.get_setting('mnu_infantiles', default=True):
-            if not infantiles == 0: txt += '      ' + str(infantiles) + '  [COLOR lightyellow]Infantiles[/COLOR][CR]'
+            if not infantiles == 0: txt += '      ' + str(infantiles) + '  [COLOR lightyellow][B]Infantiles[/B][/COLOR][CR]'
 
-        if config.get_setting('mnu_novelas', default=True):
-            txt += '    ' + str(tales) + '  [COLOR limegreen]Novelas[/COLOR][CR]'
+        if config.get_setting('mnu_novelas', default=True): txt += '    ' + str(tales) + '  [COLOR limegreen][B]Novelas[/B][/COLOR][CR]'
 
-        if not bibles == 0: txt += '      ' + str(bibles) + '  [COLOR tan]Bíblicos[/COLOR][CR]'
+        if not bibles == 0: txt += '      ' + str(bibles) + '  [COLOR tan][B]Bíblicos[/B][/COLOR][CR]'
 
-        if config.get_setting('mnu_torrents', default=True):
-            txt += '    ' + str(torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
+        if config.get_setting('mnu_torrents', default=True): txt += '    ' + str(torrents) + ' [COLOR blue][B]Torrents[/B][/COLOR][CR]'
 
-        if config.get_setting('mnu_doramas', default=True):
-            txt += '    ' + str(doramas) + '  [COLOR firebrick]Doramas[/COLOR][CR]'
+        if config.get_setting('mnu_doramas', default=True): txt += '    ' + str(doramas) + '  [COLOR firebrick][B]Doramas[/B][/COLOR][CR]'
 
         if config.get_setting('mnu_animes', default=True):
-            if not config.get_setting('descartar_anime', default=False):
-                txt += '    ' + str(animes) + '  [COLOR springgreen]Animes[/COLOR][CR]'
+            if not config.get_setting('descartar_anime', default=False): txt += '    ' + str(animes) + '  [COLOR springgreen][B]Animes[/B][/COLOR][CR]'
 
-        if not trailers == 0: txt += '       ' + str(trailers) + ' [COLOR darkgoldenrod]Traílers[/COLOR][CR]'
+        if not trailers == 0: txt += '       ' + str(trailers) + ' [COLOR darkgoldenrod][B]Traílers[/B][/COLOR][CR]'
 
         if config.get_setting('mnu_adultos', default=True):
-            if not adults == 0: txt += '    ' + str(adults) + '  [COLOR orange]Adultos[/COLOR][CR]'
+            if not adults == 0: txt += '    ' + str(adults) + '  [COLOR orange][B]Adultos[/B][/COLOR][CR]'
 
-    txt += '[CR][COLOR powderblue][B]BÚSQUEDAS POR TÍTULO EN CANALES DISPONIBLES:[/B][/COLOR][CR]'
+    txt += '[CR][COLOR powderblue][B]BÚSQUEDAS POR TÍTULO EN LOS CANALES DISPONIBLES:[/B][/COLOR][CR]'
 
-    txt += '   ' + str(bus_pelisyoseries) + ' [COLOR yellow]Películas y/ó Series[/COLOR][CR]'
+    txt += '  ' + str(bus_pelisyoseries) + ' [COLOR yellow][B]Películas y/ó Series[/B][/COLOR][CR]'
 
     bus_tematica_documentales = bus_documentales + bus_documentaryes
-    txt += '           ' + str(bus_tematica_documentales) + ' [COLOR darkcyan]Temática Documental[/COLOR][CR]'
+    txt += '          [COLOR darkcyan][B]Con Temática Documental[/B][/COLOR] ' + str(bus_tematica_documentales) + '[CR]'
 
     bus_tematica_infantil = bus_kids + bus_infantiles
-    txt += '           ' + str(bus_tematica_infantil) + ' [COLOR lightyellow]Temática Infantil[/COLOR][CR]'
+    txt += '          [COLOR lightyellow][B]Con Temática Infantil[/B][/COLOR] ' + str(bus_tematica_infantil) + '[CR]'
 
-    if not bus_torrents == 0: txt += '           ' + str(bus_torrents) + ' [COLOR blue]Contenido Torrent[/COLOR][CR]'
+    if not bus_torrents == 0: txt += '          [COLOR blue][B]Con Contenido Torrent[/B][/COLOR] ' + str(bus_torrents) + '[CR]'
 
     bus_tematica_doramas = bus_doramas + doramas
-    if not bus_tematica_doramas == 0: txt += '           ' + str(bus_tematica_doramas) + ' [COLOR firebrick]Temática Dorama[/COLOR][CR]'
+    if not bus_tematica_doramas == 0: txt += '          [COLOR firebrick][B]Con Temática Dorama[/B][/COLOR] ' + str(bus_tematica_doramas) +'[CR]'
 
     bus_tematica_animes = bus_animes + animes
     if not bus_tematica_animes == 0:
-        if not config.get_setting('descartar_anime', default=True):
-            txt += '           ' + str(bus_tematica_animes) + ' [COLOR springgreen]Temática Anime[/COLOR][CR]'
+        if not config.get_setting('descartar_anime', default=True): txt += '          [COLOR springgreen][B]Con Temática Anime[/B][/COLOR] ' + str(bus_tematica_animes) + '[CR]'
 
-    if not temas_adults == 0: txt += '           ' + str(temas_adults) + ' [COLOR orange]Temática Adultos[/COLOR][CR]'
+    if not temas_adults == 0: txt += '          [COLOR orange][B]Con Temática Adultos[/B][/COLOR] ' + str(temas_adults) + '[CR]'
 
-    if config.get_setting('mnu_pelis', default=True):
-        txt += '[CR]      ' + str(bus_pelis) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
+    if config.get_setting('mnu_pelis', default=True): txt += '[CR]  ' + str(bus_pelis) + ' [COLOR deepskyblue][B]Películas[/B][/COLOR][CR]'
 
-    if config.get_setting('mnu_series', default=True):
-        txt += '      ' + str(bus_series) + ' [COLOR hotpink]Series[/COLOR][CR]'
+    if config.get_setting('mnu_series', default=True): txt += '  ' + str(bus_series) + ' [COLOR hotpink][B]Series[/B][/COLOR][CR]'
 
-    if config.get_setting('mnu_documentales', default=True):
-        txt += '[CR]      ' + str(bus_tematica_documentales) + ' [COLOR cyan]Documentales[/COLOR][CR]'
+    if config.get_setting('mnu_documentales', default=True): txt += '[CR]  ' + str(bus_tematica_documentales) + ' [COLOR cyan][B]Documentales[/B][/COLOR][CR]'
 
-    if config.get_setting('mnu_torrents', default=True):
-        txt += '      ' + str(torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
+    if config.get_setting('mnu_torrents', default=True): txt += '    ' + str(torrents) + ' [COLOR blue][B]Torrents[/B][/COLOR][CR]'
 
     if config.get_setting('mnu_doramas', default=True):
-        if not bus_tematica_doramas == 0: txt += '      ' + str(bus_tematica_doramas) + ' [COLOR firebrick]Doramas[/COLOR][CR]'
+        if not bus_tematica_doramas == 0: txt += '    ' + str(bus_tematica_doramas) + ' [COLOR firebrick][B]Doramas[/B][/COLOR][CR]'
 
     if config.get_setting('mnu_animes', default=True):
         if not config.get_setting('descartar_anime', default=True):
-            if not bus_tematica_animes == 0: txt += '      ' + str(bus_tematica_animes) + ' [COLOR springgreen]Animes[/COLOR][CR]'
+            if not bus_tematica_animes == 0: txt += '    ' + str(bus_tematica_animes) + ' [COLOR springgreen][B]Animes[/COLOR][/B][CR]'
 
     if not bus_trailers == 0:
-        if config.get_setting('search_extra_trailers', default=False):
-           txt += '      ' + str(bus_trailers) + ' [COLOR darkgoldenrod]Traílers[/COLOR]'
+        if config.get_setting('search_extra_trailers', default=False): txt += '      ' + str(bus_trailers) + ' [COLOR darkgoldenrod][B]Traílers[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Resúmenes de Canales y su Distribución (según sus Ajustes)', txt)
 
@@ -3155,7 +3147,7 @@ def resumen_con_problemas(item):
                 if '[COLOR moccasin]' in match: txt += '[B' + match + '/I][/B][/COLOR][CR]'
 
     if not txt:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No Hay No Accesibles[/COLOR][/B]' % color_exec)
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No Hay Con Problemas[/COLOR][/B]' % color_exec)
         return
 
     platformtools.dialog_textviewer('Canales Con Problemas', txt)
@@ -3174,7 +3166,7 @@ def resumen_servidores(item):
 
     aditionals = 0
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-         aditionals = 100  # ~ 44 Various  y  56 Zures
+         aditionals = 102  # ~ 44 Various  y  58 Zures
 
     pending = 0
 
@@ -3209,21 +3201,21 @@ def resumen_servidores(item):
 
     txt = '[COLOR yellow][B]RESUMEN SITUACIÓN SERVIDORES:[/B][/COLOR][CR]'
 
-    txt += '  ' + str(total) + ' [COLOR darkorange][B]Servidores[/B][/COLOR][CR]'
+    txt += '  ' + str(total) + ' [COLOR darkorange][B]SERVIDORES[/B][/COLOR][CR]'
 
     inactivos = (inactives + notsuported + outservice)
 
     if not inactivos == 0:
-        txt += '          ' + str(inactivos) + ' [COLOR coral][B]Inactivos[/B][/COLOR][CR]'
+        txt += '          ' + str(inactivos) + ' [COLOR palevioletred][B]Inactivos[/B][/COLOR][CR]'
 
-        txt += '               ' + str(inactives) + ' [COLOR coral]Desactivados[/COLOR][CR]'
-        txt += '               ' + str(notsuported) + ' [COLOR fuchsia]Sin Soporte[/COLOR][CR]'
+        txt += '                [COLOR darkviolet][B]Desactivados[/B][/COLOR] ' + str(inactives) + '[CR]'
+        txt += '                [COLOR darkred][B]Sin Soporte[/B][/COLOR] ' + str(notsuported) + '[CR]'
 
-        if outservice > 0: txt += '               ' + str(outservice) + ' [COLOR red]Sin Servicio[/COLOR][CR]'
+        if outservice > 0: txt += '                [COLOR red][B]Sin Servicio[/B][/COLOR] ' + str(outservice) + '[CR]'
 
     disponibles = (total - inactivos)
 
-    txt += '[CR]     ' + str(disponibles) + ' [COLOR cyan][B]Activos[/B][/COLOR][CR]'
+    txt += '[CR]    ' + str(disponibles) + ' [COLOR cyan][B]ACTIVOS[/B][/COLOR][CR]'
 
     presentar = False
 
@@ -3237,7 +3229,7 @@ def resumen_servidores(item):
        if not cliente_torrent == 'Ninguno':  presentar = True
 
     if presentar:
-        txt += '[COLOR yellow][B][CR]SERVIDORES VÍAS ALTERNATIVAS, ADICIONALES, TORRENTS, INPUTSTREAM, YOUTUBE:[/B][/COLOR]'
+        txt += '[COLOR yellow][B][CR]SERVIDORES OTRAS VÍAS:[/B][/COLOR]'
 
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
             try:
@@ -3250,8 +3242,8 @@ def resumen_servidores(item):
 
             txt += '      Versión' + tex_mr + '[CR]'
 
-            txt += '          ' + str(alternatives) + '  [COLOR green]Vías alternativas[/COLOR][CR]'
-            txt += '        ' + str(aditionals) + '  [COLOR powderblue]Vías Adicionales[/COLOR][CR]'
+            txt += '          ' + str(alternatives) + '  [COLOR green][B]Vías alternativas[/B][/COLOR][CR]'
+            txt += '        ' + str(aditionals) + '  [COLOR powderblue][B]Vías Adicionales[/B][/COLOR][CR]'
 
         cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
 
@@ -3272,7 +3264,7 @@ def resumen_servidores(item):
         if not cliente_torrent == 'Ninguno':
             txt += '[CR]  [COLOR goldenrod][B]Torrents:[/B][/COLOR][CR]'
 
-            txt += '       1' + '   [COLOR fuchsia]' + tex_tor + '[/COLOR][CR]'
+            txt += '       1' + '   [COLOR fuchsia][B]' + tex_tor + '[/B][/COLOR][CR]'
 
         tex_ia = ''
 
@@ -3286,7 +3278,7 @@ def resumen_servidores(item):
                 tex_ia = '  [COLOR gray]Desactivado[/COLOR]'
         else: tex_ia = '  [COLOR red]No instalado[/COLOR]'
 
-        tex_ia = '       1' + '   [COLOR orchid]InputStream Adaptive[/COLOR] ' + tex_ia + '[CR]'
+        tex_ia = '       1' + '   [COLOR orchid][B]InputStream Adaptive[/B][/COLOR] ' + tex_ia + '[CR]'
 
         tex_if = ''
 
@@ -3300,7 +3292,7 @@ def resumen_servidores(item):
                 tex_if = '  [COLOR gray]Desactivado[/COLOR]'
         else: tex_if = '  [COLOR red]No instalado[/COLOR]'
 
-        tex_if = '       1' + '   [COLOR orchid]InputStream Ffmpegdirect[/COLOR] ' + tex_if + '[CR]'
+        tex_if = '       1' + '   [COLOR orchid][B]InputStream Ffmpegdirect[/B][/COLOR] ' + tex_if + '[CR]'
 
         if tex_ia or tex_if:
             txt += '[CR]  [COLOR goldenrod][B]InputStream:[/B][/COLOR][CR]'
@@ -3320,7 +3312,10 @@ def resumen_servidores(item):
 
         txt += '[CR]  [COLOR goldenrod][B]Youtube:[/B][/COLOR][CR]'
 
-        txt += '       1' + '   [COLOR green]Vía alternativa[/COLOR]' + tex_yt + '[CR]'
+        txt += '       1' + '   [COLOR palegoldenrod][B]Vía alternativa[/B][/COLOR]' + tex_yt + '[CR]'
+
+    otrasvias = (aditionals + alternatives)
+    txt += '[CR]  ' + str(otrasvias) + ' [COLOR cyan][B]OTRAS VIAS[/B][/COLOR][CR]'
 
     accesibles = (disponibles + aditionals + alternatives)
 
@@ -3397,6 +3392,7 @@ def show_help_alternativas(item):
         txt += '   [COLOR yellow]Gamovideo[/COLOR][CR]'
         txt += '   [COLOR yellow]Fastplay[/COLOR][CR]'
         txt += '   [COLOR yellow]Gofile[/COLOR][CR]'
+        txt += '   [COLOR yellow]Kinoger[/COLOR][CR]'
         txt += '   [COLOR yellow]MegaUp[/COLOR][CR]'
         txt += '   [COLOR yellow]Mixdrop[/COLOR][CR]'
         txt += '   [COLOR yellow]Playtube[/COLOR][CR]'
@@ -3405,12 +3401,14 @@ def show_help_alternativas(item):
         txt += '   [COLOR yellow]Streamtape[/COLOR][CR]'
         txt += '   [COLOR yellow]Streamvid[/COLOR][CR]'
         txt += '   [COLOR yellow]Uptobox[/COLOR][CR]'
+        txt += '   [COLOR yellow]Uqload[/COLOR][CR]'
         txt += '   [COLOR yellow]Userscloud[/COLOR][CR]'
         txt += '   [COLOR yellow]Various[/COLOR][CR]'
         txt += '   [COLOR yellow]Vimeo[/COLOR][CR]'
         txt += '   [COLOR yellow]Vidmoly[/COLOR][CR]'
         txt += '   [COLOR yellow]Vk[/COLOR][CR]'
         txt += '   [COLOR yellow]Voe[/COLOR][CR]'
+        txt += '   [COLOR yellow]Vshare[/COLOR][CR]'
         txt += '   [COLOR yellow]Waaw[/COLOR][CR]'
         txt += '   [COLOR yellow]Zures[/COLOR]'
 
@@ -3543,6 +3541,7 @@ def show_help_adicionales(item):
         txt += '   [COLOR yellow]Videa[/COLOR][CR]'
         txt += '   [COLOR yellow]Vidlook[/COLOR][CR]'
         txt += '   [COLOR yellow]Vidmx[/COLOR][CR]'
+        txt += '   [COLOR yellow]Vidnest[/COLOR][CR]'
         txt += '   [COLOR yellow]Vido[/COLOR][CR]'
         txt += '   [COLOR yellow]Vidpro[/COLOR][CR]'
         txt += '   [COLOR yellow]Vidstore[/COLOR][CR]'

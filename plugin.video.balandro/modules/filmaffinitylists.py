@@ -43,7 +43,6 @@ def mainlist(item):
         if config.get_setting('mnu_documentales', default=True):
             itemlist.append(item.clone( action='listas', search_type='documentary', stype='documentary', title=' - Buscar [COLOR cyan]documental[/COLOR] ...', thumbnail=config.get_thumb('documentary'), plot = 'Indicar el título de un documental' ))
 
-    if not config.get_setting('mnu_simple', default=False):
         itemlist.append(item.clone( action='', title= '[B]Premios y Festivales:[/B]', folder=False, text_color='darkgoldenrod' ))
 
         itemlist.append(item.clone( action='emmy_ediciones', title=' - Premios Emmy', url = host + 'award_data.php?award_id=emmy&year=', thumbnail = config.get_thumb('emmys'), search_type = 'tvshow' ))
@@ -74,15 +73,23 @@ def mainlist(item):
 
         itemlist.append(item.clone( title = ' - En cartelera', action = 'list_all', url = host + 'cat_new_th_es.html', thumbnail=config.get_thumb('novedades'), search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = ' - Por plataforma', action = 'plataformas', thumbnail=config.get_thumb('booklet'), search_type = 'movie' ))
-        itemlist.append(item.clone( title = ' - Por tema', action = 'temas', url = host + 'topics.php', thumbnail=config.get_thumb('listthemes'), search_type = 'movie' ))
+        itemlist.append(item.clone( title = ' - Las mejores', action = 'list_sel', url = host + ruta_sel + '&notvse=1&nodoc=1', thumbnail=config.get_thumb('bestmovies'), search_type = 'movie' ))
+
+        if not item.search_type:
+            if config.get_setting('channels_link_main', default=True):
+                itemlist.append(item.clone( title = ' - Novedades a la venta', action = 'list_all', url = host + 'cat_new_sa_es.html', thumbnail=config.get_thumb('novedades'), search_type = 'all' ))
+                itemlist.append(item.clone( title = ' - Novedades en alquiler', action = 'list_all', url = host + 'cat_new_re_es.html', thumbnail=config.get_thumb('novedades'), search_type = 'all' ))
+
         itemlist.append(item.clone( title = ' - Por género', action = 'generos', thumbnail=config.get_thumb('listgenres'), search_type = 'movie' ))
         itemlist.append(item.clone( title = ' - Por país', action = 'paises', thumbnail=config.get_thumb('idiomas'), search_type = 'movie' ))
         itemlist.append(item.clone( title = ' - Por año', action = 'anios', thumbnail=config.get_thumb('listyears'), search_type = 'movie' ))
 
+        itemlist.append(item.clone( title = '[B]Películas y Series:[/B]', action = '', text_color='teal' ))
+
         itemlist.append(item.clone( title = ' - Sagas y colecciones', action = 'sagas', url = host + 'movie-groups-all.php', page = 1, thumbnail=config.get_thumb('bestsagas'), search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = ' - Las mejores', action = 'list_sel', url = host + ruta_sel + '&notvse=1&nodoc=1', thumbnail=config.get_thumb('bestmovies'), search_type = 'movie' ))
+        itemlist.append(item.clone( title = ' - Por plataforma', action = 'plataformas', thumbnail=config.get_thumb('booklet'), search_type = 'movie' ))
+        itemlist.append(item.clone( title = ' - Por tema', action = 'temas', url = host + 'topics.php', thumbnail=config.get_thumb('listthemes'), search_type = 'movie' ))
 
     presentar = True
     if item.search_type == 'movie': presentar = False
@@ -101,8 +108,6 @@ def mainlist(item):
 
         itemlist.append(item.clone( title = ' - Las mejores', action = 'list_sel', url = host + ruta_sel + '&nodoc=1', cod_genre = 'TV_SE', thumbnail=config.get_thumb('besttvshows'), search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = ' - Por plataforma', action = 'plataformas', thumbnail=config.get_thumb('booklet'), search_type = 'tvshow' ))
-        itemlist.append(item.clone( title = ' - Por tema', action = 'temas', url = host + 'topics.php', thumbnail=config.get_thumb('listthemes'), search_type = 'tvshow' ))
         itemlist.append(item.clone( title=' - Por género', action='_genres', thumbnail = config.get_thumb('listgenres'), search_type = 'tvshow' ))
         itemlist.append(item.clone( title=' - Por país', action='paises', thumbnail = config.get_thumb('idiomas'), search_type = 'tvshow' ))
         itemlist.append(item.clone( action='_years', title='   - Por año', thumbnail = config.get_thumb('listyears'), search_type = 'tvshow' ))
@@ -121,13 +126,6 @@ def mainlist(item):
                 itemlist.append(item.clone( title = '[B]Documentales:[/B]', action = '', text_color='cyan' ))
 
                 itemlist.append(item.clone( title = ' - Los mejores', action = 'list_sel', url = host + ruta_sel + '&notvse=1', cod_genre = 'DO', thumbnail=config.get_thumb('bestdocumentaries'), search_type = 'all' ))
-
-    if not item.search_type:
-        if config.get_setting('channels_link_main', default=True):
-            itemlist.append(item.clone( title = '[B]Películas y Series:[/B]', action = '', text_color='teal' ))
-
-            itemlist.append(item.clone( title = ' - Novedades a la venta', action = 'list_all', url = host + 'cat_new_sa_es.html', thumbnail=config.get_thumb('novedades'), search_type = 'all' ))
-            itemlist.append(item.clone( title = ' - Novedades en alquiler', action = 'list_all', url = host + 'cat_new_re_es.html', thumbnail=config.get_thumb('novedades'), search_type = 'all' ))
 
     return itemlist
  

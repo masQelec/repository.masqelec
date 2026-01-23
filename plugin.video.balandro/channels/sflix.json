@@ -1,0 +1,17 @@
+{
+  "id": "sflix",
+  "name": "SFlix",
+  "thumbnail": "sflix.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["tvshow"],
+
+  "categories": ["tvshow"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["lasts", "producers", "lists", "kids", "docs", "vos"],
+
+  "notes": "Series por Géneros."
+}

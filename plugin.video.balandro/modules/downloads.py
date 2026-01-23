@@ -66,16 +66,16 @@ def mainlist(item):
         it.folder = False
 
         if it.downloadStatus == STATUS_CODES.completed:
-            it.title = '[COLOR gold][B][Ok][/B] %s [%s][/COLOR]' % (it.downloadFilename, config.format_bytes(it.downloadSize))
+            it.title = '[COLOR cyan][B]%s[/B]  %s[/COLOR]' % (it.downloadFilename, config.format_bytes(it.downloadSize))
 
         elif it.downloadStatus == STATUS_CODES.canceled:
-            it.title = '[COLOR red][B][%s%%][/B] %s [%s de %s][/COLOR]' % (int(it.downloadProgress), it.downloadFilename, config.format_bytes(it.downloadCompleted), config.format_bytes(it.downloadSize))
+            it.title = '[COLOR red][B]%s%% %s[/B]  %s de %s[/COLOR]' % (int(it.downloadProgress), it.downloadFilename, config.format_bytes(it.downloadCompleted), config.format_bytes(it.downloadSize))
 
         elif it.downloadStatus == STATUS_CODES.error:
-            it.title = '[COLOR gray][B][I][Error][/B][/I] %s[/COLOR]' % it.downloadFilename
+            it.title = '[COLOR darkred][B][I][Error][/I] %s[/B][/COLOR]' % it.downloadFilename
 
         else:
-            it.title = '[COLOR yellow][I][B][???][/B][/I] %s[/COLOR]' % it.downloadFilename
+            it.title = '[COLOR yellow][I][B][???][/B][/I] %s[/B][/COLOR]' % it.downloadFilename
 
         elem += 1
 

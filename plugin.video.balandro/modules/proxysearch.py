@@ -176,16 +176,16 @@ def proxysearch_all(item):
                                 if not 'movie' in ch['search_types']: continue
 
                             elif item.extra == 'tvshows':
-                                  if not 'tvshow' in ch['search_types']: continue
+                                if not 'tvshow' in ch['search_types']: continue
 
                             elif item.extra == 'mixed':
-                                  if not 'all' in ch['search_types']: continue
+                                if not 'all' in ch['search_types']: continue
 
                             elif item.extra == 'documentaries':
-                                  if not 'documentary' in ch['search_types']: continue
+                                if not 'documentary' in ch['search_types']: continue
 
                             elif item.extra == 'torrents':
-                                  if not 'torrent' in ch['categories']: continue
+                                if not 'torrent' in ch['categories']: continue
 
                             else:
                                  if 'movie' in ch['search_types']: pass
@@ -244,16 +244,16 @@ def proxysearch_all(item):
                             if not 'movie' in ch['search_types']: continue
 
                         elif item.extra == 'tvshows':
-                              if not 'tvshow' in ch['search_types']: continue
+                            if not 'tvshow' in ch['search_types']: continue
 
                         elif item.extra == 'mixed':
-                              if not 'all' in ch['search_types']: continue
+                            if not 'all' in ch['search_types']: continue
 
                         elif item.extra == 'documentaries':
-                              if not 'documentary' in ch['search_types']: continue
+                            if not 'documentary' in ch['search_types']: continue
 
                         elif item.extra == 'torrents':
-                              if not 'torrent' in ch['categories']: continue
+                            if not 'torrent' in ch['categories']: continue
 
                         else:
                              if 'movie' in ch['search_types']: pass
@@ -531,6 +531,7 @@ def proxysearch_all(item):
 
                proxysearch_channel(item, ch['id'], ch['name'], iniciales_channels_proxies_memorized)
 
+               added_memorized = False
 
                cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
 
@@ -573,19 +574,25 @@ def proxysearch_all(item):
 
     if procesados == 0:
         if iniciales_channels_proxies_memorized:
-            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales a Proceasar según los Memorizados[/B][/COLOR]' % color_adver)
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales a Proceasar según sus Memorizados[/B][/COLOR]' % color_adver)
         else:
-            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales a Proceasar según sus Parámetros[/B][/COLOR]' % color_adver)
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales a Proceasar según sus Ajustes[/B][/COLOR]' % color_adver)
         return
 
     if tests_all_webs:
-        if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]Canales con Proxies Quitados.[/B][/COLOR]', '[COLOR yellow][B]Desea Verlos ?[/B][/COLOR]'):
+        if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]Informe Búsqueda Global de Proxies.[/B][/COLOR]', '[COLOR yellow][B]¿ Desea Visualizarlo ?[/B][/COLOR]'):
             txt_cambiados = ''
 
             for cambiado in tests_all_webs:
-                txt_cambiados += cambiado + '[CR]'
+                if 'Proxies Configurados' in cambiado: txt_cambiados += '[COLOR red][B]' + cambiado + '[/B][/COLOR][CR]'
+                elif 'Proxies Eliminados' in cambiado: txt_cambiados += '[COLOR palegoldenrod][B]' + cambiado + '[/B][/COLOR][CR]'
+                elif 'Ignorado' in cambiado: txt_cambiados += '[COLOR cyan][B]' + cambiado + '[/B][/COLOR][CR]'
+                elif 'CloudFlare' in cambiado: txt_cambiados += '[COLOR yellow][B]' + cambiado + '[/B][/COLOR][CR]'
+                elif 'Actualmente Memorizados' in cambiado: txt_cambiados += '[COLOR palevioletred][B]' + cambiado + '[/B][/COLOR][CR]'
+                else: txt_cambiados += cambiado + '[CR]'
 
-                platformtools.dialog_textviewer('Comprobar Canales con Proxies Quitados', txt_cambiados)
+            if txt_cambiados:
+                platformtools.dialog_textviewer('Informe Búsqueda Global de Proxies', txt_cambiados)
 
     if config.get_setting('memorize_channels_proxies', default=True):
        txt = 'Revise los canales Memorizados, porque podría ser que algún canal NO los necesite ó viceversa. '
@@ -595,7 +602,7 @@ def proxysearch_all(item):
            txt += 'Para ello bastará con entrar al canal y ver si se presentan listas en cualquiera de sus opciones, '
            txt += 'si procede deberá Eliminar los proxies memorizados ó Configurarlos de Nuevo dentro del canal.'
 
-    platformtools.dialog_ok(config.__addon_name, 'Proceso configurar proxies a usar y su memorización Finalizado.', '[COLOR yellow][B]' + txt + '[/COLOR][/B]')
+    platformtools.dialog_ok(config.__addon_name, 'Proceso Configurar proxies a usar y su Memorización Finalizado.', '[COLOR yellow][B]' + txt + '[/COLOR][/B]')
 
 
 def channels_excluded_list(ret, channels_ids, channels_excludes):
@@ -641,27 +648,48 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
 
     if txt_status:
         if con_incidencias:
-           if channel_name in str(con_incidencias): return
+           if channel_name in str(con_incidencias):
+               platformtools.dialog_notification(channel_name.capitalize() + ' [COLOR darkcyan][B]Ignorado[/B][/COLOR]', '[COLOR sienna][B]Con Incidencia[/B][/COLOR]')
+
+               tests_all_webs.append((channel_name + ' Ignorado está en la Lista de con Inciencias'))
+               procesados += 1
+               return
 
         if no_accesibles:
-           if channel_name in str(no_accesibles): return
+           if channel_name in str(no_accesibles):
+               platformtools.dialog_notification(channel_name.capitalize() + ' [COLOR darkcyan][B]Ignorado[/B][/COLOR]', '[COLOR slateblue][B]No Accesible[/B][/COLOR]')
+
+               tests_all_webs.append((channel_name + ' Ignorado está en la Lista de No Accesibles'))
+               procesados += 1
+               return
 
         if con_problemas:
-           if channel_name in str(con_problemas): return
+           if channel_name in str(con_problemas):
+               platformtools.dialog_notification(channel_name.capitalize() + ' [COLOR darkcyan][B]Ignorado[/B][/COLOR]', '[COLOR tomato][B]Con Problema[/B][/COLOR]')
+
+               tests_all_webs.append((channel_name + ' Ignorado está en la Lista de Con  Problemas'))
+               procesados += 1
+               return
 
     channels_proxies_memorized = config.get_setting('channels_proxies_memorized', default='')
 
     if config.get_setting('memorize_channels_proxies', default=True):
         if channels_proxies_memorized:
-            el_memorizado = "'" + channel_id + "'"
-
-            if iniciales_channels_proxies_memorized:
-                if not el_memorizado in str(channels_proxies_memorized): return
-
             channel_json = channel_id + '.json'
             filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
             existe = filetools.exists(filename_json)
-            if not existe: return
+            if not existe:
+               tests_all_webs.append((channel_name + ' Ignorado No Existe el Canal'))
+               procesados += 1
+               return
+
+            el_memorizado = "'" + channel_id + "'"
+
+            if iniciales_channels_proxies_memorized:
+                if not el_memorizado in str(channels_proxies_memorized):
+                    tests_all_webs.append((channel_name + ' No está en los Canales Actualmente Memorizados'))
+                    procesados += 1
+                    return
 
             cfg_proxies_channel = 'channel_' + channel_id + '_proxies'
 
@@ -681,12 +709,17 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
         if not ("'" + channel_id + "'") in str(only_channels_includes):
             el_canal = ('[B][COLOR %s]Ignorado no está en Incluidos[/B][/COLOR]') % color_infor
             platformtools.dialog_notification(config.__addon_name + ' [COLOR cyan][B]' + channel_name + '[/COLOR][/B]' , el_canal)
+
+            tests_all_webs.append((channel_name + ' Ignorado porqué No está en la Lista de los Incluidos'))
+            procesados += 1
             return
 
     cfg_searchable_channel = 'channel_' + channel_id + '_no_searchable'
     if config.get_setting(cfg_searchable_channel, default=False):
         el_canal = ('[B][COLOR %s]Ignorado por Excluido[/B][/COLOR]') % color_infor
         platformtools.dialog_notification(config.__addon_name + ' [COLOR cyan][B]' + channel_name + '[/COLOR][/B]' , el_canal)
+        tests_all_webs.append((channel_name + ' Ignorado porqué en la Lista de los Excluidos'))
+        procesados += 1
         return
 
     el_canal = '[B][COLOR %s]' % color_exec
@@ -718,8 +751,11 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
           try:
              data = filetools.read(filename_py)
           except:
-             el_canal = ('Se ignora este canal en el proceso, no se pudo acceder a su módulo ' + channel_py  + '[B][COLOR %s] en el caso de que requiera proxies, deberá efectuar esta Configuracíon dentro del propio canal.') % color_alert
+             el_canal = ('Se ignora este canal en el proceso, no se pudo acceder a su módulo ' + channel_py  + '[B][COLOR %s] en el caso de que requiera proxies, deberá efectuar esta Configuración dentro del propio Canal.') % color_alert
              platformtools.dialog_ok(config.__addon_name + ' ' + channel_name , el_canal + '[/COLOR][/B]')
+
+             tests_all_webs.append((channel_name + ' Ignorado por Error de Filename'))
+             procesados += 1
              return
 
           if not host:
@@ -771,9 +807,11 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
     host = host.strip()
 
     if not host or not '//' in host:
-        el_canal = ('Se ignora este canal en el proceso, porque Falta seleccionar que dominio "HOST" se utilizará  [B][COLOR %s]' + channel_name) % color_alert
+        el_canal = ('Se Ignora este Canal en el proceso, porqué Falta seleccionar que dominio "HOST" se utilizará  [B][COLOR %s]' + channel_name) % color_alert
 
         platformtools.dialog_ok(config.__addon_name, el_canal + '[/COLOR][/B]')
+        tests_all_webs.append((channel_name + ' Ignorado porqué Falta el Host'))
+        procesados += 1
         return
 
     headers = {}
@@ -797,12 +835,14 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
 
                        config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
 
-                tests_all_webs.append(channel_name)
-
                 el_canal = ('[B][COLOR %s]' + channel_name + '[/COLOR][/B]') % color_exec
-                el_canal += ('[B][COLOR %s] no los necesita[/COLOR][/B]') % color_infor
+                el_canal += ('[B][COLOR %s] NO Necesita[/COLOR][/B]') % color_infor
                 platformtools.dialog_notification(config.__addon_name, el_canal)
+
+                tests_all_webs.append((channel_name + ' No Necesita Proxies'))
+                procesados += 1
                 return
+
     else:
         response = httptools.downloadpage(host, headers=headers, raise_weberror=False)
 
@@ -820,8 +860,6 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
 
                         config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
 
-                tests_all_webs.append(channel_name)
-
                 el_canal = ('[B][COLOR %s]Proxies quitados ') % color_alert
                 el_canal += ('[COLOR %s]' + channel_name + '[/COLOR][/B]') % color_exec
                 platformtools.dialog_notification(config.__addon_name, el_canal)
@@ -833,7 +871,17 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
 
                 if config.get_setting(cfg_proxytools_max_channel, default=''): config.set_setting(cfg_proxytools_max_channel, '')
                 if config.get_setting(cfg_proxytools_provider, default=''): config.set_setting(cfg_proxytools_provider, '')
+
+                tests_all_webs.append((channel_name + ' Proxies Eliminados'))
+                procesados += 1
                 return
+
+    if '<title>You are being redirected...</title>' in response.data or '<title>Just a moment...</title>' in response.data or '<title>Just a moment please...</title>' in response.data:
+        platformtools.dialog_notification(channel_name.capitalize() + ' [COLOR darkcyan][B]Ignorado[/B][/COLOR]', '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+
+        tests_all_webs.append((channel_name + ' CloudFlare Human Verify'))
+        procesados += 1
+        return
 
     if config.get_setting('memorize_channels_proxies', default=True):
         el_memorizado = "'" + channel_id + "'"
@@ -854,9 +902,15 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
                config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
 
         if el_memorizado in str(channels_proxies_memorized):
+            tests_all_webs.append((channel_name + ' Proxies Configurados'))
+            procesados += 1
+
             return proxytools.configurar_proxies_canal(channel_name, host)
 
         return
+
+    tests_all_webs.append((channel_name + ' Proxies Configurados'))
+    procesados += 1
 
     return proxytools.configurar_proxies_canal(channel_name, host)
 

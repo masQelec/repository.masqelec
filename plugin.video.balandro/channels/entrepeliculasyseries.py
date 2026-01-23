@@ -233,7 +233,7 @@ def generos(item):
 
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = text_color ))
 
-    return itemlist
+    return sorted(itemlist, key=lambda x: x.title)
 
 
 def list_all(item):
@@ -305,12 +305,18 @@ def list_all(item):
         if '<nav class="nav-links">' in data:
             next_page = scrapertools.find_single_match(data, '<nav class="nav-links">.*?class="page-numbers current">.*?href="(.*?)"')
 
-            if '?page=' in next_page:
+            if '?page=' in next_page or '&page=' in next_page:
                 ant_page = item.url
 
+                if '/search?s=' in item.url: ant_page = ant_page.replace('?page=', '&page=')
+
                 if '?page=' in ant_page: ant_page = ant_page.split("?page=")[0]
+                elif '&page=' in ant_page: ant_page = ant_page.split("&page=")[0]
+
+                if '/search?s=' in item.url: next_page = next_page.replace('?page=', '&page=')
 
                 if next_page.startswith("?"): next_page = ant_page + next_page
+                elif next_page.startswith("&"): next_page = ant_page + next_page
 
                 itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color='coral' ))
 
@@ -690,17 +696,23 @@ def play(item):
         if not bytes:
             url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
             url += '='
-            url = base64.b64decode(url).decode()
-            url = scrapertools.find_single_match(url, '"link":"(.*?)"')
 
-        if not url:
             try:
-                url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
+                url = base64.b64decode(url).decode()
+                url = scrapertools.find_single_match(url, '"link":"(.*?)"')
             except:
                 url = ''
 
+        if not url:
+            if bytes:
+                try:
+                   url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
+                except:
+                    url = ''
+
             if not url:
-                url = decrypters.decode_decipher(crypto, bytes)
+                if bytes:
+                    url = decrypters.decode_decipher(crypto, bytes)
 
             if not url:
                 if crypto.startswith("http"):

@@ -633,7 +633,8 @@ def submnu_alls(item):
     itemlist.append(item.clone( title = '   - Con vídeos en 3D', action = 'ch_groups', group = '3d', extra = 'all' ))
 
     if config.get_setting('mnu_generos', default=True):
-        itemlist.append(item.clone( title = '   - Con Géneros', action = 'ch_groups', group = 'genres', extra = 'all' ))
+        itemlist.append(item.clone( title = '   - Con Géneros películas', action = 'ch_groups', group = 'genres', extra = 'movies' ))
+        itemlist.append(item.clone( title = '   - Con Géneros series', action = 'ch_groups', group = 'genres', extra = 'tvshows' ))
 
     itemlist.append(item.clone( title = '   - Con temas Bíblicos', action = 'ch_groups', group = 'bibles', extra = 'all' ))
 
@@ -647,7 +648,8 @@ def submnu_alls(item):
     elif config.get_setting('mnu_pelis', default=True): presentar = True
 
     if presentar:
-        itemlist.append(item.clone( title = '   - Con Países', action = 'ch_groups', group = 'countries', extra = 'all' ))
+        itemlist.append(item.clone( title = '   - Con Países películas', action = 'ch_groups', group = 'countries', extra = 'movies' ))
+        itemlist.append(item.clone( title = '   - Con Países series', action = 'ch_groups', group = 'countries', extra = 'tvshows' ))
 
     return itemlist
 
@@ -1145,8 +1147,8 @@ def ch_groups(item):
 
             if 'anime' in ch['notes']: action = 'mainlist_anime'
             else:
-                 if ch['name'].startswith('Series'): action = 'mainlist_series'
-                 else: action = 'mainlist_pelis'
+                if ch['name'].startswith('Series'): action = 'mainlist_series'
+                else: action = 'mainlist_pelis'
 
         elif item.group == 'adults':
             if item.only == 'adults':
@@ -1307,6 +1309,14 @@ def ch_groups(item):
             tit = '[COLOR tan][B]Aviso Canal[/B][/COLOR]'
             context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_' + ch['id']})
 
+        if 'clons' in ch['clusters']:
+            tit = '[COLOR turquoise][B]Clones[/B][/COLOR]'
+            context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_prales'})
+
+        if 'clone' in ch['clusters']:
+            tit = '[COLOR paleturquoise][B]Principal[/B][/COLOR]'
+            context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_principal'})
+
         tit = '[COLOR darkorange][B]Test Web Canal[/B][/COLOR]'
         context.append({'title': tit, 'channel': item.channel, 'action': '_tests'})
 
@@ -1381,6 +1391,10 @@ def ch_groups(item):
 
             if not item.extra == 'clones': titulo += '[I][B][COLOR turquoise] (clon)[/COLOR][/I][/B]'
 
+        elif 'clons' in ch['clusters']:
+            if not config.get_setting('mnu_simple', default=False):
+                titulo += '[I][B][COLOR paleturquoise] (pral)[/COLOR][/I][/B]'
+
         if con_incidencias:
            if ch['name'] in str(con_incidencias): titulo += '[I][B][COLOR tan] (incidencia)[/COLOR][/I][/B]'
 
@@ -1426,16 +1440,39 @@ def ch_groups(item):
                 if '+18' in ch['notes']: continue
 
             if 'movie' in ch['categories']:
-                if 'tvshow' in ch['categories']:
+                if 'torrent' in ch['categories']:
+                    if not 'Canal con enlaces Streaming y Torrent' in ch['notes']: titulo += '[B][I][COLOR blue] torrents[/COLOR][/I][/B]'
+
+                    if 'movie' in ch['categories']: titulo += '[B][I][COLOR deepskyblue] películas[/COLOR][/I][/B]'
+                    if 'tvshow' in ch['categories']: titulo += '[B][I][COLOR hotpink] series[/COLOR][/I][/B]'
+
+                    if 'Canal con enlaces Streaming y Torrent' in ch['notes']: titulo += '[B][I][COLOR magenta] streaming/torrent[/COLOR][/I][/B]'
+
+                elif 'tvshow' in ch['categories']:
                     titulo += '[B][I][COLOR deepskyblue] películas[/COLOR] [COLOR hotpink]series[/COLOR][/I][/B]'
+                    if 'infantil' in ch['clusters']: titulo += '[B][I][COLOR lightyellow] infantiles[/COLOR][/I][/B]'
                     if 'tales' in ch['clusters']: titulo += '[B][I][COLOR limegreen] novelas[/COLOR][/I][/B]'
+                    if 'dorama' in ch['clusters']: titulo += '[B][I][COLOR firebrick] doramas[/COLOR][/I][/B]'
+                    if 'anime' in ch['clusters']: titulo += '[B][I][COLOR springgreen] animes[/COLOR][/I][/B]'
+
                 else:
                     if '+18' in ch['notes']: titulo += '[B][I][COLOR orange] +18[/COLOR][/I][/B]'
                     else: titulo += '[B][I][COLOR deepskyblue] películas[/COLOR][/I][/B]'
             else:
-                if 'tvshow' in ch['categories']:
+                if 'torrent' in ch['categories']:
+                    if not 'Canal con enlaces Streaming y Torrent' in ch['notes']: titulo += '[B][I][COLOR blue] torrents[/COLOR][/I][/B]'
+
                     titulo += '[B][I][COLOR hotpink] series[/COLOR][/I][/B]'
+
+                    if 'Canal con enlaces Streaming y Torrent' in ch['notes']: titulo += '[B][I][COLOR magenta] streaming/torrent[/COLOR][/I][/B]'
+
+                elif 'tvshow' in ch['categories']:
+                    titulo += '[B][I][COLOR hotpink] series[/COLOR][/I][/B]'
+                    if 'infantil' in ch['clusters']: titulo += '[B][I][COLOR lightyellow] infantiles[/COLOR][/I][/B]'
                     if 'tales' in ch['clusters']: titulo += '[B][I][COLOR limegreen] novelas[/COLOR][/I][/B]'
+                    if 'dorama' in ch['clusters']: titulo += '[B][I][COLOR firebrick] doramas[/COLOR][/I][/B]'
+                    if 'anime' in ch['clusters']: titulo += '[B][I][COLOR springgreen] animes[/COLOR][/I][/B]'
+
                 elif "documentary" in ch['categories']: titulo += '[B][I][COLOR cyan] documentales[/COLOR][/I][/B]'
 
             langs = str(ch['language'])
@@ -1498,12 +1535,22 @@ def ch_groups(item):
                 elif item.group == '4k': grupo = '4K'
                 elif item.group == '3d': grupo = '3D'
                 elif item.group == 'bibles': grupo = 'Bíblicos'
-                elif item.group == 'genres': grupo = 'Géneros'
+
+                elif item.group == 'genres': 
+                     grupo = 'Géneros'
+                     if item.extra == 'movies': grupo = 'Géneros Películas'
+                     elif item.extra == 'tvshows': grupo = 'Géneros Series'
+
                 elif item.group == 'languages': grupo = 'Idiomas'
                 elif item.group == 'years': grupo = 'Años'
                 elif item.group == 'epochs': grupo = 'Épocas'
                 elif item.group == 'qualityes': grupo = 'Calidades'
-                elif item.group == 'countries': grupo = 'Países'
+
+                elif item.group == 'countries':
+                     grupo = 'Países'
+                     if item.extra == 'movies': grupo = 'Países Películas'
+                     elif item.extra == 'tvshows': grupo = 'Países Series'
+
                 elif item.group == 'categories': grupo = 'Categorías'
                 elif item.group == 'stars': grupo = 'Intérpretes'
                 elif item.group == 'directors': grupo = 'Directores/as'

@@ -1160,7 +1160,7 @@ def channels(item):
             if not 'tvshow' in tipos: continue
 
         elif item.extra == 'torrents':
-            if 'Streaming y Torrent' in ch['notes']: continue
+            if 'Canal con enlaces Streaming y Torrent' in ch['notes']: continue
 
             tipos = ch['search_types']
             if 'documentary' in tipos: continue
@@ -1201,10 +1201,10 @@ def channels(item):
                    elif 'dedicada exclusivamente al dorama' in ch['notes']: continue
 
                    elif not config.get_setting('mnu_documentales', default=True):
-                       if str(ch['search_types']) == "['documentary']": continue
+                        if str(ch['search_types']) == "['documentary']": continue
 
                    elif not config.get_setting('mnu_novelas', default=True):
-                       if 'exclusivamente en novelas' in ch['notes']: continue
+                        if 'exclusivamente en novelas' in ch['notes']: continue
 
            else:
               if not config.get_setting('mnu_documentales', default=True):
@@ -1396,6 +1396,14 @@ def channels(item):
                    tit = '[COLOR springgreen][B]Test Login Cuenta[/B][/COLOR]'
                    context.append({'title': tit, 'channel': 'submnuctext', 'action': '_credenciales_' + ch['id']})
 
+        if 'clons' in ch['clusters']:
+            tit = '[COLOR turquoise][B]Clones[/B][/COLOR]'
+            context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_prales'})
+
+        if 'clone' in ch['clusters']:
+            tit = '[COLOR paleturquoise][B]Principal[/B][/COLOR]'
+            context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_principal'})
+
         tit = '[COLOR darkorange][B]Test Web Canal[/B][/COLOR]'
         context.append({'title': tit, 'channel': item.channel, 'action': '_tests'})
 
@@ -1477,6 +1485,10 @@ def channels(item):
 
             if not item.extra == 'clones': titulo += '[I][B][COLOR turquoise] (clon)[/COLOR][/I][/B]'
 
+        elif 'clons' in ch['clusters']:
+            if not config.get_setting('mnu_simple', default=False):
+                titulo += '[I][B][COLOR paleturquoise] (pral)[/COLOR][/I][/B]'
+
         if con_incidencias:
            if ch['name'] in str(con_incidencias): titulo += '[I][B][COLOR tan] (incidencia)[/COLOR][/I][/B]'
 
@@ -1517,16 +1529,39 @@ def channels(item):
                 if '+18' in ch['notes']: continue
 
             if 'movie' in ch['categories']:
-                if 'tvshow' in ch['categories']:
+                if 'torrent' in ch['categories']:
+                    if not 'Canal con enlaces Streaming y Torrent' in ch['notes']: titulo += '[B][I][COLOR blue] torrents[/COLOR][/I][/B]'
+
+                    if 'movie' in ch['categories']: titulo += '[B][I][COLOR deepskyblue] películas[/COLOR][/I][/B]'
+                    if 'tvshow' in ch['categories']: titulo += '[B][I][COLOR hotpink] series[/COLOR][/I][/B]'
+
+                    if 'Canal con enlaces Streaming y Torrent' in ch['notes']: titulo += '[B][I][COLOR magenta] streaming/torrent[/COLOR][/I][/B]'
+
+                elif 'tvshow' in ch['categories']:
                     titulo += '[B][I][COLOR deepskyblue] películas[/COLOR] [COLOR hotpink]series[/COLOR][/I][/B]'
+                    if 'infantil' in ch['clusters']: titulo += '[B][I][COLOR lightyellow] infantiles[/COLOR][/I][/B]'
                     if 'tales' in ch['clusters']: titulo += '[B][I][COLOR limegreen] novelas[/COLOR][/I][/B]'
+                    if 'dorama' in ch['clusters']: titulo += '[B][I][COLOR firebrick] doramas[/COLOR][/I][/B]'
+                    if 'anime' in ch['clusters']: titulo += '[B][I][COLOR springgreen] animes[/COLOR][/I][/B]'
+
                 else:
                     if '+18' in ch['notes']: titulo += '[B][I][COLOR orange] +18[/COLOR][/I][/B]'
                     else: titulo += '[B][I][COLOR deepskyblue] películas[/COLOR][/I][/B]'
             else:
-                if 'tvshow' in ch['categories']:
+                if 'torrent' in ch['categories']:
+                    if not 'Canal con enlaces Streaming y Torrent' in ch['notes']: titulo += '[B][I][COLOR blue] torrents[/COLOR][/I][/B]'
+
                     titulo += '[B][I][COLOR hotpink] series[/COLOR][/I][/B]'
+
+                    if 'Canal con enlaces Streaming y Torrent' in ch['notes']: titulo += '[B][I][COLOR magenta] streaming/torrent[/COLOR][/I][/B]'
+
+                elif 'tvshow' in ch['categories']:
+                    titulo += '[B][I][COLOR hotpink] series[/COLOR][/I][/B]'
+                    if 'infantil' in ch['clusters']: titulo += '[B][I][COLOR lightyellow] infantiles[/COLOR][/I][/B]'
                     if 'tales' in ch['clusters']: titulo += '[B][I][COLOR limegreen] novelas[/COLOR][/I][/B]'
+                    if 'dorama' in ch['clusters']: titulo += '[B][I][COLOR firebrick] doramas[/COLOR][/I][/B]'
+                    if 'anime' in ch['clusters']: titulo += '[B][I][COLOR springgreen] animes[/COLOR][/I][/B]'
+
                 elif "documentary" in ch['categories']: titulo += '[B][I][COLOR cyan] documentales[/COLOR][/I][/B]'
 
         i =+ 1

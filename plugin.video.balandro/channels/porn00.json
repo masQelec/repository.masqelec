@@ -1,0 +1,17 @@
+{
+  "id": "porn00",
+  "name": "Porn00",
+  "thumbnail": "porn00.jpg",
+
+  "active": true,
+
+  "searchable": false,
+  "search_types": ["movie"],
+
+  "categories": ["movie", "adults"],
+  "language": ["vo"],
+
+  "clusters": ["onlyone", "adults"],
+
+  "notes": "Vídeos en versión Original para Adultos +18."
+}

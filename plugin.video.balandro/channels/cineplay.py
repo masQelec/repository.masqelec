@@ -336,7 +336,10 @@ def episodios(item):
 
     for match in matches[item.page * item.perpage:]:
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
-        if thumb: thumb = 'https:' + thumb
+        if thumb.startswith("//"): thumb = 'https:' + thumb
+
+        proximamente = False
+        if '/themes/torofilm/public/img/cnt/noimg-episode.png' in thumb: proximamente = True
 
         epis = scrapertools.find_single_match(match, '<span class="num-epi">.*?x(.*?)</span>')
 
@@ -352,7 +355,7 @@ def episodios(item):
         titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
         titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail=thumb,
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail=thumb, proximamente = proximamente,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
@@ -375,6 +378,11 @@ def findvideos(item):
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
     matches = scrapertools.find_multiple_matches(data, 'href="#options-(.*?)</li>')
+
+    if not matches:
+        if item.proximamente:
+             platformtools.dialog_notification('CinePlay', '[COLOR cyan][B]Proximamente[/B][/COLOR]')
+             return
 
     ses = 0
 

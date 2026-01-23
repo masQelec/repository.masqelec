@@ -240,6 +240,18 @@ def findvideos(item):
     return itemlist
 
 
+def _news(item):
+    logger.info()
+
+    url = host + 'pelicula/ultimas-peliculas/'
+
+    item.url = url
+    item.grp = url
+    item.search_type = 'movie'
+
+    return list_all(item)
+
+
 def search(item, texto):
     logger.info()
     try:

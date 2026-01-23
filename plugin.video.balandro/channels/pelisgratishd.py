@@ -249,39 +249,39 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        # ~ 28/10/25 a partir de la Tercera pagina, esta tercera sale Siempre 2 Vece
+        # ~ 28/10/25 a partir de la Tercera pagina, esta tercera sale Siempre 2 Veces
+        if '<div class="pagination' in data:
+            bloque = scrapertools.find_single_match(data, '<div class="pagination(.*?)</section>')
 
-        if not '/search?s=' in item.url:
-            if '<div class="pagination' in data:
-                bloque = scrapertools.find_single_match(data, '<div class="pagination(.*?)/section>')
+            next_page = scrapertools.find_single_match(bloque, '</span>.*?href="(.*?)"')
 
-                next_page = scrapertools.find_single_match(bloque, '</span>.*?href="(.*?)"')
+            if '?page=' in next_page or '&page=' in next_page:
+                ant_page = item.url
 
-                if '?page=' in next_page:
-                    ant_page = item.url
+                num_page = scrapertools.find_single_match(item.url, 'page=.*?page=(.*?)$')
 
-                    num_page = scrapertools.find_single_match(item.url, 'page=.*?page=(.*?)$')
+                if num_page:
+                    try:
+                       num_page = int(num_page) + 1
 
-                    if num_page:
-                        try:
-                           num_page = int(num_page) + 1
+                       new_page = '?page=' + str(num_page)
 
-                           new_page = '?page=' + str(num_page)
+                       item.url = item.url.split("?page=")[0]
 
-                           item.url = item.url.split("?page=")[0]
+                       next_page = item.url + new_page
+                    except:
+                       pass
 
-                           next_page = item.url + new_page
-                        except:
-                            pass
+                else:
+                    if '?page=' in ant_page: ant_page = ant_page.split("?page=")[0]
+                    elif '&page=' in ant_page: ant_page = ant_page.split("&page=")[0]
 
-                    else:
-                       if '?page=' in ant_page: ant_page = ant_page.split("?page=")[0]
+                    if next_page.startswith("?"): next_page = ant_page + next_page
+                    elif next_page.startswith("&"): next_page = ant_page + next_page
 
-                       if next_page.startswith("?"): next_page = ant_page + next_page
+                    elif next_page.startswith("/"): next_page = host[:-1] + next_page
 
-                       elif next_page.startswith("/"): next_page = host[:-1] + next_page
-
-                    itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color='coral' ))
+                itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color='coral' ))
 
     return itemlist
 
@@ -612,17 +612,23 @@ def play(item):
         if not bytes:
             url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
             url += '='
-            url = base64.b64decode(url).decode()
-            url = scrapertools.find_single_match(url, '"link":"(.*?)"')
 
-        if not url:
             try:
-                url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
+                url = base64.b64decode(url).decode()
+                url = scrapertools.find_single_match(url, '"link":"(.*?)"')
             except:
                 url = ''
 
+        if not url:
+            if bytes:
+                try:
+                   url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
+                except:
+                    url = ''
+
             if not url:
-                url = decrypters.decode_decipher(crypto, bytes)
+                if bytes:
+                    url = decrypters.decode_decipher(crypto, bytes)
 
             if not url:
                 if crypto.startswith("http"):

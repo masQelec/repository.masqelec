@@ -602,7 +602,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '143.0.7499.170')  # ~ 19/12/25
+        config.set_setting('chrome_last_version', '144.0.7559.60')  # ~ 20/1/26
 
         config.set_setting('debug', '0')
 
@@ -678,6 +678,47 @@ def manto_cookies(item):
     if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar el fichero de Cookies ?[/B][/COLOR]'):
         filetools.remove(path)
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Fichero Cookies eliminado[/B][/COLOR]' % color_infor)
+
+
+def manto_crashes(item):
+    logger.info()
+
+    path = translatePath(os.path.join('special://home/', ''))
+
+    crashes = filetools.listdir(path)
+
+    hay_crashes = False
+
+    for _file in crashes:
+        if _file.endswith('.dmp') == True: pass
+        elif _file.endswith('.txt') == True: pass
+        else: continue
+
+        hay_crashes = True
+
+    if not hay_crashes:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay Ficheros de Crashes[/COLOR][/B]' % color_alert)
+        return
+
+    erase_crashes = False
+
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Eliminar los Ficheros de Crashes ?[/B][/COLOR]'):
+        path = translatePath(os.path.join('special://home/', ''))
+
+        crashes = filetools.listdir(path)
+
+        for _file in crashes:
+            if _file.endswith('.dmp') == True: pass
+            elif _file.endswith('.txt') == True: pass
+            else: continue
+
+            file = path + _file
+
+            filetools.remove(file)
+            erase_crashes = True
+
+        if erase_crashes:
+            platformtools.dialog_ok(config.__addon_name, '[B][COLOR pink]Ficheros de Crashes eliminados[/B][/COLOR]')
 
 
 def manto_advs(item):
@@ -790,6 +831,23 @@ def manto_limpiezas(item):
         procesado = False
 
         if ret == 0:
+            path = translatePath(os.path.join('special://home/', ''))
+
+            crashes = filetools.listdir(path)
+
+            hay_crashes = False
+
+            for _file in crashes:
+                if _file.endswith('.dmp') == True: pass
+                elif _file.endswith('.txt') == True: pass
+                else: continue
+
+                hay_crashes = True
+
+            if hay_crashes:
+                manto_crashes(item)
+                procesado = True
+
             path_advs = translatePath(os.path.join('special://home/userdata', ''))
             file_advs = 'advancedsettings.xml'
             file = path_advs + file_advs

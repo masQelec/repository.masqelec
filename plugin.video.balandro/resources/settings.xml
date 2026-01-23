@@ -573,9 +573,10 @@
 
         <setting id="bus_opc" type="bool" label="Opciones" default="false"/>
         <setting id="search_youtube" type="bool" label="Añadir la opción de búsquedas en [COLOR darksalmon][B]YouTube[/B][/COLOR]" default="true" visible="eq(-1,true)"/>
-        <setting id="search_show_last" type="bool" label="Recordar Último Texto buscado" default="true" visible="eq(-2,true)"/>
-        <setting id="manto_textos" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] los Textos Memorizados" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_textos)"/>
-        <setting id="search_limit_by_channel" type="labelenum" label="Cuantos [COLOR cyan][B]Resultados[/B][/COLOR] se previsualizarán por canal" values="1|2|3|4|5|6|7|8|9|10" default="2" visible="eq(-4,true)"/>
+        <setting id="search_trailers" type="bool" label="Añadir la opción de búsquedas en [COLOR darkgoldenrod][B]Tráilers[/B][/COLOR]" default="false" visible="eq(-2,true)"/>
+        <setting id="search_show_last" type="bool" label="Recordar Último Texto buscado" default="true" visible="eq(-3,true)"/>
+        <setting id="manto_textos" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] los Textos Memorizados" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_textos)"/>
+        <setting id="search_limit_by_channel" type="labelenum" label="Cuantos [COLOR cyan][B]Resultados[/B][/COLOR] se previsualizarán por canal" values="1|2|3|4|5|6|7|8|9|10" default="2" visible="eq(-5,true)"/>
 
         <setting label="Proceso Canales:" type="lsep"/>
 

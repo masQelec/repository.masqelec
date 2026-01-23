@@ -1,0 +1,17 @@
+{
+  "id": "megadedeoficial",
+  "name": "MegaDedeOficial",
+  "thumbnail": "megadedeoficial.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": [ "movie", "tvshow" ],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["clone", "crypto", "rankings", "kids", "docs", "vos", "anime"],
+
+  "notes": "Películas por géneros. Series por Géneros."
+}

@@ -11,7 +11,7 @@
   "categories": ["tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["lasts", "countries", "years", "kids", "docs", "vos"],
+  "clusters": ["crypto", "lasts", "countries", "years", "kids", "docs", "vos"],
 
   "notes": "Series por Géneros."
 }

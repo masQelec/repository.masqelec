@@ -13,6 +13,19 @@ host = 'https://doramaexpress.com/'
 def do_downloadpage(url, post=None, headers=None):
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
+    if not data:
+        if not '/?s=' in url:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('DoramaExpress', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+            timeout = config.get_setting('channels_repeat', default=30)
+
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+
+    if '<title>Just a moment...</title>' in data:
+        if not '/?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
     return data
 
 
@@ -480,7 +493,6 @@ def findvideos(item):
             elif '/hgbazooka.' in url: continue
             elif '.tickcounter.' in url: continue
             elif '/zuvioeb.' in url: continue
-            elif '/minochinos.' in url: continue
 
             url = url.replace('/Mivalyo.com/', '/mivalyo.com/')
 

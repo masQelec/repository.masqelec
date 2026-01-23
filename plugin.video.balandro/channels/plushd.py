@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww3.tioplus.net/'
+host = 'https://tioplus.app/'
 
 
 espera = config.get_setting('servers_waiting', default=6)
@@ -47,7 +47,7 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True, timeout=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://ww3.pelisplus.to/']
+    ant_hosts = ['https://ww3.pelisplus.to/', 'https://ww3.tioplus.net/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)

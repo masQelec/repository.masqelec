@@ -1416,7 +1416,7 @@ def show_channels_list(item):
         elif item.onlyone:
             if not 'onlyone' in ch['clusters']: continue
         elif item.streaminytorrent:
-            if not 'Canal con enlaces Streaming y Torrent.' in ch['notes']: continue
+            if not 'Canal con enlaces Streaming y Torrent' in ch['notes']: continue
 
         cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
 
@@ -1554,7 +1554,7 @@ def show_channels_list(item):
         elif item.notices == True: cabecera = 'Canales con [COLOR yellow]Aviso CloudFlare Protection[/COLOR]'
         elif item.cryptos == True: cabecera = 'Canales que requieren [COLOR yellow]Descifrar Enlaces[/COLOR]'
         elif item.onlyone == True: cabecera = 'Canales con [COLOR yellow]Un Único Servidor[/COLOR]'
-        elif item.streaminytorrent == True: cabecera = 'Canales con enlaces [COLOR yellow]Streamin Y Torrent[/COLOR]'
+        elif item.streaminytorrent == True: cabecera = 'Canales con enlaces [COLOR yellow]Streaming y Torrent[/COLOR]'
 
         else: cabecera = 'Canales [COLOR yellow]Disponibles[/COLOR] (segun sus Ajustes)'
 

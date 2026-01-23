@@ -168,12 +168,6 @@ def mainlist(item):
         if config.get_setting('mnu_adultos', default=True):
             itemlist.append(item.clone( action='search', title='- [B][COLOR orange]+18 Vídeo[/COLOR][/B] ...', extra = '+18', search_video = 'adult', thumbnail=config.get_thumb('adults'), text_color='yellow' ))
 
-        if config.get_setting('search_youtube', default=True):
-            itemlist.append(item.clone( channel='youtubetrailers', action='search', title= ' - [COLOR darksalmon][B]Youtube[/B][/COLOR] ...', thumbnail=config.get_thumb('youtube'), search_special = 'youtube', search_type = 'all' ))
-
-    if config.get_setting('search_extra_trailers', default=False):
-         itemlist.append(item.clone( channel='trailers', action='search', title= ' - [COLOR darkgoldenrod][B]Tráiler[/B][/COLOR] ...', thumbnail=config.get_thumb('trailers'), plot = 'Indicar el Título de una película para buscar su Tráiler' ))
-
     itemlist.append(item.clone( action='', title= '[B]Búsquedas de Personas en los Canales:[/B]', thumbnail=config.get_thumb('stack'), text_color='salmon' ))
 
     itemlist.append(item.clone( title = ' - [COLOR aquamarine][B]Intérprete[/B][/COLOR] ...', action = 'search', search_type = 'person',
@@ -181,12 +175,29 @@ def mainlist(item):
     itemlist.append(item.clone( title = ' - [COLOR mediumaquamarine][B]Dirección[/B][/COLOR] ...', action = 'search', search_type = 'person',
                                 plot = 'Indicars el nombre y/ó apellido/s del director.'))
 
-    if config.get_setting('search_extra_main', default=False) or config.get_setting('channels_link_pyse', default=False):
+    presentar = False
+    if config.get_setting('search_youtube', default=True): presentar = True
+    elif config.get_setting('search_extra_trailers', default=False): presentar = True
+    elif config.get_setting('search_trailers', default=False): presentar = True
+
+    if presentar:
         itemlist.append(item.clone( action='', title= '[B]Búsquedas Especiales:[/B]', folder=False, text_color='yellowgreen' ))
 
-        itemlist.append(item.clone( channel='tmdblists', action='mainlist', title= ' - Búsquedas y listas en [COLOR violet][B]TMDB[/B][/COLOR]', thumbnail=thumb_tmdb, plot = 'Buscar personas y ver listas de películas y series de la base de datos de The Movie Database' ))
+        if config.get_setting('search_youtube', default=True):
+            itemlist.append(item.clone( channel='youtubetrailers', action='search', title= ' - [COLOR darksalmon][B]Youtube[/B][/COLOR] ...', thumbnail=config.get_thumb('youtube'), search_special = 'youtube', search_type = 'all' ))
 
-        itemlist.append(item.clone( channel='filmaffinitylists', action='mainlist', title= ' - Búsquedas y listas en [COLOR violet][B]Filmaffinity[/B][/COLOR]', thumbnail=thumb_filmaffinity, plot = 'Buscar personas y ver listas de películas, series ó documentales de Filmaffinity' ))
+        if config.get_setting('mnu_pelis', default=True):
+            if config.get_setting('search_extra_trailers', default=False) or config.get_setting('search_trailers', default=False):
+                 itemlist.append(item.clone( channel='trailers', action='search', title= ' - [COLOR darkgoldenrod][B]Tráiler[/B][/COLOR] ...', thumbnail=config.get_thumb('trailers'), plot = 'Indicar el Título de una película para buscar su Tráiler' ))
+
+    if not config.get_setting('mnu_simple', default=False):
+        if config.get_setting('search_extra_main', default=False) or config.get_setting('channels_link_pyse', default=False):
+            if not presentar:
+                itemlist.append(item.clone( action='', title= '[B]Búsquedas Especiales:[/B]', folder=False, text_color='yellowgreen' ))
+
+            itemlist.append(item.clone( channel='tmdblists', action='mainlist', title= ' - Búsquedas y listas en [COLOR violet][B]TMDB[/B][/COLOR]', thumbnail=thumb_tmdb, plot = 'Buscar personas y ver listas de películas y series de la base de datos de The Movie Database' ))
+
+            itemlist.append(item.clone( channel='filmaffinitylists', action='mainlist', title= ' - Búsquedas y listas en [COLOR violet][B]Filmaffinity[/B][/COLOR]', thumbnail=thumb_filmaffinity, plot = 'Buscar personas y ver listas de películas, series ó documentales de Filmaffinity' ))
 
     return itemlist
 
