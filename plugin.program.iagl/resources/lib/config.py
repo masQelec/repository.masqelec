@@ -46,9 +46,8 @@ class config(object):
 		self.paths['assets_url'] = 'special://home/addons/plugin.program.iagl/assets/default/{}'
 
 		#Files
-		self.files['addon_data_db'] = self.paths['addon_data'].joinpath('iagl.db')
 		self.files['addon_data_db_zipped'] = self.paths['addon_data'].joinpath('iagl.db.zip')
-		self.files['addon_data_db_zipped_backup'] = self.paths['addon_data'].joinpath('iagl_backup.db.zip')
+		self.files['db_zipped_backup'] = self.paths['userdata'].joinpath('iagl_backup.db.zip')
 		self.files['db'] = self.paths['userdata'].joinpath('iagl.db')
 		self.files['ia_cookie'] = self.paths['userdata'].joinpath('ia.cookie')
 		self.files['sounds'] = dict()
@@ -255,7 +254,7 @@ class config(object):
 		self.dialogs['discord_invite']['buttons']['ok'] = 3001
 
 		#Downloads
-		self.downloads['archive_org_login_url'] = 'https://archive.org/account/login'
+		self.downloads['archive_org_login_url'] = 'https://archive.org/services/xauthn/'
 		self.downloads['archive_org_check_acct'] = 'https://archive.org/services/user.php?op=whoami'
 		self.downloads['chunk_size'] = 500000 #500 kb chunks
 		self.downloads['bad_file_return_size'] = 10000 #Small size returned file may mean archive returned 'Not found' html.  Note chunk_size must be larger than this
