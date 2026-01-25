@@ -30,6 +30,10 @@ import urllib.request
 import urllib.parse
 import urllib.error
 
+# Último diagnóstico de mismatch (canales en DB pero no en playlist)
+_LAST_DB_MISMATCH_EXAMPLES: list[str] = []
+
+
 from lib import log_utils
 from lib import rclone_utils
 from lib import utils
@@ -53,6 +57,9 @@ TVH_SERVICE  = "service.tvheadend43"
 TVH_HTTP_PORT = 9981
 TVH_HTSP_PORT = 9982
 
+
+# User-Agent para HTTP local (Tvheadend)
+UA = "KodiELEC/1.0"
 # Rescate
 ENABLE_KODI_RESTART_FALLBACK = True
 
@@ -158,6 +165,119 @@ def _restart_tvheadend() -> bool:
     else:
         log_utils.write_log("[pvr] No pude reiniciar Tvheadend.", level="WARNING")
     return ok
+
+
+def _tvh_api_get(path: str, params: dict | None = None, timeout: float = 6.0):
+    """GET simple a la API de Tvheadend (localhost:9981)."""
+    try:
+        base = "http://127.0.0.1:9981"
+        url = base + path
+        if params:
+            qs = urllib.parse.urlencode(params, doseq=True)
+            url = url + ("&" if "?" in url else "?") + qs
+        req = urllib.request.Request(url, headers={"User-Agent": UA})
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return json.loads(r.read().decode("utf-8", "replace") or "{}")
+    except Exception:
+        return None
+
+
+def _tvh_api_post_form(path: str, form: dict, timeout: float = 6.0):
+    """POST x-www-form-urlencoded a la API de Tvheadend (localhost:9981)."""
+    try:
+        base = "http://127.0.0.1:9981"
+        url = base + path
+        data = urllib.parse.urlencode(form or {}).encode("utf-8")
+        req = urllib.request.Request(
+            url,
+            data=data,
+            headers={
+                "User-Agent": UA,
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            raw = r.read().decode("utf-8", "replace") or "{}"
+            try:
+                return json.loads(raw)
+            except Exception:
+                return {"raw": raw}
+    except Exception:
+        return None
+
+
+def _tvh_find_target_bouquet_uuid() -> str:
+    """
+    Tvheadend 4.3: localiza el bouquet que debe estar siempre activo.
+    Criterios (OR):
+      - name == "IPTV LOCAL"
+      - comment contiene "file:///storage/.user/playlist.m3u"
+    Devuelve uuid o "".
+    """
+    data = _tvh_api_get("/api/bouquet/list")
+    try:
+        entries = (data or {}).get("entries") or []
+        for b in entries:
+            name = (b.get("name") or "").strip()
+            comment = (b.get("comment") or "").strip()
+            if name == "IPTV LOCAL" or ("file:///storage/.user/playlist.m3u" in comment):
+                # en TVH suele ser 'uuid'; en algunos listados antiguos puede ser 'key'
+                uuid_ = (b.get("uuid") or b.get("key") or "").strip()
+                if uuid_:
+                    return uuid_
+    except Exception:
+        pass
+    return ""
+
+
+def _tvh_set_bouquet_enabled(bouquet_uuid: str, enabled: bool) -> bool:
+    """
+    Activa/desactiva un bouquet por idnode/save.
+    Sin auth (tal como has indicado).
+    """
+    if not bouquet_uuid:
+        return False
+
+    # Intento POST (lo normal); fallback a GET si algún build lo acepta mejor.
+    payload = {"uuid": bouquet_uuid, "enabled": 1 if enabled else 0}
+
+    resp = _tvh_api_post_form("/api/idnode/save", payload, timeout=6.0)
+    if isinstance(resp, dict) and resp.get("success") in (1, True, "1", "true"):
+        return True
+
+    resp2 = _tvh_api_get("/api/idnode/save", payload, timeout=6.0)
+    if isinstance(resp2, dict) and resp2.get("success") in (1, True, "1", "true"):
+        return True
+
+    # algunos builds responden vacío/200; si hay dict sin success, no puedo asegurar
+    return False
+
+
+def _tvh_reset_target_bouquet() -> bool:
+    """
+    Reset lógico del bouquet objetivo:
+      disable -> enable.
+    Garantía: el bouquet debe quedar ENABLED al final.
+    """
+    bouquet_uuid = _tvh_find_target_bouquet_uuid()
+    if not bouquet_uuid:
+        log_utils.write_log("[pvr] TVH bouquet reset: no encontré bouquet objetivo (name='IPTV LOCAL' o comment contiene playlist).", level="WARNING")
+        return False
+
+    # Disable
+    if not _tvh_set_bouquet_enabled(bouquet_uuid, False):
+        log_utils.write_log("[pvr] TVH bouquet reset: no pude deshabilitar bouquet (uuid={}).".format(bouquet_uuid), level="WARNING")
+        # No abortamos aquí: intentamos asegurar enabled
+    time.sleep(0.8)
+
+    # Enable (obligatorio)
+    if not _tvh_set_bouquet_enabled(bouquet_uuid, True):
+        log_utils.write_log("[pvr] TVH bouquet reset: ERROR no pude habilitar bouquet (uuid={}).".format(bouquet_uuid), level="ERROR")
+        return False
+
+    log_utils.write_log("[pvr] TVH bouquet reset: disable/enable aplicado (uuid={}).".format(bouquet_uuid), level="INFO")
+    return True
 
 
 def _restart_kodi_if_idle(timeout_s=20) -> bool:
@@ -574,11 +694,27 @@ def _norm_url(s: str) -> str:
     return (s or "").strip()
 
 def _parse_m3u_name_logo_group(m3u_path: str):
+    """
+    Extrae de la playlist:
+      - wanted_names: set de nombres normalizados (tvg-name y/o display-name tras la coma)
+      - logos_by_name: dict[nombre_norm] -> set(url_logo) (asociado al nombre que tengamos)
+      - wanted_groups: set de grupos normalizados (group-title)
+
+    Nota: comparar SOLO por tvg-name es frágil; algunos M3U no lo traen o Kodi usa el display-name.
+    """
     wanted_names = set()
     logos_by_name = {}
     wanted_groups = set()
 
-    def _add_logo(nkey, logo):
+    def _add_name(name_raw: str) -> str:
+        nk = _norm_key(name_raw)
+        if nk:
+            wanted_names.add(nk)
+        return nk
+
+    def _add_logo(nkey: str, logo: str):
+        if not nkey:
+            return
         logos_by_name.setdefault(nkey, set()).add(logo)
 
     try:
@@ -587,23 +723,35 @@ def _parse_m3u_name_logo_group(m3u_path: str):
                 if not line.startswith("#EXTINF"):
                     continue
 
+                # 1) tvg-name (si existe)
+                nkey_tvg = ""
                 m = _RE_TVG_NAME.search(line)
-                if not m:
-                    continue
-                name_raw = (m.group(2) or "").strip()
-                if not name_raw:
-                    continue
-                nkey = _norm_key(name_raw)
-                if not nkey:
-                    continue
-                wanted_names.add(nkey)
+                if m:
+                    name_raw = (m.group(2) or "").strip()
+                    if name_raw:
+                        nkey_tvg = _add_name(name_raw)
 
+                # 2) display-name (fallback y también adicional)
+                # Formato típico: #EXTINF:-1 ... ,NOMBRE CANAL
+                nkey_disp = ""
+                if "," in line:
+                    disp = line.split(",", 1)[1].strip()
+                    if disp:
+                        nkey_disp = _add_name(disp)
+
+                # Si no hay ningún nombre usable, seguimos
+                if not (nkey_tvg or nkey_disp):
+                    continue
+
+                # logo
                 m = _RE_TVG_LOGO.search(line)
                 logo = (m.group(2) if m else "") or ""
                 logo = _norm_url(logo)
                 if logo:
-                    _add_logo(nkey, logo)
+                    # preferimos asociar al tvg-name si existe; si no, al display
+                    _add_logo(nkey_tvg or nkey_disp, logo)
 
+                # group-title
                 m = _RE_GRP_TITLE.search(line)
                 grp = (m.group(2) if m else "") or ""
                 grp = (grp or "").strip()
@@ -689,6 +837,7 @@ def _plan_reconcile(tv_db_path: str, playlist_m3u_path: str, update_icons: bool)
 
         del_channels = 0
         upd_icons = 0
+        missing_examples = []  # diagnóstico: primeros nombres que DB tiene y playlist no
 
         for _, ch_name, ch_icon in rows:
             name_key = _norm_key(ch_name)
@@ -697,6 +846,8 @@ def _plan_reconcile(tv_db_path: str, playlist_m3u_path: str, update_icons: bool)
                 continue
             if name_key not in wanted_names:
                 del_channels += 1
+                if len(missing_examples) < 5:
+                    missing_examples.append(ch_name)
                 continue
             if update_icons:
                 logos = logos_by_name.get(name_key) or set()
@@ -704,6 +855,14 @@ def _plan_reconcile(tv_db_path: str, playlist_m3u_path: str, update_icons: bool)
                     pl_icon = next(iter(logos))
                     if pl_icon and pl_icon != icon:
                         upd_icons += 1
+
+        _LAST_DB_MISMATCH_EXAMPLES = list(missing_examples)
+
+        if del_channels:
+            log_utils.write_log(
+                "[pvr] DB mismatch: ejemplos canales en DB pero no en playlist: {}".format(missing_examples),
+                level="INFO",
+            )
 
         del_groups = 0
         if "channelgroups" in tables:
@@ -1089,14 +1248,15 @@ def sync_tvh_channel_tags_from_playlist(playlist_m3u_path):
             pass
 
     # Creación
+    next_index = max_index + 1  # continuar índices existentes
     for g in to_create:
         try:
             tag_id = uuid.uuid4().hex
             path = os.path.join(tagdir, tag_id)
             data = {
                 "enabled": True,
-                "index": 0,
-                "name": g,  # EXACTO
+                "index": int(next_index),
+                "name": g,  # EXACTO (como en el M3U)
                 "internal": False,
                 "private": False,
                 "icon": "",
@@ -1308,6 +1468,16 @@ def update_playlist() -> tuple[bool, bool]:
             _popup("PVR", "Sincronizando PVR…", ms=3500)
             log_utils.write_log("[pvr] Playlist igual, pero DB NO coincide (soft reset). plan={}".format(plan), level="INFO")
 
+            # FIX: si la DB tiene canales que NO están en la playlist, Kodi los borra
+            # pero Tvheadend puede re-publicarlos si el canal aún existe allí.
+            # Intento borrar esos huérfanos en TVH antes del soft reset, para cortar el bucle.
+            try:
+                if isinstance(plan, tuple) and len(plan) >= 2 and int(plan[1]) > 0 and _LAST_DB_MISMATCH_EXAMPLES:
+                    _tvh_reset_target_bouquet()
+            except Exception:
+                pass
+
+
         # 1) disable pvr.hts + wait real
         _addon_set_enabled(PVR_ADDON_ID, False)
         _wait_addon_enabled(PVR_ADDON_ID, want_enabled=False, timeout_s=12)
@@ -1413,6 +1583,77 @@ def update_playlist() -> tuple[bool, bool]:
         _log_pvr_db_stats(prefix="[pvr]")
         return False, False
 
+def _ensure_tvh_service_active_final() -> bool:
+    """
+    Última comprobación: Tvheadend debe estar activo y con puertos OK.
+    NO entra en bucles: un intento.
+    """
+    try:
+        if _is_service_active(TVH_SERVICE) and _check_port_connection("localhost", TVH_HTTP_PORT) and _check_port_connection("localhost", TVH_HTSP_PORT):
+            log_utils.write_log("[pvr][final] Tvheadend OK (servicio+puertos).", level="INFO")
+            return True
+
+        log_utils.write_log("[pvr][final] Tvheadend NO OK; intento arrancar...", level="WARNING")
+        _start_tvheadend()
+        if _wait_tvheadend_ready(timeout_s=70):
+            return True
+
+        log_utils.write_log("[pvr][final] Tvheadend sigue NO listo tras intento.", level="ERROR")
+        return False
+    except Exception as e:
+        log_utils.write_log("[pvr][final] Error comprobando Tvheadend: {}".format(e), level="WARNING")
+        return False
+
+def _ensure_pvr_hts_enabled_final() -> bool:
+    """
+    Última comprobación: pvr.hts debe estar habilitado y PVR READY.
+    No hace nada si ya está bien. Un intento, sin bucles.
+    """
+    try:
+        en = _get_addon_enabled(PVR_ADDON_ID)
+        if en is True:
+            # Si está enabled, comprueba READY rápido para evitar “enabled pero muerto”
+            if _wait_pvr_ready(timeout_s=25, poll_s=1.5, grace_s=8):
+                log_utils.write_log("[pvr][final] {} enabled y PVR READY.".format(PVR_ADDON_ID), level="INFO")
+                return True
+            log_utils.write_log("[pvr][final] {} enabled pero PVR NO READY (no fuerzo bucle).".format(PVR_ADDON_ID), level="WARNING")
+            return False
+
+        if en is False:
+            log_utils.write_log("[pvr][final] {} estaba DESHABILITADO; habilitando...".format(PVR_ADDON_ID), level="WARNING")
+            _addon_set_enabled(PVR_ADDON_ID, True)
+            _wait_addon_enabled(PVR_ADDON_ID, want_enabled=True, timeout_s=12)
+            time.sleep(1.5)
+
+            if _wait_pvr_ready(timeout_s=60, poll_s=1.5, grace_s=15):
+                log_utils.write_log("[pvr][final] {} habilitado y PVR READY.".format(PVR_ADDON_ID), level="INFO")
+                return True
+
+            log_utils.write_log("[pvr][final] {} habilitado pero PVR no llegó a READY.".format(PVR_ADDON_ID), level="WARNING")
+            return False
+
+        # en is None (no pude leer estado)
+        log_utils.write_log("[pvr][final] No pude leer estado de {} (GetAddonDetails falló).".format(PVR_ADDON_ID), level="WARNING")
+        return False
+
+    except Exception as e:
+        log_utils.write_log("[pvr][final] Error comprobando {}: {}".format(PVR_ADDON_ID, e), level="WARNING")
+        return False
+
+
+def ensure_pvr_stack_active_final() -> None:
+    """
+    Última acción del mantenimiento PVR:
+    - asegura TVH activo
+    - asegura pvr.hts enabled
+    """
+    tvh_ok = _ensure_tvh_service_active_final()
+    if not tvh_ok:
+        # Si TVH no está OK, NO tiene sentido tocar pvr.hts (Kodi puede marcarlo failed)
+        log_utils.write_log("[pvr][final] TVH no OK; no fuerzo {}.".format(PVR_ADDON_ID), level="WARNING")
+        return
+
+    _ensure_pvr_hts_enabled_final()
 
 # ------------------------------
 # Punto de entrada general (mínimo)
@@ -1429,9 +1670,17 @@ def update_pvr():
         ensure_tvh_http_user_agent()
     except Exception as e:
         log_utils.write_log("[pvr] ensure_tvh_http_user_agent error: {}".format(e), level="WARNING")
+
+    # --- ÚLTIMO: asegurar stack PVR activo (TVH + pvr.hts) ---
+    try:
+        ensure_pvr_stack_active_final()
+    except Exception as e:
+        log_utils.write_log("[pvr] ensure_pvr_stack_active_final error: {}".format(e), level="WARNING")
+
     try:
         dt = time.time() - start_ts
         log_utils.write_log("[pvr] update_pvr terminado en {:.1f}s".format(dt), level="INFO")
     except Exception:
         pass
+
 
