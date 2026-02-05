@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-update_pvr.py — Gestión de PVR:
-- Playlist con USER_CODE/PASS_CODE (instalación SOLO si cambia el hash final)
-- Sincronización de tv_grab_file desde la nube
+update_pvr.py — Gestión de PVR (limpio)
+- Playlist con USER_CODE/PASS_CODE (instalación SOLO si cambia hash final)
+- Sync tv_grab_file desde nube
 - Ajuste http_user_agent en Tvheadend
 - Reconciliación selectiva en Kodi (TVxx.db)
 - Soft reset robusto si:
     a) cambia playlist, o
-    b) la DB no coincide con la playlist aunque el hash sea igual
-- Reload agresivo (rescate):
-    - enable pvr.hts -> esperar "PVR ready" (PVR.GetProperties + condiciones PVR)
-    - si falla -> toggle rescate
-    - si sigue fallando -> reinicio Kodi (solo idle) [activado]
+    b) DB no coincide con playlist aunque el hash sea igual
+- Prune TVH: deshabilita canales fuera de playlist (channel/grid) por bouquet
+- Rescate: toggle pvr.hts y reinicio Kodi (solo idle) opcional
 """
 
 import os
 import re
+import unicodedata
 import time
 import json
 import gzip
@@ -24,15 +23,9 @@ import socket
 import sqlite3
 import subprocess
 import traceback
-import base64
 import uuid
 import urllib.request
 import urllib.parse
-import urllib.error
-
-# Último diagnóstico de mismatch (canales en DB pero no en playlist)
-_LAST_DB_MISMATCH_EXAMPLES: list[str] = []
-
 
 from lib import log_utils
 from lib import rclone_utils
@@ -46,29 +39,30 @@ except Exception:
     xbmc = None
     xbmcgui = None
 
-
 # ------------------------------
 # Constantes
 # ------------------------------
 PVR_ADDON_ID = "pvr.hts"
 TVH_TAGDIR = "/storage/.kodi/userdata/addon_data/service.tvheadend43/channel/tag"
-TVH_SERVICE  = "service.tvheadend43"
+TVH_SERVICE = "service.tvheadend43"
 
 TVH_HTTP_PORT = 9981
 TVH_HTSP_PORT = 9982
 
+TVH_AUTH_FILE = "/storage/.kodi/userdata/addon_data/service.cloud.masqelec/tvh_auth.json"
 
-# User-Agent para HTTP local (Tvheadend)
 UA = "KodiELEC/1.0"
-# Rescate
 ENABLE_KODI_RESTART_FALLBACK = True
+
+# Último diagnóstico de mismatch (canales en DB pero no en playlist)
+_LAST_DB_MISMATCH: list[str] = []
 
 
 # ------------------------------
 # Regex playlist
 # ------------------------------
-_RE_TVG_NAME  = re.compile(r"""tvg-name\s*=\s*(['"])(.*?)\1""", re.IGNORECASE)
-_RE_TVG_LOGO  = re.compile(r"""tvg-logo\s*=\s*(['"])(.*?)\1""", re.IGNORECASE)
+_RE_TVG_NAME = re.compile(r"""tvg-name\s*=\s*(['"])(.*?)\1""", re.IGNORECASE)
+_RE_TVG_LOGO = re.compile(r"""tvg-logo\s*=\s*(['"])(.*?)\1""", re.IGNORECASE)
 _RE_GRP_TITLE = re.compile(r"""group-title\s*=\s*(['"])(.*?)\1""", re.IGNORECASE)
 
 
@@ -86,12 +80,14 @@ def _popup(title: str, message: str, ms: int = 3500) -> None:
         pass
     try:
         if xbmc:
-            xbmc.executebuiltin('Notification({}, {}, {}, {})'.format(
-                title.replace(",", " "),
-                message.replace(",", " "),
-                int(ms),
-                ""
-            ))
+            xbmc.executebuiltin(
+                "Notification({}, {}, {}, {})".format(
+                    title.replace(",", " "),
+                    message.replace(",", " "),
+                    int(ms),
+                    "",
+                )
+            )
     except Exception:
         pass
 
@@ -101,8 +97,13 @@ def _popup(title: str, message: str, ms: int = 3500) -> None:
 # ------------------------------
 def _run(cmd, timeout=20) -> bool:
     try:
-        subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                       timeout=int(timeout), check=True)
+        subprocess.run(
+            cmd,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=int(timeout),
+            check=True,
+        )
         return True
     except Exception:
         return False
@@ -110,8 +111,12 @@ def _run(cmd, timeout=20) -> bool:
 
 def _is_service_active(unit: str) -> bool:
     try:
-        r = subprocess.run(["systemctl", "is-active", unit],
-                           stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=5)
+        r = subprocess.run(
+            ["systemctl", "is-active", unit],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            timeout=5,
+        )
         return (r.stdout or b"").decode("utf-8", "ignore").strip() == "active"
     except Exception:
         return False
@@ -119,8 +124,12 @@ def _is_service_active(unit: str) -> bool:
 
 def _is_service_inactive(unit: str) -> bool:
     try:
-        r = subprocess.run(["systemctl", "is-active", unit],
-                           stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=5)
+        r = subprocess.run(
+            ["systemctl", "is-active", unit],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            timeout=5,
+        )
         s = (r.stdout or b"").decode("utf-8", "ignore").strip()
         return s in ("inactive", "failed", "deactivating", "unknown", "")
     except Exception:
@@ -141,193 +150,223 @@ def _wait_service_state(unit: str, want_active: bool, timeout_s: int = 25) -> bo
 def _stop_tvheadend() -> bool:
     ok = _run(["systemctl", "stop", TVH_SERVICE], timeout=25)
     _wait_service_state(TVH_SERVICE, want_active=False, timeout_s=25)
-    if ok:
-        log_utils.write_log("[pvr] Tvheadend parado.", level="INFO")
-    else:
-        log_utils.write_log("[pvr] No pude parar Tvheadend.", level="WARNING")
+    log_utils.write_log("[pvr] Tvheadend parado." if ok else "[pvr] No pude parar Tvheadend.", level="INFO" if ok else "WARNING")
     return ok
 
 
 def _start_tvheadend() -> bool:
     ok = _run(["systemctl", "start", TVH_SERVICE], timeout=25)
     _wait_service_state(TVH_SERVICE, want_active=True, timeout_s=25)
-    if ok:
-        log_utils.write_log("[pvr] Tvheadend iniciado.", level="INFO")
-    else:
-        log_utils.write_log("[pvr] No pude iniciar Tvheadend.", level="WARNING")
+    log_utils.write_log("[pvr] Tvheadend iniciado." if ok else "[pvr] No pude iniciar Tvheadend.", level="INFO" if ok else "WARNING")
     return ok
 
 
-def _restart_tvheadend() -> bool:
-    ok = _run(["systemctl", "restart", TVH_SERVICE], timeout=25)
-    if ok:
-        log_utils.write_log("[pvr] Tvheadend reiniciado.", level="INFO")
-    else:
-        log_utils.write_log("[pvr] No pude reiniciar Tvheadend.", level="WARNING")
-    return ok
+# ------------------------------
+# Tvheadend Digest HTTP layer
+# ------------------------------
+_TVH_DIGEST_OPENER = None
+_TVH_DIGEST_USERPASS = None  # (user, pass)
 
 
-def _tvh_api_get(path: str, params: dict | None = None, timeout: float = 6.0):
-    """GET simple a la API de Tvheadend (localhost:9981)."""
+def _tvh_read_http_auth() -> tuple[str, str]:
+    """Lee credenciales de TVH desde TVH_AUTH_FILE.
+
+    Soporta:
+      - user+pass (Basic Auth)
+      - user sin pass (TVH con auth "usuario sin contraseña")
+    """
     try:
-        base = "http://127.0.0.1:9981"
-        url = base + path
-        if params:
-            qs = urllib.parse.urlencode(params, doseq=True)
-            url = url + ("&" if "?" in url else "?") + qs
-        req = urllib.request.Request(url, headers={"User-Agent": UA})
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            return json.loads(r.read().decode("utf-8", "replace") or "{}")
+        if not os.path.exists(TVH_AUTH_FILE):
+            return "", ""
+        with open(TVH_AUTH_FILE, "r", encoding="utf-8", errors="replace") as f:
+            data = json.load(f)
+        if not isinstance(data, dict):
+            return "", ""
+        u = (data.get("username") or data.get("user") or "").strip()
+        p = (data.get("password") or data.get("pass") or "")
+        p = (p if isinstance(p, str) else "").strip()
+        return (u, p) if u else ("", "")
     except Exception:
-        return None
+        return "", ""
 
 
-def _tvh_api_post_form(path: str, form: dict, timeout: float = 6.0):
-    """POST x-www-form-urlencoded a la API de Tvheadend (localhost:9981)."""
+_TVH_HTTP_AUTH_CACHE: tuple[str, str] | None = None
+_TVH_BASIC_OPENER = None
+_TVH_BASIC_USERPASS: tuple[str, str] | None = None
+
+
+def _tvh_get_http_auth() -> tuple[str, str]:
+    """Credenciales cacheadas (evita leer JSON en cada request)."""
+    global _TVH_HTTP_AUTH_CACHE
+    if _TVH_HTTP_AUTH_CACHE is None:
+        _TVH_HTTP_AUTH_CACHE = _tvh_read_http_auth()
+    return _TVH_HTTP_AUTH_CACHE
+
+
+def _tvh_urlopen(req: urllib.request.Request, timeout_s: float):
+    """Abre request a TVH.
+
+    - Sin credenciales: directo.
+    - user+pass: Basic Auth via opener.
+    - user sin pass: NO fuerza Authorization; se usará `username=` inyectado en GET/POST.
+    """
+    u, p = _tvh_get_http_auth()
+    if not u:
+        return urllib.request.urlopen(req, timeout=float(timeout_s))
+
+    if not p:
+        # Importante: NO enviar Authorization: Basic user:
+        return urllib.request.urlopen(req, timeout=float(timeout_s))
+
+    global _TVH_BASIC_OPENER, _TVH_BASIC_USERPASS
+    if _TVH_BASIC_OPENER is None or _TVH_BASIC_USERPASS != (u, p):
+        pm = urllib.request.HTTPPasswordMgrWithDefaultRealm()
+        base = f"http://127.0.0.1:{int(TVH_HTTP_PORT)}/"
+        pm.add_password(None, base, u, p)
+        handler = urllib.request.HTTPBasicAuthHandler(pm)
+        _TVH_BASIC_OPENER = urllib.request.build_opener(handler)
+        _TVH_BASIC_USERPASS = (u, p)
+
+    return _TVH_BASIC_OPENER.open(req, timeout=float(timeout_s))
+
+
+def _tvh_api_get(api_path: str, query: dict | None = None, timeout_s: float = 10.0) -> tuple[bool, int, str]:
+    host = "127.0.0.1"
+
+    q = dict(query or {})
+    # auth: user sin pass -> TVH suele aceptar ?username=USER
+    u, p = _tvh_get_http_auth()
+    if u and not p and "username" not in q:
+        q["username"] = u
+
+    qs = urllib.parse.urlencode(q)
+    url = f"http://{host}:{int(TVH_HTTP_PORT)}/api/{api_path.lstrip('/')}{('?' + qs) if qs else ''}"
+
+    req = urllib.request.Request(url, method="GET")
+    req.add_header("User-Agent", UA)
+    req.add_header("Accept", "*/*")
+    req.add_header("Connection", "close")
+
     try:
-        base = "http://127.0.0.1:9981"
-        url = base + path
-        data = urllib.parse.urlencode(form or {}).encode("utf-8")
-        req = urllib.request.Request(
-            url,
-            data=data,
-            headers={
-                "User-Agent": UA,
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            method="POST",
-        )
-        with urllib.request.urlopen(req, timeout=timeout) as r:
-            raw = r.read().decode("utf-8", "replace") or "{}"
-            try:
-                return json.loads(raw)
-            except Exception:
-                return {"raw": raw}
-    except Exception:
-        return None
-
-
-def _tvh_find_target_bouquet_uuid() -> str:
-    """
-    Tvheadend 4.3: localiza el bouquet que debe estar siempre activo.
-    Criterios (OR):
-      - name == "IPTV LOCAL"
-      - comment contiene "file:///storage/.user/playlist.m3u"
-    Devuelve uuid o "".
-    """
-    data = _tvh_api_get("/api/bouquet/list")
-    try:
-        entries = (data or {}).get("entries") or []
-        for b in entries:
-            name = (b.get("name") or "").strip()
-            comment = (b.get("comment") or "").strip()
-            if name == "IPTV LOCAL" or ("file:///storage/.user/playlist.m3u" in comment):
-                # en TVH suele ser 'uuid'; en algunos listados antiguos puede ser 'key'
-                uuid_ = (b.get("uuid") or b.get("key") or "").strip()
-                if uuid_:
-                    return uuid_
-    except Exception:
-        pass
-    return ""
-
-
-def _tvh_set_bouquet_enabled(bouquet_uuid: str, enabled: bool) -> bool:
-    """
-    Activa/desactiva un bouquet por idnode/save.
-    Sin auth (tal como has indicado).
-    """
-    if not bouquet_uuid:
-        return False
-
-    # Intento POST (lo normal); fallback a GET si algún build lo acepta mejor.
-    payload = {"uuid": bouquet_uuid, "enabled": 1 if enabled else 0}
-
-    resp = _tvh_api_post_form("/api/idnode/save", payload, timeout=6.0)
-    if isinstance(resp, dict) and resp.get("success") in (1, True, "1", "true"):
-        return True
-
-    resp2 = _tvh_api_get("/api/idnode/save", payload, timeout=6.0)
-    if isinstance(resp2, dict) and resp2.get("success") in (1, True, "1", "true"):
-        return True
-
-    # algunos builds responden vacío/200; si hay dict sin success, no puedo asegurar
-    return False
-
-
-def _tvh_reset_target_bouquet() -> bool:
-    """
-    Reset lógico del bouquet objetivo:
-      disable -> enable.
-    Garantía: el bouquet debe quedar ENABLED al final.
-    """
-    bouquet_uuid = _tvh_find_target_bouquet_uuid()
-    if not bouquet_uuid:
-        log_utils.write_log("[pvr] TVH bouquet reset: no encontré bouquet objetivo (name='IPTV LOCAL' o comment contiene playlist).", level="WARNING")
-        return False
-
-    # Disable
-    if not _tvh_set_bouquet_enabled(bouquet_uuid, False):
-        log_utils.write_log("[pvr] TVH bouquet reset: no pude deshabilitar bouquet (uuid={}).".format(bouquet_uuid), level="WARNING")
-        # No abortamos aquí: intentamos asegurar enabled
-    time.sleep(0.8)
-
-    # Enable (obligatorio)
-    if not _tvh_set_bouquet_enabled(bouquet_uuid, True):
-        log_utils.write_log("[pvr] TVH bouquet reset: ERROR no pude habilitar bouquet (uuid={}).".format(bouquet_uuid), level="ERROR")
-        return False
-
-    log_utils.write_log("[pvr] TVH bouquet reset: disable/enable aplicado (uuid={}).".format(bouquet_uuid), level="INFO")
-    return True
-
-
-def _restart_kodi_if_idle(timeout_s=20) -> bool:
-    """
-    Reinicia Kodi SOLO si está idle.
-    """
-    try:
-        if not utils.kodi_is_idle():
-            log_utils.write_log("[pvr] Kodi no está idle; NO reinicio (rescate).", level="INFO")
-            return False
+        with _tvh_urlopen(req, timeout_s) as r:
+            code = int(getattr(r, "status", 200) or 200)
+            body = (r.read() or b"").decode("utf-8", "replace")
+            return True, code, body
     except Exception as e:
-        log_utils.write_log("[pvr] No pude comprobar idle; NO reinicio Kodi: {}".format(e), level="WARNING")
-        return False
-
-    for cmd in (["systemctl", "restart", "kodi"], ["systemctl", "restart", "kodi.service"]):
         try:
-            subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                           timeout=int(timeout_s), check=True)
-            log_utils.write_log("[pvr] Kodi reiniciado (rescate PVR).", level="WARNING")
-            return True
+            code = int(getattr(e, "code", 0) or 0)
+            body = (e.read() or b"").decode("utf-8", "replace") if hasattr(e, "read") else str(e)
+            return False, code, body
         except Exception:
-            pass
+            return False, 0, str(e)
+
+
+def _tvh_api_get_json(api_path: str, query: dict | None = None, timeout_s: float = 10.0) -> tuple[bool, int, dict | None, str]:
+    ok, code, body = _tvh_api_get(api_path, query=query, timeout_s=timeout_s)
+    if not ok:
+        return False, code, None, body or ""
+    try:
+        j = json.loads(body or "{}")
+        return True, code, (j if isinstance(j, dict) else None), body or ""
+    except Exception:
+        return True, code, None, body or ""
+
+
+def _tvh_api_post_form(api_path: str, form: dict, timeout_s: float = 15.0) -> tuple[bool, int, str]:
+    host = "127.0.0.1"
+    url = f"http://{host}:{int(TVH_HTTP_PORT)}/api/{api_path.lstrip('/')}"
+
+    f = dict(form or {})
+    # auth: user sin pass -> TVH suele aceptar username=USER también en POST form
+    u, p = _tvh_get_http_auth()
+    if u and not p and "username" not in f:
+        f["username"] = u
+
+    data = urllib.parse.urlencode(f).encode("utf-8")
+
+    req = urllib.request.Request(url, data=data, method="POST")
+    req.add_header("User-Agent", UA)
+    req.add_header("Content-Type", "application/x-www-form-urlencoded")
+    req.add_header("Accept", "*/*")
+    req.add_header("Connection", "close")
 
     try:
-        subprocess.run(["killall", "-TERM", "kodi.bin"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                       timeout=5, check=True)
-        log_utils.write_log("[pvr] Kodi TERM enviado (rescate PVR).", level="WARNING")
-        return True
+        with _tvh_urlopen(req, timeout_s) as r:
+            code = int(getattr(r, "status", 200) or 200)
+            body = (r.read() or b"").decode("utf-8", "replace")
+            return True, code, body
     except Exception as e:
-        log_utils.write_log("[pvr] No pude reiniciar Kodi: {}".format(e), level="ERROR")
-        return False
+        try:
+            code = int(getattr(e, "code", 0) or 0)
+            body = (e.read() or b"").decode("utf-8", "replace") if hasattr(e, "read") else str(e)
+            return False, code, body
+        except Exception:
+            return False, 0, str(e)
 
+def _tvh_channel_set_epggrab(channel_uuid: str, epggrab_uuid: str) -> tuple[bool, int, str]:
+    """
+    Intenta asignar EPG Source a un channel UUID.
+    En tu grid.json, channel.epggrab es LISTA, así que aquí forzamos lista siempre.
 
-# ------------------------------
-# JSON-RPC helpers
-# ------------------------------
+    Prueba varios formatos porque TVH cambia entre builds:
+      - POST form idnode/save con node={...} (JSON object)
+      - POST form idnode/save con node=[{...}] (JSON array)
+      - POST json idnode/save con node={...}
+      - POST json idnode/save con node=[{...}]
+    """
+    ch = (channel_uuid or "").strip()
+    epg = (epggrab_uuid or "").strip()
+    if not ch or not epg:
+        return False, 0, "missing uuid"
+
+    node_obj = {"uuid": ch, "epggrab": [epg]}
+
+    variants_form = [
+        ("v1_form_node_obj", {"node": json.dumps(node_obj, separators=(",", ":"))}),
+        ("v2_form_node_arr", {"node": json.dumps([node_obj], separators=(",", ":"))}),
+    ]
+
+    for tag, fields in variants_form:
+        log_utils.write_log(f"[pvr][epgsrc] TRY {tag}: fields={fields}", level="WARNING")
+        ok, code, body = _tvh_api_post_form("idnode/save", fields, timeout_s=18.0)
+        if ok and 200 <= int(code or 0) < 300:
+            return True, int(code or 0), body
+        log_utils.write_log(
+            f"[pvr][epgsrc] SAVE FAIL {tag} (HTTP {code}): {(body or '')[:200]}",
+            level="WARNING",
+        )
+
+    variants_json = [
+        ("v3_json_node_obj", {"node": node_obj}),
+        ("v4_json_node_arr", {"node": [node_obj]}),
+    ]
+
+    for tag, payload in variants_json:
+        log_utils.write_log(f"[pvr][epgsrc] TRY {tag}: payload={payload}", level="WARNING")
+        ok, code, body = _tvh_api_post_json("idnode/save", payload, timeout_s=18.0)
+        if ok and 200 <= int(code or 0) < 300:
+            return True, int(code or 0), body
+        log_utils.write_log(
+            f"[pvr][epgsrc] SAVE FAIL {tag} (HTTP {code}): {(body or '')[:200]}",
+            level="WARNING",
+        )
+
+    return False, 0, "all variants failed"
+
 def _addon_set_enabled(addon_id: str, enabled: bool) -> bool:
     try:
         return bool(jsonrpc_utils.set_addon_enabled(addon_id, enabled))
     except Exception as e:
-        log_utils.write_log("[pvr] JSON-RPC set_addon_enabled({},{}): {}".format(addon_id, enabled, e), level="WARNING")
+        log_utils.write_log(f"[pvr] JSON-RPC set_addon_enabled({addon_id},{enabled}): {e}", level="WARNING")
         return False
 
 
 def _get_addon_enabled(addon_id: str):
     try:
-        res = jsonrpc_utils.jsonrpc_call("Addons.GetAddonDetails", {
-            "addonid": addon_id,
-            "properties": ["enabled"]
-        })
+        res = jsonrpc_utils.jsonrpc_call(
+            "Addons.GetAddonDetails",
+            {"addonid": addon_id, "properties": ["enabled"]},
+        )
         if isinstance(res, dict):
             det = res.get("addon") or {}
             if "enabled" in det:
@@ -341,46 +380,35 @@ def _wait_addon_enabled(addon_id: str, want_enabled: bool, timeout_s: int = 12) 
     deadline = time.time() + max(1, int(timeout_s))
     while time.time() < deadline:
         v = _get_addon_enabled(addon_id)
-        if v is None:
-            time.sleep(0.5)
-            continue
-        if bool(v) == bool(want_enabled):
+        if v is not None and bool(v) == bool(want_enabled):
             return True
         time.sleep(0.5)
     return False
 
 
 def _pvr_get_properties():
-    """
-    READY fiable: PVR.GetProperties.available.
-    """
-    ok, res, err = jsonrpc_utils.jsonrpc_try(
+    ok, res, _ = jsonrpc_utils.jsonrpc_try(
         "PVR.GetProperties",
         params={"properties": ["available", "scanning", "recording"]},
         retries=0,
         quiet_codes={-32100, -32602},
         log_level="DEBUG",
     )
-    if ok and isinstance(res, dict):
-        return res
-    return None
+    return res if (ok and isinstance(res, dict)) else None
 
 
 def _pvr_has_any_channels_via_conditions() -> bool:
-    """
-    Segundo candado: condiciones internas (cuando xbmc está disponible).
-    """
     try:
         if xbmc:
-            return bool(
-                xbmc.getCondVisibility("Pvr.HasTVChannels") or
-                xbmc.getCondVisibility("Pvr.HasRadioChannels")
-            )
+            return bool(xbmc.getCondVisibility("Pvr.HasTVChannels") or xbmc.getCondVisibility("Pvr.HasRadioChannels"))
     except Exception:
         pass
     return False
 
 
+# ------------------------------
+# DB helpers
+# ------------------------------
 def _pick_tv_db_path() -> str:
     db_dir = "/storage/.kodi/userdata/Database"
     if not os.path.isdir(db_dir):
@@ -409,7 +437,6 @@ def _db_count_channels_groups(tv_db_path: str) -> tuple[int, int]:
     try:
         con = sqlite3.connect(tv_db_path, timeout=2.0)
         cur = con.cursor()
-
         cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
         tables = {r[0] for r in cur.fetchall()}
 
@@ -421,13 +448,13 @@ def _db_count_channels_groups(tv_db_path: str) -> tuple[int, int]:
             n_channels = int(cur.fetchone()[0] or 0)
 
         if "channelgroups" in tables:
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT COUNT(1)
                 FROM channelgroups
-                WHERE
-                    idGroup <> 1
-                    AND TRIM(IFNULL(sName,'')) <> ''
-            """)
+                WHERE idGroup <> 1 AND TRIM(IFNULL(sName,'')) <> ''
+                """
+            )
             n_groups = int(cur.fetchone()[0] or 0)
 
         return n_channels, n_groups
@@ -442,266 +469,50 @@ def _db_count_channels_groups(tv_db_path: str) -> tuple[int, int]:
 
 
 def _pvr_has_any_channels_via_db() -> bool:
-    """
-    Tercer candado (fallback): TVxx.db con canales.
-    OJO: si wal/shm presentes, devuelve 0/0 => NO concluyas.
-    """
     try:
         tvdb = _pick_tv_db_path()
         if not tvdb:
             return False
         n_ch, _ = _db_count_channels_groups(tvdb)
-        return (n_ch > 0)
+        return n_ch > 0
     except Exception:
         return False
 
 
-def _wait_pvr_ready(timeout_s=120, poll_s=1.5, grace_s=20) -> bool:
-    """
-    READY robusto (sin PVR.GetChannelGroups):
-      1) PVR.GetProperties.available=True
-      2) y (Pvr.HasTVChannels or Pvr.HasRadioChannels) si xbmc disponible
-      3) fallback: DB tiene canales
-    """
-    t0 = time.time()
-    warned = False
-
-    while (time.time() - t0) < float(timeout_s):
-        props = _pvr_get_properties()
-
-        if props and bool(props.get("available")):
-            if _pvr_has_any_channels_via_conditions():
-                return True
-            if _pvr_has_any_channels_via_db():
-                return True
-
-            if (time.time() - t0) >= float(grace_s) and not warned:
-                log_utils.write_log("[pvr] PVR available=True pero aún sin canales; espero…", level="INFO")
-                warned = True
-        else:
-            if (time.time() - t0) >= float(grace_s) and not warned:
-                log_utils.write_log("[pvr] PVR aún no disponible (available=False); espero…", level="INFO")
-                warned = True
-
-        time.sleep(float(poll_s))
-
-    log_utils.write_log("[pvr] TIMEOUT esperando PVR READY.", level="WARNING")
-    return False
-
-
-def _toggle_pvr_addon_rescue(addon_id: str) -> None:
-    """
-    Rescate: toggle con esperas grandes.
-    """
-    _addon_set_enabled(addon_id, False)
-    time.sleep(2.5)
-    _addon_set_enabled(addon_id, True)
-    time.sleep(2.5)
-
-
-# ------------------------------
-# Port helpers
-# ------------------------------
-def _check_port_connection(host: str, port: int) -> bool:
-    try:
-        infos = socket.getaddrinfo(host, int(port), socket.AF_UNSPEC, socket.SOCK_STREAM)
-    except Exception:
-        return False
-
-    for fam, socktype, proto, _, addr in infos:
-        try:
-            s = socket.socket(fam, socktype, proto)
-            s.settimeout(1.0)
-            try:
-                if s.connect_ex(addr) == 0:
-                    return True
-            finally:
-                try:
-                    s.close()
-                except Exception:
-                    pass
-        except Exception:
-            pass
-    return False
-
-
-def _wait_tvheadend_ready(timeout_s: int = 70) -> bool:
-    log_utils.write_log("[pvr] Esperando Tvheadend: servicio + puertos 9981/9982...", level="INFO")
-    deadline = time.time() + max(5, int(timeout_s))
-
-    while time.time() < deadline:
-        if _is_service_active(TVH_SERVICE):
-            http_ok = _check_port_connection("localhost", TVH_HTTP_PORT)
-            htsp_ok = _check_port_connection("localhost", TVH_HTSP_PORT)
-            if http_ok and htsp_ok:
-                time.sleep(2.0)
-                log_utils.write_log("[pvr] Tvheadend READY (9981/9982 OK).", level="INFO")
-                return True
-        time.sleep(2.0)
-
-    log_utils.write_log("[pvr] TIMEOUT: Tvheadend no abrió 9981/9982 a tiempo.", level="ERROR")
-    return False
-
-def _tvh_read_http_auth_from_config() -> tuple[str, str]:
-    """
-    Intenta sacar user/pass del config del addon tvheadend.
-    Si no hay (típico en tu caso), devuelve ("","").
-    """
-    cfg_path = "/storage/.kodi/userdata/addon_data/service.tvheadend43/config"
-    try:
-        if not os.path.exists(cfg_path):
-            return "", ""
-
-        with open(cfg_path, "r", encoding="utf-8", errors="replace") as f:
-            raw = f.read().strip()
-
-        if raw.endswith(";"):
-            raw = raw[:-1].rstrip()
-
-        data = json.loads(raw) if raw else {}
-        if not isinstance(data, dict):
-            return "", ""
-
-        # Claves posibles (varían según builds/configs)
-        for ukey, pkey in (
-            ("http_username", "http_password"),
-            ("http_user", "http_pass"),
-            ("username", "password"),
-            ("user", "pass"),
-        ):
-            u = (data.get(ukey) or "").strip()
-            p = (data.get(pkey) or "").strip()
-            if u:
-                return u, p
-
-        return "", ""
-    except Exception:
-        return "", ""
-
-def _tvh_api_get(api_path: str, query: dict | None = None, timeout_s: int = 8) -> tuple[bool, int, str]:
-    """
-    GET a Tvheadend JSON API:
-      - Primero sin auth
-      - Si responde 401, reintenta con basic-auth si hay credenciales en config
-    Devuelve: (ok, http_status, body_text)
-    """
-    host = "localhost"
-    port = TVH_HTTP_PORT
-
-    q = urllib.parse.urlencode(query or {})
-    url = "http://{}:{}/api/{}{}".format(host, int(port), api_path.lstrip("/"), ("?" + q) if q else "")
-
-    def _do_req(user="", pwd=""):
-        req = urllib.request.Request(url, method="GET")
-        req.add_header("User-Agent", "masQelec/1.0 (+Kodi)")
-        if user:
-            token = base64.b64encode(("{}:{}".format(user, pwd)).encode("utf-8")).decode("ascii")
-            req.add_header("Authorization", "Basic {}".format(token))
-        try:
-            with urllib.request.urlopen(req, timeout=float(timeout_s)) as r:
-                code = getattr(r, "status", 200) or 200
-                body = (r.read() or b"").decode("utf-8", "replace")
-                return True, int(code), body
-        except urllib.error.HTTPError as e:
-            try:
-                body = (e.read() or b"").decode("utf-8", "replace")
-            except Exception:
-                body = ""
-            return False, int(getattr(e, "code", 0) or 0), body
-        except Exception as e:
-            return False, 0, str(e)
-
-    # 1) intento sin auth
-    ok, code, body = _do_req("", "")
-    if ok:
-        return True, code, body
-
-    # 2) si pide auth, reintento
-    if code == 401:
-        u, p = _tvh_read_http_auth_from_config()
-        if u:
-            ok2, code2, body2 = _do_req(u, p)
-            return bool(ok2), int(code2), body2
-
-    return False, code, body
-
-
-def force_tvh_epg_reload(internal: bool = True, ota: bool = False) -> bool:
-    """
-    Fuerza recarga EPG en Tvheadend:
-      - internal=True  => epggrab/internal/rerun
-      - ota=True       => epggrab/ota/trigger
-    """
-    any_ok = False
-
-    if internal:
-        ok, code, body = _tvh_api_get("epggrab/internal/rerun", {"rerun": 1}, timeout_s=10)
-        if ok:
-            log_utils.write_log("[pvr] EPG: internal rerun OK (HTTP {}).".format(code), level="INFO")
-            any_ok = True
-        else:
-            log_utils.write_log("[pvr] EPG: internal rerun FAIL (HTTP {}): {}".format(code, (body or "")[:200]), level="WARNING")
-
-    if ota:
-        ok, code, body = _tvh_api_get("epggrab/ota/trigger", {"trigger": 1}, timeout_s=10)
-        if ok:
-            log_utils.write_log("[pvr] EPG: OTA trigger OK (HTTP {}).".format(code), level="INFO")
-            any_ok = True
-        else:
-            log_utils.write_log("[pvr] EPG: OTA trigger FAIL (HTTP {}): {}".format(code, (body or "")[:200]), level="WARNING")
-
-    return any_ok
-
-# ------------------------------
-# Net helper
-# ------------------------------
-def _download_to(path_dst: str, url: str, retries: int = 2, timeout: int = 20) -> bool:
-    return bool(utils.download_atomic(path_dst, url, retries=retries, timeout=timeout))
-
-
-# ------------------------------
-# DB logging
-# ------------------------------
 def _log_pvr_db_stats(prefix: str = "[pvr]") -> None:
     try:
         tvdb = _pick_tv_db_path()
         if not tvdb:
-            log_utils.write_log("{} DB stats: TVxx.db no encontrada".format(prefix), level="INFO")
+            log_utils.write_log(f"{prefix} DB stats: TVxx.db no encontrada", level="INFO")
             return
 
         n_ch, n_gr = _db_count_channels_groups(tvdb)
         if n_ch == 0 and n_gr == 0:
             if os.path.exists(tvdb + "-wal") or os.path.exists(tvdb + "-shm"):
-                log_utils.write_log("{} DB stats: DB en uso (wal/shm), omito conteo".format(prefix), level="INFO")
+                log_utils.write_log(f"{prefix} DB stats: DB en uso (wal/shm), omito conteo", level="INFO")
             else:
-                log_utils.write_log("{} DB stats: no pude leer conteo (0/0)".format(prefix), level="INFO")
+                log_utils.write_log(f"{prefix} DB stats: no pude leer conteo (0/0)", level="INFO")
             return
 
-        log_utils.write_log("{} DB stats: canales={} grupos={}".format(prefix, n_ch, n_gr), level="INFO")
+        log_utils.write_log(f"{prefix} DB stats: canales={n_ch} grupos={n_gr}", level="INFO")
     except Exception:
         pass
 
 
 # ------------------------------
-# Normalización / parse playlist
+# Playlist parse + normalización
 # ------------------------------
 def _norm_key(s: str) -> str:
     s = (s or "").strip()
     s = re.sub(r"\s+", " ", s)
     return s.casefold()
 
+
 def _norm_url(s: str) -> str:
     return (s or "").strip()
 
-def _parse_m3u_name_logo_group(m3u_path: str):
-    """
-    Extrae de la playlist:
-      - wanted_names: set de nombres normalizados (tvg-name y/o display-name tras la coma)
-      - logos_by_name: dict[nombre_norm] -> set(url_logo) (asociado al nombre que tengamos)
-      - wanted_groups: set de grupos normalizados (group-title)
 
-    Nota: comparar SOLO por tvg-name es frágil; algunos M3U no lo traen o Kodi usa el display-name.
-    """
+def _parse_m3u_name_logo_group(m3u_path: str):
     wanted_names = set()
     logos_by_name = {}
     wanted_groups = set()
@@ -723,7 +534,6 @@ def _parse_m3u_name_logo_group(m3u_path: str):
                 if not line.startswith("#EXTINF"):
                     continue
 
-                # 1) tvg-name (si existe)
                 nkey_tvg = ""
                 m = _RE_TVG_NAME.search(line)
                 if m:
@@ -731,27 +541,21 @@ def _parse_m3u_name_logo_group(m3u_path: str):
                     if name_raw:
                         nkey_tvg = _add_name(name_raw)
 
-                # 2) display-name (fallback y también adicional)
-                # Formato típico: #EXTINF:-1 ... ,NOMBRE CANAL
                 nkey_disp = ""
                 if "," in line:
                     disp = line.split(",", 1)[1].strip()
                     if disp:
                         nkey_disp = _add_name(disp)
 
-                # Si no hay ningún nombre usable, seguimos
                 if not (nkey_tvg or nkey_disp):
                     continue
 
-                # logo
                 m = _RE_TVG_LOGO.search(line)
                 logo = (m.group(2) if m else "") or ""
                 logo = _norm_url(logo)
                 if logo:
-                    # preferimos asociar al tvg-name si existe; si no, al display
                     _add_logo(nkey_tvg or nkey_disp, logo)
 
-                # group-title
                 m = _RE_GRP_TITLE.search(line)
                 grp = (m.group(2) if m else "") or ""
                 grp = (grp or "").strip()
@@ -764,26 +568,18 @@ def _parse_m3u_name_logo_group(m3u_path: str):
 
 
 # ------------------------------
-# Protección de grupos internos / localizados (FIX)
+# Grupos protegidos (Kodi DB)
 # ------------------------------
 _PROTECTED_GROUP_NAMES_RAW = {
     "all channels", "all radio",
     "todos los canales", "todos los radios", "todas las radios",
-    "toda la radio", "todo radio",
-    "tots els canals", "tots els canals de tv", "tota la ràdio",
+    "tots els canals", "tota la ràdio",
     "tous les canaux", "toutes les chaînes", "toutes les radios",
 }
-
-# pre-normalizado para no recalcular en cada llamada
 _PROTECTED_GROUP_NAMES_NORM = {_norm_key(x) for x in _PROTECTED_GROUP_NAMES_RAW if _norm_key(x)}
 
+
 def _is_internal_or_protected_group(gid: int, gname: str, iClientId, sClientName: str) -> bool:
-    """
-    NO tocar si:
-      - idGroup == 1
-      - grupos internos Kodi: iClientId < 0 o sClientName vacío (tu caso real "Todos los canales")
-      - nombres protegidos (varios idiomas)
-    """
     try:
         gid = int(gid)
     except Exception:
@@ -796,23 +592,21 @@ def _is_internal_or_protected_group(gid: int, gname: str, iClientId, sClientName
         if iClientId is not None and int(iClientId) < 0:
             return True
     except Exception:
-        # ante duda: protege
         return True
 
     if not (sClientName or "").strip():
         return True
 
     nk = _norm_key(gname)
-    if nk and nk in _PROTECTED_GROUP_NAMES_NORM:
-        return True
-
-    return False
+    return bool(nk and nk in _PROTECTED_GROUP_NAMES_NORM)
 
 
 # ------------------------------
-# Plan reconcile (FIX grupos internos)
+# Plan reconcile (solo calcula)
 # ------------------------------
 def _plan_reconcile(tv_db_path: str, playlist_m3u_path: str, update_icons: bool) -> tuple[bool, int, int, int]:
+    global _LAST_DB_MISMATCH
+
     if not tv_db_path or not os.path.exists(tv_db_path):
         return False, 0, 0, 0
     if os.path.exists(tv_db_path + "-wal") or os.path.exists(tv_db_path + "-shm"):
@@ -837,7 +631,7 @@ def _plan_reconcile(tv_db_path: str, playlist_m3u_path: str, update_icons: bool)
 
         del_channels = 0
         upd_icons = 0
-        missing_examples = []  # diagnóstico: primeros nombres que DB tiene y playlist no
+        missing = []
 
         for _, ch_name, ch_icon in rows:
             name_key = _norm_key(ch_name)
@@ -846,8 +640,8 @@ def _plan_reconcile(tv_db_path: str, playlist_m3u_path: str, update_icons: bool)
                 continue
             if name_key not in wanted_names:
                 del_channels += 1
-                if len(missing_examples) < 5:
-                    missing_examples.append(ch_name)
+                if len(missing) < 5:
+                    missing.append(ch_name)
                 continue
             if update_icons:
                 logos = logos_by_name.get(name_key) or set()
@@ -856,17 +650,13 @@ def _plan_reconcile(tv_db_path: str, playlist_m3u_path: str, update_icons: bool)
                     if pl_icon and pl_icon != icon:
                         upd_icons += 1
 
-        _LAST_DB_MISMATCH_EXAMPLES = list(missing_examples)
+        _LAST_DB_MISMATCH = list(missing)
 
         if del_channels:
-            log_utils.write_log(
-                "[pvr] DB mismatch: ejemplos canales en DB pero no en playlist: {}".format(missing_examples),
-                level="INFO",
-            )
+            log_utils.write_log(f"[pvr] DB mismatch: ejemplos canales en DB pero no en playlist: {missing}", level="INFO")
 
         del_groups = 0
         if "channelgroups" in tables:
-            # FIX: detectar y proteger grupos internos Kodi
             cur.execute("SELECT idGroup, sName, iClientId, sClientName FROM channelgroups")
             grows = cur.fetchall()
             wanted_groups_norm = set(wanted_groups)
@@ -881,9 +671,7 @@ def _plan_reconcile(tv_db_path: str, playlist_m3u_path: str, update_icons: bool)
                     continue
 
                 gname_key = _norm_key(gname)
-                if not gname_key:
-                    continue
-                if gname_key not in wanted_groups_norm:
+                if gname_key and (gname_key not in wanted_groups_norm):
                     del_groups += 1
 
         return True, del_channels, upd_icons, del_groups
@@ -899,12 +687,12 @@ def _plan_reconcile(tv_db_path: str, playlist_m3u_path: str, update_icons: bool)
 
 
 # ------------------------------
-# Reconcile real (FIX grupos internos)
+# Reconcile real (borra canales/grupos en TVxx.db)
 # ------------------------------
 def reconcile_kodi_channels_and_groups_with_playlist(
     tv_db_path: str,
     playlist_m3u_path: str = "/storage/.user/playlist.m3u",
-    update_icons: bool = True,
+    update_icons: bool = False,
 ) -> tuple[bool, int, int, int]:
     if not tv_db_path or not os.path.exists(tv_db_path):
         log_utils.write_log("[pvr] TVxx.db no encontrada; abortando reconcile.", level="WARNING")
@@ -926,7 +714,6 @@ def reconcile_kodi_channels_and_groups_with_playlist(
 
         cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
         tables = {r[0] for r in cur.fetchall()}
-
         if "channels" not in tables:
             log_utils.write_log("[pvr] No existe tabla 'channels'; abortando.", level="WARNING")
             return False, 0, 0, 0
@@ -954,10 +741,8 @@ def reconcile_kodi_channels_and_groups_with_playlist(
 
         to_delete_groups = []
         if "channelgroups" in tables:
-            # FIX: detectar y proteger grupos internos Kodi
             cur.execute("SELECT idGroup, sName, iClientId, sClientName FROM channelgroups")
             grows = cur.fetchall()
-
             wanted_groups_norm = set(wanted_groups)
 
             for gid, gname, iClientId, sClientName in grows:
@@ -970,9 +755,7 @@ def reconcile_kodi_channels_and_groups_with_playlist(
                     continue
 
                 gname_key = _norm_key(gname)
-                if not gname_key:
-                    continue
-                if gname_key not in wanted_groups_norm:
+                if gname_key and (gname_key not in wanted_groups_norm):
                     to_delete_groups.append(gid_int)
 
         if not to_delete_channels and not to_update_icons and not to_delete_groups:
@@ -1035,6 +818,689 @@ def reconcile_kodi_channels_and_groups_with_playlist(
 
 
 # ------------------------------
+# Tags TVH (ficheros)
+# ------------------------------
+def _tvh_tag_norm(s):
+    s = (s or "").strip()
+    s = re.sub(r"\s+", " ", s)
+    return s.casefold()
+
+
+def _tvh_parse_groups_from_m3u(m3u_path):
+    groups = set()
+    try:
+        with open(m3u_path, "r", encoding="utf-8", errors="replace") as f:
+            for line in f:
+                if not line.lstrip().startswith("#EXTINF"):
+                    continue
+                m = _RE_GRP_TITLE.search(line)
+                if not m:
+                    continue
+                g = (m.group(2) or "").strip()
+                if g:
+                    groups.add(g)
+    except Exception:
+        return set()
+    return groups
+
+def _tvh_api_post_json(api_path: str, payload: dict, timeout_s: float = 15.0) -> tuple[bool, int, str]:
+    host = "127.0.0.1"
+    url = f"http://{host}:{int(TVH_HTTP_PORT)}/api/{api_path.lstrip('/')}"
+
+    p = dict(payload or {})
+
+    # auth: user sin pass -> también lo metemos en payload si aplica
+    u, pw = _tvh_get_http_auth()
+    if u and not pw and "username" not in p:
+        p["username"] = u
+
+    data = json.dumps(p, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+
+    req = urllib.request.Request(url, data=data, method="POST")
+    req.add_header("User-Agent", UA)
+    req.add_header("Content-Type", "application/json")
+    req.add_header("Accept", "*/*")
+    req.add_header("Connection", "close")
+
+    try:
+        with _tvh_urlopen(req, timeout_s) as r:
+            code = int(getattr(r, "status", 200) or 200)
+            body = (r.read() or b"").decode("utf-8", "replace")
+            return True, code, body
+    except Exception as e:
+        try:
+            code = int(getattr(e, "code", 0) or 0)
+            body = (e.read() or b"").decode("utf-8", "replace") if hasattr(e, "read") else str(e)
+            return False, code, body
+        except Exception:
+            return False, 0, str(e)
+
+def _tvh_load_json(path):
+    try:
+        with open(path, "r", encoding="utf-8", errors="replace") as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+
+def _tvh_save_json_atomic(path, data):
+    tmp = path + ".tmp"
+    try:
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+            f.write("\n")
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+        return True
+    except Exception:
+        try:
+            if os.path.exists(tmp):
+                os.remove(tmp)
+        except Exception:
+            pass
+        return False
+
+
+def sync_tvh_channel_tags_from_playlist(playlist_m3u_path):
+    tagdir = TVH_TAGDIR
+
+    if not os.path.isdir(tagdir):
+        log_utils.write_log(f"[pvr][tags] tagdir no existe: {tagdir}", level="WARNING")
+        return False, 0, 0
+
+    desired_raw = _tvh_parse_groups_from_m3u(playlist_m3u_path)
+    if not desired_raw:
+        log_utils.write_log("[pvr][tags] playlist sin group-title; no sincronizo tags.", level="WARNING")
+        return False, 0, 0
+
+    desired_norm = set(_tvh_tag_norm(g) for g in desired_raw)
+
+    entries = []
+    max_index = -1
+
+    try:
+        for fn in os.listdir(tagdir):
+            if fn.startswith("."):
+                continue
+            path = os.path.join(tagdir, fn)
+            if not os.path.isfile(path):
+                continue
+
+            d = _tvh_load_json(path)
+            if not isinstance(d, dict):
+                continue
+
+            name = (d.get("name") or "").strip()
+            if not name:
+                continue
+
+            internal = bool(d.get("internal"))
+            idx = d.get("index")
+            if isinstance(idx, int):
+                max_index = max(max_index, idx)
+
+            entries.append({"file": path, "norm": _tvh_tag_norm(name), "internal": internal})
+    except Exception as e:
+        log_utils.write_log(f"[pvr][tags] error leyendo tagdir: {e}", level="ERROR")
+        return False, 0, 0
+
+    existing_norm = set(e["norm"] for e in entries if not e["internal"])
+    to_create = [g for g in sorted(desired_raw) if _tvh_tag_norm(g) not in existing_norm]
+    to_delete = [e for e in entries if (not e["internal"]) and (e["norm"] not in desired_norm)]
+
+    created = 0
+    deleted = 0
+
+    for e in to_delete:
+        try:
+            os.remove(e["file"])
+            deleted += 1
+        except Exception:
+            pass
+
+    next_index = max_index + 1
+    for g in to_create:
+        try:
+            tag_id = uuid.uuid4().hex
+            path = os.path.join(tagdir, tag_id)
+            data = {
+                "enabled": True,
+                "index": int(next_index),
+                "name": g,
+                "internal": False,
+                "private": False,
+                "icon": "",
+                "titled_icon": False,
+                "comment": "",
+            }
+            if _tvh_save_json_atomic(path, data):
+                created += 1
+                next_index += 1
+        except Exception:
+            pass
+
+    log_utils.write_log(f"[pvr][tags] sync OK: created={created} deleted={deleted} (groups={len(desired_raw)})", level="INFO")
+    return True, created, deleted
+
+
+# ------------------------------
+# Ports / READY
+# ------------------------------
+def _check_port_connection(host: str, port: int) -> bool:
+    try:
+        infos = socket.getaddrinfo(host, int(port), socket.AF_UNSPEC, socket.SOCK_STREAM)
+    except Exception:
+        return False
+
+    for fam, socktype, proto, _, addr in infos:
+        try:
+            s = socket.socket(fam, socktype, proto)
+            s.settimeout(1.0)
+            try:
+                if s.connect_ex(addr) == 0:
+                    return True
+            finally:
+                try:
+                    s.close()
+                except Exception:
+                    pass
+        except Exception:
+            pass
+    return False
+
+
+def _wait_tvheadend_ready(timeout_s: int = 70) -> bool:
+    log_utils.write_log("[pvr] Esperando Tvheadend: servicio + puertos 9981/9982...", level="INFO")
+    deadline = time.time() + max(5, int(timeout_s))
+
+    while time.time() < deadline:
+        if _is_service_active(TVH_SERVICE):
+            http_ok = _check_port_connection("localhost", TVH_HTTP_PORT)
+            htsp_ok = _check_port_connection("localhost", TVH_HTSP_PORT)
+            if http_ok and htsp_ok:
+                time.sleep(2.0)
+                log_utils.write_log("[pvr] Tvheadend READY (9981/9982 OK).", level="INFO")
+                return True
+        time.sleep(2.0)
+
+    log_utils.write_log("[pvr] TIMEOUT: Tvheadend no abrió 9981/9982 a tiempo.", level="ERROR")
+    return False
+
+
+def _wait_pvr_ready(timeout_s=120, poll_s=1.5, grace_s=20) -> bool:
+    t0 = time.time()
+    warned = False
+
+    while (time.time() - t0) < float(timeout_s):
+        props = _pvr_get_properties()
+        if props and bool(props.get("available")):
+            if _pvr_has_any_channels_via_conditions() or _pvr_has_any_channels_via_db():
+                return True
+            if (time.time() - t0) >= float(grace_s) and not warned:
+                log_utils.write_log("[pvr] PVR available=True pero aún sin canales; espero…", level="INFO")
+                warned = True
+        else:
+            if (time.time() - t0) >= float(grace_s) and not warned:
+                log_utils.write_log("[pvr] PVR aún no disponible (available=False); espero…", level="INFO")
+                warned = True
+        time.sleep(float(poll_s))
+
+    log_utils.write_log("[pvr] TIMEOUT esperando PVR READY.", level="WARNING")
+    return False
+
+
+def _toggle_pvr_addon_rescue(addon_id: str) -> None:
+    _addon_set_enabled(addon_id, False)
+    time.sleep(2.5)
+    _addon_set_enabled(addon_id, True)
+    time.sleep(2.5)
+
+
+def _restart_kodi_if_idle(timeout_s=20) -> bool:
+    try:
+        if not utils.kodi_is_idle():
+            log_utils.write_log("[pvr] Kodi no está idle; NO reinicio (rescate).", level="INFO")
+            return False
+    except Exception as e:
+        log_utils.write_log(f"[pvr] No pude comprobar idle; NO reinicio Kodi: {e}", level="WARNING")
+        return False
+
+    for cmd in (["systemctl", "restart", "kodi"], ["systemctl", "restart", "kodi.service"]):
+        try:
+            subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=int(timeout_s), check=True)
+            log_utils.write_log("[pvr] Kodi reiniciado (rescate PVR).", level="WARNING")
+            return True
+        except Exception:
+            pass
+
+    try:
+        subprocess.run(["killall", "-TERM", "kodi.bin"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5, check=True)
+        log_utils.write_log("[pvr] Kodi TERM enviado (rescate PVR).", level="WARNING")
+        return True
+    except Exception as e:
+        log_utils.write_log(f"[pvr] No pude reiniciar Kodi: {e}", level="ERROR")
+        return False
+
+
+# ------------------------------
+# Tvheadend grid helpers (channel + bouquet)
+# ------------------------------
+def _tvh_find_target_bouquet_uuid() -> str:
+    ok, code, data, raw = _tvh_api_get_json("bouquet/grid", query={"start": 0, "limit": 200}, timeout_s=10)
+    if not ok or not isinstance(data, dict):
+        log_utils.write_log(f"[pvr] bouquet/grid FAIL (HTTP {code}): {(raw or '')[:200]}", level="WARNING")
+        return ""
+
+    entries = data.get("entries") or []
+    if not isinstance(entries, list) or not entries:
+        log_utils.write_log("[pvr] bouquet/grid OK pero sin entries.", level="WARNING")
+        return ""
+
+    iptv_bouquets = []
+    for b in entries:
+        if not isinstance(b, dict):
+            continue
+        uuid_ = (b.get("uuid") or "").strip()
+        source = ((b.get("source") or b.get("type") or "")).strip().lower()
+        name = (b.get("name") or "").strip()
+        if not uuid_:
+            continue
+        if "iptv" in source:
+            iptv_bouquets.append((uuid_, name))
+            lname = name.lower()
+            if "iptv" in lname or "local" in lname:
+                log_utils.write_log(f"[pvr] bouquet IPTV seleccionado por nombre: {name} ({uuid_})", level="INFO")
+                return uuid_
+
+    if len(iptv_bouquets) == 1:
+        uuid_, name = iptv_bouquets[0]
+        log_utils.write_log(f"[pvr] bouquet IPTV único seleccionado: {name} ({uuid_})", level="INFO")
+        return uuid_
+
+    if iptv_bouquets:
+        log_utils.write_log(f"[pvr] bouquets IPTV encontrados pero ambiguos: {iptv_bouquets}", level="WARNING")
+        return iptv_bouquets[0][0]
+
+    log_utils.write_log("[pvr] No se encontró ningún bouquet IPTV.", level="WARNING")
+    return ""
+
+
+def _tvh_channel_grid_fetch(limit: int = 7000) -> tuple[bool, list[dict], int, str]:
+    ok, code, data, raw = _tvh_api_get_json("channel/grid", query={"start": 0, "limit": int(limit)}, timeout_s=12)
+    if not ok or not isinstance(data, dict):
+        return False, [], int(code or 0), (raw or "")
+    entries = data.get("entries") or []
+    if not isinstance(entries, list):
+        entries = []
+    entries = [e for e in entries if isinstance(e, dict)]
+    return True, entries, int(code or 0), (raw or "")
+
+
+def _tvh_idnode_delete_uuids(uuids: list[str], retries: int = 2, timeout_s: float = 15.0) -> tuple[bool, int]:
+    """
+    Borra nodos por UUID usando /api/idnode/delete.
+    Soporta dos formatos (A y B) porque TVH depende del build:
+      A) form: node=[{"uuid":"..."},...]
+      B) form: uuid=<u>&uuid=<u2>...
+    Devuelve (ok, deleted_count_aproximado)
+    """
+    if not uuids:
+        return True, 0
+
+    uuids = [u.strip() for u in uuids if (u or "").strip()]
+    if not uuids:
+        return True, 0
+
+    def _is_auth(body: str, code: int) -> bool:
+        b = (body or "")
+        return int(code or 0) == 401 or ("401 Unauthorized" in b) or ("Default login" in b) or ("/login" in b)
+
+    last_code = 0
+    last_body = ""
+
+    for attempt in range(retries + 1):
+        if attempt > 0:
+            time.sleep(0.6 + attempt * 0.8)
+
+        # Formato A (node JSON dentro de form-urlencoded)
+        node = [{"uuid": u} for u in uuids]
+        formA = {"node": json.dumps(node, separators=(",", ":"))}
+        ok, code, body = _tvh_api_post_form("idnode/delete", formA, timeout_s=float(timeout_s))
+        code_i = int(code or 0)
+        last_code, last_body = code_i, (body or "")
+
+        if ok and 200 <= code_i < 300:
+            return True, len(uuids)
+
+        if _is_auth(last_body, last_code):
+            log_utils.write_log(
+                "[pvr][tvh_delete] idnode/delete AUTH FAIL (HTTP {}): {}".format(code_i, (last_body or "")[:200]),
+                level="ERROR",
+            )
+            return False, 0
+
+        # Si 400, probamos formato B: uuid repetido
+        if code_i == 400:
+            try:
+                formB = [("uuid", u) for u in uuids]
+                data = urllib.parse.urlencode(formB).encode("utf-8")
+
+                url = "http://127.0.0.1:{}/api/idnode/delete".format(int(TVH_HTTP_PORT))
+                req = urllib.request.Request(url, data=data, method="POST")
+                req.add_header("User-Agent", UA)
+                req.add_header("Content-Type", "application/x-www-form-urlencoded")
+                req.add_header("Accept", "*/*")
+                req.add_header("Connection", "close")
+
+                with _tvh_urlopen(req, timeout_s) as r:
+                    code2 = int(getattr(r, "status", 200) or 200)
+                    body2 = (r.read() or b"").decode("utf-8", "replace")
+
+                if 200 <= code2 < 300:
+                    return True, len(uuids)
+
+                last_code, last_body = code2, body2
+            except Exception as e:
+                last_code, last_body = 0, str(e)
+
+        log_utils.write_log(
+            "[pvr][tvh_delete] idnode/delete FAIL (HTTP {} attempt={}/{}): {}".format(
+                last_code, attempt + 1, retries + 1, (last_body or "")[:200].replace("\n", " ")
+            ),
+            level="WARNING",
+        )
+
+    log_utils.write_log(
+        "[pvr][tvh_delete] idnode/delete FINAL FAIL (HTTP {}): {}".format(
+            last_code, (last_body or "")[:200].replace("\n", " ")
+        ),
+        level="ERROR",
+    )
+    return False, 0
+
+def _tvh_list_bad_channels_in_bouquet(bouquet_uuid: str) -> tuple[bool, list[str], list[dict]]:
+    bq = (bouquet_uuid or "").strip()
+    if not bq:
+        return False, [], []
+
+    ok, entries, code, raw = _tvh_channel_grid_fetch(limit=8000)
+    if not ok:
+        log_utils.write_log("[pvr][tvh_cleanup] channel/grid FAIL (HTTP {}): {}".format(code, (raw or "")[:200]), level="WARNING")
+        return False, [], []
+
+    bad_names = {"{name-not-set}", "service01", ""}
+
+    uuids: list[str] = []
+    samples: list[dict] = []
+
+    for ch in entries:
+        if (ch.get("bouquet") or "").strip() != bq:
+            continue
+        if bool(ch.get("internal")):
+            continue
+
+        uuid_ = (ch.get("uuid") or ch.get("key") or ch.get("id") or "").strip()
+        if not uuid_:
+            continue
+
+        name = (ch.get("name") or "").strip()
+        if name.casefold() in bad_names:
+            uuids.append(uuid_)
+            if len(samples) < 10:
+                samples.append({
+                    "uuid": uuid_,
+                    "name": name,
+                    "enabled": ch.get("enabled"),
+                    "number": ch.get("number"),
+                    "services": ch.get("services"),
+                })
+
+    return True, uuids, samples
+
+def tvh_delete_name_not_set_channels(
+    bouquet_uuid: str,
+    dry_run: bool = False,
+    batch: int = 40,
+) -> tuple[bool, int]:
+    """
+    Borra canales basura del bouquet ({name-not-set}, Service01, vacío),
+    con verificación real y reintento individual si queda alguno.
+
+    Devuelve (ok, deleted_real).
+    """
+    bq = (bouquet_uuid or "").strip()
+    if not bq:
+        log_utils.write_log("[pvr][tvh_cleanup] bouquet_uuid vacío; no limpio.", level="WARNING")
+        return False, 0
+
+    ok, to_delete, samples = _tvh_list_bad_channels_in_bouquet(bq)
+    if not ok:
+        return False, 0
+
+    if not to_delete:
+        log_utils.write_log("[pvr][tvh_cleanup] OK: no hay {name-not-set}/Service01 en ese bouquet.", level="INFO")
+        return True, 0
+
+    log_utils.write_log(
+        "[pvr][tvh_cleanup] Detectados canales basura: {} (bouquet={}). Ejemplos: {}".format(len(to_delete), bq, samples),
+        level="WARNING",
+    )
+
+    if dry_run:
+        log_utils.write_log("[pvr][tvh_cleanup] DRY_RUN activo: no borro.", level="WARNING")
+        return True, 0
+
+    before_set = set(to_delete)
+
+    # 1) intento por batches
+    for i in range(0, len(to_delete), max(1, int(batch))):
+        chunk = to_delete[i:i + int(batch)]
+        ok2, _ = _tvh_idnode_delete_uuids(chunk, retries=2, timeout_s=18.0)
+        if not ok2:
+            log_utils.write_log("[pvr][tvh_cleanup] ABORT: fallo borrando batch {}..{}".format(i, i + len(chunk) - 1), level="ERROR")
+            return False, 0
+        time.sleep(0.4)  # deja respirar a TVH
+
+    # 2) verificar qué queda
+    okv, remaining, _samples2 = _tvh_list_bad_channels_in_bouquet(bq)
+    if not okv:
+        # no puedo verificar => no te vendo humo: considero fallo parcial
+        log_utils.write_log("[pvr][tvh_cleanup] No pude verificar tras borrado (channel/grid).", level="WARNING")
+        return False, 0
+
+    remaining_set = set(remaining)
+    deleted_real = len(before_set - remaining_set)
+
+    # 3) reintento individual para los que queden (esto suele arreglar el “borra 1 de 2”)
+    if remaining:
+        log_utils.write_log("[pvr][tvh_cleanup] Quedan {} basura tras batch; reintento 1-by-1...".format(len(remaining)), level="WARNING")
+        for u in list(remaining):
+            ok3, _ = _tvh_idnode_delete_uuids([u], retries=3, timeout_s=18.0)
+            time.sleep(0.35)
+            # recheck rápido del mismo uuid
+            okx, rem2, _ = _tvh_list_bad_channels_in_bouquet(bq)
+            if not okx:
+                continue
+            if u not in set(rem2):
+                deleted_real += 1
+
+        # verificación final
+        okf, final_rem, _ = _tvh_list_bad_channels_in_bouquet(bq)
+        if okf and final_rem:
+            log_utils.write_log("[pvr][tvh_cleanup] WARNING: aún quedan basura tras retries: {}".format(final_rem[:10]), level="WARNING")
+
+    log_utils.write_log("[pvr][tvh_cleanup] OK: deleted_real={}".format(deleted_real), level="INFO")
+    return True, deleted_real
+
+def _tvh_collect_channels_to_delete(
+    playlist_m3u_path: str,
+    bouquet_uuid: str,
+) -> tuple[bool, list[str], list[dict]]:
+    """
+    Devuelve uuids a borrar y samples (debug).
+    Criterios:
+      - En el bouquet dado
+      - No internal
+      - (a) name NOT IN playlist  OR
+      - (b) name in {name-not-set, Service01, vacío}
+    """
+    bq = (bouquet_uuid or "").strip()
+    if not bq:
+        return False, [], []
+
+    wanted_names, _, _ = _parse_m3u_name_logo_group(playlist_m3u_path)
+    if not wanted_names:
+        log_utils.write_log("[pvr][tvh_prune_ch] playlist sin nombres parseables; abort.", level="WARNING")
+        return False, [], []
+
+    ok, entries, code, raw = _tvh_channel_grid_fetch(limit=8000)
+    if not ok:
+        log_utils.write_log("[pvr][tvh_prune_ch] channel/grid FAIL (HTTP {}): {}".format(code, (raw or "")[:200]), level="WARNING")
+        return False, [], []
+
+    bad_names = {"{name-not-set}", "service01", ""}
+
+    uuids: list[str] = []
+    samples: list[dict] = []
+
+    for ch in entries:
+        if (ch.get("bouquet") or "").strip() != bq:
+            continue
+        if bool(ch.get("internal")):
+            continue
+
+        uuid_ = (ch.get("uuid") or ch.get("key") or ch.get("id") or "").strip()
+        if not uuid_:
+            continue
+
+        name = (ch.get("name") or "").strip()
+        ncf = name.casefold()
+
+        # (b) basura explícita
+        is_bad = (ncf in bad_names)
+
+        # (a) fuera de playlist
+        in_playlist = False
+        if name:
+            in_playlist = (_norm_key(name) in wanted_names)
+
+        if is_bad or (not in_playlist):
+            uuids.append(uuid_)
+            if len(samples) < 12:
+                samples.append({
+                    "uuid": uuid_,
+                    "name": name,
+                    "enabled": ch.get("enabled"),
+                    "number": ch.get("number"),
+                    "services": ch.get("services"),
+                    "reason": ("bad-name" if is_bad else "name-not-in-playlist"),
+                })
+
+    return True, uuids, samples
+
+def tvh_delete_channels_not_in_playlist_or_bad(
+    playlist_m3u_path: str,
+    bouquet_uuid: str,
+    dry_run: bool = False,
+    batch: int = 60,
+    max_rounds: int = 4,
+    settle_s: float = 0.6,
+) -> tuple[bool, int]:
+    """
+    BORRA (idnode/delete) canales del bouquet:
+      - fuera de playlist
+      - y/o {name-not-set}/Service01/vacío
+    Con verificación REAL y rondas por si TVH tarda o regenera.
+
+    Devuelve (ok, deleted_real_acumulado).
+    """
+    bq = (bouquet_uuid or "").strip()
+    if not bq:
+        log_utils.write_log("[pvr][tvh_prune_ch] bouquet_uuid vacío; no borro.", level="WARNING")
+        return False, 0
+
+    deleted_real_total = 0
+
+    for round_i in range(1, max_rounds + 1):
+        ok, to_del, samples = _tvh_collect_channels_to_delete(playlist_m3u_path, bq)
+        if not ok:
+            return False, deleted_real_total
+
+        if not to_del:
+            if round_i == 1:
+                log_utils.write_log("[pvr][tvh_prune_ch] OK: no hay canales fuera/basura en ese bouquet.", level="INFO")
+            else:
+                log_utils.write_log("[pvr][tvh_prune_ch] OK: limpio tras {} rondas.".format(round_i - 1), level="INFO")
+            return True, deleted_real_total
+
+        log_utils.write_log(
+            "[pvr][tvh_prune_ch] Ronda {}/{}: a borrar={} (bouquet={}). Ejemplos: {}".format(
+                round_i, max_rounds, len(to_del), bq, samples
+            ),
+            level="WARNING",
+        )
+
+        if dry_run:
+            log_utils.write_log("[pvr][tvh_prune_ch] DRY_RUN activo: no borro.", level="WARNING")
+            return True, 0
+
+        before_set = set(to_del)
+
+        # 1) Borrado por batches
+        for i in range(0, len(to_del), max(1, int(batch))):
+            chunk = to_del[i:i + int(batch)]
+            ok2, _ = _tvh_idnode_delete_uuids(chunk, retries=3, timeout_s=18.0)
+            if not ok2:
+                log_utils.write_log("[pvr][tvh_prune_ch] ABORT: fallo borrando batch {}..{}".format(i, i + len(chunk) - 1), level="ERROR")
+                return False, deleted_real_total
+            time.sleep(settle_s)
+
+        # 2) Verificación
+        okv, after_list, _ = _tvh_collect_channels_to_delete(playlist_m3u_path, bq)
+        if not okv:
+            log_utils.write_log("[pvr][tvh_prune_ch] No pude verificar tras borrado.", level="WARNING")
+            return False, deleted_real_total
+
+        after_set = set(after_list)
+        deleted_this_round = len(before_set - after_set)
+        deleted_real_total += deleted_this_round
+
+        log_utils.write_log(
+            "[pvr][tvh_prune_ch] Ronda {}: deleted_real={} quedan={}".format(round_i, deleted_this_round, len(after_set)),
+            level="INFO",
+        )
+
+        # 3) Si quedan, reintento 1-by-1 (muy importante para tu caso de “borra 1 de 2”)
+        if after_set:
+            for u in list(after_set):
+                ok3, _ = _tvh_idnode_delete_uuids([u], retries=4, timeout_s=18.0)
+                time.sleep(settle_s)
+                if not ok3:
+                    continue
+
+            # mini-verificación extra
+            okf, final_list, _ = _tvh_collect_channels_to_delete(playlist_m3u_path, bq)
+            if okf and not final_list:
+                log_utils.write_log("[pvr][tvh_prune_ch] Limpieza completa tras reintento 1-by-1.", level="INFO")
+                return True, deleted_real_total
+
+        # Si sigue habiendo, volvemos a empezar otra ronda (posible regen)
+        time.sleep(1.0)
+
+    # Si llegamos aquí, tras max_rounds sigue apareciendo: esto es casi seguro REGENERACIÓN
+    ok_last, remain, samples_last = _tvh_collect_channels_to_delete(playlist_m3u_path, bq)
+    if ok_last and remain:
+        log_utils.write_log(
+            "[pvr][tvh_prune_ch] WARNING: tras {} rondas siguen reapareciendo {} canales. Esto huele a regeneración automática. Ejemplos: {}".format(
+                max_rounds, len(remain), samples_last[:6]
+            ),
+            level="WARNING",
+        )
+    return True, deleted_real_total
+
+
+# ------------------------------
 # tv_grab_file
 # ------------------------------
 def update_tv_grab_file() -> bool:
@@ -1045,7 +1511,7 @@ def update_tv_grab_file() -> bool:
     try:
         os.makedirs(os.path.dirname(local_path), exist_ok=True)
 
-        if not _download_to(remote_tmp, remote_url):
+        if not utils.download_atomic(remote_tmp, remote_url, retries=2, timeout=20):
             log_utils.write_log("[tv_grab_file] Descarga fallida.", level="ERROR")
             return False
 
@@ -1071,14 +1537,12 @@ def update_tv_grab_file() -> bool:
     except Exception as e:
         log_utils.write_log("[tv_grab_file] Error: {}\n{}".format(e, traceback.format_exc()), level="ERROR")
         return False
-
     finally:
         try:
             if os.path.exists(remote_tmp):
                 os.remove(remote_tmp)
         except Exception:
             pass
-
 
 # ------------------------------
 # http_user_agent tvheadend
@@ -1120,157 +1584,275 @@ def ensure_tvh_http_user_agent() -> bool:
         log_utils.write_log("[tvh_config] Error: {}\n{}".format(e, traceback.format_exc()), level="ERROR")
         return False
 
-
 # ------------------------------
-# Playlist updater
+# EPG
 # ------------------------------
-def _tvh_tag_norm(s):
-    # comparación exacta (texto completo), case-insensitive y espacios normalizados
-    s = (s or "").strip()
-    s = re.sub(r"\s+", " ", s)
-    return s.casefold()
-
-
-def _tvh_parse_groups_from_m3u(m3u_path):
-    groups = set()
-    try:
-        with open(m3u_path, "r", encoding="utf-8", errors="replace") as f:
-            for line in f:
-                if not line.lstrip().startswith("#EXTINF"):
-                    continue
-                m = _RE_GRP_TITLE.search(line)
-                if not m:
-                    continue
-                g = (m.group(2) or "").strip()
-                if g:
-                    groups.add(g)
-    except Exception:
-        return set()
-    return groups
-
-
-def _tvh_load_json(path):
-    try:
-        with open(path, "r", encoding="utf-8", errors="replace") as f:
-            return json.load(f)
-    except Exception:
-        return None
-
-
-def _tvh_save_json_atomic(path, data):
-    tmp = path + ".tmp"
-    try:
-        with open(tmp, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-            f.write("\n")
-            f.flush()
-            os.fsync(f.fileno())
-        os.replace(tmp, path)
-        return True
-    except Exception:
-        try:
-            if os.path.exists(tmp):
-                os.remove(tmp)
-        except Exception:
-            pass
+def force_tvh_epg_reload(internal: bool = True) -> bool:
+    if not internal:
         return False
+    ok, code, body = _tvh_api_get("epggrab/internal/rerun", {"rerun": 1}, timeout_s=10)
+    if ok:
+        log_utils.write_log(f"[pvr] EPG: internal rerun OK (HTTP {code}).", level="INFO")
+        return True
+    log_utils.write_log(f"[pvr] EPG: internal rerun FAIL (HTTP {code}): {(body or '')[:200]}", level="WARNING")
+    return False
 
-def sync_tvh_channel_tags_from_playlist(playlist_m3u_path):
+def _tvh_service_set_svcname(service_uuid: str, svc_name: str):
     """
-    Sincroniza TVH_TAGDIR con los group-title del M3U (comparación exacta: casefold + espacios).
-      - Crea tags que falten
-      - Borra tags no-internal que no estén en la lista IPTV
-    Recomendado ejecutarlo con Tvheadend parado (soft reset) para evitar lecturas concurrentes.
-    Devuelve: (ok:bool, created:int, deleted:int)
+    CoreELEC / tvheadend43
+    El nombre editable del SERVICE es 'svcname', NO 'channelname'.
     """
-    tagdir = TVH_TAGDIR
+    fields = {
+        "op": "save",
+        "conf": 1,
+        "class": "service",
+        "node": (service_uuid or "").strip(),
+        "svcname": (svc_name or "").strip(),
+    }
+    return _tvh_api_post_form("idnode/save", fields)
 
-    if not os.path.isdir(tagdir):
-        log_utils.write_log("[pvr][tags] tagdir no existe: {}".format(tagdir), level="WARNING")
-        return False, 0, 0
+def _pick_best_epg_hit(ch_name_raw: str, want_raw: str, hits: list[dict]) -> dict | None:
+    """
+    Desempata hits que colisionan en la misma key normalizada.
+    Devuelve 1 dict o None si no puede decidir con seguridad.
+    """
+    if not hits:
+        return None
+    if len(hits) == 1:
+        return hits[0]
 
-    desired_raw = _tvh_parse_groups_from_m3u(playlist_m3u_path)
-    if not desired_raw:
-        log_utils.write_log("[pvr][tags] playlist sin group-title; no sincronizo tags.", level="WARNING")
-        return False, 0, 0
+    ch = (ch_name_raw or "").strip()
+    want = (want_raw or ch).strip()
 
-    desired_norm = set(_tvh_tag_norm(g) for g in desired_raw)
+    # Variante "display" sin prefijo |ES|/[ES]/(ES)
+    want_noprefix = re.sub(r'^\s*\|[^|]{1,16}\|\s*', '', want)
+    want_noprefix = re.sub(r'^\s*\[[^\]]{1,16}\]\s*', '', want_noprefix)
+    want_noprefix = re.sub(r'^\s*\([^\)]{1,16}\)\s*', '', want_noprefix).strip()
 
-    entries = []
-    max_index = -1
+    def _epg_name(e: dict) -> str:
+        for k in ("name", "channelname", "displayname", "id"):
+            v = e.get(k)
+            if v:
+                return str(v).strip()
+        return ""
 
-    try:
-        for fn in os.listdir(tagdir):
-            if fn.startswith("."):
+    hit_names = [(_epg_name(h), h) for h in hits]
+
+    # 1) match exacto (con y sin prefijo)
+    for nm, h in hit_names:
+        if nm == want or nm == want_noprefix:
+            return h
+
+    # 2) match por token de calidad (si el canal lo trae)
+    qual = None
+    for q in ("UHD", "4K", "FHD", "HD", "SD"):
+        if q in want.upper():
+            qual = q
+            break
+
+    if qual:
+        qual_hits = [(nm, h) for nm, h in hit_names if qual in nm.upper()]
+        if len(qual_hits) == 1:
+            return qual_hits[0][1]
+
+    # 3) si hay uno "sin calidad" y el canal tampoco trae calidad, preferir ese
+    def _has_quality(s: str) -> bool:
+        up = s.upper()
+        return any(t in up for t in ("UHD", "4K", "FHD", "HD", "SD"))
+
+    want_has_q = _has_quality(want)
+    noqual_hits = [(nm, h) for nm, h in hit_names if not _has_quality(nm)]
+    if (not want_has_q) and len(noqual_hits) == 1:
+        return noqual_hits[0][1]
+
+    return None
+
+def tvh_autofix_missing_epg_sources(
+    dry_run: bool = False,
+    max_examples: int = 12,   # ya no se usa para log de missing; lo dejo para compatibilidad
+    max_changes: int = 60,
+    skip_adult: bool = True,
+) -> tuple[bool, int, int, int]:
+    """
+    Asigna EPG Source a canales que lo han perdido (epggrab vacío).
+    Matching por nombre normalizado.
+
+    Devuelve: (ok, fixed, not_found, ambiguous)
+    """
+
+    QUALITY_TOKENS = {
+        "SD", "HD", "FHD", "UHD", "4K",
+        "HEVC", "H265", "H.265", "H264", "H.264",
+        "HDR", "DV", "DOLBY", "VISION",
+    }
+
+    OVERRIDE = {
+        # "|ES| SOMOS FHD": "SOMOS",
+        # "|ES| SOMOS": "SOMOS",
+    }
+
+    def _norm_epg_name(s: str) -> str:
+        s = (s or "").strip()
+        if not s:
+            return ""
+
+        # prefijos IPTV
+        s = re.sub(r'^\s*\|[^|]{1,16}\|\s*', '', s)      # |ES|
+        s = re.sub(r'^\s*\[[^\]]{1,16}\]\s*', '', s)     # [ES]
+        s = re.sub(r'^\s*\([^\)]{1,16}\)\s*', '', s)     # (ES)
+
+        # acentos fuera
+        s = unicodedata.normalize("NFKD", s)
+        s = "".join(c for c in s if not unicodedata.combining(c))
+
+        s = s.upper()
+
+        parts = re.split(r"\s+", s)
+        parts = [p for p in parts if p and p not in QUALITY_TOKENS]
+        s = " ".join(parts)
+
+        s = re.sub(r"[^A-Z0-9 ]+", " ", s)
+        s = re.sub(r"\s+", " ", s).strip()
+        return s
+
+    # 1) EPG grabber channels
+    ok, code, data, raw = _tvh_api_get_json("epggrab/channel/grid", query={"start": 0, "limit": 9000}, timeout_s=12)
+    if not ok or not isinstance(data, dict):
+        log_utils.write_log(
+            f"[pvr][epgsrc] epggrab/channel/grid FAIL (HTTP {code}): {(raw or '')[:200]}",
+            level="WARNING",
+        )
+        return False, 0, 0, 0
+
+    epg_entries = data.get("entries") or []
+    if not isinstance(epg_entries, list):
+        epg_entries = []
+
+    epg_by_norm: dict[str, list[dict]] = {}
+    for e in epg_entries:
+        if not isinstance(e, dict):
+            continue
+        candidates = set()
+
+        for k in ("name", "id", "channelname", "displayname"):
+            v = e.get(k)
+            if v:
+                nn = _norm_epg_name(str(v))
+                if nn:
+                    candidates.add(nn)
+
+        names = e.get("names")
+        if isinstance(names, list):
+            for a in names:
+                if a:
+                    nn = _norm_epg_name(str(a))
+                    if nn:
+                        candidates.add(nn)
+
+        for nn in candidates:
+            epg_by_norm.setdefault(nn, []).append(e)
+
+    # 2) Channels
+    okc, channels, code2, raw2 = _tvh_channel_grid_fetch(limit=12000)
+    if not okc:
+        log_utils.write_log(
+            f"[pvr][epgsrc] channel/grid FAIL (HTTP {code2}): {(raw2 or '')[:200]}",
+            level="WARNING",
+        )
+        return False, 0, 0, 0
+
+    # Missing = epggrab vacío (None / "" / [])
+    missing = []
+    for ch in channels:
+        if not isinstance(ch, dict):
+            continue
+        eg = ch.get("epggrab")
+        if not eg:
+            missing.append(ch)
+
+    if not missing:
+        log_utils.write_log("[pvr][epgsrc] OK: no hay canales sin EPG Source.", level="INFO")
+        return True, 0, 0, 0
+
+    fixed = 0
+    not_found = 0
+    ambiguous = 0
+    save_fail = 0
+    skipped_adult = 0
+    skipped_no_uuid_or_name = 0
+
+    for ch in missing:
+        if fixed >= int(max_changes):
+            log_utils.write_log(f"[pvr][epgsrc] STOP: alcanzado max_changes={max_changes}", level="WARNING")
+            break
+
+        ch_name = (ch.get("name") or "").strip()
+        ch_uuid = (ch.get("uuid") or ch.get("key") or ch.get("id") or "").strip()
+        if not ch_uuid or not ch_name:
+            skipped_no_uuid_or_name += 1
+            continue
+
+        if skip_adult and ch_name.startswith("|ADULTOS|"):
+            skipped_adult += 1
+            continue
+
+        want = OVERRIDE.get(ch_name)
+        key = _norm_epg_name(want if want else ch_name)
+
+        hits = epg_by_norm.get(key, [])
+        if len(hits) == 0:
+            not_found += 1
+            continue
+
+        if len(hits) > 1:
+            picked = _pick_best_epg_hit(ch_name, want if want else ch_name, hits)
+            if not picked:
+                ambiguous += 1
+                cand = [(h.get("name") or h.get("id") or "<?>") for h in hits[:4] if isinstance(h, dict)]
+                log_utils.write_log(
+                    f"[pvr][epgsrc] AMBIGUO: '{ch_name}' -> '{key}' hits={len(hits)} cand={cand}",
+                    level="INFO",
+                )
                 continue
-            path = os.path.join(tagdir, fn)
-            if not os.path.isfile(path):
-                continue
+            hits = [picked]
 
-            d = _tvh_load_json(path)
-            if not isinstance(d, dict):
-                continue
+        epg = hits[0]
+        epg_uuid = (epg.get("uuid") or epg.get("key") or epg.get("id") or "").strip()
+        if not epg_uuid:
+            ambiguous += 1
+            log_utils.write_log(f"[pvr][epgsrc] HIT sin uuid/id: '{ch_name}' -> '{key}'", level="WARNING")
+            continue
 
-            name = (d.get("name") or "").strip()
-            if not name:
-                continue
+        if dry_run:
+            fixed += 1
+            log_utils.write_log(f"[pvr][epgsrc] DRY_RUN OK: '{ch_name}' -> '{key}' ({epg_uuid})", level="INFO")
+            continue
 
-            internal = bool(d.get("internal"))
-            idx = d.get("index")
-            if isinstance(idx, int):
-                max_index = max(max_index, idx)
+        oks, c3, b3 = _tvh_channel_set_epggrab(ch_uuid, epg_uuid)
 
-            entries.append({
-                "file": path,
-                "norm": _tvh_tag_norm(name),
-                "internal": internal,
-            })
-    except Exception as e:
-        log_utils.write_log("[pvr][tags] error leyendo tagdir: {}".format(e), level="ERROR")
-        return False, 0, 0
+        if oks and 200 <= int(c3 or 0) < 300:
+            fixed += 1
+            log_utils.write_log(f"[pvr][epgsrc] OK: '{ch_name}' -> '{key}'", level="INFO")
+        else:
+            save_fail += 1
+            log_utils.write_log(
+                f"[pvr][epgsrc] SAVE FAIL (HTTP {c3}): ch='{ch_name}' key='{key}' body='{(b3 or '')[:160]}'",
+                level="WARNING",
+            )
 
-    # Crear los que falten (nombre EXACTO del M3U)
-    existing_norm = set(e["norm"] for e in entries if not e["internal"])
-    to_create = [g for g in sorted(desired_raw) if _tvh_tag_norm(g) not in existing_norm]
+    # Resumen compacto (sin inflar logs)
+    log_utils.write_log(
+        "[pvr][epgsrc] Fin autofix: fixed={} not_found={} ambiguous={} save_fail={} skipped_adult={} skipped_invalid={}".format(
+            fixed, not_found, ambiguous, save_fail, skipped_adult, skipped_no_uuid_or_name
+        ),
+        level="INFO",
+    )
+    return True, fixed, not_found, ambiguous
 
-    # Borrar los que sobran (solo no-internal)
-    to_delete = [e for e in entries if (not e["internal"]) and (e["norm"] not in desired_norm)]
 
-    created = 0
-    deleted = 0
-
-    # Borrado
-    for e in to_delete:
-        try:
-            os.remove(e["file"])
-            deleted += 1
-        except Exception:
-            pass
-
-    # Creación
-    next_index = max_index + 1  # continuar índices existentes
-    for g in to_create:
-        try:
-            tag_id = uuid.uuid4().hex
-            path = os.path.join(tagdir, tag_id)
-            data = {
-                "enabled": True,
-                "index": int(next_index),
-                "name": g,  # EXACTO (como en el M3U)
-                "internal": False,
-                "private": False,
-                "icon": "",
-                "titled_icon": False,
-                "comment": "",
-            }
-            if _tvh_save_json_atomic(path, data):
-                created += 1
-                next_index += 1
-        except Exception:
-            pass
-
-    log_utils.write_log("[pvr][tags] sync OK: created={} deleted={} (groups={})".format(created, deleted, len(desired_raw)), level="INFO")
-    return True, created, deleted
+# ------------------------------
+# Playlist updater principal
+# ------------------------------
 def update_playlist() -> tuple[bool, bool]:
     """
     Devuelve: (ok, did_something)
@@ -1313,22 +1895,16 @@ def update_playlist() -> tuple[bool, bool]:
                 ni = utils.get_net_info() or {}
                 eth0 = (ni.get("eth0") or "").strip().replace(":", "").lower() or eth0
             except Exception as e:
-                log_utils.write_log("Excepción ignorada en update_pvr: {}".format(e), "DEBUG")
+                log_utils.write_log(f"Excepción ignorada en update_pvr: {e}", "DEBUG")
 
             remote = "masqelec"
-            remote_path = "masqelec/user/{}".format(eth0)
+            remote_path = f"masqelec/user/{eth0}"
             tmp_dir = "/tmp"
             tmp_file = os.path.join(tmp_dir, eth0)
 
-            ok = False
-            try:
-                ok = rclone_utils.copy_remote_to_tmp_then_move(remote, remote_path, tmp_dir)
-            except Exception as e:
-                log_utils.write_log("[update_playlist] rclone copy failed: {}\n{}".format(e, traceback.format_exc()), level="ERROR")
-                return False
-
+            ok = rclone_utils.copy_remote_to_tmp_then_move(remote, remote_path, tmp_dir)
             if not ok or not os.path.exists(tmp_file):
-                log_utils.write_log("[update_playlist] user remoto no encontrado: {}:{}".format(remote, remote_path), level="INFO")
+                log_utils.write_log(f"[update_playlist] user remoto no encontrado: {remote}:{remote_path}", level="INFO")
                 return False
 
             txt = _read_text(tmp_file)
@@ -1353,11 +1929,11 @@ def update_playlist() -> tuple[bool, bool]:
             except Exception:
                 pass
 
-            log_utils.write_log("[update_playlist] user recuperado del remoto ({})".format(eth0))
+            log_utils.write_log(f"[update_playlist] user recuperado del remoto ({eth0})")
             return True
 
         except Exception as e:
-            log_utils.write_log("[update_playlist] Error recuperando user remoto: {}\n{}".format(e, traceback.format_exc()), level="ERROR")
+            log_utils.write_log(f"[update_playlist] Error recuperando user remoto: {e}\n{traceback.format_exc()}", level="ERROR")
             return False
 
     try:
@@ -1369,7 +1945,7 @@ def update_playlist() -> tuple[bool, bool]:
                 _log_pvr_db_stats(prefix="[pvr]")
                 return False, False
 
-        # plantilla en memoria
+        # descargar plantilla playlist (con soporte gzip/deflate)
         remote_tpl = None
         last_bytes = 0
         last_firstline = ""
@@ -1380,10 +1956,12 @@ def update_playlist() -> tuple[bool, bool]:
                     data = r.read()
                 last_bytes = len(data or b"")
 
+                enc = ""
                 try:
                     enc = (getattr(r, "headers", None).get("Content-Encoding") or "").lower()
                 except Exception:
                     enc = ""
+
                 try:
                     if ("gzip" in enc) or (data[:3] == b"\x1f\x8b\x08"):
                         data = gzip.decompress(data)
@@ -1393,8 +1971,7 @@ def update_playlist() -> tuple[bool, bool]:
                     pass
 
                 txt = (data or b"").decode("utf-8", "replace")
-            except Exception as e:
-                log_utils.write_log("[update_playlist] Descarga plantilla falló para {}: {}".format(url, e), level="DEBUG")
+            except Exception:
                 continue
 
             candidate_norm = _norm_newlines(txt)
@@ -1404,7 +1981,7 @@ def update_playlist() -> tuple[bool, bool]:
                 last_firstline = ""
 
             low = (candidate_norm.lstrip()[:160] or "").lower()
-            if last_bytes < 64 or low.startswith("<!doctype html") or low.startswith("<html") or "rate limit" in low or "access denied" in low:
+            if last_bytes < 64 or low.startswith("<!doctype html") or low.startswith("<html"):
                 continue
 
             if "USER_CODE" in candidate_norm and "PASS_CODE" in candidate_norm:
@@ -1413,15 +1990,12 @@ def update_playlist() -> tuple[bool, bool]:
 
         if not remote_tpl:
             log_utils.write_log(
-                "Plantilla playlist remota inválida. URLs probadas={}; última bytes={}; primera='{}'".format(
-                    len(BASE_URLS), last_bytes, last_firstline
-                ),
+                f"Plantilla playlist remota inválida. URLs probadas={len(BASE_URLS)}; última bytes={last_bytes}; primera='{last_firstline}'",
                 level="ERROR",
             )
             _log_pvr_db_stats(prefix="[pvr]")
             return False, False
 
-        # creds
         content = _read_text(user_file)
         if not _has_valid_creds(content):
             log_utils.write_log("USER_CODE o PASS_CODE inválidos en /storage/.user/user", level="ERROR")
@@ -1429,8 +2003,7 @@ def update_playlist() -> tuple[bool, bool]:
             return False, False
 
         user_code, pass_code = _extract_creds(content)
-        tpl = _norm_newlines(remote_tpl)
-        new_playlist = tpl.replace("USER_CODE", user_code).replace("PASS_CODE", pass_code)
+        new_playlist = _norm_newlines(remote_tpl).replace("USER_CODE", user_code).replace("PASS_CODE", pass_code)
         new_hash = _sha256_text(new_playlist)
 
         local_hash = None
@@ -1442,11 +2015,9 @@ def update_playlist() -> tuple[bool, bool]:
 
         playlist_changed = (local_hash is None) or (local_hash != new_hash)
 
-        # DB mismatch aunque hash igual
         tvdb = _pick_tv_db_path()
         db_mismatch = False
         plan = (False, 0, 0, 0)
-
         if tvdb and os.path.exists(playlist_file):
             plan = _plan_reconcile(tvdb, playlist_file, update_icons=False)
             if plan[0]:
@@ -1454,40 +2025,60 @@ def update_playlist() -> tuple[bool, bool]:
                 db_mismatch = (del_ch > 0) or (upd_ic > 0) or (del_gr > 0)
 
         needs_soft_reset = bool(playlist_changed or db_mismatch)
-
         if not needs_soft_reset:
             log_utils.write_log("[pvr] Sin cambios y DB consistente con playlist.", level="INFO")
             _log_pvr_db_stats(prefix="[pvr]")
             return True, False
 
-        # --- SOFT RESET ---
-        if playlist_changed:
-            _popup("PVR", "Actualizando lista IPTV…", ms=3500)
-            log_utils.write_log("[pvr] Playlist CAMBIA.", level="INFO")
-        else:
-            _popup("PVR", "Sincronizando PVR…", ms=3500)
-            log_utils.write_log("[pvr] Playlist igual, pero DB NO coincide (soft reset). plan={}".format(plan), level="INFO")
+        _popup("PVR", "Actualizando PVR…", ms=3000)
+        log_utils.write_log(
+            "[pvr] Playlist CAMBIA." if playlist_changed else f"[pvr] Playlist igual, pero DB NO coincide (soft reset). plan={plan}",
+            level="INFO",
+        )
 
-            # FIX: si la DB tiene canales que NO están en la playlist, Kodi los borra
-            # pero Tvheadend puede re-publicarlos si el canal aún existe allí.
-            # Intento borrar esos huérfanos en TVH antes del soft reset, para cortar el bucle.
-            try:
-                if isinstance(plan, tuple) and len(plan) >= 2 and int(plan[1]) > 0 and _LAST_DB_MISMATCH_EXAMPLES:
-                    _tvh_reset_target_bouquet()
-            except Exception:
-                pass
-
-
-        # 1) disable pvr.hts + wait real
+        # 1) disable pvr.hts
         _addon_set_enabled(PVR_ADDON_ID, False)
         _wait_addon_enabled(PVR_ADDON_ID, want_enabled=False, timeout_s=12)
-        time.sleep(1.5)
+        time.sleep(2.0)
 
-        # 2) stop tvheadend + wait real
+        # 2) asegurar TVH ready
+        if not _is_service_active(TVH_SERVICE):
+            _start_tvheadend()
+        tvh_ready = _wait_tvheadend_ready(timeout_s=70)
+
+        # 2.5) prune TVH channels fuera de playlist (por bouquet)
+        if tvh_ready and os.path.exists(playlist_file):
+            try:
+                bq_uuid = _tvh_find_target_bouquet_uuid()
+                tvh_delete_channels_not_in_playlist_or_bad(
+                    playlist_m3u_path=playlist_file,
+                    bouquet_uuid=bq_uuid,
+                    dry_run=False,
+                    batch=60,
+                    max_rounds=4,
+            )
+
+            except Exception as e:
+                log_utils.write_log(f"[pvr][tvh_prune_ch] EXCEPTION: {e}", level="WARNING")
+
+        # 2.6) LIMPIEZA FINAL: eliminar basura {name-not-set}
+        try:
+            tvh_delete_name_not_set_channels(
+                bouquet_uuid=bq_uuid,
+                dry_run=False,
+                batch=40,
+            )
+        except Exception as e:
+            log_utils.write_log(
+                "[pvr][tvh_cleanup] EXCEPTION limpiando {name-not-set}: {}".format(e),
+                level="WARNING",
+            )
+
+        # 3) stop tvh
         _stop_tvheadend()
         time.sleep(1.0)
 
-        # 3) write playlist (solo si cambió)
+        # 4) instalar playlist si cambia
         if playlist_changed:
             tmp = playlist_file + ".part"
             with open(tmp, "w", encoding="utf-8") as f:
@@ -1497,190 +2088,159 @@ def update_playlist() -> tuple[bool, bool]:
             os.replace(tmp, playlist_file)
             log_utils.write_log("[pvr] Playlist instalada/actualizada.", level="INFO")
 
-        # 4) reconcile DB
+        # 5) reconcile DB con TVH parado
         tvdb = _pick_tv_db_path()
         if tvdb:
-            reconcile_kodi_channels_and_groups_with_playlist(
-                tv_db_path=tvdb,
-                playlist_m3u_path=playlist_file,
-                update_icons=False,
-            )
+            reconcile_kodi_channels_and_groups_with_playlist(tv_db_path=tvdb, playlist_m3u_path=playlist_file, update_icons=False)
         else:
             log_utils.write_log("[pvr] No se encontró TVxx.db para reconciliar.", level="WARNING")
 
-        
-        # 4.5) Sync tags de Tvheadend (solo en soft reset / con tvheadend parado)
+        # 6) tags TVH (ficheros) con TVH parado
         try:
             ok_tags, n_created, n_deleted = sync_tvh_channel_tags_from_playlist(playlist_file)
             if ok_tags:
-                log_utils.write_log("[pvr][tags] sincronizados: +{} -{}".format(n_created, n_deleted), level="INFO")
-            else:
-                log_utils.write_log("[pvr][tags] sync NO aplicada.", level="WARNING")
+                log_utils.write_log(f"[pvr][tags] sincronizados: +{n_created} -{n_deleted}", level="INFO")
         except Exception as e:
-            log_utils.write_log("[pvr][tags] sync error: {}".format(e), level="WARNING")
+            log_utils.write_log(f"[pvr][tags] sync error: {e}", level="WARNING")
 
-# 5) start tvheadend + wait ports
+        # 7) start tvh + wait
         _start_tvheadend()
         if not _wait_tvheadend_ready(timeout_s=70):
             log_utils.write_log("[pvr] Tvheadend no listo; NO habilito pvr.hts (evito 0%).", level="WARNING")
             _log_pvr_db_stats(prefix="[pvr]")
             return True, True
-        # 5.5) Forzar recarga EPG en Tvheadend (antes de que Kodi reconecte al backend)
-        force_tvh_epg_reload(internal=True, ota=False)
+        
+        # 7.1) TVH a veces regenera basura al arrancar -> limpieza 2ª pasada
+        try:
+            bq_uuid = _tvh_find_target_bouquet_uuid()
+            tvh_delete_name_not_set_channels(
+                bouquet_uuid=bq_uuid,
+                dry_run=False,
+                batch=40,
+            )
+        except Exception as e:
+            log_utils.write_log("[pvr][tvh_cleanup] EXCEPTION post-start: {}".format(e), level="WARNING")
+
+        # 7.2) Reasignar EPG Source a canales que lo pierdan al reiniciar TVH
+        try:
+            tvh_autofix_missing_epg_sources(dry_run=False)
+        except Exception as e:
+            log_utils.write_log(f"[pvr][epgsrc] EXCEPTION autofix: {e}", level="WARNING")
+
+        force_tvh_epg_reload(internal=True)
         time.sleep(1.0)
 
-        # 6) enable pvr.hts (primera activación)
+        # 8) enable pvr.hts + wait ready
         _addon_set_enabled(PVR_ADDON_ID, True)
-
-        # Espera READY robusta (sin channelgroupid)
         pvr_ok = _wait_pvr_ready(timeout_s=120, poll_s=1.5, grace_s=20)
 
         if not pvr_ok:
-            try:
-                _log_pvr_db_stats(prefix="[pvr]")
-            except Exception:
-                pass
-
             log_utils.write_log("[pvr] PVR no quedó READY tras enable. Aplico toggle rescate.", level="WARNING")
             _toggle_pvr_addon_rescue(PVR_ADDON_ID)
 
             if not _wait_pvr_ready(timeout_s=70, poll_s=1.5, grace_s=15):
-                log_utils.write_log("[pvr] PVR sigue sin READY tras rescate 1. Aplico rescate fuerte (tvh restart + enable).", level="WARNING")
-                _restart_tvheadend()
+                log_utils.write_log("[pvr] PVR sigue sin READY tras rescate. Intento restart tvheadend + toggle.", level="WARNING")
+                _run(["systemctl", "restart", TVH_SERVICE], timeout=25)
                 if _wait_tvheadend_ready(timeout_s=70):
-                    _addon_set_enabled(PVR_ADDON_ID, False)
-                    time.sleep(2.0)
-                    _addon_set_enabled(PVR_ADDON_ID, True)
+                    _toggle_pvr_addon_rescue(PVR_ADDON_ID)
                     _wait_pvr_ready(timeout_s=90, poll_s=1.5, grace_s=20)
 
-        # 7) Toggle rescate adicional (si aún no está ready)
         if not _wait_pvr_ready(timeout_s=25, poll_s=1.5, grace_s=8):
-            log_utils.write_log("[pvr] PVR no ready tras enable/rescates. Aplico rescate adicional (toggle)…", level="WARNING")
-
-            _addon_set_enabled(PVR_ADDON_ID, False)
-            _wait_addon_enabled(PVR_ADDON_ID, want_enabled=False, timeout_s=12)
-            time.sleep(2.0)
-
-            _addon_set_enabled(PVR_ADDON_ID, True)
-            _wait_addon_enabled(PVR_ADDON_ID, want_enabled=True, timeout_s=12)
-            time.sleep(2.0)
-
-            if _wait_pvr_ready(timeout_s=45, poll_s=1.5, grace_s=10):
-                log_utils.write_log("[pvr] PVR recuperado tras toggle rescate.", level="WARNING")
-                _log_pvr_db_stats(prefix="[pvr]")
-                return True, True
-
-            # 8) Último recurso: reinicio Kodi (solo idle)
-            if ENABLE_KODI_RESTART_FALLBACK:
-                log_utils.write_log("[pvr] PVR sigue sin ready. Intento reinicio Kodi (idle).", level="ERROR")
+            log_utils.write_log("[pvr] PVR sigue sin ready. Último rescate: toggle + (opcional) reinicio Kodi idle.", level="ERROR")
+            _toggle_pvr_addon_rescue(PVR_ADDON_ID)
+            if not _wait_pvr_ready(timeout_s=45, poll_s=1.5, grace_s=10) and ENABLE_KODI_RESTART_FALLBACK:
                 _restart_kodi_if_idle(timeout_s=25)
 
         _log_pvr_db_stats(prefix="[pvr]")
+
         return True, True
 
     except Exception as e:
-        log_utils.write_log("Error en update_playlist: {}\n{}".format(e, traceback.format_exc()), level="ERROR")
+        log_utils.write_log(f"Error en update_playlist: {e}\n{traceback.format_exc()}", level="ERROR")
         _log_pvr_db_stats(prefix="[pvr]")
         return False, False
 
-def _ensure_tvh_service_active_final() -> bool:
-    """
-    Última comprobación: Tvheadend debe estar activo y con puertos OK.
-    NO entra en bucles: un intento.
-    """
-    try:
-        if _is_service_active(TVH_SERVICE) and _check_port_connection("localhost", TVH_HTTP_PORT) and _check_port_connection("localhost", TVH_HTSP_PORT):
-            log_utils.write_log("[pvr][final] Tvheadend OK (servicio+puertos).", level="INFO")
-            return True
 
-        log_utils.write_log("[pvr][final] Tvheadend NO OK; intento arrancar...", level="WARNING")
-        _start_tvheadend()
-        if _wait_tvheadend_ready(timeout_s=70):
-            return True
-
-        log_utils.write_log("[pvr][final] Tvheadend sigue NO listo tras intento.", level="ERROR")
-        return False
-    except Exception as e:
-        log_utils.write_log("[pvr][final] Error comprobando Tvheadend: {}".format(e), level="WARNING")
-        return False
-
-def _ensure_pvr_hts_enabled_final() -> bool:
-    """
-    Última comprobación: pvr.hts debe estar habilitado y PVR READY.
-    No hace nada si ya está bien. Un intento, sin bucles.
-    """
-    try:
-        en = _get_addon_enabled(PVR_ADDON_ID)
-        if en is True:
-            # Si está enabled, comprueba READY rápido para evitar “enabled pero muerto”
-            if _wait_pvr_ready(timeout_s=25, poll_s=1.5, grace_s=8):
-                log_utils.write_log("[pvr][final] {} enabled y PVR READY.".format(PVR_ADDON_ID), level="INFO")
-                return True
-            log_utils.write_log("[pvr][final] {} enabled pero PVR NO READY (no fuerzo bucle).".format(PVR_ADDON_ID), level="WARNING")
-            return False
-
-        if en is False:
-            log_utils.write_log("[pvr][final] {} estaba DESHABILITADO; habilitando...".format(PVR_ADDON_ID), level="WARNING")
-            _addon_set_enabled(PVR_ADDON_ID, True)
-            _wait_addon_enabled(PVR_ADDON_ID, want_enabled=True, timeout_s=12)
-            time.sleep(1.5)
-
-            if _wait_pvr_ready(timeout_s=60, poll_s=1.5, grace_s=15):
-                log_utils.write_log("[pvr][final] {} habilitado y PVR READY.".format(PVR_ADDON_ID), level="INFO")
-                return True
-
-            log_utils.write_log("[pvr][final] {} habilitado pero PVR no llegó a READY.".format(PVR_ADDON_ID), level="WARNING")
-            return False
-
-        # en is None (no pude leer estado)
-        log_utils.write_log("[pvr][final] No pude leer estado de {} (GetAddonDetails falló).".format(PVR_ADDON_ID), level="WARNING")
-        return False
-
-    except Exception as e:
-        log_utils.write_log("[pvr][final] Error comprobando {}: {}".format(PVR_ADDON_ID, e), level="WARNING")
-        return False
+# ------------------------------
+# Final checks (lo mínimo)
+# ------------------------------
+def tvh_auth_smoketest() -> bool:
+    ok, code, body = _tvh_api_get("serverinfo", timeout_s=8)
+    if ok and (200 <= code < 300):
+        log_utils.write_log(f"[pvr] TVH auth OK (serverinfo HTTP {code}).", level="INFO")
+        return True
+    log_utils.write_log(f"[pvr] TVH auth FAIL (serverinfo HTTP {code}): {(body or '')[:200]}", level="ERROR")
+    return False
 
 
 def ensure_pvr_stack_active_final() -> None:
-    """
-    Última acción del mantenimiento PVR:
-    - asegura TVH activo
-    - asegura pvr.hts enabled
-    """
-    tvh_ok = _ensure_tvh_service_active_final()
-    if not tvh_ok:
-        # Si TVH no está OK, NO tiene sentido tocar pvr.hts (Kodi puede marcarlo failed)
-        log_utils.write_log("[pvr][final] TVH no OK; no fuerzo {}.".format(PVR_ADDON_ID), level="WARNING")
-        return
+    try:
+        # TVH
+        if not (_is_service_active(TVH_SERVICE) and _check_port_connection("localhost", TVH_HTTP_PORT) and _check_port_connection("localhost", TVH_HTSP_PORT)):
+            log_utils.write_log("[pvr][final] Tvheadend NO OK; intento arrancar...", level="WARNING")
+            _start_tvheadend()
+            if not _wait_tvheadend_ready(timeout_s=70):
+                log_utils.write_log("[pvr][final] Tvheadend sigue NO listo.", level="ERROR")
+                return
+        else:
+            log_utils.write_log("[pvr][final] Tvheadend OK (servicio+puertos).", level="INFO")
 
-    _ensure_pvr_hts_enabled_final()
+        # pvr.hts
+        en = _get_addon_enabled(PVR_ADDON_ID)
+        if en is True:
+            if _wait_pvr_ready(timeout_s=25, poll_s=1.5, grace_s=8):
+                log_utils.write_log(f"[pvr][final] {PVR_ADDON_ID} enabled y PVR READY.", level="INFO")
+            else:
+                log_utils.write_log(f"[pvr][final] {PVR_ADDON_ID} enabled pero PVR NO READY.", level="WARNING")
+            return
 
-# ------------------------------
-# Punto de entrada general (mínimo)
-# ------------------------------
+        if en is False:
+            log_utils.write_log(f"[pvr][final] {PVR_ADDON_ID} estaba DESHABILITADO; habilitando...", level="WARNING")
+            _addon_set_enabled(PVR_ADDON_ID, True)
+            _wait_addon_enabled(PVR_ADDON_ID, want_enabled=True, timeout_s=12)
+            time.sleep(1.5)
+            if _wait_pvr_ready(timeout_s=60, poll_s=1.5, grace_s=15):
+                log_utils.write_log(f"[pvr][final] {PVR_ADDON_ID} habilitado y PVR READY.", level="INFO")
+            else:
+                log_utils.write_log(f"[pvr][final] {PVR_ADDON_ID} habilitado pero PVR no llegó a READY.", level="WARNING")
+            return
+
+        log_utils.write_log(f"[pvr][final] No pude leer estado de {PVR_ADDON_ID}.", level="WARNING")
+    except Exception as e:
+        log_utils.write_log(f"[pvr][final] Error en ensure_pvr_stack_active_final: {e}", level="WARNING")
+
+
 def update_pvr():
     start_ts = time.time()
 
     try:
+        tvh_auth_smoketest()
+    except Exception:
+        pass
+
+    try:
         update_tv_grab_file()
     except Exception as e:
-        log_utils.write_log("[pvr] update_tv_grab_file error: {}".format(e), level="WARNING")
+        log_utils.write_log(f"[pvr] update_tv_grab_file error: {e}", level="WARNING")
 
     try:
         ensure_tvh_http_user_agent()
     except Exception as e:
-        log_utils.write_log("[pvr] ensure_tvh_http_user_agent error: {}".format(e), level="WARNING")
+        log_utils.write_log(f"[pvr] ensure_tvh_http_user_agent error: {e}", level="WARNING")
 
-    # --- ÚLTIMO: asegurar stack PVR activo (TVH + pvr.hts) ---
+    if _is_service_active(TVH_SERVICE) and _check_port_connection("localhost", TVH_HTTP_PORT):
+        tvh_autofix_missing_epg_sources(dry_run=False)
+        force_tvh_epg_reload(internal=True)   # para que haga matching y rellene EPG cuanto antes
+
+
     try:
         ensure_pvr_stack_active_final()
     except Exception as e:
-        log_utils.write_log("[pvr] ensure_pvr_stack_active_final error: {}".format(e), level="WARNING")
+        log_utils.write_log(f"[pvr] ensure_pvr_stack_active_final error: {e}", level="WARNING")
 
     try:
         dt = time.time() - start_ts
-        log_utils.write_log("[pvr] update_pvr terminado en {:.1f}s".format(dt), level="INFO")
+        log_utils.write_log(f"[pvr] update_pvr terminado en {dt:.1f}s", level="INFO")
     except Exception:
         pass
-
 

@@ -31,6 +31,7 @@ from lib.updater import update_system
 from lib.update_library import update_library
 from lib.update_pvr import update_pvr, update_playlist
 from lib.jsonrpc_utils import get_library_stats, get_installed_addons_filtered, format_addons_for_log
+from lib.fix_settings import fix_skin_home_menu_visibility_and_reload
 from lib import utils
 from lib import core_catalog
 
@@ -466,6 +467,12 @@ def _phase1_cloud_storage_blocking(monitor: xbmc.Monitor):
         raise SystemExit
 
 # ---------- WRAPPERS ONE-SHOT (FASE 2) ----------
+def _fix_settings_wrapper():
+    try:
+        fix_skin_home_menu_visibility_and_reload(log_summary=True)
+    except Exception:
+        log(f"Fallo en fix_settings:\n{traceback.format_exc()}", "WARNING")
+
 def _update_system_wrapper():
     try:
         enabled = _get_bool_setting("auto_update", True)
@@ -883,6 +890,7 @@ def run_service():
     _phase1_cloud_storage_blocking(monitor)
 
     oneshot_sequence = [
+        ("fix_settings_once",   _fix_settings_wrapper),
         ("auto_update_once",    _update_system_wrapper),
         ("library_update_once", _update_library_wrapper),
         ("pvr_update_once",     _update_pvr_wrapper),
