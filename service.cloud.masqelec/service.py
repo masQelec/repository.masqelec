@@ -426,7 +426,7 @@ def _upload_log(n: str, nwid: str, id_device: str, eth0: str, wlan0: str):
         if os.path.exists(LOG_FILE):
             with open(LOG_FILE, 'r', encoding='utf-8', errors='replace') as f:
                 for line in f:
-                    if '[ERROR]' in line or '[WARNING]' in line:
+                    if '[ERROR]' in line: #or '[WARNING]' in line:
                         error_or_warning_found = True
                         break
 
