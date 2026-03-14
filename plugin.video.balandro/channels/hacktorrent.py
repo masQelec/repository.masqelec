@@ -431,7 +431,6 @@ def play(item):
            itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
     else:
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

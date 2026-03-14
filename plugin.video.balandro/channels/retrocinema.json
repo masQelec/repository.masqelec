@@ -1,0 +1,17 @@
+{
+  "id": "retrocinema",
+  "name": "RetroCinema",
+  "thumbnail": "retrocinema.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["cast", "vo"],
+
+  "clusters": ["classic"],
+
+  "notes": "Películas clásicas por géneros."
+}

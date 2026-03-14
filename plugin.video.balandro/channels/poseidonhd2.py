@@ -514,7 +514,7 @@ def findvideos(item):
 
         url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', url = url, language = lang, quality = qlty, ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', url = url, language = lang, quality = qlty ))
 
     if not itemlist:
         if not ses == 0:
@@ -638,7 +638,6 @@ def play(item):
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

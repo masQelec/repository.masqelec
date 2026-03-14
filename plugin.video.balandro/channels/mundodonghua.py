@@ -374,9 +374,6 @@ def findvideos(item):
                 if '/api_donghua.php?' in url: continue
 
                 servidor = servertools.get_server_from_url(url)
-                servidor = servertools.corregir_servidor(servidor)
-
-                url = servertools.normalize_url(servidor, url)
 
                 other = ''
                 if servidor == 'various': other = servertools.corregir_other(url)
@@ -418,9 +415,6 @@ def findvideos(item):
                     if 'api_donghua.php?slug=' in url: ref = item.url
 
                     servidor = servertools.get_server_from_url(url)
-                    servidor = servertools.corregir_servidor(servidor)
-
-                    url = servertools.normalize_url(servidor, url)
 
                     other = ''
                     if servidor == 'various': other = servertools.corregir_other(url)
@@ -437,9 +431,6 @@ def findvideos(item):
                 if not url.startswith('http'): url = 'https:' + url
 
                 servidor = servertools.get_server_from_url(url)
-                servidor = servertools.corregir_servidor(servidor)
-
-                url = servertools.normalize_url(servidor, url)
 
                 other = ''
                 if servidor == 'various': other = servertools.corregir_other(url)
@@ -477,7 +468,6 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

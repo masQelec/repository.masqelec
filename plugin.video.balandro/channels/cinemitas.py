@@ -188,6 +188,22 @@ def generos(item):
     matches = scrapertools.find_multiple_matches(bloque,'<a href="(.*?)">(.*?)</a>')
 
     for url, title in matches:
+        if title == 'Aquipelis': continue
+        elif title == 'Cinecalidad': continue
+        elif title == 'Cinemitas.net': continue
+        elif title == 'Cuevana3.vip': continue
+        elif title == 'NewPelis org': continue
+        elif title == 'Paraveronline': continue
+        elif title == 'Peliculasflix': continue
+        elif title == 'Pelisflix': continue
+        elif title == 'Pelishouse': continue
+        elif title == 'Pelismart': continue
+        elif title == 'Pelisplay': continue
+        elif title == 'Pelispop': continue
+        elif title == 'RepelisHD.TV': continue
+        elif title == 'UltraPelisHD': continue
+        elif title == 'Verpeliculasultra': continue
+
         if item.search_type == 'movie':
             if 'Peliculas ' in title: continue
             elif 'Series ' in title: continue
@@ -225,8 +241,8 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    if '>Añadido recientemente<' in data: bloque = scrapertools.find_single_match(data,'>Añadido recientemente<(.*?)<div class="copy">')
-    elif '</h1>' in data: bloque = scrapertools.find_single_match(data,'</h1>(.*?)<div class="copy">')
+    if '</h1>' in data: bloque = scrapertools.find_single_match(data,'</h1>(.*?)<div class="copy">')
+    elif '>Añadido recientemente<' in data: bloque = scrapertools.find_single_match(data,'>Añadido recientemente<(.*?)<div class="copy">')
     else: bloque = data
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
@@ -507,6 +523,9 @@ def findvideos(item):
                 elif '/viewsb.' in url: continue
                 elif '/www.fembed.' in url: continue
 
+                elif '/auvexiug.' in url: continue
+                elif '/audinifer.' in url: continue
+
                 url = url.replace('E', 'e').replace('F', 'f').replace('D', 'd')
 
                 url = url.replace('/player.cuevana.ac/f/', '/waaw.to/watch_video.php?v=').replace('/player.cuevana3.one/f/', '/waaw.to/watch_video.php?v=')
@@ -514,20 +533,24 @@ def findvideos(item):
                 if url.startswith('https://cvid.lat/'): url = url.replace('/cvid.lat/', '/waaw.to/')
 
                 servidor = servertools.get_server_from_url(url)
-                servidor = servertools.corregir_servidor(servidor)
-
-                url = servertools.normalize_url(servidor, url)
 
                 other = ''
                 if servidor == 'various': other = servertools.corregir_other(url)
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                                      language = lang, other = other ))
 
             continue
 
         embed = embed.replace('\\/', '/')
 
         if not embed: continue
+
+        elif '/viewsb.' in embed: continue
+        elif '/www.fembed.' in embed: continue
+
+        elif '/auvexiug.' in embed: continue
+        elif '/audinifer.' in embed: continue
 
         embed = embed.replace('E', 'e').replace('F', 'f').replace('D', 'd')
 
@@ -536,17 +559,12 @@ def findvideos(item):
         if embed.startswith('https://cvid.lat/'): embed = embed.replace('/cvid.lat/', '/waaw.to/')
 
         servidor = servertools.get_server_from_url(embed)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, embed)
-
-        if '/viewsb.' in url: continue
-        elif '/www.fembed.' in url: continue
 
         other = ''
-        if servidor == 'various': other = servertools.corregir_other(url)
+        if servidor == 'various': other = servertools.corregir_other(embed)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = embed,
+                              language = lang, other = other ))
 
     # ~ Descargas tiene acortadores
 
@@ -562,16 +580,17 @@ def play(item):
     logger.info()
     itemlist = []
 
-    url = item.url
+    servidor = item.server
 
-    servidor = servertools.get_server_from_url(url)
-    servidor = servertools.corregir_servidor(servidor)
+    url = item.url
 
     if servidor == 'directo':
         new_server = servertools.corregir_other(url).lower()
         if new_server.startswith("http"):
             if not config.get_setting('developer_mode', default=False): return itemlist
         servidor = new_server
+
+    url = servertools.normalize_url(servidor, url)
 
     itemlist.append(item.clone( url=url, server=servidor))
 

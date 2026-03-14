@@ -164,12 +164,21 @@ def findvideos(item):
 
         elif '.player4me.' in url: continue
         elif '.embedseek.' in url: continue
+        elif '.rpmplay.' in url: continue
+        elif '.seekplayer.' in url: continue
+        elif '.streamkithmc.' in url: continue
+        elif '.streamkitagg.' in url: continue
+        elif '.cloudwarebrh.' in url: continue
+        elif '.upns.' in url: continue
+        elif '.video-twimg.' in url: continue
 
         elif '/nitroflare.' in url: continue
         elif 'rapidgator.' in url: continue
 
+        elif '/pooptv.' in url: continue
+        elif '=pooptv.me' in url: continue
+
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

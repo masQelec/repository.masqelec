@@ -102,6 +102,14 @@ def get_video_url(page_url, url_referer=''):
     elif 'streamdav' in page_url: txt_server = 'Streamdav'
     elif 'streamcool' in page_url: txt_server = 'Streamcool'
     elif 'streamgzzz' in page_url: txt_server = 'Streamgzzz'
+
+    elif 'streamix' in page_url or 'stmix' in page_url:
+          txt_server = 'Streamix'
+
+          page_url = page_url.replace('/stmix.io/', '/streamix.so/')
+
+          ini_page_url = page_url
+
     elif 'streamoupload' in page_url: txt_server = 'Streamoupload'
 
     elif 'streamup' in page_url or 'strmup' in page_url:

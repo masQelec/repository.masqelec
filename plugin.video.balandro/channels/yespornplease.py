@@ -222,7 +222,6 @@ def findvideos(item):
                 return itemlist
 
         servidor = servertools.get_server_from_url(link)
-        servidor = servertools.corregir_servidor(servidor)
 
         link = servertools.normalize_url(servidor, link)
 

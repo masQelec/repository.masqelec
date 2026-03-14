@@ -1,48 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] < 3: PY3 = False
-else: PY3 = True
-
-
 import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
-
-
-LINUX = False
-BR = False
-BR2 = False
-
-if PY3:
-    try:
-       import xbmc
-       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
-    except: pass
-
-try:
-   if LINUX:
-       try:
-          from lib import balandroresolver2 as balandroresolver
-          BR2 = True
-       except: pass
-   else:
-       if PY3:
-           from lib import balandroresolver
-           BR = true
-       else:
-          try:
-             from lib import balandroresolver2 as balandroresolver
-             BR2 = True
-          except: pass
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-      BR2 = True
-   except: pass
 
 
 host = 'https://detodopeliculas.net/'
@@ -109,23 +71,6 @@ def do_downloadpage(url, post=None, headers=None):
                     data = httptools.downloadpage_proxy('dpeliculas', url, post=post, headers=headers, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-
-                if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('dpeliculas', url, post=post, headers=headers, timeout=timeout).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-            except:
-                pass
 
     if '<title>Just a moment...</title>' in data:
         if not '/?s=' in url:
@@ -305,12 +250,11 @@ def findvideos(item):
                         if new_url: embed = new_url
 
                     servidor = servertools.get_server_from_url(embed)
-                    servidor = servertools.corregir_servidor(servidor)
-
-                    embed = servertools.normalize_url(servidor, embed)
 
                     other = ''
                     if servidor == 'various': other = servertools.corregir_other(embed)
+                    elif servidor == 'zures': other = servertools.corregir_zures(embed)
+
                     elif servidor == 'directo':
                           if '/player/?id=' in embed:
                               servidor = ''
@@ -362,12 +306,10 @@ def findvideos(item):
                         if '/multiup.' in url or '/gdtvid.' in url or '/filepv.' in url or '/filemirage.' in url: continue
 
                         servidor = servertools.get_server_from_url(url)
-                        servidor = servertools.corregir_servidor(servidor)
-
-                        url = servertools.normalize_url(servidor, url)
 
                         other = ''
                         if servidor == 'various': other = servertools.corregir_other(url)
+                        elif servidor == 'zures': other = servertools.corregir_zures(url)
 
                         itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
                                              language = 'Esp', other = other ))
@@ -409,12 +351,10 @@ def findvideos(item):
                         if '/multiup.' in url or '/gdtvid.' in url or '/filepv.' in url or '/filemirage.' in url: continue
 
                         servidor = servertools.get_server_from_url(url)
-                        servidor = servertools.corregir_servidor(servidor)
-
-                        url = servertools.normalize_url(servidor, url)
 
                         other = ''
                         if servidor == 'various': other = servertools.corregir_other(url)
+                        elif servidor == 'zures': other = servertools.corregir_zures(url)
 
                         itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
                                             language = 'Lat', other = other ))
@@ -456,12 +396,10 @@ def findvideos(item):
                         if '/multiup.' in url or '/gdtvid.' in url or '/filepv.' in url or '/filemirage.' in url: continue
 
                         servidor = servertools.get_server_from_url(url)
-                        servidor = servertools.corregir_servidor(servidor)
-
-                        url = servertools.normalize_url(servidor, url)
 
                         other = ''
                         if servidor == 'various': other = servertools.corregir_other(url)
+                        elif servidor == 'zures': other = servertools.corregir_zures(url)
 
                         itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
                                              language = 'Vose', other = other ))
@@ -490,13 +428,14 @@ def play(item):
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
             if new_server.startswith("http"):
                 if not config.get_setting('developer_mode', default=False): return itemlist
             servidor = new_server
+
+        url = servertools.normalize_url(servidor, url)
 
         itemlist.append(item.clone(url = url, server = servidor))
 

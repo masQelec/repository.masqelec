@@ -3,7 +3,8 @@
 import os, sys, xbmc, xbmcgui, xbmcaddon
 
 from platformcode import logger, config, platformtools, updater
-from core import filetools, scrapertools
+from core import jsontools, filetools, scrapertools
+
 from core.item import Item
 
 from modules import filters
@@ -1368,19 +1369,20 @@ def test_providers(item):
         opciones_provider.append('z-free-proxy-list.com')
         opciones_provider.append('z-free-proxy-list.uk')
         opciones_provider.append('z-github')
+        opciones_provider.append('z-hidemium')
         opciones_provider.append('z-opsxcq')
         opciones_provider.append('z-proxy-daily')
         opciones_provider.append('z-proxy-list.org')
         opciones_provider.append('z-proxyhub')
         opciones_provider.append('z-proxyranker')
-        opciones_provider.append('z-xroxy')
         opciones_provider.append('z-socks')
         opciones_provider.append('z-squidproxyserver')
+        opciones_provider.append('z-xroxy')
 
     if not proxies_list: opciones_provider.remove(private_list)
 
     preselect = 0
-    opciones_provider = sorted(opciones_provider, key=lambda x: x[0])
+    opciones_provider = sorted(opciones_provider, key=lambda x: x)
     ret = platformtools.dialog_select('Proveedores de proxies', opciones_provider, preselect=preselect)
     if ret == -1: return
 
@@ -1498,12 +1500,13 @@ def test_tplus(item):
             'Vakhov http',
             'Vakhov https',
             'Vakhov socks4',
-            'Vakhov socks5'
+            'Vakhov socks5',
+            'Hidemium'
             ]
 
     preselect = tplus_actual
 
-    opciones_tplus = sorted(opciones_tplus, key=lambda x: x[0])
+    opciones_tplus = sorted(opciones_tplus, key=lambda x: x)
 
     ret = platformtools.dialog_select('[COLOR cyan][B]Proveedores Proxies Tplus[/B][/COLOR]', opciones_tplus, preselect=preselect)
     if ret == -1: return -1
@@ -1570,6 +1573,7 @@ def test_tplus(item):
     elif opciones_tplus[ret] == 'Vakhov https': proxies_tplus = '59'
     elif opciones_tplus[ret] == 'Vakhov socks4': proxies_tplus = '60'
     elif opciones_tplus[ret] == 'Vakhov socks': proxies_tplus = '61'
+    elif opciones_tplus[ret] == 'Hidemium': proxies_tplus = '62'
 
     else: proxies_tplus = '32'
 
@@ -1670,10 +1674,10 @@ def test_all_webs(item):
                 try: txt = tester.test_channel(ch['name'])
                 except:
                      platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[B][COLOR %s]Error comprobación, Canal Ignorado[/B][/COLOR]' % color_alert)
-                     tests_all_webs.append(ch['name'])
+                     tests_all_webs.append(ch['name'] + '  Error Comprobacion Canal')
                      continue
             else:
-                tests_all_webs.append(ch['name'])
+                tests_all_webs.append(ch['name'] + '  Error Canal Ignorado')
                 continue
 
         rememorize = False
@@ -1691,46 +1695,51 @@ def test_all_webs(item):
                         try: txt = tester.test_channel(ch['name'])
                         except:
                              platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[B][COLOR %s]Error comprobación, Canal Ignorado[/B][/COLOR]' % color_alert)
-                             tests_all_webs.append(ch['name'])
+                             tests_all_webs.append(ch['name'] + '  Error Comprobacion con Proxies')
                              continue
 
                         if not 'code: [COLOR springgreen][B]200' in str(txt):
                             if ' con proxies ' in str(txt):
                                 platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado Buscando Nuevos Proxies.[/B][/COLOR]')
-                                tests_all_webs.append(ch['name'])
+                                tests_all_webs.append(ch['name'] + '  Sin Nuevos Proxies')
                         else:
                             rememorize = True
 
                 elif 'Sin proxies' in str(txt):
+                    if 'CloudFlare Human Verify' in txt:
+                        tests_all_webs.append(ch['name'] + ' CloudFlare Human Verify')
+                        continue
+
                     if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR chartreuse][B]Quizás necesite Proxies.[/B][/COLOR] ¿ Desea Iniciar la Búsqueda de Proxies en el Canal ?'):
                         _proxies(item, ch['id'])
 
                         try: txt = tester.test_channel(ch['name'])
                         except:
                              platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[B][COLOR %s]Error comprobación, Canal Ignorado[/B][/COLOR]' % color_alert)
-                             tests_all_webs.append(ch['name'])
+                             tests_all_webs.append(ch['name'] + '  Error Comprobacion Quizas Necesite Proxies')
                              continue
 
                         if not 'code: [COLOR springgreen][B]200' in str(txt):
                             if 'Sin proxies' in str(txt):
                                 platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado Buscando Nuevos Proxies.[/B][/COLOR]')
-                                tests_all_webs.append(ch['name'])
+                                tests_all_webs.append(ch['name'] + '  Sin Nuevos Proxies')
                         else:
                             rememorize = True
 
                 if 'invalid:' in str(txt):
                     if not 'Suspendida' in str(txt):
                         if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '¿ Desea comprobar el Canal de nuevo, [COLOR red][B]por Acceso sin Host Válido en los datos. [/B][/COLOR]?'):
+
                             try: txt = tester.test_channel(ch['name'])
                             except:
                                  platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[B][COLOR %s]Error comprobación, Canal Ignorado[/B][/COLOR]' % color_alert)
-                                 tests_all_webs.append(ch['name'])
+                                 tests_all_webs.append(ch['name'] + '  Error Comprobacion Acceso Sin Host Valido')
                                  continue
 
                             if 'code: [COLOR springgreen][B]200' in str(txt):
                                 if 'invalid:' in str(txt):
                                     platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado el Acceso sin Host Válido en los datos.[/B][/COLOR]')
-                                    tests_all_webs.append(ch['name'])
+                                    tests_all_webs.append(ch['name'] + '  Acceso Sin Host Valido')
 
             elif 'Falso Positivo.' in str(txt):
                 platformtools.dialog_textviewer(ch['name'], txt)
@@ -1742,30 +1751,34 @@ def test_all_webs(item):
                         try: txt = tester.test_channel(ch['name'])
                         except:
                               platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[B][COLOR %s]Error comprobación, Canal Ignorado[/B][/COLOR]' % color_alert)
-                              tests_all_webs.append(ch['name'])
+                              tests_all_webs.append(ch['name'] + '  Error Comprobacion Nueva Busqueda de Proxies')
                               continue
 
                         if not 'code: [COLOR springgreen][B]200' in str(txt):
                             if ' con proxies ' in str(txt):
                                 platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado Buscando Nuevos Proxies.[/B][/COLOR]')
-                                tests_all_webs.append(ch['name'])
+                                tests_all_webs.append(ch['name'] + '  Sin Solucion Buscando Nuevos Proxies')
                         else:
                             rememorize = True
 
                 elif 'Sin proxies' in str(txt):
+                    if 'CloudFlare Human Verify' in txt:
+                        tests_all_webs.append(ch['name'] + ' CloudFlare Human Verify')
+                        continue
+
                     if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR chartreuse][B]Quizás necesite Proxies.[/B][/COLOR] ¿ Desea Iniciar la Búsqueda de Proxies en el Canal ?'):
                         _proxies(item, ch['id'])
 
                         try: txt = tester.test_channel(ch['name'])
                         except:
                              platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[B][COLOR %s]Error comprobación, Canal Ignorado[/B][/COLOR]' % color_alert)
-                             tests_all_webs.append(ch['name'])
+                             tests_all_webs.append(ch['name'] + '  Error Comprobacion Quizas Necesite Nuevos Proxies')
                              continue
 
                         if not 'code: [COLOR springgreen][B]200' in str(txt):
                             if 'Sin proxies' in str(txt):
                                 platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado Buscando Nuevos Proxies.[/B][/COLOR]')
-                                tests_all_webs.append(ch['name'])
+                                tests_all_webs.append(ch['name'] + '  Sin Solucion Buscando Nuevos Proxies')
                         else:
                             rememorize = True
 
@@ -1786,7 +1799,7 @@ def test_all_webs(item):
                                     break
 
                                 if incidencia:
-                                    tests_all_webs.append(ch['name'])
+                                    tests_all_webs.append(ch['name'] + '  Con Incidencia')
                                     continue
 
                         if no_accesibles:
@@ -1804,20 +1817,21 @@ def test_all_webs(item):
                                     break
 
                                 if incidencia:
-                                    tests_all_webs.append(ch['name'])
+                                    tests_all_webs.append(ch['name'] + '  No Accesible')
                                     continue
 
                     if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '¿ Desea comprobar el Canal de nuevo, [COLOR red][B]por Falso Positivo. [/B][/COLOR]?'):
+
                         try: txt = tester.test_channel(ch['name'])
                         except:
                              platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[B][COLOR %s]Error comprobación, Canal Ignorado[/B][/COLOR]' % color_alert)
-                             tests_all_webs.append(ch['name'])
+                             tests_all_webs.append(ch['name'] + '  Error Comprobacion Falso Positivo')
                              continue
 
                         if 'code: [COLOR springgreen][B]200' in str(txt):
                             if 'Falso Positivo.' in str(txt):
                                 platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado el Falso Positivo.[/B][/COLOR]')
-                                tests_all_webs.append(ch['name'])
+                                tests_all_webs.append(ch['name'] + '  Sin Solucion Falso Positivo')
 
             if ' al parecer No se necesitan' in str(txt):
                 if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]¿ Desea Quitar los Proxies del Canal ?[/B][/COLOR], porqué parece que NO se necesitan.'):
@@ -1826,7 +1840,7 @@ def test_all_webs(item):
                     try: txt = tester.test_channel(ch['name'])
                     except:
                          platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[B][COLOR %s]Error comprobación, Canal Ignorado[/B][/COLOR]' % color_alert)
-                         tests_all_webs.append(ch['name'])
+                         tests_all_webs.append(ch['name'] + '  Error Comprobacion Quitar Proxies')
                          continue
 
                     proxies = config.get_setting('proxies', ch['id'], default='').strip()
@@ -1842,16 +1856,24 @@ def test_all_webs(item):
                                 config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
 
         else:
-           if 'code: [COLOR [COLOR orangered][B]301' in str(txt) or 'code: [COLOR [COLOR orangered][B]308' in str(txt):
-               tests_all_webs.append(ch['name'])
+           if 'CloudFlare Human Verify' in txt:
+               tests_all_webs.append(ch['name'] + ' CloudFlare Human Verify')
                continue
 
-           if 'code: [COLOR [COLOR orangered][B]302' in str(txt) or 'code: [COLOR [COLOR orangered][B]307' in str(txt):
-               tests_all_webs.append(ch['name'])
+           elif 'code: [COLOR [COLOR orangered][B]301' in str(txt) or 'code: [COLOR [COLOR orangered][B]308' in str(txt):
+               tests_all_webs.append(ch['name'] + '  Codigo Respuesta 301 o 308')
                continue
 
-           if 'Podría estar Correcto' in str(txt):
-               tests_all_webs.append(ch['name'])
+           elif 'code: [COLOR [COLOR orangered][B]302' in str(txt) or 'code: [COLOR [COLOR orangered][B]307' in str(txt):
+               tests_all_webs.append(ch['name'] + '  Codigo Respuesta 302 o 307')
+               continue
+
+           elif '[B]Unknow[/B]' in str(txt):
+               tests_all_webs.append(ch['name'] + '  Error Desconocido Comprobar')
+               continue
+
+           elif 'Podría estar Correcto' in str(txt):
+               tests_all_webs.append(ch['name'] + '  Podria Estar Correcto')
                continue
 
            if txt_status:
@@ -1870,7 +1892,7 @@ def test_all_webs(item):
                            break
 
                        if incidencia:
-                           tests_all_webs.append(ch['name'])
+                           tests_all_webs.append(ch['name'] + '  Con Incidencia')
                            continue
 
                if no_accesibles:
@@ -1888,7 +1910,7 @@ def test_all_webs(item):
                             break
 
                        if incidencia:
-                           tests_all_webs.append(ch['name'])
+                           tests_all_webs.append(ch['name'] + '  No Accesible')
                            continue
 
                if con_problemas:
@@ -1906,10 +1928,12 @@ def test_all_webs(item):
                             break
 
                        if incidencia:
-                           tests_all_webs.append(ch['name'])
+                           tests_all_webs.append(ch['name'] + '  Con Problema')
                            continue
 
-           if not 'nuevo:' in txt:
+           if 'nuevo:' in txt:
+               tests_all_webs.append(ch['name'] + '  Nuevo Dominio Verificar')
+           else:
                if ' con proxies ' in str(txt):
                    if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]¿ Desea Iniciar una nueva Búsqueda de Proxies en el Canal ?[/B][/COLOR]'):
                        _proxies(item, ch['id'])
@@ -1917,35 +1941,39 @@ def test_all_webs(item):
                        try: txt = tester.test_channel(ch['name'])
                        except:
                             platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[B][COLOR %s]Error comprobación, Canal Ignorado[/B][/COLOR]' % color_alert)
-                            tests_all_webs.append(ch['name'])
+                            tests_all_webs.append(ch['name'] + '  Error Comprobacion Iniciar Nueva Busqueda de Proxies')
                             continue
 
                        if not 'code: [COLOR springgreen][B]200' in str(txt):
                            if ' con proxies ' in str(txt):
                                platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado Buscando Nuevos Proxies.[/B][/COLOR]')
-                               tests_all_webs.append(ch['name'])
+                               tests_all_webs.append(ch['name'] + '  Sin Solucion Buscando Nuevos Proxies')
                        else:
                            rememorize = True
 
                elif 'Sin proxies' in str(txt):
+                   if 'CloudFlare Human Verify' in txt:
+                       tests_all_webs.append(ch['name'] + ' CloudFlare Human Verify')
+                       continue
+
                    if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR chartreuse][B]Quizás necesite Proxies.[/B][/COLOR] ¿ Desea Iniciar la Búsqueda de Proxies en el Canal ?'):
                        _proxies(item, ch['id'])
 
                        try: txt = tester.test_channel(ch['name'])
                        except:
                             platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[B][COLOR %s]Error comprobación, Canal Ignorado[/B][/COLOR]' % color_alert)
-                            tests_all_webs.append(ch['name'])
+                            tests_all_webs.append(ch['name'] + '  Error Comprobacion Quizas Necesite Proxies')
                             continue
 
                        if not 'code: [COLOR springgreen][B]200' in str(txt):
                            if 'Sin proxies' in str(txt):
                                platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado Buscando Nuevos Proxies.[/B][/COLOR]')
-                               tests_all_webs.append(ch['name'])
+                               tests_all_webs.append(ch['name'] + '  Sin Solucion Buscando Nuevos Proxies')
                        else:
                            rememorize = True
 
                else:
-                   tests_all_webs.append(ch['name'])
+                   tests_all_webs.append(ch['name'] + '  Verificar Canal')
 
         if rememorize:
             proxies = config.get_setting('proxies', ch['id'], default='').strip()
@@ -1966,17 +1994,25 @@ def test_all_webs(item):
         if not tests_all_webs:
             platformtools.dialog_ok(config.__addon_name, 'Canales Testeados ' + str(i))
         else:
-            if not config.get_setting('developer_mode', default=False):
-                platformtools.dialog_ok(config.__addon_name, 'Canales Testeados ' + str(i))
-            else:
-                if config.get_setting('developer_team'):
-                    if platformtools.dialog_yesno(config.__addon_name, 'Canales Testeados ' + str(i), '[B][COLOR red]Hay Conflictos. [COLOR yellow]Desea Verlos ?[/B][/COLOR]'):
-                        txt_conflict = ''
+            conflictos = len(tests_all_webs)
 
-                        for conflict in tests_all_webs:
-                            txt_conflict += conflict + '[CR]'
+            if config.get_setting('developer_team'):
+                canales_log = os.path.join(config.get_data_path(), 'canales.log')
 
-                        platformtools.dialog_textviewer('Canales con Conflictos', txt_conflict)
+                txt_log = ''
+
+                for conflict in tests_all_webs:
+                    txt_log += conflict + os.linesep
+
+                with open(canales_log, 'wb') as f: f.write(txt_log if not PY3 else txt_log.encode('utf-8')); f.close()
+
+            if platformtools.dialog_yesno(config.__addon_name + ' Tests Canales', '[B][COLOR gold]Canales Testeados ' + str(i) + '[/B][/COLOR]', '[B][COLOR red]Con Conflictos ' + str(conflictos) + '[/B][/COLOR]', '[COLOR yellow][B]¿ Desea Ver los conflictos ?[/B][/COLOR]'):
+                txt_conflict = ''
+
+                for conflict in tests_all_webs:
+                    txt_conflict += conflict + '[CR]'
+
+                platformtools.dialog_textviewer('Canales con Conflictos', txt_conflict)
 
     config.set_setting('developer_test_channels', '')
 
@@ -2024,7 +2060,6 @@ def test_all_srvs(item):
     if item.unsatisfactory: config.set_setting('developer_test_servers', 'unsatisfactory')
 
 
-    from core import jsontools
     from modules import tester
 
     path = os.path.join(config.get_runtime_path(), 'servers')
@@ -2109,21 +2144,31 @@ def test_all_srvs(item):
         if not 'code: [COLOR springgreen][B]200' in str(txt):
             tests_all_srvs.append(dict_server['name'])
 
-    if i > 0:
+    if i == 0:
+        platformtools.dialog_ok(config.__addon_name, 'Sin Servidores Testeados')
+    else:
         if not tests_all_srvs:
             platformtools.dialog_ok(config.__addon_name, 'Servidores Testeados ' + str(i))
         else:
-            if not config.get_setting('developer_mode', default=False):
-                platformtools.dialog_ok(config.__addon_name, 'Servidores Testeados ' + str(i))
-            else:
-                if config.get_setting('developer_team'):
-                    if platformtools.dialog_yesno(config.__addon_name, 'Servidores Testeados ' + str(i), '[B][COLOR red]Hay Conflictos. [COLOR yellow]Desea Verlos ?[/B][/COLOR]'):
-                        txt_conflict = ''
+            conflictos = len(tests_all_srvs)
 
-                        for conflict in tests_all_srvs:
-                            txt_conflict += conflict + '[CR]'
+            if config.get_setting('developer_team'):
+                servidores_log = os.path.join(config.get_data_path(), 'servidores.log')
 
-                        platformtools.dialog_textviewer('Servidores con Conflictos', txt_conflict)
+                txt_log = ''
+
+                for conflict in tests_all_srvs:
+                    txt_log += conflict + os.linesep
+
+                with open(servidores_log, 'wb') as f: f.write(txt_log if not PY3 else txt_log.encode('utf-8')); f.close()
+
+            if platformtools.dialog_yesno(config.__addon_name + ' Tests Servidores', '[B][COLOR gold]Servidores Testeados ' + str(i) + '[/B][/COLOR]', '[B][COLOR red]Con Conflictos ' + str(conflictos) + '[/B][/COLOR]', '[COLOR yellow][B]¿ Desea Ver los conflictos ?[/B][/COLOR]'):
+                txt_conflict = ''
+
+                for conflict in tests_all_srvs:
+                    txt_conflict += conflict + '[CR]'
+
+                platformtools.dialog_textviewer('Servidores con Conflictos', txt_conflict)
 
     config.set_setting('developer_test_servers', '')
 
@@ -2918,6 +2963,10 @@ def resumen_canales(item):
 
     txt += '  ' + str(total) + ' [COLOR darkorange][B]CANALES[/B][/COLOR][CR]'
 
+    activos = (total - inactives)
+
+    txt += '           ' + str(activos) + ' [COLOR cyan][B]Activos[/B][/COLOR][CR]'
+
     if not inactives == 0:
         txt += '           ' + str(inactives) + ' [COLOR palevioletred][B]Inactivos[/B][/COLOR][CR]'
 
@@ -2929,38 +2978,43 @@ def resumen_canales(item):
 
         if not privates == 0: txt += '                   [COLOR grey][B]Privados[/B][/COLOR] ' + str(privates) + '[CR]'
 
-    activos = (total - inactives)
-
-    txt += '[CR]  ' + str(activos) + ' [COLOR cyan][B]ACTIVOS[/B][/COLOR][CR][CR]'
+    txt += '[CR]  ' + str(activos) + ' [COLOR cyan][B]CANALES ACTIVOS DISTRIBUCIÓN:[/B][/COLOR][CR]'
 
     if not PY3:
-        if not mismatcheds == 0: txt += '       ' + str(mismatcheds) + ' [COLOR violet][B]Posible Incompatibilidad[/B][/COLOR][CR]'
+        if not mismatcheds == 0: txt +=  '          [COLOR violet][B]Con Posible Incompatibilidad[/B][/COLOR] ' + str(mismatcheds) + '[CR]'
 
-    if not inestables == 0: txt += '       ' + str(inestables) + ' [COLOR plum][B]Inestables[/B][/COLOR][CR]'
+    if not inestables == 0: txt += '          [COLOR plum][B]Inestables[/B][/COLOR] ' + str(inestables) + '[CR]'
 
-    if not problematics == 0: txt += '       ' + str(problematics) + ' [COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR][CR]'
+    if not problematics == 0: txt += '          [COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR] ' + str(problematics) + '[CR]'
 
-    if not clons == 0:txt += '     ' + str(clons) + ' [COLOR aquamarine][B]Principal con clones[/B][/COLOR][CR]' 
+    if not clons == 0:txt += '          [COLOR aquamarine][B]Principales con Clones[/B][/COLOR] ' + str(clons) + '[CR]' 
 
-    if not clones == 0: txt += '     ' + str(clones) + ' [COLOR turquoise][B]Clones[/B][/COLOR][CR]'
+    if not clones == 0: txt += '          [COLOR turquoise][B]Que son Clones de un Canal Principal[/B][/COLOR] ' + str(clones) + '[CR]'
 
-    if not notices == 0: txt += '     ' + str(notices) + ' [COLOR olivedrab][B]Control CloudFlare Protection[/B][/COLOR][CR]'
+    if not notices == 0: txt += '          [COLOR olivedrab][B]Con Control CloudFlare Protection[/B][/COLOR] ' + str(notices) + '[CR]'
 
-    if not cryptos == 0: txt += '     ' + str(cryptos) + ' [COLOR darksalmon][B]Descifrar Enlaces[/B][/COLOR][CR]' 
+    if not cryptos == 0: txt += '          [COLOR darksalmon][B]Que Requieren Descifrar Enlaces[/B][/COLOR] ' + str(cryptos) + '[CR]' 
 
-    if not proxies == 0: txt += '     ' + str(proxies) + ' [COLOR red][B]Pueden Usar Proxies[/B][/COLOR][CR]'
+    if not proxies == 0: txt += '          [COLOR red][B]Que Pueden Usar Proxies[/B][/COLOR] ' + str(proxies) + '[CR]'
 
-    if not registers == 0: txt += '       ' + str(registers) + ' [COLOR teal][B]Requieren Cuenta[/B][/COLOR][CR]'
+    if not registers == 0: txt += '          [COLOR teal][B]Que Requieren Cuenta[/B][/COLOR] ' + str(registers) + '[CR]'
 
-    if not dominios == 0: txt += '       ' + str(dominios) + ' [COLOR green][B]Con Varios Dominios[/B][/COLOR][CR]'
+    if not dominios == 0: txt += '          [COLOR green][B]Con Varios Dominios[/B][/COLOR] ' + str(dominios) + '[CR]'
 
-    if not currents == 0: txt += '     ' + str(currents) + ' [COLOR goldenrod][B]Gestión Dominio Vigente[/B][/COLOR][CR]'
+    if not currents == 0: txt += '          [COLOR goldenrod][B]Con Gestión Dominio Vigente[/B][/COLOR] ' + str(currents) + '[CR]'
 
-    if not streaminytorrent == 0: txt += '     ' + str(streaminytorrent) + ' [COLOR magenta][B]Con enlaces Streaming y Torrent[/B][/COLOR][CR]'
+    if not streaminytorrent == 0: txt += '          [COLOR magenta][B]Con enlaces Streaming y Torrent[/B][/COLOR] ' + str(streaminytorrent) +'[CR]'
 
-    if not onlyones == 0: txt += '     ' + str(onlyones) + ' [COLOR fuchsia][B]Con un Único Servidor[/B][/COLOR][CR]'
+    if not onlyones == 0: txt += '          [COLOR fuchsia][B]Con un Único Servidor[/B][/COLOR] ' + str(onlyones) + '[CR]'
 
-    if not nosearchables == 0: txt += '     ' + str(nosearchables) + ' [COLOR aquamarine][B]No Intervienen en Búsquedas[/B][/COLOR][CR]'
+    if not nosearchables == 0: txt += '          [COLOR aquamarine][B]Que No Intervienen en Búsquedas[/B][/COLOR] ' + str(nosearchables) + '[CR]'
+
+    con_tipologia = (mismatcheds + inestables + problematics + clons + clones + notices + cryptos + proxies + registers + dominios + currents + streaminytorrent + onlyones + nosearchables)
+
+    sin_tipologia = (activos - con_tipologia)
+    sin_tipologia = (sin_tipologia * (- 1))
+ 
+    txt += '          [COLOR palegreen][B]Sin Tipología Especial[/B][/COLOR] ' + str(sin_tipologia) + '[CR]'
 
     if txt_status:
         if no_accesibles:
@@ -2975,7 +3029,7 @@ def resumen_canales(item):
             if matches:
                 status_problems = matches
 
-    txt += '[CR]  ' + str(disponibles) + ' [COLOR gold][B]DISPONIBLES[/B][/COLOR][CR]'
+    txt += '[CR]  ' + str(disponibles) + ' [COLOR gold][B]CANALES ACTIVOS DISPONIBLES:[/B][/COLOR][CR]'
 
     if not status_access == 0: txt += '          [COLOR indianred][B]No Accesibles[/COLOR] '  + str(status_access) + '[/B][CR]'
     if not status_problems == 0: txt += '          [COLOR tomato][B]Con Problemas[/COLOR] '  + str(status_problems) + '[/B][CR]'
@@ -3010,7 +3064,7 @@ def resumen_canales(item):
 
         if con_proxies > 0: txt += '          [COLOR red][B]Con Proxies Informados[/COLOR] ' +  str(con_proxies) + '[/B][CR]'
 
-    txt += '[CR][COLOR dodgerblue][B]CANALES DISPONIBLES:[/B][/COLOR]'
+    txt += '[CR][COLOR dodgerblue][B]CANALES DISPONIBLES DISTRIBUCIÓN:[/B][/COLOR]'
 
     if config.get_setting('mnu_sugeridos', default=True): txt += '[CR]    ' + str(suggesteds) + ' [COLOR moccasin][B]Sugeridos[/B][/COLOR][CR]'
 
@@ -3048,7 +3102,7 @@ def resumen_canales(item):
         if config.get_setting('mnu_adultos', default=True):
             if not adults == 0: txt += '    ' + str(adults) + '  [COLOR orange][B]Adultos[/B][/COLOR][CR]'
 
-    txt += '[CR][COLOR powderblue][B]BÚSQUEDAS POR TÍTULO EN LOS CANALES DISPONIBLES:[/B][/COLOR][CR]'
+    txt += '[CR][COLOR powderblue][B]BÚSQUEDAS POR TÍTULO EN CANALES DISPONIBLES:[/B][/COLOR][CR]'
 
     txt += '  ' + str(bus_pelisyoseries) + ' [COLOR yellow][B]Películas y/ó Series[/B][/COLOR][CR]'
 
@@ -3156,8 +3210,6 @@ def resumen_con_problemas(item):
 def resumen_servidores(item):
     logger.info()
 
-    from core import jsontools
-
     total = 0
     inactives = 0
     notsuported = 0
@@ -3205,6 +3257,10 @@ def resumen_servidores(item):
 
     inactivos = (inactives + notsuported + outservice)
 
+    disponibles = (total - inactivos)
+
+    txt += '          ' + str(disponibles) + ' [COLOR cyan][B]Activos[/B][/COLOR][CR]'
+
     if not inactivos == 0:
         txt += '          ' + str(inactivos) + ' [COLOR palevioletred][B]Inactivos[/B][/COLOR][CR]'
 
@@ -3213,9 +3269,7 @@ def resumen_servidores(item):
 
         if outservice > 0: txt += '                [COLOR red][B]Sin Servicio[/B][/COLOR] ' + str(outservice) + '[CR]'
 
-    disponibles = (total - inactivos)
-
-    txt += '[CR]    ' + str(disponibles) + ' [COLOR cyan][B]ACTIVOS[/B][/COLOR][CR]'
+    txt += '[CR]    ' + str(disponibles) + ' [COLOR cyan][B]SERVIDORES ACTIVOS[/B][/COLOR][CR]'
 
     presentar = False
 
@@ -3319,9 +3373,13 @@ def resumen_servidores(item):
 
     accesibles = (disponibles + aditionals + alternatives)
 
-    txt += '[CR][COLOR cyan][B]SERVIDORES DISPONIBLES[/B][/COLOR][CR]'
+    txt += '[CR][COLOR cyan][B]SERVIDORES DISPONIBLES:[/B][/COLOR][CR]'
 
     txt += '  ' + str(accesibles) + '  [COLOR gold][B]Disponibles[/B][/COLOR][CR]'
+
+    txt += '           [COLOR cyan][B]Activos[/B][/COLOR] ' + str(disponibles) + '[CR]'
+
+    txt += '           [COLOR cyan][B]Otras Vías[/B][/COLOR] ' + str(otrasvias) + '[CR]'
 
     txt += '[CR][COLOR dodgerblue][B]SERVIDORES ACCESIBLES:[/B][/COLOR][CR]'
 
@@ -3384,33 +3442,35 @@ def show_help_alternativas(item):
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
         txt += '[CR][CR] - Qué servidores tienen [COLOR goldenrod][B]Vías Alternativas[/B][/COLOR] a través de [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]:[CR]'
 
-        txt += '   [COLOR yellow]Clicknupload[/COLOR][CR]'
-        txt += '   [COLOR yellow]Cloudvideo[/COLOR][CR]'
-        txt += '   [COLOR yellow]Dailymotion[/COLOR][CR]'
-        txt += '   [COLOR yellow]Doodstream[/COLOR][CR]'
-        txt += '   [COLOR yellow]Flashx[/COLOR][CR]'
-        txt += '   [COLOR yellow]Gamovideo[/COLOR][CR]'
-        txt += '   [COLOR yellow]Fastplay[/COLOR][CR]'
-        txt += '   [COLOR yellow]Gofile[/COLOR][CR]'
-        txt += '   [COLOR yellow]Kinoger[/COLOR][CR]'
-        txt += '   [COLOR yellow]MegaUp[/COLOR][CR]'
-        txt += '   [COLOR yellow]Mixdrop[/COLOR][CR]'
-        txt += '   [COLOR yellow]Playtube[/COLOR][CR]'
-        txt += '   [COLOR yellow]Racaty[/COLOR][CR]'
-        txt += '   [COLOR yellow]Streamlare[/COLOR][CR]'
-        txt += '   [COLOR yellow]Streamtape[/COLOR][CR]'
-        txt += '   [COLOR yellow]Streamvid[/COLOR][CR]'
-        txt += '   [COLOR yellow]Uptobox[/COLOR][CR]'
-        txt += '   [COLOR yellow]Uqload[/COLOR][CR]'
-        txt += '   [COLOR yellow]Userscloud[/COLOR][CR]'
-        txt += '   [COLOR yellow]Various[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vimeo[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vidmoly[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vk[/COLOR][CR]'
-        txt += '   [COLOR yellow]Voe[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vshare[/COLOR][CR]'
-        txt += '   [COLOR yellow]Waaw[/COLOR][CR]'
-        txt += '   [COLOR yellow]Zures[/COLOR]'
+        path = os.path.join(config.get_runtime_path(), 'servers')
+
+        servidores = os.listdir(path)
+        servidores = sorted(servidores)
+
+        for server in servidores:
+            if not server.endswith('.json'): continue
+
+            path_server = os.path.join(config.get_runtime_path(), 'servers', server)
+
+            if not os.path.isfile(path_server): continue
+
+            data = filetools.read(path_server)
+            dict_server = jsontools.load(data)
+
+            if dict_server['active'] == False: continue
+
+            try:
+               notes = dict_server['notes']
+            except: 
+               notes = ''
+
+            if not "alternative" in notes.lower(): continue
+
+            server_name = dict_server['name']
+
+            if server_name == 'Youtube': continue
+
+            txt += '   [COLOR gold][B]' + server_name + '[/B][/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
         try:
@@ -3420,12 +3480,12 @@ def show_help_alternativas(item):
             tex_yt = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
 
-    txt += '[CR][CR][COLOR fuchsia][B]Youtube Plugin[/B]:[/COLOR]  %s' % tex_yt
+    txt += '[CR][COLOR fuchsia][B]Youtube Plugin[/B]:[/COLOR]  %s' % tex_yt
 
     if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
         txt += '[CR][CR] - Qué servidor tiene [COLOR goldenrod][B]Vía Alternativa[/B][/COLOR] a través de [COLOR fuchsia][B]YouTube[/B][/COLOR]:[CR]'
 
-        txt += '    [COLOR yellow]Youtube[/COLOR]'
+        txt += '    [COLOR gold][B]Youtube[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Servidores Vías Alternativas', txt)
 
@@ -3448,109 +3508,60 @@ def show_help_adicionales(item):
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
         txt += '[CR][CR] - Servidores [COLOR goldenrod][B]Vías Adicionales[/B][/COLOR] a través de [COLOR yellowgreen][B]Various[/COLOR][/B] [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]:[CR]'
 
-        txt += '   [COLOR yellow]Azipcdn[/COLOR][CR]'
-        txt += '   [COLOR yellow]Bembed[/COLOR][CR]'
-        txt += '   [COLOR yellow]Desiupload[/COLOR][CR]'
-        txt += '   [COLOR yellow]Doodporn[/COLOR][CR]'
-        txt += '   [COLOR yellow]Drop[/COLOR][CR]'
-        txt += '   [COLOR yellow]Dropload[/COLOR][CR]'
-        txt += '   [COLOR yellow]Embedgram[/COLOR][CR]'
-        txt += '   [COLOR yellow]Embedrise[/COLOR][CR]'
-        txt += '   [COLOR yellow]Emturbovid[/COLOR][CR]'
-        txt += '   [COLOR yellow]Fastupload[/COLOR][CR]'
-        txt += '   [COLOR yellow]Filelions[/COLOR][CR]'
-        txt += '   [COLOR yellow]Filemoon[/COLOR][CR]'
-        txt += '   [COLOR yellow]Fileupload[/COLOR][CR]'
-        txt += '   [COLOR yellow]Goodstream[/COLOR][CR]'
-        txt += '   [COLOR yellow]Hxfile[/COLOR][CR]'
-        txt += '   [COLOR yellow]Hexupload[/COLOR][CR]'
-        txt += '   [COLOR yellow]Krakenfiles[/COLOR][CR]'
-        txt += '   [COLOR yellow]Lulustream[/COLOR][CR]'
-        txt += '   [COLOR yellow]Mvidoo[/COLOR][CR]'
-        txt += '   [COLOR yellow]Qiwi[/COLOR][CR]'
-        txt += '   [COLOR yellow]Rumble[/COLOR][CR]'
-        txt += '   [COLOR yellow]Rutube[/COLOR][CR]'
-        txt += '   [COLOR yellow]Streamhub[/COLOR][CR]'
-        txt += '   [COLOR yellow]Streamruby[/COLOR][CR]'
-        txt += '   [COLOR yellow]Streamsilk[/COLOR][CR]'
-        txt += '   [COLOR yellow]Streamvid[/COLOR][CR]'
-        txt += '   [COLOR yellow]Streamwish[/COLOR][CR]'
-        txt += '   [COLOR yellow]Terabox[/COLOR][CR]'
-        txt += '   [COLOR yellow]Tubeload[/COLOR][CR]'
-        txt += '   [COLOR yellow]Turboviplay[/COLOR][CR]'
-        txt += '   [COLOR yellow]Twitch[/COLOR][CR]'
-        txt += '   [COLOR yellow]Uploaddo[/COLOR][CR]'
-        txt += '   [COLOR yellow]Uploadever[/COLOR][CR]'
-        txt += '   [COLOR yellow]Uploadraja[/COLOR][CR]'
-        txt += '   [COLOR yellow]Userload[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vidello[/COLOR][CR]'
-        txt += '   [COLOR yellow]Videowood[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vidguard[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vidhide[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vidspeed[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vkspeed[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vudeo[/COLOR][CR]'
-        txt += '   [COLOR yellow]Yandex[/COLOR][CR]'
-        txt += '   [COLOR yellow]Youdbox[/COLOR]'
+        path = translatePath(os.path.join(config.get_runtime_path(), 'servers/'))
 
-        txt += '[CR][CR] - Servidores [COLOR goldenrod][B]Vías Adicionales[/B][/COLOR] a través de [COLOR yellowgreen][B]Zures[/COLOR][/B] [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]:[CR]'
+        file_various = 'various.json'
+        path_server = path + file_various
 
-        txt += '   [COLOR yellow]Allviid[/COLOR][CR]'
-        txt += '   [COLOR yellow]Amdahost[/COLOR][CR]'
-        txt += '   [COLOR yellow]Asianload[/COLOR][CR]'
-        txt += '   [COLOR yellow]Asianplay[/COLOR][CR]'
-        txt += '   [COLOR yellow]Bigwarp[/COLOR][CR]'
-        txt += '   [COLOR yellow]Cloudfile[/COLOR][CR]'
-        txt += '   [COLOR yellow]Cloudmail[/COLOR][CR]'
-        txt += '   [COLOR yellow]Dailyuploads[/COLOR][CR]'
-        txt += '   [COLOR yellow]Darkibox[/COLOR][CR]'
-        txt += '   [COLOR yellow]Dembed[/COLOR][CR]'
-        txt += '   [COLOR yellow]Downace[/COLOR][CR]'
-        txt += '   [COLOR yellow]Fastdrive[/COLOR][CR]'
-        txt += '   [COLOR yellow]Filegram[/COLOR][CR]'
-        txt += '   [COLOR yellow]Gostream[/COLOR][CR]'
-        txt += '   [COLOR yellow]Letsupload[/COLOR][CR]'
-        txt += '   [COLOR yellow]Liivideo[/COLOR][CR]'
-        txt += '   [COLOR yellow]Myupload[/COLOR][CR]'
-        txt += '   [COLOR yellow]Neohd[/COLOR][CR]'
-        txt += '   [COLOR yellow]Oneupload[/COLOR][CR]'
-        txt += '   [COLOR yellow]Pandafiles[/COLOR][CR]'
-        txt += '   [COLOR yellow]Rovideo[/COLOR][CR]'
-        txt += '   [COLOR yellow]Savefiles[/COLOR][CR]'
-        txt += '   [COLOR yellow]Send[/COLOR][CR]'
-        txt += '   [COLOR yellow]Streamable[/COLOR][CR]'
-        txt += '   [COLOR yellow]Streamdav[/COLOR][CR]'
-        txt += '   [COLOR yellow]Streamcool[/COLOR][CR]'
-        txt += '   [COLOR yellow]Streamgzzz[/COLOR][CR]'
-        txt += '   [COLOR yellow]Streamoupload[/COLOR][CR]'
-        txt += '   [COLOR yellow]Streamup[/COLOR][CR]'
-        txt += '   [COLOR yellow]SwiftLoad[/COLOR][CR]'
-        txt += '   [COLOR yellow]Turbovid[/COLOR][CR]'
-        txt += '   [COLOR yellow]Tusfiles[/COLOR][CR]'
-        txt += '   [COLOR yellow]Udrop[/COLOR][CR]'
-        txt += '   [COLOR yellow]Updown[/COLOR][CR]'
-        txt += '   [COLOR yellow]Uploadbaz[/COLOR][CR]'
-        txt += '   [COLOR yellow]Uploadflix[/COLOR][CR]'
-        txt += '   [COLOR yellow]Uploadhub[/COLOR][CR]'
-        txt += '   [COLOR yellow]Uploady[/COLOR][CR]'
-        txt += '   [COLOR yellow]Upvid[/COLOR][CR]'
-        txt += '   [COLOR yellow]Veev[/COLOR][CR]'
-        txt += '   [COLOR yellow]Veoh[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vidbasic[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vidbob[/COLOR][CR]'
-        txt += '   [COLOR yellow]Videa[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vidlook[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vidmx[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vidnest[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vido[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vidpro[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vidstore[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vidtube[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vimeos[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vipss[/COLOR][CR]'
-        txt += '   [COLOR yellow]Vkprime[/COLOR][CR]'
-        txt += '   [COLOR yellow]Wecima[/COLOR][CR]'
-        txt += '   [COLOR yellow]Worlduploads[/COLOR][CR]'
-        txt += '   [COLOR yellow]Ztreamhub[/COLOR]'
+        existe = filetools.exists(path_server)
+
+        if existe:
+            data = filetools.read(path_server)
+            dict_server = jsontools.load(data)
+
+            if dict_server['active'] == True:
+                try:
+                   notes = dict_server['notes']
+                except: 
+                   notes = ''
+
+                notes = notes.replace('Alternative vía: Script.Module.ResolveUrl (', '').replace(')', '').strip()
+
+                notes += ','
+
+                servers_names = scrapertools.find_multiple_matches(notes, '(.*?),')
+
+                for server_name in servers_names:
+                    server_name = server_name.strip()
+
+                    txt += '   [COLOR gold][B]' + server_name + '[/B][/COLOR][CR]'
+
+        txt += '[CR] - Servidores [COLOR goldenrod][B]Vías Adicionales[/B][/COLOR] a través de [COLOR yellowgreen][B]Zures[/COLOR][/B] [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]:[CR]'
+
+        file_zures = 'zures.json'
+        path_server = path + file_zures
+
+        existe = filetools.exists(path_server)
+
+        if existe:
+            data = filetools.read(path_server)
+            dict_server = jsontools.load(data)
+
+            if dict_server['active'] == True:
+                try:
+                   notes = dict_server['notes']
+                except: 
+                   notes = ''
+
+                notes = notes.replace('Alternative vía: Script.Module.ResolveUrl (', '').replace(')', '').strip()
+
+                notes += ','
+
+                servers_names = scrapertools.find_multiple_matches(notes, '(.*?),')
+
+                for server_name in servers_names:
+                    server_name = server_name.strip()
+
+                    txt += '   [COLOR gold][B]' + server_name + '[/B][/COLOR][CR]'
 
     platformtools.dialog_textviewer('Servidores Vías Adicionales', txt)

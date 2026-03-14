@@ -456,7 +456,6 @@ def findvideos(item):
         url = url.replace('&amp;', '&')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         other = ''
 
@@ -512,9 +511,6 @@ def findvideos(item):
             url = url.replace('&amp;', '&')
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
-
-            url = servertools.normalize_url(servidor, url)
 
             other = ''
             if servidor == 'various': other = servertools.corregir_other(url)
@@ -560,14 +556,12 @@ def findvideos(item):
                u_link = u_link.replace('&amp;', '&')
 
                servidor = servertools.get_server_from_url(u_link)
-               servidor = servertools.corregir_servidor(servidor)
-
-               u_link = servertools.normalize_url(servidor, u_link)
 
                other = ''
                if servidor == 'various': other = servertools.corregir_other(u_link)
 
-               itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor, language = lang, other = other ))
+               itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor,
+                                     language = lang, other = other ))
 
            i += 1
 
@@ -593,9 +587,6 @@ def findvideos(item):
         url = url.replace('&amp;', '&')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
 
         other = ''
         if servidor == 'various': other = servertools.corregir_other(url)
@@ -624,7 +615,6 @@ def play(item):
         url = url.replace('/Smoothpre.', '/smoothpre.')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()

@@ -369,7 +369,6 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if '/damedamehoy.' in url or '//tomatomatela.' in url:
             url = resuelve_dame_toma(url)

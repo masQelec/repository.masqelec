@@ -486,7 +486,7 @@ def findvideos(item):
 
     query = {
             "operationName":"listProblemsItem",
-            "variables":{"problem_id" :item.url},
+            "variables":{"problem_id": item.url},
             "query": "query listProblemsItem($problem_id: ID!) {\n"
             +" listProblems(\n"
             +" filter: {problem_id: $problem_id}\n"
@@ -524,7 +524,6 @@ def findvideos(item):
         elif '/fplayer.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue

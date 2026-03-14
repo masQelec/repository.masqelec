@@ -115,10 +115,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = url, grp = url, search_type = 'movie' ))
 
-    url = host + 'pelicula/peliculas-mas-votadas/'
-
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = url, grp = url, search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
     return itemlist
@@ -150,14 +146,10 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    if '>Resultados para' in data:
-        bloque = scrapertools.find_single_match(data, '>Resultados para(.*?)</div> </div> </div>')
-    else:
-        bloque = scrapertools.find_single_match(data, '<center>(.*?)</li></ul>')
+    bloque = scrapertools.find_single_match(data, '>Ver Peliculas Online Completas<(.*?)</li></ul>')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<div class="bkcnpels br1px brdr10px mgtop15px">(.*?)</li></ul>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<li class="peli_bx br1px brdr10px ico_a">(.*?)</div></div></div>')
-    if not matches: matches = scrapertools.find_multiple_matches(bloque, '<li class="peli_bx br1px brdr10px ico_a">(.*?)</div> </div>')
-    if not matches: matches = scrapertools.find_multiple_matches(bloque, '<li class="peli_bx br1px brdr10px ico_a">(.*?)</div></div></div>')
+    matches = scrapertools.find_multiple_matches(bloque, '<li class="peli_bx br1px brdr10px ico_a">(.*?)</a></div>')
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
@@ -199,7 +191,7 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = scrapertools.find_multiple_matches(data, '<iframe src="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
 
     ses = 0
 
@@ -209,7 +201,6 @@ def findvideos(item):
         if '.mystream.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
@@ -228,7 +219,7 @@ def findvideos(item):
         if servidor == 'directo':
             if not config.get_setting('developer_mode', default=False): continue
             other = url.split("/")[2]
-            other = other.replace('https:', '').strip()
+            other = other.replace('https:', '').replace('www.', '').strip()
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Lat', other = other ))
 

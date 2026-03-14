@@ -24,7 +24,7 @@ def mainlist(item):
     itemlist = []
 
     if item.youtube_search:
-        url = youtube_search(item.youtube_search)
+        url, tit = youtube_search(item.youtube_search)
 
         if url:
             video_urls = youtube_play(url)
@@ -82,17 +82,18 @@ def youtube_search(nombre):
 
     if i == 0:
          platformtools.dialog_notification(config.__addon_name, '[B][COLOR red]Sin Tráilers y/ó Vídeos en YouTube[/B][/COLOR]')
-         return ''
+         return '', ''
 
     ret = platformtools.dialog_select('Tráilers y Vídeos en YouTube', opciones_youtube)
 
-    if ret == -1: return ''
+    if ret == -1: return '', ''
 
     match = elemento_youtube[ret]
 
     url = match[1]
+    tit = match[0]
 
-    return url
+    return url, tit
 
 
 def youtube_play(ini_page_url):
@@ -211,7 +212,9 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(Item( channel = 'actions', action = 'player_youtube', server = 'directo', title = '[COLOR fuchsia][B]Play Youtube[/B][/COLOR]', url = item.url, thumbnail=config.get_thumb('youtube') ))
+    titulo = '[COLOR paleturquoise][B]' + item.tit.strip() + '  [COLOR fuchsia][B]YouTube[/B][/COLOR]'
+
+    itemlist.append(Item( channel = 'actions', action = 'player_youtube', server='directo', title=titulo, url=item.url, thumbnail=config.get_thumb('youtube') ))
 
     return itemlist
 
@@ -229,7 +232,7 @@ def search(item, texto):
 
             item.youtube_search = texto.replace(" ", "+")
 
-            url = youtube_search(item.youtube_search)
+            url, tit = youtube_search(item.youtube_search)
 
             if url:
                 video_urls = youtube_play(url)
@@ -238,6 +241,7 @@ def search(item, texto):
                     item.channel = 'youtubetrailers'
 
                     item.url = video_urls[0][1]
+                    item.tit = tit
 
                     return findvideos(item)
 

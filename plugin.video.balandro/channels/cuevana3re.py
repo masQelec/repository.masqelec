@@ -321,7 +321,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'Latino': 'Lat', 'Español Latino': 'Lat', 'Español': 'Esp', 'Castellano': 'Esp', 'Subtitulado': 'Vose', 'Latinoingles': 'Vose', 'Japonessub': 'Jap', 'Japones': 'Jap'}
+    IDIOMAS = {'Latino': 'Lat', 'Español Latino': 'Lat', 'Español': 'Esp', 'Castellano': 'Esp', 'Subtitulado': 'Vose', 'Latinoingles': 'Vose', 'Japonessub': 'Jap', 'Japones': 'Jap', 'Latinojapones': 'Vose'}
 
     if item.contentType == 'movie':
         headers = {'Referer': host}
@@ -355,7 +355,6 @@ def findvideos(item):
         elif 'fembed' in url or 'fembed-hd' in url or 'fembeder'in url or 'divload' in url or 'ilovefembed' in url or 'myurlshort' in url or 'jplayer' in url or 'feurl' in url or 'fembedisthebest'in url or 'femax20'in url or 'fcdn' in url or 'fembad' in url or 'pelispng' in url or 'hlshd'in url or  'embedsito' in url or 'mrdhan' in url or 'dutrag' in url or 'fplayer' in url or 'diasfem' in url or 'suzihaza' in url or 'vanfem'in url or  'youtvgratis' in url or 'oceanplay' in url or 'gotovideo.kiev.ua' in url or 'owodeuwu' in url or 'sypl' in url or 'fembed9hd' in url or 'watchse' in url or 'vcdn' in url or 'femoload' in url or 'cubeembed'in url: continue
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if '/vimeos.' in url:
             servidor = 'zures'
@@ -407,7 +406,6 @@ def play(item):
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

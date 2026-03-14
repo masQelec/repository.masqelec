@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://wvv.monoschinos2.net/'
+host = 'https://vww.monoschinos2.net/'
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://monoschinos2.net/', 'https://wwv.monoschinos2.net/']
+    ant_hosts = ['https://monoschinos2.net/', 'https://wwv.monoschinos2.net/', 'https://wvv.monoschinos2.net/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -479,8 +479,6 @@ def findvideos(item):
 
         servidor = servertools.get_server_from_url(url)
 
-        servidor = servertools.corregir_servidor(servidor)
-
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
         else:
@@ -514,8 +512,6 @@ def findvideos(item):
             if '/rpmplayer.' in url: continue
 
             servidor = servertools.get_server_from_url(url)
-
-            servidor = servertools.corregir_servidor(servidor)
 
             if servertools.is_server_available(servidor):
                 if not servertools.is_server_enabled(servidor): continue

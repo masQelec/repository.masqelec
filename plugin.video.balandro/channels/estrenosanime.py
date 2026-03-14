@@ -416,10 +416,8 @@ def findvideos(item):
             if 'krakenfiles.' in srv: continue
 
             servidor = servertools.get_server_from_url(srv)
-            servidor = servertools.corregir_servidor(servidor)
 
             link_other = srv
-
 
             link_other = link_other.replace('www.', '').replace('.com', '').replace('.net', '').replace('.org', '').replace('.top', '')
             link_other = link_other.replace('.co', '').replace('.cc', '').replace('.sh', '').replace('.to', '').replace('.tv', '').replace('.ru', '').replace('.io', '')
@@ -434,7 +432,8 @@ def findvideos(item):
             lang = 'Vose'
             if 'Español Latino' in datos: lang = 'Lat'
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = link_other.capitalize() ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url,
+                                  language = lang, other = link_other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:
@@ -461,9 +460,6 @@ def play(item):
             url = new_url
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
-
-            url = servertools.normalize_url(servidor, url)
 
     if url:
         if url.startswith("https://sb"):
@@ -474,6 +470,8 @@ def play(item):
             if new_server.startswith("http"):
                 if not config.get_setting('developer_mode', default=False): return itemlist
             servidor = new_server
+
+        url = servertools.normalize_url(servidor, url)
 
         itemlist.append(item.clone(url = url, server = servidor))
 

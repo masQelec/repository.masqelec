@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os, xbmc, xbmcgui
+import os, xbmc, xbmcgui, xbmcaddon
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -1284,9 +1284,9 @@ def show_servers_list(item):
                     cod_version = ''
 
                 if not cod_version: exists_addon = '[COLOR gray][B]Desactivado[/B]'
-                else: exists_addon = '[COLOR tan][B] Vía Instalada [/B]'
+                else: exists_addon = '[COLOR tan][B] Vía Instalada[/B]'
 
-            else: exists_addon = '[COLOR red][B] Vía No Instalada [/B]'
+            else: exists_addon = '[COLOR red][B] Vía No Instalada[/B]'
 
             info += exists_addon
 

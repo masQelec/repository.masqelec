@@ -514,7 +514,6 @@ def findvideos(item):
 
             if link:
                 servidor = servertools.get_server_from_url(link)
-                servidor = servertools.corregir_servidor(servidor)
 
                 if servertools.is_server_available(servidor):
                     if not servertools.is_server_enabled(servidor): continue
@@ -527,7 +526,8 @@ def findvideos(item):
 
                 if servidor == other: other = ''
 
-                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = servidor, language = lang, other = other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = servidor,
+                                      language = lang, other = other ))
 
 
         bloque3 = scrapertools.find_single_match(data2, '<tbody>(.*?)</tbody>')
@@ -558,7 +558,6 @@ def findvideos(item):
                  elif '.rapidvideo.' in url: continue
 
                  servidor = servertools.get_server_from_url(url)
-                 servidor = servertools.corregir_servidor(servidor)
 
                  if servertools.is_server_available(servidor):
                      if not servertools.is_server_enabled(servidor): continue
@@ -612,7 +611,6 @@ def findvideos(item):
 
                 if not '/embed.php?id=' in url:
                     servidor = servertools.get_server_from_url(url)
-                    servidor = servertools.corregir_servidor(servidor)
 
                     if servertools.is_server_available(servidor):
                         if not servertools.is_server_enabled(servidor): continue
@@ -637,7 +635,6 @@ def findvideos(item):
 
                     if link:
                        servidor = servertools.get_server_from_url(link)
-                       servidor = servertools.corregir_servidor(servidor)
 
                        if servertools.is_server_available(servidor):
                            if not servertools.is_server_enabled(servidor): continue
@@ -682,7 +679,6 @@ def findvideos(item):
                         elif '.rapidvideo.' in url: continue
 
                         servidor = servertools.get_server_from_url(url)
-                        servidor = servertools.corregir_servidor(servidor)
 
                         if servertools.is_server_available(servidor):
                             if not servertools.is_server_enabled(servidor): continue

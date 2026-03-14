@@ -445,7 +445,6 @@ def findvideos(item):
                             url = link
 
                             servidor = servertools.get_server_from_url(url)
-                            servidor = servertools.corregir_servidor(servidor)
 
                             url = servertools.normalize_url(servidor, url)
 
@@ -478,7 +477,6 @@ def findvideos(item):
                 url = url.replace('/yosisubogordas.site/', '/vgembed.com/')
 
                 servidor = servertools.get_server_from_url(url)
-                servidor = servertools.corregir_servidor(servidor)
 
                 url = servertools.normalize_url(servidor, url)
 
@@ -542,7 +540,6 @@ def play(item):
 
         if url:
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             new_url = servertools.normalize_url(servidor, url)
 
@@ -555,7 +552,6 @@ def play(item):
 
         if url:
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             new_url = servertools.normalize_url(servidor, url)
 
@@ -568,7 +564,6 @@ def play(item):
 
         if url:
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             new_url = servertools.normalize_url(servidor, url)
 
@@ -581,7 +576,6 @@ def play(item):
 
         if url:
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             new_url = servertools.normalize_url(servidor, url)
 
@@ -628,7 +622,6 @@ def play(item):
         url = url.replace('&amp;', '&').replace("\\/", "/")
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

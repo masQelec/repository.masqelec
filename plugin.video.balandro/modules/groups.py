@@ -537,16 +537,13 @@ def submnu_news(item):
 
         itemlist.append(item.clone( channel='submnuctext', action='submnu_channels', title='[COLOR yellow][B]Buscar[/B][/COLOR]', context=context_buscar, extra = 'mixed', thumbnail=config.get_thumb('search') ))
 
-        if config.get_setting('mnu_sugeridos', default=True):
-            itemlist.append(item.clone( title = '[B]Recomendaciones:[/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='darksalmon' ))
+        itemlist.append(item.clone( title = '[B]Novedades Películas, Series y Documentales:[/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='darksalmon' ))
 
-            if config.get_setting('mnu_pelis', default=True) or config.get_setting('channels_link_pyse', default=False):
-                itemlist.append(item.clone( title = ' - [B]Películas[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('movie'), extra = 'movies', search_type = 'movies', text_color='deepskyblue' ))
+        if config.get_setting('mnu_pelis', default=True) or config.get_setting('channels_link_pyse', default=False):
+            itemlist.append(item.clone( title = ' - [B]Películas[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('movie'), extra = 'movies', search_type = 'movies', text_color='deepskyblue' ))
 
-            if config.get_setting('mnu_series', default=True) or config.get_setting('channels_link_pyse', default=False):
-                itemlist.append(item.clone( title = ' - [B]Series[/B]', channel='novelty', action='mainlist', context=context_usual, news='lasts', thumbnail=config.get_thumb('tvshow'), extra = 'tvshows', search_type = 'tvshow', text_color='hotpink' ))
-
-                itemlist.append(item.clone( title = ' - [B]Episodios[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('tvshow'), extra = 'episodes', search_type = 'tvshow', text_color='hotpink' ))
+        if config.get_setting('mnu_series', default=True) or config.get_setting('channels_link_pyse', default=False):
+            itemlist.append(item.clone( title = ' - [B]Series[/B]', channel='novelty', action='mainlist', context=context_usual, news='lasts', thumbnail=config.get_thumb('tvshow'), extra = 'tvshows', search_type = 'tvshow', text_color='hotpink' ))
 
         if not config.get_setting('mnu_simple', default=False):
             if config.get_setting('mnu_documentales', default=True):
@@ -557,6 +554,11 @@ def submnu_news(item):
 
             if config.get_setting('mnu_torrents', default=True):
                 itemlist.append(item.clone( title = ' - [B]Torrents[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('torrents'), extra = 'torrents', search_type = 'movie', text_color='blue' ))
+
+        if config.get_setting('mnu_series', default=True) or config.get_setting('channels_link_pyse', default=False):
+            itemlist.append(item.clone( title = '[B]Novedades Episodios:[/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='darksalmon' ))
+
+            itemlist.append(item.clone( title = ' - [B]Series[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('tvshow'), extra = 'episodes', search_type = 'tvshow', text_color='hotpink' ))
 
             if config.get_setting('mnu_doramas', default=True):
                 itemlist.append(item.clone( title = ' - [B]Doramas[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('computer'), extra = 'doramas', search_type = 'tvshow', text_color='firebrick' ))
@@ -1049,6 +1051,7 @@ def ch_groups(item):
             if 'lat' in audios: continue
             elif 'vose' in audios: continue
             elif 'vo' in audios: continue
+
         elif item.group == 'lat':
             audios = ch['language']
             if not item.group in audios: continue
@@ -1056,6 +1059,7 @@ def ch_groups(item):
             if 'cast' in audios: continue
             elif 'vose' in audios: continue
             elif 'vo' in audios: continue
+
         elif item.group == 'vose':
             audios = ch['language']
             if not item.group in audios: continue
@@ -1063,6 +1067,7 @@ def ch_groups(item):
             if 'cast' in audios: continue
             elif 'lat' in audios: continue
             elif 'vo' in audios: continue
+
         elif item.group == 'vo':
             audios = ch['language']
             if not item.group in audios: continue
@@ -1072,7 +1077,13 @@ def ch_groups(item):
             elif 'vose' in audios: continue
 
             if ch['searchable'] == False: # adultos
-               if descartar_xxx: continue
+                if descartar_xxx: continue
+
+        elif item.group == 'vos':
+            audios = ch['language']
+
+            if 'cast' in audios: continue
+            elif 'lat' in audios: continue
 
         elif item.group == 'all':
             audios = ch['language']

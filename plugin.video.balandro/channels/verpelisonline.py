@@ -13,6 +13,14 @@ host = 'https://ver-peliculas-online.org/'
 def do_downloadpage(url, post=None, headers=None):
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
+    if not data:
+        if not '/?s=' in url:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('VerPelisOnline', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
+
+            timeout = config.get_setting('channels_repeat', default=30)
+
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+
     return data
 
 
@@ -113,6 +121,8 @@ def list_all(item):
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
+        if '/ggpick.com/' in url: continue
+
         title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
         if not url or not title: continue
@@ -202,7 +212,6 @@ def findvideos(item):
         url = url.replace('/opuxa.lat/', '/waaw.to/')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

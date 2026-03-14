@@ -283,6 +283,11 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(data, '<li data-playerid="(.*?)"')
 
+    if not matches:
+        bloque = scrapertools.find_single_match(data, 'var video =(.*?)</script>')
+
+        matches = scrapertools.find_multiple_matches(str(bloque), 'src="(.*?)"')
+
     ses = 0
 
     for url in matches:
@@ -314,14 +319,11 @@ def findvideos(item):
             elif '#lang=' in url: url = url.split("#lang=")[0]
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
         else:
             if not config.get_setting('developer_mode', default=False): continue
-
-        url = servertools.normalize_url(servidor, url)
 
         if servidor == 'directo':
             if '/play/' in url:
@@ -355,14 +357,11 @@ def findvideos(item):
                         elif '#lang=' in url: url = url.split("#lang=")[0]
 
                     servidor = servertools.get_server_from_url(url)
-                    servidor = servertools.corregir_servidor(servidor)
 
                     if servertools.is_server_available(servidor):
                         if not servertools.is_server_enabled(servidor): continue
                     else:
                         if not config.get_setting('developer_mode', default=False): continue
-
-                    url = servertools.normalize_url(servidor, url)
 
                     other = ''
                     if servidor == 'various': other = servertools.corregir_other(url)
@@ -404,14 +403,11 @@ def findvideos(item):
             elif '/feurl.' in url: continue
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             if servertools.is_server_available(servidor):
                 if not servertools.is_server_enabled(servidor): continue
             else:
                 if not config.get_setting('developer_mode', default=False): continue
-
-            url = servertools.normalize_url(servidor, url)
 
             other = ''
             if servidor == 'various': other = servertools.corregir_other(url)
@@ -442,6 +438,8 @@ def play(item):
         if new_server.startswith("http"):
             if not config.get_setting('developer_mode', default=False): return itemlist
         servidor = new_server
+
+    url = servertools.normalize_url(servidor, url)
 
     itemlist.append(item.clone(server = servidor, url = url))
 

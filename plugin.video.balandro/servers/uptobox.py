@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
+if PY3:
+    import xbmcvfs
+    translatePath = xbmcvfs.translatePath
+else:
+    import xbmc
+    translatePath = xbmc.translatePath
+
+
 import os, xbmc, time
 
-from platformcode import logger, config, platformtools
-from core import httptools, scrapertools, filetools, jsontools
-
-
-BR2 = False
-
-try:
-   from lib import balandroresolver
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-
-      BR2 = True
-   except:
-      BR2 = None
+from platformcode import config, logger, platformtools
+from core import filetools, httptools, scrapertools, jsontools
 
 
 espera = config.get_setting('servers_waiting', default=6)
@@ -27,8 +27,7 @@ el_srv += ('ResolveUrl[/B][/COLOR]')
 
 
 def import_libs(module):
-    import os, sys, xbmcaddon
-    from core import filetools
+    import xbmcaddon
 
     path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
     addon_xml = filetools.read(filetools.join(path, "addon.xml"))
@@ -49,6 +48,7 @@ def import_libs(module):
         for lib in list(filter(lambda x: not '.py' in x, lib_path)):
             sys.path.append(os.path.join(path, lib))
 
+
 def get_video_url(page_url, url_referer=''):
     logger.info("url=" + page_url)
 
@@ -60,6 +60,7 @@ def get_video_url(page_url, url_referer=''):
 
     path_server = os.path.join(config.get_runtime_path(), 'servers', 'uptobox.json')
     data = filetools.read(path_server)
+
     dict_server = jsontools.load(data)
 
     try:
@@ -84,6 +85,12 @@ def get_video_url(page_url, url_referer=''):
     if waiting: platformtools.dialog_notification(config.__addon_name, "Tiempo de espera indeterminado")
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+        path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'uptobox.py'))
+
+        existe = filetools.exists(path)
+        if not existe:
+            return 'El Plugin No existe en Resolveurl'
+
         if config.get_setting('servers_time', default=True):
             platformtools.dialog_notification('Cargando [COLOR cyan][B]Uptobox[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
             time.sleep(int(espera))
@@ -131,35 +138,14 @@ def get_video_url(page_url, url_referer=''):
     else:
         return 'Falta ResolveUrl'
 
-    if not BR2 is not None:
-        if BR2:
-            try:
-               lbl, url = balandroresolver.decode_video_uptostream(data)
-
-               if lbl and url:
-                   video_urls.append([lbl, url])
-            except:
-               pass
-        else:
-            try:
-               video_urls = balandroresolver.resolve_uptobox().getLink(vid, video_urls)
-            except Exception as e:
-               e = str(e)
-               if '150 minutos' in e: return "Debes esperar 150 minutos para poder reproducir"
-
-               elif 'Unfortunately, the file you want is not available' in e or 'Unfortunately, the video you want to see is not available' in e or 'This stream doesn' in e or 'Page not found' in e or 'Archivo no encontrado' in e:
-                   return "Archivo inexistente ó eliminado"
-
-               elif "'str' object has no attribute 'get'" in e: return video_urls
-
-               return "Acceso temporalmente restringido"
-
-            except:
-               import traceback
-               logger.error(traceback.format_exc())
-
     if not video_urls:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+            path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'uptobox.py'))
+
+            existe = filetools.exists(path)
+            if not existe:
+                return 'El Plugin No existe en Resolveurl'
+
             if config.get_setting('servers_time', default=True):
                 platformtools.dialog_notification('Cargando [COLOR cyan][B]Uptobox[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
                 time.sleep(int(espera))
@@ -206,10 +192,6 @@ def get_video_url(page_url, url_referer=''):
 
         else:
             return 'Falta ResolveUrl'
-
-    # ~ 31/1/2023  Pendiente porque algo no ha funcionado bien
-    if BR2 is None:
-        platformtools.dialog_notification(config.__addon_name, "BR2 Not Resolve")
 
     return video_urls
 

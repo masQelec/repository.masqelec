@@ -7,11 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://wc5v.gnula.onl/'
+host = 'https://www.srnovelas.one/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://www.1ennovelas.top/', 'https://www.gnula.onl/', 'https://wv5n.gnula.onl/']
+ant_hosts = ['https://www.1ennovelas.top/', 'https://www.gnula.onl/', 'https://wv5n.gnula.onl/',
+            'https://wc5v.gnula.onl/']
 
 
 domain = config.get_setting('dominio', 'vernovelas', default='')
@@ -511,9 +512,6 @@ def findvideos(item):
             qlty = scrapertools.find_single_match(data1, "<strong class='quality'>(.*?)</strong>")
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
-
-            url = servertools.normalize_url(servidor, url)
 
             other = ''
 
@@ -540,9 +538,6 @@ def findvideos(item):
         qlty = scrapertools.find_single_match(data, "<strong class='quality'>(.*?)</strong>")
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
 
         other = ''
 
@@ -567,7 +562,6 @@ def findvideos(item):
         qlty = scrapertools.find_single_match(data, "<strong class='quality'>(.*?)</strong>")
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

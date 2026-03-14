@@ -302,7 +302,6 @@ def findvideos(item):
             url = 'https://goodstream.one/video/embed/' + embed
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

@@ -7,16 +7,16 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www25.pelisplushd.to/'
+host = 'https://www.pelisplushd.la/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://pelisplushd.lat/', 'https://www1.pelisplushd.lat/', 'https://www2.pelisplushd.lat/',
-             'https://www.pelisplushd.la/', 'https://ww1.pelisplushd.to/', 'https://www9.pelisplushd.to/',
-             'https://www11.pelisplushd.to/', 'https://www15.pelisplushd.to/', 'https://www16.pelisplushd.to/',
-             'https://www17.pelisplushd.to/', 'https://www18.pelisplushd.to/', 'https://www19.pelisplushd.to/',
-             'https://www20.pelisplushd.to/', 'https://www23.pelisplushd.to/', 'https://www24.pelisplushd.to/',
-             'https://ww3.pelisplushd.to/', 'https://ww4.pelisplushd.to/', 'https://ww5.pelisplushd.to/']
+             'https://ww1.pelisplushd.to/', 'https://www9.pelisplushd.to/', 'https://www11.pelisplushd.to/',
+             'https://www15.pelisplushd.to/', 'https://www16.pelisplushd.to/', 'https://www17.pelisplushd.to/',
+             'https://www18.pelisplushd.to/', 'https://www19.pelisplushd.to/', 'https://www20.pelisplushd.to/',
+             'https://www23.pelisplushd.to/', 'https://www24.pelisplushd.to/', 'https://ww3.pelisplushd.to/',
+             'https://ww4.pelisplushd.to/', 'https://ww5.pelisplushd.to/', 'https://www25.pelisplushd.to/']
              
 
 
@@ -521,9 +521,6 @@ def findvideos(item):
         if url.startswith('/'): url = host[:-1] + url
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
 
         link_other = ''
 
@@ -550,9 +547,6 @@ def findvideos(item):
         if url.startswith('/'): url = host[:-1] + url
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
 
         if lng == 'Subtitulado': lang = 'Vose'
         elif lng == 'Español': lang = 'Esp'
@@ -624,7 +618,6 @@ def play(item):
 
         if url:
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             url = servertools.normalize_url(servidor, url)
 
@@ -646,7 +639,6 @@ def play(item):
                 elif '/plustream.' in url: continue
 
                 servidor = servertools.get_server_from_url(url)
-                servidor = servertools.corregir_servidor(servidor)
 
                 url = servertools.normalize_url(servidor, url)
 
@@ -664,7 +656,6 @@ def play(item):
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

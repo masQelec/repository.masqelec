@@ -145,7 +145,6 @@ def findvideos(item):
         url = "%s%s56ea912c4df934c216c352fa8d623af3%s" % (servervideo, path, filee)
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

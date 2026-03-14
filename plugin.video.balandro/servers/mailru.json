@@ -8,7 +8,7 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "(?:videoapi|api.video).my.mail.ru/(?:videos|video)/embed/(mail|inbox)/([^/]+)/.*?/(\\d+).html",
+        "pattern": "(?:videoapi|api.video).my.mail.ru/(?:videos|video)/embed/(?!mail|inbox)/([^/]+)/.*?/(\\d+).html",
         "url": "http://videoapi.my.mail.ru/videos/embed/\\1/\\2/_myvideo/\\3.html"
       },
       {

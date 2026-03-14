@@ -157,10 +157,11 @@ def findvideos(item):
         if 'php?q=' in url: url = url.split('php?q=')
 
         if url:
-            url_decode = base64.b64decode(url[-1]).decode("utf8")
-            url = urllib.unquote(url_decode)
+            if not url.endswith('.mp4'):
+                url_decode = base64.b64decode(url[-1]).decode("utf8")
+                url = urllib.unquote(url_decode)
 
-            url = scrapertools.find_single_match(url, '<(?:iframe|source) src="([^"]+)"')
+                url = scrapertools.find_single_match(url, '<(?:iframe|source) src="([^"]+)"')
 
             if url:
                 itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = 'Vo' ))

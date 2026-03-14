@@ -24,9 +24,6 @@ from core.jsontools import json
 host = 'https://la.movie/'
 
 
-# ~ 31/7/25  Los Generos NO se Incluyen en generos.py
-
-
 def do_downloadapi(type, filter, page, terms, _id, season, order):
     try:
         url_filter = _urllib.urlencode({'filter':"{{{0}}}".format(filter)})
@@ -162,6 +159,9 @@ def generos(item):
     else:
         item.group = 'tvshow'
 
+    # ~ Necesario Solo para la Opcion Generos del Menu Principal del Addon
+    item.url = host
+
     return list_filter(item)
 
 def anios(item):
@@ -219,6 +219,12 @@ def list_filter(item):
                title = str(data[filter]['name']).replace('&amp;', '&')
 
                if grp == 'providers': title = title.capitalize()
+
+               elif grp == 'genres':
+                  title = title.replace('\\u00f3n', 'ón')
+                  title = title.replace('\\u00e9', 'é')
+                  title = title.replace('\\u00ed', 'í')
+                  title = title.replace('\\u00fa', 'ú')
 
                itemlist.append(item.clone ( title = title, action = "list_all", filter = sfilter, grp = grp, text_color = text_color ))
         except:

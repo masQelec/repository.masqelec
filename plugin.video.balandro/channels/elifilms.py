@@ -525,7 +525,6 @@ def findvideos(item):
         elif 'fcom' in link: continue
 
         servidor = servertools.get_server_from_url(link)
-        servidor = servertools.corregir_servidor(servidor)
 
         if '/vimeos.' in link:
             servidor = 'zures'
@@ -559,7 +558,6 @@ def findvideos(item):
         elif '/vimeos.' in link: continue
 
         servidor = servertools.get_server_from_url(link)
-        servidor = servertools.corregir_servidor(servidor)
 
         if '/vimeos.' in link:
             servidor = 'zures'

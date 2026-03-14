@@ -1,0 +1,17 @@
+{
+  "id": "todocineclasico",
+  "name": "TodoCineClasico",
+  "thumbnail": "todocineclasico.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["cast", "lat", "vose", "vo"],
+
+  "clusters": ["suggested", "classic", "rankings", "languages", "lists", "kids", "vos"],
+
+  "notes": "Películas clásicas por géneros."
+}

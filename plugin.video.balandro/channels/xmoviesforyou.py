@@ -57,17 +57,21 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
-    patron = '<article id="post-\d+.*?<a href="([^"]+)" rel="bookmark" title="([^"]+)".*?src="([^"]+)"'
+    matches = scrapertools.find_multiple_matches(data, '<article.*?<a href="(.*?)".*?src="(.*?)".*?alt="(.*?)"')
 
-    matches = scrapertools.find_multiple_matches(data, patron)
+    for url, thumb, title in matches:
+        if not title: continue
 
-    for url, title, thumb, in matches:
+        url = host[:-1] + url
+
         itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<a class="next page-numbers" href="(.*?)"')
+        next_page = scrapertools.find_single_match(data, '<div class="flex justify-center mt-12 gap-2">.*?<a href="(.*?)".*?</section>')
 
         if next_page:
+            next_page = host[:-1] + next_page
+
             itemlist.append(item.clone (action='list_all', title='Siguientes ...', url=next_page, text_color = 'coral') )
 
     return itemlist
@@ -87,10 +91,9 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
-    bloque = scrapertools.find_single_match(data, '<div class="entry-content post_content">(.*?)</span></strong>')
+    bloque = scrapertools.find_single_match(data, '<div class="flex flex-wrap gap-4 mb-8">(.*?)</div>')
 
-    matches = re.compile('<(?:iframe src|IFRAME SRC|a href)="([^"]+)"', re.DOTALL).findall(bloque)
-    if not matches: matches = re.compile('<a href="(.*?)"', re.DOTALL).findall(bloque)
+    matches = re.compile('<a href="([^"]+)"', re.DOTALL).findall(bloque)
 
     ses = 0
 
@@ -100,7 +103,6 @@ def findvideos(item):
         # ~ Netu
         if not "0load" in url:
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             url = servertools.normalize_url(servidor, url)
 

@@ -1,0 +1,17 @@
+{
+  "id": "cinecalidadrs",
+  "name": "CineCalidadRs",
+  "thumbnail": "cinecalidadrs.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["years", "kids", "docs", "vos", "4k"],
+
+  "notes": "Acceso por separado Castellano y Latino. Películas por géneros."
+}

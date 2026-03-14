@@ -299,7 +299,6 @@
         <setting id="opc_cinecalidadla" type="action" label="[COLOR gold]CineCalidadLa[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cinecalidadla)"/>
         <setting id="opc_cinecalidadlol" type="action" label="[COLOR gold]CineCalidadLol[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cinecalidadlol)"/>
         <setting id="opc_cuevana2" type="action" label="[COLOR gold]Cuevana2[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cuevana2)"/>
-        <setting id="opc_cuevana2esp" type="action" label="[COLOR gold]Cuevana2Esp[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cuevana2esp)"/>
         <setting id="opc_cuevana3pro" type="action" label="[COLOR gold]Cuevana3Pro[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cuevana3pro)"/>
 
         <setting id="opc_divxtotal" type="action" label="[COLOR gold]DixTotal[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_divxtotal)"/>
@@ -329,7 +328,6 @@
         <setting id="last_domain_hdfull" type="action" label=" [COLOR goldenrod][B]Asociar[/B][/COLOR] el Último Dominio Vigente [COLOR dodgerblue][B] dominioshdfull.com[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=last_domain_hdfull)"/>
 		<setting id="ch_hdfull_dominio" type="action" label=" [COLOR darkorange][B]Informar ó Modificar[/B][/COLOR] el dominio" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_hdfull)"/>
 
-        <setting id="opc_henaojara" type="action" label="[COLOR gold]HenaOjara[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_henaojara)"/>
         <setting id="opc_homecine" type="action" label="[COLOR gold]HomeCine[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_homecine)"/>
 
         <setting id="opc_mejortorrentapp" type="action" label="[COLOR gold]MejorTorrentApp[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_mejortorrentapp)"/>
@@ -350,6 +348,7 @@
         <setting id="opc_serieskao" type="action" label="[COLOR gold]SeriesKao[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_serieskao)"/>
         <setting id="opc_seriespapayato" type="action" label="[COLOR gold]SeriesPapayaTo[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_seriespapayato)"/>
         <setting id="opc_seriesplus" type="action" label="[COLOR gold]SeriesPlus[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_seriesplus)"/>
+        <setting id="opc_sflix" type="action" label="[COLOR gold]SFlix[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_sflix)"/>
         <setting id="opc_srnovelas" type="action" label="[COLOR gold]SrNovelas[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_srnovelas)"/>
         <setting id="opc_subtorrents" type="action" label="[COLOR gold]SubTorrents[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_subtorrents)"/>
 
@@ -428,7 +427,7 @@
         <setting id="autoplay_max_links" type="labelenum" label="Número máximo de enlaces para intentar el auto play" values="3|5|10|15|20|25|30" default="10" visible="eq(-2,true)"/>
         <setting id="autoplay_one_link" type="bool" label="Si solo hay [COLOR gold][B]Un enlace[/B][/COLOR] para reproducir efectuar Auto play" default="true" visible="eq(-3,true)"/>
         <setting id="show_servers_list1" type="action" label="Servidores que están [COLOR darkorange][B]Disponibles[/B][/COLOR] (Activos)" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_servers_list)"/> 
-        <setting id="autoplay_channels_discarded" label="Canales [COLOR goldenrod][B]Sin Auto Play[/B][/COLOR] (Nombre de cada Canal separados por coma)" type="text" default="" visible="eq(-5,true)"/>
+        <setting id="autoplay_channels_discarded" label="Canales [COLOR goldenrod][B]Sin Auto Play[/B][/COLOR] (cada Canal separado por coma)" type="text" default="" visible="eq(-5,true)"/>
 
         <setting label="Ordenar y/ó Filtrar por Idioma:" type="lsep"/>
 
@@ -446,9 +445,9 @@
 
         <setting id="pfil_opc" type="bool" label="Opciones" default="false"/>
         <setting id="show_servers_list2" type="action" label="Servidores que están [COLOR darkorange][B]Disponibles[/B][/COLOR] (Activos)" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_servers_list)"/> 
-        <setting id="servers_preferred" label="Servidores [COLOR darkorange][B]Preferidos[/B][/COLOR] (Nombre de cada Servidos separados por coma)" type="text" default="" visible="eq(-2,true)"/>
-        <setting id="servers_unfavored" label="Servidores como [COLOR gold][B]Última opción[/B][/COLOR] (Nombre de cada Servidos separados por coma)" type="text" default="" visible="eq(-3,true)"/>
-        <setting id="servers_discarded" label="Servidores [COLOR cyan][B]Descartados[/B][/COLOR] (Nombre de cada Servidos separados por coma)" type="text" default="" visible="eq(-4,true)"/>
+        <setting id="servers_preferred" label="Servidores [COLOR darkorange][B]Preferidos[/B][/COLOR] (cada Servidor separado por coma)" type="text" default="" visible="eq(-2,true)"/>
+        <setting id="servers_unfavored" label="Servidores como [COLOR gold][B]Última opción[/B][/COLOR] (cada Servidor separado por coma)" type="text" default="" visible="eq(-3,true)"/>
+        <setting id="servers_discarded" label="Servidores [COLOR cyan][B]Descartados[/B][/COLOR] (cada Servidor separado por coma)" type="text" default="" visible="eq(-4,true)"/>
 
         <setting label="Notificaciones:" type="lsep"/>
 
@@ -486,7 +485,7 @@
         <setting id="proxies_recommended" type="bool" label="Solo tener en cuenta en las Búsquedas los Proveedores [COLOR lime][B]Recomendados[/B][/COLOR]" default="false" visible="eq(-2,true)"/>
         <setting id="proxies_search_extended" type="bool" label="Tratar Primero en las Búsquedas los Proveedores de la [COLOR aqua][B]Lista Ampliada[/B][/COLOR]" default="false" visible="eq(-3,true)"/>
         <setting id="show_help_providers3" type="action" label="Qué Proveedores de Proxies están [COLOR goldenrod][B]Disponibles[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_providers)"/>
-        <setting id="providers_preferred" label="Tratar [COLOR springgreen][B]Solo[/B][/COLOR] los Proveedores [COLOR wheat][B]Preferidos[/B][/COLOR] (Nombre de cada Proveedor separados por coma)" type="text" default="" visible="eq(-5,true)"/>
+        <setting id="providers_preferred" label="Tratar [COLOR springgreen][B]Solo[/B][/COLOR] los Proveedores [COLOR wheat][B]Preferidos[/B][/COLOR] (cada Proveedor separado por coma)" type="text" default="" visible="eq(-5,true)"/>
 
         <setting label="Canales:" type="lsep"/>
 
@@ -511,8 +510,8 @@
 
         <setting id="proxp_vias" type="bool" label="Opciones" default="false"/>
         <setting id="proxies_vias" type="bool" label="Gestionar [COLOR yellow][B]Vías alternativas[/B][/COLOR] si no se obtubieron suficientes proxies a analizar" default="false" visible="eq(-1,true)"/>
-        <setting id="proxies_tplus" type="labelenum" label="Seleccionar código de la Via Alternativa (requiere activar la [COLOR yellow][B]Gestión[/B][/COLOR])" values="0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54|55|56|57|58|59|60|61" default="32" visible="eq(-2,true)"/>
-        <setting id="proxies_show_vias" type="action" label="Información Lista [COLOR aqua][B]Vías alternativas[/B][/COLOR] de Proveedores de proxies" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=proxies_show_vias)"/>
+        <setting id="proxies_tplus" type="labelenum" label="Seleccionar código de la Via Alternativa (requiere activar la [COLOR yellow][B]Gestión[/B][/COLOR])" values="0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54|55|56|57|58|59|60|61|62" default="32" visible="eq(-2,true)"/>
+        <setting id="proxies_show_vias" type="action" label="Lista [COLOR aqua][B]Vías alternativas[/B][/COLOR] de Proveedores de proxies" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=proxies_show_vias)"/>
 
         <setting label="Solicitudes al Procesar:" type="lsep"/>
 

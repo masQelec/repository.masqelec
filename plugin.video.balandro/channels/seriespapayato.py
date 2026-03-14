@@ -565,7 +565,6 @@ def play(item):
         if 'dailymotion' in url: url = 'https://www.dailymotion.com/' + url.split('/')[-1]
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()

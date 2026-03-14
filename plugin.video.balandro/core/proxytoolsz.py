@@ -14,7 +14,7 @@ if config.get_setting('developer_mode', default=False):
     if config.get_setting('developer_team'): developer = True
 
 
-tipos_plus = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61]
+tipos_plus = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62]
 
 
 def plus_proxies(proxies, max_proxies):
@@ -127,6 +127,8 @@ def plus_proxies(proxies, max_proxies):
     elif tplus == 59: url_provider = 'https://raw.githubusercontent.com/vakhov/fresh-proxy-list/master/https.txt'
     elif tplus == 60: url_provider = 'https://raw.githubusercontent.com/vakhov/fresh-proxy-list/master/socks4.txt'
     elif tplus == 61: url_provider = 'https://raw.githubusercontent.com/vakhov/fresh-proxy-list/master/socks5.txt'
+
+    elif tplus == 62: url_provider = 'https://hidemium.io/free-proxy/'
 
     if url_provider:
         resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
@@ -520,8 +522,30 @@ def plus_proxies(proxies, max_proxies):
         except:
            if developer: platformtools.dialog_ok('Plus9', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
+    elif tplus == 62:
+        el_provider = '[B][COLOR %s] Hidemium[/B][/COLOR]' % color_exec
+        platformtools.dialog_notification('Plus62 ' + str(tplus), 'Vía' + el_provider)
+
+        resp.data = resp.data.replace('\\"', '"')
+
+        block = scrapertools.find_single_match(str(resp.data), '"listProxyFree(.*?)"total')
+
+        enlaces = scrapertools.find_multiple_matches(str(block), '"address":.*?"(.*?)"')
+
+        try:			 
+           for prox in enlaces:
+               prox = prox.strip()
+
+               if not ':' in prox: continue
+
+               if prox: proxies_plus.append(prox)
+        except:
+           if developer: platformtools.dialog_ok('Plus62', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
+
     # ~ si no se obtuvo ninguno
     if not proxies_plus:
+        if developer: platformtools.dialog_ok('T-Plus '+ str(tplus), '[COLOR red][B]Revisar estructura[/B][/COLOR]')
+
         if not tplus == 3:
             url_provider = 'https://vpnoverview.com/privacy/anonymous-browsing/free-proxy-servers/'
             resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
@@ -956,7 +980,7 @@ def z_coderduck(url, tipo_proxy, pais_proxy, max_proxies):
            for prox in enlaces:
                proxies.append(prox)
         except:
-          if developer: platformtools.dialog_ok('Pdfcoffee', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
+           if developer: platformtools.dialog_ok('Pdfcoffee', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
     else:
         # ~ 13/9/2022 no devuelve proxies
         url_provider = 'https://www.coderduck.com/free-proxy-list'
@@ -974,7 +998,36 @@ def z_coderduck(url, tipo_proxy, pais_proxy, max_proxies):
 
                if prox: proxies.append(prox + ':' + port)
         except:
-          if developer: platformtools.dialog_ok('Coderduck', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
+           if developer: platformtools.dialog_ok('Coderduck', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
+
+    if len(proxies) < 50: proxies = plus_proxies(proxies, max_proxies)
+
+    return proxies
+
+
+def z_hidemium(url, tipo_proxy, pais_proxy, max_proxies):
+    logger.info()
+
+    proxies = []
+
+    url_provider = 'https://hidemium.io/free-proxy/'
+    resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
+
+    resp.data = resp.data.replace('\\"', '"')
+
+    block = scrapertools.find_single_match(str(resp.data), '"listProxyFree(.*?)"total')
+
+    enlaces = scrapertools.find_multiple_matches(str(block), '"address":.*?"(.*?)"')
+
+    try:			 
+       for prox in enlaces:
+           prox = prox.strip()
+
+           if not ':' in prox: continue
+
+           if prox: proxies.append(prox)
+    except:
+        if developer: platformtools.dialog_ok('Hidemium', '[COLOR red][B]Revisar estructura[/B][/COLOR]')
 
     if len(proxies) < 50: proxies = plus_proxies(proxies, max_proxies)
 

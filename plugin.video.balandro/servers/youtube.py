@@ -5,19 +5,25 @@ import sys
 if sys.version_info[0] < 3:
     PY3 = False
 
+    import xbmc
+    translatePath = xbmc.translatePath
+
     import urllib
     import urlparse
 else:
     PY3 = True
 
+    import xbmcvfs
+    translatePath = xbmcvfs.translatePath
+
     import urllib.parse as urllib
     import urllib.parse as urlparse
 
 
-import xbmc, xbmcaddon, re, time
+import os, xbmc, xbmcaddon, re, time
 
 from platformcode import config, logger, platformtools
-from core import httptools, scrapertools, servertools
+from core import filetools, httptools, scrapertools, servertools
 
 from core import jsontools as json
 
@@ -208,10 +214,6 @@ def extract_from_player_response(params, youtube_page_data=''):
 
 
 def import_libs(module):
-    import os
-
-    from core import filetools
-
     try:
        path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
        addon_xml = filetools.read(filetools.join(path, "addon.xml"))
@@ -329,6 +331,12 @@ def extract_videos(video_id, ini_page_url):
                    cod_version = ''
 
                 if cod_version:
+                    path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'youtube.py'))
+
+                    existe = filetools.exists(path)
+                    if not existe:
+                        return 'El Plugin No existe en Resolveurl'
+
                     if config.get_setting('servers_time', default=True):
                         platformtools.dialog_notification('Accediendo con', '[COLOR cyan][B]ResolveUrl[/B][/COLOR]')
 
@@ -508,6 +516,12 @@ def extract_videos(video_id, ini_page_url):
                cod_version = ''
 
             if cod_version:
+                path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'youtube.py'))
+
+                existe = filetools.exists(path)
+                if not existe:
+                    return 'El Plugin No existe en Resolveurl'
+
                 if config.get_setting('servers_time', default=True):
                     platformtools.dialog_notification('Re-accediendo con', '[COLOR cyan][B]ResolveUrl[/B][/COLOR]')
 

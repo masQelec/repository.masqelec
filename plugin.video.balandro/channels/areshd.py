@@ -329,7 +329,6 @@ def play(item):
         elif url.startswith("https://okru.cx/?h="): return itemlist
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

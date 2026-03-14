@@ -106,6 +106,8 @@ def mainlist(item):
     else:
         itemlist.append(item.clone( action='', title='[B]- Recomendaciones [I][COLOR hotpink]Episodios Series:[/I][/B][/COLOR]', thumbnail=config.get_thumb('tvshow'), fanart=fanart, text_color='darksalmon' ))
 
+    i = 0
+
     for ch in ch_list:
         if '+18' in ch['notes']: continue
 
@@ -336,51 +338,25 @@ def mainlist(item):
         if item.extra == 'movies':
             if not 'movie' in ch['categories']: continue
 
-            elif ch['id'] == 'gnula24h': continue
-            elif ch['id'] == 'seriesretro': continue
-            elif ch['id'] == 'cuevana3pro': continue
-            elif ch['id'] == 'cuevana3run': continue
-            elif ch['id'] == 'onlinetv': continue
-            elif ch['id'] == 'retrotv': continue
-            elif ch['id'] == 'cinemundo': continue
-            elif ch['id'] == 'cineplay': continue
-            elif ch['id'] == 'cineteca': continue
-            elif ch['id'] == 'creyente': continue
-            elif ch['id'] == 'flizzmovies': continue
-            elif ch['id'] == 'genteclic': continue
-            elif ch['id'] == 'hdcinema': continue
-            elif ch['id'] == 'legalmentegratis': continue
-            elif ch['id'] == 'megaserie': continue
-            elif ch['id'] == 'pelis182': continue
-            elif ch['id'] == 'pelis28re': continue
-            elif ch['id'] == 'pelisforte': continue
-            elif ch['id'] == 'pelismart': continue
-            elif ch['id'] == 'pelispediaws': continue
-            elif ch['id'] == 'pelisplayhd': continue
-            elif ch['id'] == 'seriespapayato': continue
-            elif ch['id'] == 'streamgratis': continue
-            elif ch['id'] == 'tubeonline': continue
-            elif ch['id'] == 'verflix': continue
-            elif ch['id'] == 'zonaleros': continue
+            if not 'news' in ch['clusters']: continue
 
         elif item.extra == 'tvshows':
             if not 'tvshow' in ch['categories']: continue
 
-            elif ch['id'] == 'cinecalidad': continue
-            elif ch['id'] == 'cuevana3pro': continue
-            elif ch['id'] == 'cuevana3run': continue
+            if not 'lasts' in ch['clusters']: continue
+
+            if ch['id'] == 'cineplus': continue
             elif ch['id'] == 'gnula24': continue
             elif ch['id'] == 'gnula24h': continue
             elif ch['id'] == 'gnulacenter': continue
-
             elif ch['id'] == 'onlinetv': continue
             elif ch['id'] == 'retrotv': continue
             elif ch['id'] == 'series24': continue
             elif ch['id'] == 'seriesonline': continue
             elif ch['id'] == 'seriesplus': continue
-            elif ch['id'] == 'star': continue
             elif ch['id'] == 'seriesretro': continue
             elif ch['id'] == 'sololatino': continue
+            elif ch['id'] == 'star': continue
             elif ch['id'] == 'verflix': continue
             elif ch['id'] == 'vernovelas': continue
             elif ch['id'] == 'veronline': continue
@@ -390,39 +366,49 @@ def mainlist(item):
         elif item.extra == 'documentaries':
             if not 'documentary' in ch['categories']: continue
 
-            if ch['id'] == 'verdocumentalesonline': pass
-            else: continue
-
         elif item.extra == 'infantiles':
+            if not 'movie' in ch['categories']: continue
+
             if not 'kids' in ch['clusters']: continue
 
-            if ch['id'] == 'osjonosu': pass
-            else: continue
+            if ch['id'] == 'allpeliculasse': continue
+            elif ch['id'] == 'areshd': continue
+            elif ch['id'] == 'cine24h': continue
+            elif ch['id'] == 'cinehdplus': continue
+            elif ch['id'] == 'cinemitas': continue
+            elif ch['id'] == 'cineplus': continue
+            elif ch['id'] == 'cinecalidad': continue
+            elif ch['id'] == 'cuevana3pro': continue
+            elif ch['id'] == 'cuevana3re': continue
+            elif ch['id'] == 'entrepeliculasyseries': continue
+            elif ch['id'] == 'estrenoscinesaa': continue
+            elif ch['id'] == 'lamovie': continue
+            elif ch['id'] == 'megadedeoficial': continue
+            elif ch['id'] == 'pelisgratishd': continue
+            elif ch['id'] == 'pelispediais': continue
+            elif ch['id'] == 'repelishd': continue
+            elif ch['id'] == 'retrotv': continue
+            elif ch['id'] == 'serieskao': continue
+            elif ch['id'] == 'seriesretro': continue
+            elif ch['id'] == 'tucineclasico': continue
+            elif ch['id'] == 'ultrapelis': continue
+            elif ch['id'] == 'verflix': continue
+            elif ch['id'] == 'verpelis': continue
+            elif ch['id'] == 'zoowomaniacos': continue
 
         elif item.extra == 'torrents':
             if not 'torrent' in ch['categories']: continue
 
-            if ch['id'] == 'divxatope': pass
-            elif ch['id'] == 'divxtotal': pass
-            elif ch['id'] == 'dontorrents': pass
-            elif ch['id'] == 'dontorrentsin': pass
-            elif ch['id'] == 'elitedivx': pass
-            elif ch['id'] == 'lilatorrent': pass
-            elif ch['id'] == 'mejortorrentapp': pass
-            elif ch['id'] == 'mejortorrentnz': pass
-            elif ch['id'] == 'naranjatorrent': pass
-            elif ch['id'] == 'reinventorrent': pass
-            elif ch['id'] == 'rojotorrent': pass
-            elif ch['id'] == 'subtorrents': pass
-            elif ch['id'] == 'todotorrents': pass
-            elif ch['id'] == 'tomadivx': pass
-            elif ch['id'] == 'verdetorrent': pass
-            elif ch['id'] == 'vivatorrents': pass
+            if not 'movie' in ch['categories']: continue
 
-            else: continue
+            if not 'news' in ch['clusters']: continue
+
+            if ch['id'] == 'cinecalidad': continue
 
         elif item.extra == 'doramas':
             if not 'exclusivamente al dorama' in ch['notes'].lower(): continue
+
+            if not 'tvshow' in ch['categories']: continue
 
             if ch['id'] == 'doramaexpress': pass
             elif ch['id'] == 'doramasflix': pass
@@ -440,6 +426,8 @@ def mainlist(item):
         elif item.extra == 'animes':
             if not 'exclusivamente al anime' in ch['notes'].lower(): continue
 
+            if not 'tvshow' in ch['categories']: continue
+
             if ch['id'] == 'animeclub': pass
             elif ch['id'] == 'animeflv': pass
             elif ch['id'] == 'animejl': pass
@@ -447,8 +435,8 @@ def mainlist(item):
             elif ch['id'] == 'animeyt': pass
             elif ch['id'] == 'estrenosanime': pass
             elif ch['id'] == 'jkanime': pass
-            elif ch['id'] == 'henaojara': pass
             elif ch['id'] == 'henaojaran': pass
+            elif ch['id'] == 'ikucomics': pass
             elif ch['id'] == 'latanime': pass
             elif ch['id'] == 'monoschinos': pass
             elif ch['id'] == 'mundodonghua': pass
@@ -500,34 +488,16 @@ def mainlist(item):
 
             else: continue
 
-        if ch['id'] == 'allpeliculasse': continue
-        elif ch['id'] == 'areshd': continue
-        elif ch['id'] == 'cine24h': continue
-        elif ch['id'] == 'cinehdplus': continue
-        elif ch['id'] == 'cinemitas': continue
-        elif ch['id'] == 'cineplus': continue
-        elif ch['id'] == 'cuevana3re': continue
-        elif ch['id'] == 'estrenoscinesaa': continue
-        elif ch['id'] == 'entrepeliculasyseries': continue
-        elif ch['id'] == 'lacartoons': continue
-        elif ch['id'] == 'lamovie': continue
-        elif ch['id'] == 'megadedeoficial': continue
-        elif ch['id'] == 'peliculasflix': continue
-        elif ch['id'] == 'pelisgratishd': continue
-        elif ch['id'] == 'pelispediais': continue
-        elif ch['id'] == 'pelisplushdnz': continue
-        elif ch['id'] == 'plushd': continue
-        elif ch['id'] == 'repelishd': continue
-        elif ch['id'] == 'serieskao': continue
-        elif ch['id'] == 'tucineclasico': continue
-        elif ch['id'] == 'ultrapelis': continue
-        elif ch['id'] == 'verpelis': continue
-        elif ch['id'] == 'zoowomaniacos': continue
+        i += 1
 
         accion = '_' + item.news
 
         itemlist.append(Item( channel=ch['id'], action=accion, title=titulo, context=context,
                               search_type=item.search_type, text_color=color, thumbnail=ch['thumbnail'], fanart=fanart ))
+
+    if i == 0:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin Recomendaciones[/B][/COLOR]' % color_adver)
+        return
 
     return itemlist
 

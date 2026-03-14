@@ -551,7 +551,7 @@ def list_search(item):
         if item.search_type == 'all': 
             sufijo = contentType
             if sufijo == "documentary":
-                sufijo = '[COLOR yellowgreen](documental)[/COLOR]'
+                sufijo = '[COLOR cyan]Documental[/COLOR]'
 
         if contentType == 'tvshow':
             if not item.search_type == 'all':

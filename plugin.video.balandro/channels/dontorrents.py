@@ -17,8 +17,11 @@ from lib import decrypters
 
 host = 'https://4144-don.mirror.pm/'
 
-# ~ 12/12/25 last domain  'https://dontorrent.prof/'
 
+# ~ 1/2/26 last domain  'https://dontorrent.promo/'
+
+# ~ Web Search
+web_search_dontorrent = 'https://dontorrent.promo/'
 
 # ~ Alternative Webs Findvideos
 alt_find_divxatope = 'https://divxatope.net/'
@@ -43,7 +46,9 @@ if data_tor_proxy:
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://dontorrent.one/',
+ant_hosts =  [
+             # ~ 2021
+             'https://dontorrents.org/', 'https://dontorrents.net/', 'https://dontorrent.one/',
              'https://dontorrent.app/', 'https://dontorrent.lol/', 'https://dontorrent.nz/',
              'https://dontorrent.rip/', 'https://dontorrent.vip/', 'https://dontorrent.ws/',
              'https://dontorrent.win/', 'https://dontorrent.rs/', 'https://dontorrent.bz/',
@@ -105,7 +110,9 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.lighting/', 'https://dontorrent.istanbul/', 'https://dontorrent.onl/',
              'https://dontorrent.kids/', 'https://dontorrent.kiwi/', 'https://dontorrent.live/',
              'https://dontorrent.phd/', 'https://dontorrent.gripe/', 'https://dontorrent.sarl/',
-             'https://dontorrent.club/']
+             'https://dontorrent.club/',
+             # ~ 2026
+             'https://dontorrent.prof/', 'https://dontorrent.info/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')
@@ -884,33 +891,39 @@ def list_search(item):
     logger.info()
     itemlist = []
 
-    headers = {'Referer': host}
+    if not item.page: item.page = 1
 
-    data = do_downloadpage(item.url, headers=headers)
+    headers = {'Referer': web_search_dontorrent}
+
+    post = {'valor': item.tex, 'Buscar': 'Buscar', 'p': str(item.page)}
+
+    data = do_downloadpage(item.url, post = post, headers = headers)
+
+    bloque = scrapertools.find_single_match(data, '>Resultados<(.*?)</nav>')
 
     patron = "<a href='(.*?)'.*?"
     patron += 'class="text-decoration-none">(.*?)</a>'
 
-    matches = re.compile(patron).findall(data)
+    matches = re.compile(patron).findall(bloque)
 
     for url, title in matches:
         title = title.replace('<span class="text-secondary">', '').replace('<span class="text-secondary" >', '').replace('</span>', '').strip()
 
         if not url or not title: continue
 
-        if "pelicula" in url: contentType = "movie"
-        elif "documental" in url: contentType = "documentary"
+        if "/pelicula/" in url: contentType = "movie"
+        elif "/documental/" in url: contentType = "documentary"
         else: contentType = "tvshow"
 
         if item.search_type not in ['all', contentType]: continue
 
         sufijo = ''
+
         if item.search_type == 'all': 
             sufijo = contentType
-            if sufijo == "documentary":
-                sufijo = '[COLOR yellowgreen](documental)[/COLOR]'
+            if sufijo == "documentary": sufijo = '[COLOR cyan]Documental[/COLOR]'
 
-        if contentType == 'tvshow':
+        if contentType == 'tvshow' or item.search_type == 'all':
             if not item.search_type == 'all':
                 if item.search_type == "movie": continue
 
@@ -918,10 +931,10 @@ def list_search(item):
 
             title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
-            itemlist.append(item.clone( action='episodios', url=host[:-1] + url, title=title, fmt_sufijo=sufijo, 
+            itemlist.append(item.clone( action='episodios', url=host[:-1] + url, title=title, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': "-"} ))
 
-        if contentType == 'movie' or contentType == "documentary":
+        if contentType == 'movie' or contentType == "documentary" or item.search_type == 'all':
             if not item.search_type == 'all':
                 if item.search_type == "tvshow": continue
 
@@ -939,13 +952,9 @@ def list_search(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        if '>Siguiente<' in data:
-             next_page = scrapertools.find_single_match(data, '<a class="page-link".*?current="page">.*?li class="page-item"><a class="page-link".*?href="(.*?)"')
-
-             if next_page:
-                 next_page = host[:-1] + next_page
-
-                 itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_search', text_color='coral' ))
+        if '<nav class="page-navigator"' in data:
+             if 'onclick="buscarPagina' in data:
+                 itemlist.append(item.clone( title='Siguientes ...', url = item.url, page = item.page + 1, action='list_search', text_color='coral' ))
 
     return itemlist
 
@@ -995,7 +1004,8 @@ def _news(item):
 def search(item, texto):
     logger.info()
     try:
-       item.url = host + 'buscar/' + texto
+       item.url = web_search_dontorrent + 'buscar/'
+       item.tex = texto
        return list_search(item)
     except:
        import sys

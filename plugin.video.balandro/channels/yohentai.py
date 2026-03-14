@@ -190,7 +190,6 @@ def findvideos(item):
         elif '1cloudfile' in url: continue
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         other = ''
         if servidor == 'various': other = servertools.corregir_other(url)
@@ -215,7 +214,6 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

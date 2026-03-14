@@ -1,0 +1,17 @@
+{
+  "id": "ikucomics",
+  "name": "IkuComics",
+  "thumbnail": "ikucomics.jpg",
+
+  "active": true,
+
+  "searchable": false,
+  "search_types": ["tvshow"],
+
+  "categories": ["tvshow"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["anime"],
+
+  "notes": "Web dedicada exclusivamente al anime. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+}

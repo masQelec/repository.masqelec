@@ -518,7 +518,6 @@ def findvideos(item):
                 url = url.replace('/Smoothpre.', '/smoothpre.')
 
                 servidor = servertools.get_server_from_url(url)
-                servidor = servertools.corregir_servidor(servidor)
 
                 if servertools.is_server_available(servidor):
                     if not servertools.is_server_enabled(servidor): continue
@@ -593,7 +592,6 @@ def findvideos(item):
         else: lang = '?'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
@@ -635,7 +633,6 @@ def findvideos(item):
 
         if url:
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vose' ))
 
@@ -664,7 +661,6 @@ def play(item):
 
     if url_play:
         servidor = servertools.get_server_from_url(url_play)
-        servidor = servertools.corregir_servidor(servidor)
 
         url_play = servertools.normalize_url(servidor, url_play)
 

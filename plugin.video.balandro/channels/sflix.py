@@ -7,13 +7,24 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://seriesflixhd.one/'
+host = 'https://seriesflixhd.info/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://seriesflix.wtf/', 'https://seriesflixhd.one/', 'https://seriesflixhd.fun/',
+            'https://seriesflixhd.help/']
+
+
+domain = config.get_setting('dominio', 'sflix', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'sflix')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'sflix')
+    else: host = domain
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://seriesflix.wtf/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
@@ -24,6 +35,34 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     return data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'sflix', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_sflix', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='sflix', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_sflix', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'sflix', thumbnail=config.get_thumb('sflix') ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
 def mainlist(item):
     return mainlist_series(item)
 
@@ -31,6 +70,8 @@ def mainlist(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -106,7 +147,7 @@ def list_all(item):
 
         if not year: year = '-'
 
-        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&amp;', '&')
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '').replace('&amp;', '&')
 
         title = title.replace('Poster', '').strip()
 
@@ -159,7 +200,7 @@ def last_epis(item):
         episode = scrapertools.find_single_match(temp_epis, 'x(.*?)$').strip()
         if not episode: episode = 1
 
-        title = title.replace('&#8217;', '')
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '').replace('&amp;', '&')
 
         title = title.replace('( ' + str(season) + ' x ' + str(episode) + ' )', '').strip()
 
@@ -359,7 +400,6 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

@@ -1,0 +1,17 @@
+{
+  "id": "retroflix",
+  "name": "RetroFlix",
+  "thumbnail": "retroflix.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": ["movie", "tvshow"],
+  "language": ["vo"],
+
+  "clusters": ["onlyone", "classic", "rankings", "lists", "anime", "kids", "docs", "vo"],
+
+  "notes": "Películas clásicas por géneros, Documentales clásicos. Episodios de Cartoons y Episodios de Series clásicas. En idioma orignal de emisión."
+}

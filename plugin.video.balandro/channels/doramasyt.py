@@ -504,8 +504,9 @@ def findvideos(item):
         elif srv == 'drive': srv = 'gvideo'
         elif srv == 'pixel': srv = 'pixeldrain'
         elif srv == 'senvid2': srv = 'sendvid'
-        elif srv == 'mixdropco' or srv == 'mxdrop': srv = 'mixdrop'
-        elif srv == 'mdy48tn97com': srv = 'mixdrop'
+        elif srv == 'dsvplay': srv = 'doodstream'
+
+        elif srv == 'mixdropco' or srv == 'mxdrop' or srv == 'mdy48tn97com': srv = 'mixdrop'
 
         elif srv == 'cybervynx':
              srv = 'various'
@@ -513,24 +514,33 @@ def findvideos(item):
 
         else:
              if srv == 'vgembedcom': srv = 'vembed'
-             elif 'com/' in srv:
+
+             elif 'com/' in srv or 'wish' in srv:
+                other = 'wish'
                 srv = 'various'
-                other = 'Streamwish'
-             else:
-                other = servertools.corregir_other(srv)
 
-        servidor = servertools.corregir_servidor(srv)
+             elif 'filemoon' in srv:
+                other = srv
+                srv = 'various'
 
-        if servertools.is_server_available(servidor):
-            if not servertools.is_server_enabled(servidor): continue
+             elif 'lulu' in srv:
+                other = srv
+                srv = 'various'
+
+             elif 'listeamed' in srv:
+                other = srv
+                srv = 'various'
+
+        if servertools.is_server_available(srv):
+            if not servertools.is_server_enabled(srv): continue
         else:
             if not config.get_setting('developer_mode', default=False): continue
 
-        if not servidor == 'directo':
-            if not servidor == 'various': other = ''
+        if not srv == 'directo':
+            if not srv == 'various': other = ''
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', d_play = d_play,
-                              language = 'Vose', other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', d_play = d_play,
+                              language = 'Vose', other = other.capitalize() ))
 
     # download
     bloque = scrapertools.find_single_match(data, '>Descargas<(.*?)</div>')
@@ -540,10 +550,14 @@ def findvideos(item):
     for url, srv in matches:
         ses += 1
 
+        other = 'D'
+
         srv = srv.lower().strip()
 
         if srv == '1fichier' or srv == '1ficher': continue
         elif srv == '1cloud' or srv == 'cloud': continue
+
+        elif srv == 'mixdropco' or srv == 'mxdrop' or srv == 'mdy48tn97com': srv = 'mixdrop'
 
         elif srv == 'anonfile': srv = 'anonfiles'
         elif srv == 'bay': srv = 'bayfiles'
@@ -551,20 +565,31 @@ def findvideos(item):
         elif srv == 'pixel': srv = 'pixeldrain'
 
         elif srv == 'ok':
-          if '.fireload.com/' in url: continue
+           if '.fireload.com/' in url: continue
 
-          elif '/1cloudfile.' in url: srv = ''
+           elif '/1cloudfile.' in url: srv = ''
 
-          elif '/mega.nz/' in url: srv = 'mega'
+           elif '/mega.nz/' in url: srv = 'mega'
 
-        if not srv: srv = servertools.get_server_from_url(url)
+        elif 'com/' in srv or 'wish' in srv:
+             other = 'wish'
+             srv = 'various'
+
+        elif 'filemoon' in srv:
+             other = srv
+             srv = 'various'
+
+        elif 'lulu' in srv:
+             other = srv
+             srv = 'various'
 
         if servertools.is_server_available(srv):
             if not servertools.is_server_enabled(srv): continue
         else:
            if not config.get_setting('developer_mode', default=False): continue
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', url = url, language = 'Vose', other = 'D' ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', url = url,
+                              language = 'Vose', other = other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:
@@ -594,7 +619,6 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

@@ -520,7 +520,6 @@ def findvideos(item):
         elif '.monoschinos2.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 
@@ -530,6 +529,7 @@ def findvideos(item):
             if '/lulu' in url: servidor = 'various'
 
         if servidor == 'various': other = servertools.corregir_other(url)
+        elif servidor == 'zures': other = servertools.corregir_zures(url)
 
         if '-castellano-' in item.url: lang = 'Esp'
         elif '-latino-' in item.url: lang = 'Lat'

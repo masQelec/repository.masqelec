@@ -8,6 +8,12 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://ver-anime.com/'
 
 
+def do_downloadpage(url, post=None, headers=None):
+    data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    return data
+
+
 def mainlist(item):
     return mainlist_animes(item)
 
@@ -62,7 +68,7 @@ def generos(item):
 
     url_genre = host + 'directorio?genero[]='
 
-    data = httptools.downloadpage(url_genre).data
+    data = do_downloadpage(url_genre)
 
     bloque = scrapertools.find_single_match(data, '>Genero<(.*?)</select>')
 
@@ -102,7 +108,7 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     if item.group == 'last': bloque = scrapertools.find_single_match(data, '>Últimos Episodios<(.*?)>Últimas Peliculas<')
     elif item.group == 'news': bloque = scrapertools.find_single_match(data, '>Últimos Animes<(.*?)</section>')
@@ -209,7 +215,7 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     bloque = scrapertools.find_single_match(data, ">Listado de episodios<(.*?)</section>")
 
@@ -297,7 +303,7 @@ def findvideos(item):
 
         config.set_setting('ses_pin', True)
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     if not 'var videos =' in data: return itemlist
 
@@ -321,7 +327,8 @@ def findvideos(item):
         if servidor == 'umi':
             url = url.replace("gocdn.html#", "gocdn.php?v=")
 
-            data = httptools.downloadpage(url).data
+            data = do_downloadpage(url)
+
             url = scrapertools.find_single_match(data, '"file":"(.*?)"')
             url = url.replace("\\/", "/")
 
@@ -329,9 +336,6 @@ def findvideos(item):
             if not 'http' in url: url = 'https:' + url
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
-
-            url = servertools.normalize_url(servidor, url)
 
             link_other = ''
 
@@ -371,14 +375,13 @@ def play(item):
     url = item.url
 
     if not item.server:
-        data = httptools.downloadpage(item.url).data
+        data = do_downloadpage(item.url, headers = {'Referer': host})
 
         new_url = scrapertools.find_single_match(data, "window.location.href.*?'(.*?)'")
 
         if new_url == 'https://goodstream.one/video/embed/': url = ''
         else:
            servidor = servertools.get_server_from_url(new_url)
-           servidor = servertools.corregir_servidor(servidor)
 
            url = new_url
 
@@ -397,6 +400,8 @@ def play(item):
             if new_server.startswith("http"):
                 if not config.get_setting('developer_mode', default=False): return itemlist
             servidor = new_server
+
+        url = servertools.normalize_url(servidor, url)
 
         itemlist.append(item.clone(url = url, server = servidor))
 

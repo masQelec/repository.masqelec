@@ -1,9 +1,22 @@
 # -*- coding: utf-8 -*-
 
-import xbmc, time, re
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
+if PY3:
+    import xbmcvfs
+    translatePath = xbmcvfs.translatePath
+else:
+    import xbmc
+    translatePath = xbmc.translatePath
+
+
+import os, xbmc, time, re
 
 from platformcode import config, logger, platformtools
-from core import httptools, scrapertools
+from core import filetools, httptools, scrapertools
 
 from lib import jsunpack
 
@@ -16,8 +29,7 @@ el_srv += ('ResolveUrl[/B][/COLOR]')
 
 
 def import_libs(module):
-    import os, sys, xbmcaddon
-    from core import filetools
+    import xbmcaddon
 
     path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
     addon_xml = filetools.read(filetools.join(path, "addon.xml"))
@@ -66,6 +78,12 @@ def get_video_url(page_url, url_referer=''):
 
     if not video_urls:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+            path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'streamvid.py'))
+
+            existe = filetools.exists(path)
+            if not existe:
+                return 'El Plugin No existe en Resolveurl'
+
             if config.get_setting('servers_time', default=True):
                 platformtools.dialog_notification('Cargando [COLOR cyan][B]Streamvid[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
                 time.sleep(int(espera))

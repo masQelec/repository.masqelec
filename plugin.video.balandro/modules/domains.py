@@ -19,33 +19,30 @@ else:
 
 channels_currents = [
         'animeflv', 'animeonline', 'animeyt',
-        'cinecalidad', 'cinecalidadla', 'cinecalidadlol', 'cuevana2', 'cuevana2esp', 'cuevana3pro',
+        'cinecalidad', 'cinecalidadla', 'cinecalidadlol', 'cuevana2', 'cuevana3pro',
         'divxtotal', 'dontorrents', 'dontorrentsin',
         'elifilms', 'elitetorrent', 'elitetorrentnz', 'ennovelastv', 'entrepeliculasyseries',
         'gnula', 'gnula24', 'gnula24h', 'grantorrent',
-        'hdfull', 'henaojara', 'homecine',
+        'hdfull', 'homecine',
         'mejortorrentapp', 'mitorrent',
         'peliculaspro', 
         'pelisforte', 'pelismart', 'pelispanda', 'pelispediaws', 'pelisplushd', 'pelisplushdlat', 'pelisplushdnz',
         'poseidonhd2',
-        'series24', 'serieskao', 'seriespapayato', 'seriesplus', 'srnovelas', 'subtorrents',
+        'series24', 'serieskao', 'seriespapayato', 'seriesplus', 'sflix', 'srnovelas', 'subtorrents',
         'todotorrents',
         'vernovelas', 'veronline'
         ]
 
 dominioshdfull = [
          'https://hdfull.today/',
-         'https://hdfull.help/',
          'https://hdfull.love/',
-         'https://hd-full.biz/',
+         'https://hdfull.sbs/',
 
+         'https://www3.hdfull.one/',
          'https://www2.hdfull.one/',
-         'https://hdfull.cv/',
          'https://hdfull.monster/',
-         'https://hdfull.cfd/',
          'https://hdfull.tel/',
          'https://hdfull.buzz/',
-         'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
 
@@ -53,13 +50,12 @@ dominioshdfull = [
          ]
 
 domains_cloudflare_hdfull = [
+         'https://www3.hdfull.one/',
          'https://www2.hdfull.one/',
          'https://hdfull.cv/',
          'https://hdfull.monster/',
-         'https://hdfull.cfd/',
          'https://hdfull.tel/',
          'https://hdfull.buzz/',
-         'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
          'https://new.hdfull.one/'
@@ -79,7 +75,8 @@ ant_hosts_hdfull = [
          'https://hd-full.co/', 'https://hd-full.lol/', 'https://hdfull.quest/',
          'https://hd-full.info/', 'https://hd-full.sbs/', 'https://hd-full.life/',
          'https://hd-full.fit/', 'https://hd-full.me/', 'https://hd-full.vip/,'
-         'https://hdfull.blog/']
+         'https://hdfull.blog/', 'https://hdfull.cfd/', 'https://hdfull.help/',
+         'https://hd-full.biz/']
 
 
 color_alert = config.get_setting('notification_alert_color', default='red')
@@ -409,52 +406,6 @@ def test_domain_cuevana2(item):
         tester.test_channel('Cuevana2')
     except:
         platformtools.dialog_notification(config.__addon_name + ' - Cuevana2', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
-
-def manto_domain_cuevana2esp(item):
-    logger.info()
-
-    channel_json = 'cuevana2esp.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    id = params['id']
-    name = params['name']
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] ' + name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Cuevana2Esp[/B][/COLOR]' % color_exec)
-
-    manto_domain_common(item, id, name)
-
-
-def test_domain_cuevana2esp(item):
-    logger.info()
-
-    datos = channeltools.get_channel_parameters('cuevana2esp')
-    if not datos['active']:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
-        return
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('Cuevana2Esp')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - Cuevana2Esp', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_cuevana3pro(item):
@@ -1626,52 +1577,6 @@ def test_domain_hdfull(item):
         platformtools.dialog_notification(config.__addon_name + ' - HdFull', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
-def manto_domain_henaojara(item):
-    logger.info()
-
-    channel_json = 'henaojara.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    id = params['id']
-    name = params['name']
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] ' + name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando HenaOjara[/B][/COLOR]' % color_exec)
-
-    manto_domain_common(item, id, name)
-
-
-def test_domain_henaojara(item):
-    logger.info()
-
-    datos = channeltools.get_channel_parameters('henaojara')
-    if not datos['active']:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
-        return
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('HenaOjara')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - HenaOjara', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
-
 def manto_domain_homecine(item):
     logger.info()
 
@@ -2395,7 +2300,7 @@ def manto_domain_seriesplus(item):
 def test_domain_seriesplus(item):
     logger.info()
 
-    datos = channeltools.get_channel_parameters('seriespapayato')
+    datos = channeltools.get_channel_parameters('seriesplus')
     if not datos['active']:
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
         return
@@ -2406,6 +2311,52 @@ def test_domain_seriesplus(item):
         tester.test_channel('SeriesPlus')
     except:
         platformtools.dialog_notification(config.__addon_name + ' - SeriesPlus', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+
+
+def manto_domain_sflix(item):
+    logger.info()
+
+    channel_json = 'sflix.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    id = params['id']
+    name = params['name']
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] ' + name) % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando SFlix[/B][/COLOR]' % color_exec)
+
+    manto_domain_common(item, id, name)
+
+
+def test_domain_sflix(item):
+    logger.info()
+
+    datos = channeltools.get_channel_parameters('sflix')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    config.set_setting('developer_test_channels', '')
+
+    try:
+        tester.test_channel('SFlix')
+    except:
+        platformtools.dialog_notification(config.__addon_name + ' - SFlix', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_srnovelas(item):
@@ -2762,16 +2713,6 @@ def manto_domain_common(item, id, name):
         if new_domain is None: return
         elif new_domain == 'https://': return
 
-    elif id == 'cuevana2esp':
-        config.set_setting('user_test_channel', '')
-
-        if not domain: domain = 'https://'
-
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio Cuevana2Esp  -->  [COLOR %s]https://???.cuevana2espanol.???/[/COLOR]' % color_avis)
-
-        if new_domain is None: return
-        elif new_domain == 'https://': return
-
     elif id == 'cuevana3pro':
         config.set_setting('user_test_channel', '')
 
@@ -2911,16 +2852,6 @@ def manto_domain_common(item, id, name):
 
         if new_domain is None: return
         elif new_domain == 'https://hdfull': return
-
-    elif id == 'henaojara':
-        config.set_setting('user_test_channel', '')
-
-        if not domain: domain = 'https://'
-
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio HenaOjara  -->  [COLOR %s]https://???.henaojara.com/[/COLOR]' % color_avis)
-
-        if new_domain is None: return
-        elif new_domain == 'https://': return
 
     elif id == 'homecine':
         config.set_setting('user_test_channel', '')
@@ -3078,6 +3009,16 @@ def manto_domain_common(item, id, name):
         if not domain: domain = 'https://'
 
         new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio SeriesPlus  -->  [COLOR %s]https://????.gnula2h.cc/[/COLOR]' % color_avis)
+
+        if new_domain is None: return
+        elif new_domain == 'https://': return
+
+    elif id == 'sflix':
+        config.set_setting('user_test_channel', '')
+
+        if not domain: domain = 'https://'
+
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio SFlix  -->  [COLOR %s]https://seriesflixhd.???/[/COLOR]' % color_avis)
 
         if new_domain is None: return
         elif new_domain == 'https://': return

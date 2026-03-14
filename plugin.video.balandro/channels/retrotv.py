@@ -553,7 +553,6 @@ def play(item):
         if url.startswith('//') == True: url = 'https:' + url
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()

@@ -1,9 +1,22 @@
 # -*- coding: utf-8 -*-
 
-import xbmc, random, time
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
+if PY3:
+    import xbmcvfs
+    translatePath = xbmcvfs.translatePath
+else:
+    import xbmc
+    translatePath = xbmc.translatePath
+
+
+import os, xbmc, random, time
 
 from platformcode import config, logger, platformtools
-from core import httptools, scrapertools
+from core import filetools, httptools, scrapertools
 
 
 host = 'https://doodstream.com'
@@ -17,8 +30,7 @@ el_srv += ('ResolveUrl[/B][/COLOR]')
 
 
 def import_libs(module):
-    import os, sys, xbmcaddon
-    from core import filetools
+    import xbmcaddon
 
     path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
     addon_xml = filetools.read(filetools.join(path, "addon.xml"))
@@ -57,6 +69,12 @@ def get_video_url(page_url, url_referer=''):
         return "Archivo inexistente ó eliminado"
 
     if '<title>Access denied' in data or '<title>Attention Required! | Cloudflare</title>' in data:
+        path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'doodstream.py'))
+
+        existe = filetools.exists(path)
+        if not existe:
+            return 'El Plugin No existe en Resolveurl'
+
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
             if config.get_setting('servers_time', default=True):
                 platformtools.dialog_notification('Cargando [COLOR cyan][B]Doodstream[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
@@ -116,6 +134,12 @@ def get_video_url(page_url, url_referer=''):
 
         if '<title>Access denied' in data2 or '<title>Attention Required! | Cloudflare</title>' in data2:
             if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+                path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'doodstream.py'))
+
+                existe = filetools.exists(path)
+                if not existe:
+                    return 'El Plugin No existe en Resolveurl'
+
                 if config.get_setting('servers_time', default=True):
                     platformtools.dialog_notification('Cargando [COLOR cyan][B]Doodstream[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
                     time.sleep(int(espera))
@@ -172,6 +196,12 @@ def get_video_url(page_url, url_referer=''):
 
     if not video_urls:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+            path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'doodstream.py'))
+
+            existe = filetools.exists(path)
+            if not existe:
+                return 'El Plugin No existe en Resolveurl'
+
             if config.get_setting('servers_time', default=True):
                 platformtools.dialog_notification('Cargando [COLOR cyan][B]Doodstream[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
                 time.sleep(int(espera))

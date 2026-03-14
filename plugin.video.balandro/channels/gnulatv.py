@@ -259,7 +259,6 @@ def findvideos(item):
                 url = url.replace('/player.cuevana.ac/' , '/waaw.to/')
 
                 servidor = servertools.get_server_from_url(url)
-                servidor = servertools.corregir_servidor(servidor)
 
                 if servertools.is_server_available(servidor):
                     if not servertools.is_server_enabled(servidor): continue
@@ -305,7 +304,6 @@ def findvideos(item):
         url = url.replace('/player.cuevana.ac/' , '/waaw.to/')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
@@ -341,7 +339,6 @@ def play(item):
     url = item.url
 
     servidor = servertools.get_server_from_url(url)
-    servidor = servertools.corregir_servidor(servidor)
 
     url = servertools.normalize_url(servidor, url)
 
