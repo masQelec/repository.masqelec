@@ -70,17 +70,14 @@ if txt_status:
 
 dominioshdfull = [
          'https://hdfull.today/',
-         'https://hdfull.help/',
          'https://hdfull.love/',
-         'https://hd-full.biz/',
+         'https://hdfull.sbs/',
 
+         'https://www3.hdfull.one/',
          'https://www2.hdfull.one/',
-         'https://hdfull.cv/',
          'https://hdfull.monster/',
-         'https://hdfull.cfd/',
          'https://hdfull.tel/',
          'https://hdfull.buzz/',
-         'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
 

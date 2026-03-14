@@ -621,7 +621,6 @@ def play(item):
         if 'archive.org' in url: url = url.replace('https%3A%2F%2Farchive.org%2Fdownload%2F', 'https://archive.org/download/').replace('%2F', '/')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

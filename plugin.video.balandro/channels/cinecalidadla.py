@@ -14,38 +14,6 @@ from core import httptools, scrapertools, servertools, tmdb
 from lib import decrypters
 
 
-LINUX = False
-BR = False
-BR2 = False
-
-if PY3:
-    try:
-       import xbmc
-       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
-    except: pass
-
-try:
-   if LINUX:
-       try:
-          from lib import balandroresolver2 as balandroresolver
-          BR2 = True
-       except: pass
-   else:
-       if PY3:
-           from lib import balandroresolver
-           BR = true
-       else:
-          try:
-             from lib import balandroresolver2 as balandroresolver
-             BR2 = True
-          except: pass
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-      BR2 = True
-   except: pass
-
-
 host = 'https://cine-calidad.mx/'
 
 
@@ -142,23 +110,6 @@ def do_downloadpage(url, post=None, headers=None):
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-
-                if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('cinecalidadla', url, post=post, headers=headers, raise_weberror=raise_weberror).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
-            except:
-                pass
-
     if '<title>Just a moment...</title>' in data:
         if not '?s=' in url:
             platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
@@ -224,13 +175,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = '[B]En castellano:[/B]', folder=False, text_color='moccasin' ))
-    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'espana/', search_type = 'movie' ))
-
-    itemlist.append(item.clone( title = '[B]En latino:[/B]', folder=False, text_color='moccasin' ))
-    itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - Más vistas', action = 'destacadas', url = host, search_type = 'movie' ))
-    itemlist.append(item.clone( title = ' - En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'calidad/4k-ultra-hd-hdr/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'destacadas', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'calidad/4k-ultra-hd-hdr/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action='generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'movie' ))
@@ -269,15 +216,16 @@ def generos(item):
     data = do_downloadpage(host)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<div class="custom-menu-class">(.*?)</div></div>')
+    bloque = scrapertools.find_single_match(data, '<ul id="menu-menu" class="menu">(.*?)</ul>')
 
     matches = re.compile('<a href="(.*?)">(.*?)</a>').findall(bloque)
 
     for url, title in matches:
         if '#' in url: continue
 
-        if title == '4K Ultra': continue
+        elif title == '4K Ultra': continue
         elif title == 'Películas por año': continue
+        elif title == 'series': continue
 
         if config.get_setting('descartar_anime', default=False):
             if title == 'Anime': continue
@@ -355,9 +303,6 @@ def list_all(item):
             if '/serie/' in url or '/anime/' in url: continue
         elif item.search_type == 'tvshow':
             if not '/serie/' in url and not '/anime/' in url: continue
-
-        if '/espana/' in item.url:
-            if not '?castellano=sp' in item.url: url = url + '?castellano=sp'
 
         if '/fecha/' in item.url: year = scrapertools.find_single_match(item.url, "/fecha/(.*?)/")
 
@@ -558,8 +503,6 @@ def findvideos(item):
 
     lang = 'Lat'
 
-    if '?castellano=sp' in item.url: lang = 'Esp'
-
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
@@ -585,19 +528,37 @@ def findvideos(item):
 
             if servidor == 'ok': servidor = 'okru'
 
-            elif servidor == 'google': servidor = 'gvideo'
-            elif servidor == 'drive': servidor = 'gvideo'
-            elif servidor == 'google drive': servidor = 'gvideo'
             elif servidor == 'netu' or servidor == 'hqq': servidor = 'waaw'
+
+            elif servidor == 'google' or servidor == 'drive' or servidor == 'google drive': servidor = 'gvideo'
+
+            elif servidor == 'doos' or servidor == 'dood': servidor = 'doodstream'
             elif servidor == 'd0o0d' or servidor == 'do0od' or servidor == 'd0000d' or servidor == 'd000d': servidor = 'doodstream'
+            elif 'doostream' in servidor: servidor = 'doodstream'
+
             elif servidor == 'lamovie': servidor = 'clipwatching'
 
-            elif servidor == 'vimeos':
-               servidor = 'zures'
-               other = 'Vimeos'
+            else:
+                 if servidor == 'goodstream':
+                    other = servidor
+                    servidor = 'various'
+
+                 elif servidor == 'streamwish' or servidor == 'hlswish':
+                    other = servidor
+                    servidor = 'various'
+
+                 elif servidor == 'vimeos':
+                    other = servidor
+                    servidor = 'zures'
+
+                 else:
+                    other = servidor
+                    servidor = servertools.corregir_servidor(servidor)
 
             if servertools.is_server_available(servidor):
                 if not servertools.is_server_enabled(servidor): continue
+
+                if servidor == other: other = ''
             else:
                 if not config.get_setting('developer_mode', default=False): continue
 
@@ -606,7 +567,7 @@ def findvideos(item):
             quality_num = puntuar_calidad(qlty)
 
             itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', url = item.url, data_url = data_url,
-                                  quality = qlty, quality_num = quality_num, language = lang, other = other ))
+                                  quality = qlty, quality_num = quality_num, language = lang, other = other.capitalize() ))
 
     if '>DESCARGAR<' in data:
         bloque = scrapertools.find_single_match(data, '>DESCARGAR<(.*?)<div id="player">')
@@ -646,16 +607,29 @@ def findvideos(item):
             elif servidor == 'utorrent': servidor = 'torrent'
             elif 'torrent' in servidor: servidor = 'torrent'
 
-            elif servidor == 'google': servidor = 'gvideo'
-            elif servidor == 'drive': servidor = 'gvideo'
-            elif servidor == 'google drive': servidor = 'gvideo'
+            elif servidor == 'google' or servidor == 'drive' or servidor == 'google drive': servidor = 'gvideo'
 
-            elif servidor == 'vimeos':
-               servidor = 'zures'
-               other = 'Vimeos'
+            else:
+                 if servidor == 'goodstream':
+                    other = servidor
+                    servidor = 'various'
+
+                 elif servidor == 'streamwish' or servidor == 'hlswish':
+                    other = servidor
+                    servidor = 'various'
+
+                 elif servidor == 'vimeos':
+                    other = servidor
+                    servidor = 'zures'
+
+                 else:
+                    other = servidor
+                    servidor = servertools.corregir_servidor(servidor)
 
             if servertools.is_server_available(servidor):
                 if not servertools.is_server_enabled(servidor): continue
+
+                if servidor == other: other = ''
             else:
                 if not config.get_setting('developer_mode', default=False): continue
 
@@ -672,7 +646,7 @@ def findvideos(item):
             quality_num = puntuar_calidad(qlty)
 
             itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                  quality = qlty, quality_num = quality_num, language = lang, other = other ))
+                                  quality = qlty, quality_num = quality_num, language = lang, other = other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:
@@ -683,7 +657,7 @@ def findvideos(item):
 
 
 def puntuar_calidad(txt):
-    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'DVD Rip', 'WEBRip', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', 'REMUX 1080p', '1080', 'HD', 'HDRip', 'WEBRip 1080p', 'WEB-DL 4k', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', 'REMUX 4k', '4K']
+    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'DVD Rip', 'WEBRip', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', 'REMUX 1080p', '1080', 'HD', 'HDRip', 'BDRip 1080p', 'BRRip 1080p', 'WEBRip 1080p', 'WEB-DL 4k', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', 'REMUX 4k', '4K']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
 
@@ -756,7 +730,7 @@ def play(item):
                  break
 
              if link:
-                 url_play = item.url.replace('?castellano=sp', '') + '?player=' + link
+                 url_play = item.url + '?player=' + link
 
                  headers = {'Referer': item.url}
 
@@ -796,9 +770,6 @@ def play(item):
             elif not url.startswith('http'): url = 'https://mega.nz/file/' + url
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
 
     if url:
         if '/acortalink.' in url:
@@ -821,7 +792,20 @@ def play(item):
            return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
 
         if url.endswith('.torrent'):
-            itemlist.append(item.clone( url = url, server = 'torrent' ))
+            if config.get_setting('proxies', item.channel, default=''):
+                if PY3:
+                    from core import requeststools
+                    data = requeststools.read(url, 'cinecalidadla')
+                else:
+                    data = do_downloadpage(url)
+
+                file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                with open(file_local, 'wb') as f: f.write(data); f.close()
+
+                itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+            else:
+                itemlist.append(item.clone( url = url, server = 'torrent' ))
+
             return itemlist
 
         elif 'magnet:' in url:
@@ -829,7 +813,6 @@ def play(item):
             return itemlist
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 
@@ -842,6 +825,8 @@ def play(item):
                 if new_server.startswith("http"):
                     if not config.get_setting('developer_mode', default=False): return itemlist
                 servidor = new_server
+
+        url = servertools.normalize_url(servidor, url)
 
         if servidor == 'zplayer':  url = url + '|' + host_player
 

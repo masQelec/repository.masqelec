@@ -553,9 +553,10 @@ def findvideos(item):
         if 'ul.to' in url: continue
         elif '.oboom.' in url: continue
 
-        servidor = servertools.get_server_from_url(url, disabled_servers=True)
+        servidor = servertools.get_server_from_url(url)
 
         if servidor is None: continue
+        elif not servidor: continue
 
         servidor = servertools.corregir_servidor(servidor)
 
@@ -563,8 +564,6 @@ def findvideos(item):
             if not servertools.is_server_enabled(servidor): continue
         else:
             if not config.get_setting('developer_mode', default=False): continue
-
-        url = servertools.normalize_url(servidor, url)
 
         if url:
             qlty = scrapertools.find_single_match(match, "<strong class='quality'>(.*?)</strong>")

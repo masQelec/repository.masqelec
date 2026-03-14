@@ -243,8 +243,6 @@ def findvideos(item):
 
         servidor = servertools.get_server_from_url(url)
 
-        servidor = servertools.corregir_servidor(servidor)
-
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
         else:

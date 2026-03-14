@@ -5,44 +5,11 @@ import sys
 PY3 = sys.version_info[0] >= 3
 if PY3: unicode = str
 
-
 import re, base64, xbmcgui
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, jsontools, servertools, tmdb
-
-
-LINUX = False
-BR = False
-BR2 = False
-
-if PY3:
-    try:
-       import xbmc
-       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
-    except: pass
-
-try:
-   if LINUX:
-       try:
-          from lib import balandroresolver2 as balandroresolver
-          BR2 = True
-       except: pass
-   else:
-       if PY3:
-           from lib import balandroresolver
-           BR = true
-       else:
-          try:
-             from lib import balandroresolver2 as balandroresolver
-             BR2 = True
-          except: pass
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-      BR2 = True
-   except: pass
 
 
 # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
@@ -51,17 +18,14 @@ except:
 
 dominios = [
          'https://hdfull.today/',
-         'https://hdfull.help/',
          'https://hdfull.love/',
-         'https://hd-full.biz/',
+         'https://hdfull.sbs/',
 
+         'https://www3.hdfull.one/',
          'https://www2.hdfull.one/',
-         'https://hdfull.cv/',
          'https://hdfull.monster/',
-         'https://hdfull.cfd/',
          'https://hdfull.tel/',
          'https://hdfull.buzz/',
-         'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
 
@@ -70,13 +34,12 @@ dominios = [
 
 
 domains_cloudflare = [
+         'https://www3.hdfull.one/',
          'https://www2.hdfull.one/',
          'https://hdfull.cv/',
          'https://hdfull.monster/',
-         'https://hdfull.cfd/',
          'https://hdfull.tel/',
          'https://hdfull.buzz/',
-         'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
          'https://new.hdfull.one/'
@@ -98,7 +61,8 @@ ant_hosts = ['https://hdfull.sh/', 'https://hdfull.im/', 'https://hdfull.in/',
              'https://hd-full.co/', 'https://hd-full.lol/', 'https://hdfull.quest/',
              'https://hd-full.info/', 'https://hd-full.sbs/', 'https://hd-full.life/',
              'https://hd-full.fit/', 'https://hd-full.me/', 'https://hd-full.vip/',
-             'https://hdfull.blog/']
+             'https://hdfull.blog/', 'https://hdfull.cfd/', 'https://hdfull.help/',
+             'https://hd-full.biz/']
 
 
 
@@ -203,23 +167,6 @@ def do_make_login_logout(url, post=None):
             data = httptools.downloadpage_proxy('hdfull', url, post=post, raise_weberror=False).data
         else:
             data = httptools.downloadpage(url, post=post, raise_weberror=False).data
-
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, domain.replace('https://', '')[:-1])
-
-                if not url.startswith(domain):
-                    data = httptools.downloadpage(url, post=post, raise_weberror=False).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('hdfull', url, post=post, raise_weberror=False).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, raise_weberror=False).data
-            except:
-                pass
 
     if '<title>Just a moment...</title>' in data:
         platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
@@ -475,23 +422,6 @@ def do_downloadpage(url, post=None, referer=None):
             data = httptools.downloadpage_proxy('hdfull', url, post=post, headers=headers, raise_weberror=False).data
         else:
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
-
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, domain.replace('https://', '')[:-1])
-
-                if not url.startswith(domain):
-                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('hdfull', url, post=post, headers=headers, raise_weberror=False).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
-            except:
-                pass
 
     if '<title>Just a moment...</title>' in data:
         if not 'buscar' in url:
@@ -1304,7 +1234,7 @@ def findvideos(item):
         ses += 1
 
         if embed == 'd':
-            if not 'uptobox' in url: continue
+            if not 'uptobox' in url: continue 
 
         if not PY3: calidad = unicode(calidad, 'utf8').upper().encode('utf8')
 

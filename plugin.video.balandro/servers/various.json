@@ -461,6 +461,26 @@
         "url": "https://streamwish.to/f/\\1"
       },
       {
+        "pattern": "https://hgcloud.to/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://vibuxer.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://hanerix.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://masukestin.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://audinifer.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
         "pattern": "https://(?:wish.(.*))/(?:e/|f/|d/)([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },

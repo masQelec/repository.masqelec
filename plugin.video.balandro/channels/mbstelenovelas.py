@@ -187,8 +187,11 @@ def findvideos(item):
 
         url = url.replace('&amp;', '&')
 
+        if not 'http' in url:
+            if '|1' in url:
+                url = 'https://waaw.to/e/' + url.replace('|1', '')
+
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://wc3v.gnula.cc/'
+host = 'https://wnv5.gnula.cc/'
 
 
 # ~ por si viene de enlaces guardados
@@ -16,7 +16,7 @@ ant_hosts = ['https://ww3.gnula2h.cc/', 'https://www11.gnula.cc/', 'https://w-ww
              'https://wv5n.gnula.cc/', 'https://wv5h.gnula.cc/', 'https://wv5l.gnula.cc/',
              'https://w-v5n.gnula.cc/', 'https://wv-5n.gnula.cc/', 'https://kv5n.gnula.cc/',
              'https://wv5c.gnula.cc/', 'https://w5nl.gnula.cc/', 'https://w5nv.gnula.cc/',
-             'https://w5cv.gnula.cc/', 'https://cv5w.gnula.cc/']
+             'https://w5cv.gnula.cc/', 'https://cv5w.gnula.cc/', 'https://wc3v.gnula.cc/']
 
 
 domain = config.get_setting('dominio', 'gnula24h', default='')
@@ -566,7 +566,6 @@ def findvideos(item):
         elif '.oboom.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo': continue
 
@@ -611,7 +610,6 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

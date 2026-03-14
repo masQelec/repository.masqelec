@@ -95,10 +95,11 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'movies/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'DC Comics', action = 'list_all', url = host + 'genre/d-c/', search_type = 'movie', text_color='moccasin' ))
     itemlist.append(item.clone( title = 'Netflix', action = 'list_all', url = host + 'genre/netflix/', search_type = 'movie', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Marvel', action = 'list_all', url = host + 'genre/marvel/', search_type = 'movie', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Star wars', action = 'list_all', url = host + 'genre/starwars/', search_type = 'movie', text_color='moccasin' ))
+
+    itemlist.append(item.clone( title = 'DC Comics', action = 'list_all', url = host + 'genre/d-c/', search_type = 'movie', text_color='palegreen' ))
+    itemlist.append(item.clone( title = 'Marvel', action = 'list_all', url = host + 'genre/marvel/', search_type = 'movie', text_color='palegreen' ))
+    itemlist.append(item.clone( title = 'Star wars', action = 'list_all', url = host + 'genre/starwars/', search_type = 'movie', text_color='palegreen' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
@@ -341,6 +342,8 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    lang = 'Esp'
+
     data = do_downloadpage(item.url)
 
     ses = 0
@@ -356,14 +359,16 @@ def findvideos(item):
 
         elif '.fivemanage.' in url: continue
 
-        servidor = servertools.get_server_from_url(url)
+        if url:
+            servidor = servertools.get_server_from_url(url)
 
-        if servidor:
+            if servidor == 'directo': continue
+
             other = ''
             if servidor == 'various': other = servertools.corregir_other(url)
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                  language = 'Esp', other = other ))
+                                  language = lang, other = other ))
 
     # Descarga
     bloque = scrapertools.find_single_match(data, "<div id='download'(.*?)</table></div></div></div>")
@@ -375,26 +380,31 @@ def findvideos(item):
 
         url = scrapertools.find_single_match(enlace, " href='([^']+)")
 
-        servidor = scrapertools.find_single_match(enlace, "domain=(?:www.|dl.|)([^'.]+)")
+        if not url: continue
 
-        if 'up-4ever' in servidor: continue
-        elif 'mirrorace' in servidor: continue
-        elif '1fichier' in servidor: continue
+        srv = scrapertools.find_single_match(enlace, "domain=(?:www.|dl.|)([^'.]+)").lower().strip()
+
+        if not srv: continue
+
+        elif 'up-4ever' in srv: continue
+        elif 'mirrorace' in srv: continue
+        elif '1fichier' in srv: continue
 
         other = ''
         age = ''
 
-        if servidor == 'qiwi': other = 'Qiwi'
-        elif servidor == 'drop':
+        if srv == 'qiwi': other = 'Qiwi'
+
+        elif srv == 'drop':
               other = 'Drop'
               age = 'Captcha'
 
-        servidor = servertools.corregir_servidor(servidor)
+        servidor = servertools.corregir_servidor(srv)
 
-        if not url or not servidor: continue
+        if servidor == 'directo': continue
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                              language = 'Esp', quality = 'HD' , other = 'd' + ' ' + other, age = age ))
+                              language = lang, quality = 'HD' , other = 'd' + ' ' + other, age = age ))
 
     if not itemlist:
         if not ses == 0:
@@ -407,6 +417,10 @@ def findvideos(item):
 def play(item):
     logger.info()
     itemlist = []
+
+    servidor = item.server
+
+    url = item.url
 
     if host in item.url:
         data = do_downloadpage(item.url)
@@ -426,10 +440,6 @@ def play(item):
                 if new_server.startswith("http"):
                     if not config.get_setting('developer_mode', default=False): return itemlist
                 servidor = new_server
-
-            servidor = servertools.corregir_servidor(servidor)
-
-            url = servertools.normalize_url(servidor, url)
 
     else:
         servidor = servertools.get_server_from_url(item.url)
@@ -466,14 +476,12 @@ def play(item):
                 if item.url.startswith("//"): item.url = 'https:' + item.url
                 servidor = 'directo'
 
-            servidor = servertools.corregir_servidor(servidor)
-
-            url = servertools.normalize_url(servidor, item.url)
-
     if url:
         if '.fivemanage.' in url: url = ''
 
     if url:
+        url = servertools.normalize_url(servidor, url)
+
         itemlist.append(item.clone( url = url, server = servidor ))
 
     return itemlist

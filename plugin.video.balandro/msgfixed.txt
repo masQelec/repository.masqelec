@@ -6,7 +6,7 @@
   [COLOR chartreuse][B]04[/B][/COLOR]  [COLOR yellow]INSTALACION BALANDRO[/COLOR]
   [COLOR chartreuse][B]05[/B][/COLOR]  [COLOR yellow]DESCARGA E INSTALACION DEL ADDON DE VIDEO BALANDRO[/COLOR]
   [COLOR chartreuse][B]06[/B][/COLOR]  [COLOR yellow]BALANDRO REPRODUCCIONES[/COLOR]
-  [COLOR chartreuse][B]07[/B][/COLOR]  [COLOR yellow]GRUPO PRIVADO/PÜBLICO TELEGRAM BALANDRO ASESOR[/COLOR]
+  [COLOR chartreuse][B]07[/B][/COLOR]  [COLOR yellow]GRUPO PRIVADO/PUBLICO TELEGRAM BALANDRO ASESOR[/COLOR]
   [COLOR chartreuse][B]08[/B][/COLOR]  [COLOR yellow]QUITAR LOS PROXIES DE UN CANAL[/COLOR]
   [COLOR chartreuse][B]09[/B][/COLOR]  [COLOR yellow]GESTION DE PROXIES[/COLOR]
   [COLOR chartreuse][B]10[/B][/COLOR]  [COLOR yellow]SI APARECIERA LA VENTANA DE ERROR INESPERADO[/COLOR]
@@ -199,7 +199,7 @@ Comrobación antes de reportar un posible fallo en la Reproducción de [COLOR go
   porque si la carga solo recayera sobre nosotros,
   sería imposible abordarlo por saturación/falta de tiempo.
 
-[COLOR chartreuse][B]Mensaje Fijado 07[/COLOR]  [COLOR yellow]GRUPO PRIVADO/PÜBLICO TELEGRAM BALANDRO ASESOR[/B][/COLOR] 
+[COLOR chartreuse][B]Mensaje Fijado 07[/COLOR]  [COLOR yellow]GRUPO PRIVADO/PUBLICO TELEGRAM BALANDRO ASESOR[/B][/COLOR] 
 
 Atención:
   Este Grupo pasa a ser [COLOR cyan]Privado[/COLOR] cada mes de [COLOR gold]Febrero[/COLOR].
@@ -231,6 +231,11 @@ Método 3:
 [COLOR chartreuse][B]Mensaje Fijado 09[/COLOR]  [COLOR yellow]GESTION DE PROXIES[/B][/COLOR]
 
 Se recomienda su gestión, solo para [COLOR gold]Usuarios Avanzados[/COLOR].
+
+Cuestión Preliminar:
+  [COLOR goldenrod]No necesita efectuar ninguna acción especial al respecto,
+  Porque, cada vez que haya una Revisión de esa Lista
+  ya viene integrada, dentro del correspondiente Fix ó Versión del Add-On.[/COLOR]
 
 En el Foro:
   [COLOR dodgerblue]www.mimediacenter.info/foro/[/COLOR]  Balandro

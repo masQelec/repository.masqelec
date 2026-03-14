@@ -1,9 +1,22 @@
 # -*- coding: utf-8 -*-
 
-import xbmc, time
+import sys
 
-from core import httptools, scrapertools
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
+if PY3:
+    import xbmcvfs
+    translatePath = xbmcvfs.translatePath
+else:
+    import xbmc
+    translatePath = xbmc.translatePath
+
+
+import os, xbmc, time
+
 from platformcode import config, logger, platformtools
+from core import filetools, httptools, scrapertools
 
 from lib import jsunpack
 
@@ -16,8 +29,7 @@ el_srv += ('ResolveUrl[/B][/COLOR]')
 
 
 def import_libs(module):
-    import os, sys, xbmcaddon
-    from core import filetools
+    import xbmcaddon
 
     path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
     addon_xml = filetools.read(filetools.join(path, "addon.xml"))
@@ -57,7 +69,9 @@ def get_video_url(page_url, url_referer=''):
 
     data = resp.data
 
-    url = scrapertools.find_single_match(str(data), 'file:".*?)"')
+    url = scrapertools.find_single_match(data, "sources:.*?file:.*?'(.*?)'.*?,")
+    if not url: url = scrapertools.find_single_match(data, 'sources:.*?file:.*?"(.*?)".*?,')
+
     if url:
         url += '|Referer=%s' + url_referer
         video_urls.append(['m3u8', url])
@@ -81,6 +95,12 @@ def get_video_url(page_url, url_referer=''):
 
     if not video_urls:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+            path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'vidmoly.py'))
+
+            existe = filetools.exists(path)
+            if not existe:
+                return 'El Plugin No existe en Resolveurl'
+
             if config.get_setting('servers_time', default=True):
                 platformtools.dialog_notification('Cargando [COLOR cyan][B]Vidmoly[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
                 time.sleep(int(espera))

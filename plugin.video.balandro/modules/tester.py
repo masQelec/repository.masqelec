@@ -95,19 +95,17 @@ timeout = config.get_setting('httptools_timeout', default=15)
 
 espera = config.get_setting('servers_waiting', default=6)
 
+
 dominioshdfull = [
          'https://hdfull.today/',
-         'https://hdfull.help/',
          'https://hdfull.love/',
-         'https://hd-full.biz/',
+         'https://hdfull.sbs/',
 
+         'https://www3.hdfull.one/',
          'https://www2.hdfull.one/',
-         'https://hdfull.cv/',
          'https://hdfull.monster/',
-         'https://hdfull.cfd/',
          'https://hdfull.tel/',
          'https://hdfull.buzz/',
-         'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
 
@@ -119,7 +117,7 @@ channels_poe = [
         ['gdrive', 'https://drive.google.com/drive/']
         ]
 
-channels_despised = ['peliculasflix', 'ytsmx']
+channels_despised = ['pandramaio', 'peliculasflix', 'ytsmx']
 
 servers_poe = ['directo', 'm3u8hls', 'torrent']
 
@@ -533,20 +531,22 @@ def test_channel(channel_name):
 
             txt_clons = ''
 
-            if channel_id == 'cuevana2esp': txt_clons = 'Cuevana2'
-
-            elif channel_id == 'dontorrents': txt_clons = 'DivxATope, DonTorrent21, DonTorrentsIn, EliteDivx, LilaTorrent, MejorTorrentApp, MejorTorrentIn, NaranjaTorrent, ReinvenTorrent, RojoTorrent, TomaDivx, TodoTorrents, VerdeTorrent'
+            if channel_id == 'dontorrents': txt_clons = 'DivxATope, DonTorrent21, DonTorrentsIn, EliteDivx, LilaTorrent, MejorTorrentApp, MejorTorrentIn, NaranjaTorrent, ReinvenTorrent, RojoTorrent, TodoTorrents, TomaDivx, VerdeTorrent'
 
             elif channel_id == 'doramasflix': txt_clons = 'DoramasFlixIn, DoramasFlixIo'
 
+            elif channel_id == 'elitetorrent': txt_clons = 'EliteTorrentNz'
+
+            elif channel_id == 'entrepeliculasyseries': txt_clons = 'MegaDedeOficial, PelisGratisHd'
+
+            elif channel_id == 'seriesgato': txt_clons = 'GatoTv'
+
             elif channel_id == 'homecine': txt_clons = 'PelisPediaIs, SeriesMetroN'
 
-            elif channel_id == 'elitetorrent': txt_clons = 'EliteTorrentNz'
-            elif channel_id == 'entrepeliculasyseries': txt_clons = 'MegaDedeOficial, PelisGratisHd'
+            elif channel_id == 'mundodonghua': txt_clons = 'MundoDonghua'
 
             elif channel_id == 'series24': txt_clons = 'Gnula24, Gnula24h, SeriesPlus'
 
-            elif channel_id == 'mundodonghua': txt_clons = 'MundoDonghua'
             elif channel_id == 'serieskao': txt_clons = 'PelisPlusHdNz'
 
             elif channel_id == 'veronline': txt_clons = 'OnlineTv, SeriesOnline, Star, VerSerieOnline'
@@ -557,14 +557,14 @@ def test_channel(channel_name):
         if 'clone' in str(params['clusters']):
             txt_clones = ''
 
-            if channel_id == 'cuevana2': txt_clones = 'Cuevana2Esp'
-            elif channel_id == 'divxatope': txt_clones = 'DonTorrents'
+            if channel_id == 'divxatope': txt_clones = 'DonTorrents'
             elif channel_id == 'dontorrent21': txt_clones = 'DonTorrents'
             elif channel_id == 'dontorrentsin': txt_clones = 'DonTorrents'
             elif channel_id == 'doramasflixin': txt_clones = 'DoramasFlix'
             elif channel_id == 'doramasflixio': txt_clones = 'DoramasFlix'
             elif channel_id == 'elitedivx': txt_clones = 'DonTorrents'
             elif channel_id == 'elitetorrentnz': txt_clones = 'EliteTorrent'
+            elif channel_id == 'gatotv': txt_clones = 'SeriesGato'
             elif channel_id == 'gnula24': txt_clones = 'Series24'
             elif channel_id == 'gnula24h': txt_clones = 'Series24'
             elif channel_id == 'lilatorrent': txt_clones = 'DonTorrents'
@@ -977,7 +977,13 @@ def test_channel(channel_name):
                     avisado = True
 
                 else:
-                    if 'Podría estar Correcto' in txt: pass
+                    if 'CloudFlare Human Verify' in txt:
+                        avis_causas = '[COLOR goldenrod][B]CloudFlare Human Verify.[/B][/COLOR]'
+
+                        platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
+                        avisado = True
+
+                    elif 'Podría estar Correcto' in txt: pass
                     else:
                         platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
 
@@ -985,13 +991,16 @@ def test_channel(channel_name):
             else:
                 if not channels_unsatisfactory == 'unsatisfactory':
                     if 'invalid:' in txt:
-                        if txt_sorry in txt or txt_suspe in txt: avis_causas = '[COLOR goldenrod][B]La Cuenta está Suspendida.[/B][/COLOR]'
+                        if 'CloudFlare Human Verify' in txt: avis_causas = '[COLOR goldenrod][B]CloudFlare Human Verify.[/B][/COLOR]'
+
+                        elif txt_sorry in txt or txt_suspe in txt: avis_causas = '[COLOR goldenrod][B]La Cuenta está Suspendida.[/B][/COLOR]'
 
                         platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                         avisado = True
 
                     elif 'Se pueden Eliminar los Proxies' in txt:
                         avis_causas = txt_erase
+
                         platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                         avisado = True
 
@@ -1002,22 +1011,32 @@ def test_channel(channel_name):
            if not channels_unsatisfactory == 'unsatisfactory':
                if txt_verif in txt:
                    avis_causas = txt_verif
+ 
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
                elif txt_legal in txt:
                    avis_causas = '[COLOR goldenrod][B]Copyright Derechos de Autor.[/B][/COLOR]'
+
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
                else:
-                   if txt_sorry in txt or txt_suspe in txt: avis_causas = '[COLOR goldenrod][B]La Cuenta está Suspendida.[/B][/COLOR]'
+                   if 'CloudFlare Human Verify' in txt: avis_causas = '[COLOR goldenrod][B]CloudFlare Human Verify.[/B][/COLOR]'
+
+                   elif txt_sorry in txt or txt_suspe in txt: avis_causas = '[COLOR goldenrod][B]La Cuenta está Suspendida.[/B][/COLOR]'
 
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
            else:
-               if 'Podría estar Correcto' in txt: pass
+               if 'CloudFlare Human Verify' in txt:
+                   avis_causas = '[COLOR goldenrod][B]CloudFlare Human Verify.[/B][/COLOR]'
+
+                   platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
+                   avisado = True
+
+               elif 'Podría estar Correcto' in txt: pass
                else:
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
 
@@ -1026,32 +1045,39 @@ def test_channel(channel_name):
            if not channels_unsatisfactory == 'unsatisfactory':
                if 'No Sponsors / Expired' in txt:
                    avis_causas = '[COLOR goldenrod][B]El Dominio está Sin Sponsors/Expirado.[/B][/COLOR]'
+ 
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
                elif 'Suspendida' in txt:
                    avis_causas = '[COLOR goldenrod][B]La Cuenta está Suspendida.[/B][/COLOR]'
+
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
                elif txt_legal in txt:
                    avis_causas = '[COLOR goldenrod][B]Copyright Derechos de Autor.[/B][/COLOR]'
+ 
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
                elif 'Dominio Expirado' in txt:
                    avis_causas = '[COLOR goldenrod][B]El Dominio de la Web está Expirado.[/B][/COLOR]'
+
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
                elif 'invalid:' in txt:
-                   if txt_sorry in txt or txt_suspe in txt or txt_reach in txt: avis_causas = '[COLOR goldenrod][B]La Cuenta está Suspendida.[/B][/COLOR]'
+                   if 'CloudFlare Human Verify' in txt: avis_causas = '[COLOR goldenrod][B]CloudFlare Human Verify.[/B][/COLOR]'
+
+                   elif txt_sorry in txt or txt_suspe in txt or txt_reach in txt: avis_causas = '[COLOR goldenrod][B]La Cuenta está Suspendida.[/B][/COLOR]'
 
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
                elif 'Se pueden Eliminar los Proxies' in txt:
                    avis_causas = txt_erase
+ 
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
@@ -1059,16 +1085,19 @@ def test_channel(channel_name):
                    avis_causas = txt_false
 
                    if txt_sorry in txt or txt_suspe in txt or txt_reach in txt: avis_causas = '[COLOR goldenrod][B]La Cuenta está Suspendida.[/B][/COLOR]'
+ 
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
                elif 'Inaccesible' in txt:
                    avis_causas = '[COLOR goldenrod][B]No se puede acceder a este sitio web.[/B][/COLOR]'
+
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
                elif 'Sin Información de Datos' in txt:
                    avis_causas = '[COLOR goldenrod][B]Sin Información de Datos.[/B][/COLOR]'
+
                    platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                    avisado = True
 
@@ -1083,6 +1112,8 @@ def test_channel(channel_name):
             elif 'Se pueden Eliminar los Proxies' in txt: return txt
             elif 'Falso Positivo.' in txt: return txt
             elif 'invalid:' in txt: return txt
+            elif 'CloudFlare Human Verify' in txt: return txt
+
             return ''
 
         else:
@@ -1094,6 +1125,7 @@ def test_channel(channel_name):
             elif 'Incidencia:' in txt: return txt
             elif 'No Accesible:' in txt: return txt
             elif 'invalid:' in txt: return txt
+            elif 'CloudFlare Human Verify' in txt: return txt
 
             elif 'Podría estar Correcto' in txt: return ''
             else:

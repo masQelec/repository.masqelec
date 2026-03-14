@@ -296,27 +296,51 @@ def findvideos(item):
         if not url: url = scrapertools.find_single_match(data, '<divid=options-' + opt + '.*?data-src="(.*?)"')
 
         if url:
-            servidor = servertools.corregir_servidor(srv)
-
             ref = ''
+
             other = ''
+
+            srv = srv.lower().strip()
 
             if srv == 'pf': continue
             elif srv == 'w1tv': continue
 
-            elif srv == 'ok':
+            elif srv == 'mxdrop': srv = 'mixdrop'
+
+            if servertools.is_server_available(srv):
+                if not servertools.is_server_enabled(srv): continue
+            else:
+                if not config.get_setting('developer_mode', default=False): continue
+
+            servidor = servertools.corregir_servidor(srv)
+
+            if srv == 'ok':
+                other = srv
                 servidor = 'directo'
-                srv = 'ok'
+
             elif srv == 'okhd':
-                servidor = 'directo'
-                srv = 'tiwi'
+                other = 'tiwi'
                 ref = item.url
+                servidor = 'directo'
 
-            elif srv == 'playpf': servidor = 'directo'
-            elif srv == 'ds': servidor = 'directo'
+            elif srv == 'mixdrop':
+                other = 'mxdrop'
+                ref = item.url
+                servidor = 'directo'
 
-            if servidor == 'directo': other = srv
+            elif srv == 'playpf':
+                other = srv
+                servidor = 'directo'
 
+            elif srv == 'ds':
+                other = srv
+                servidor = 'directo'
+
+            elif srv == 'wltv':
+                other = srv
+                servidor = 'directo'
+
+            elif servidor == 'directo': other = srv
             elif servidor == 'various': other = servertools.corregir_other(srv)
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, ref = ref,
@@ -373,7 +397,6 @@ def play(item):
                     return 'Servidor [COLOR plum]No Soportado[/COLOR]'
 
                 servidor = servertools.get_server_from_url(url)
-                servidor = servertools.corregir_servidor(servidor)
 
                 if item.ref:
                     if not "vgfplay" in url and not "listeamed":
@@ -432,7 +455,6 @@ def play(item):
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()

@@ -418,36 +418,47 @@ def findvideos(item):
             if 'peliplaywish' in srv:
                 servidor = 'directo'
                 other = 'peliplaywish'
+
             elif 'mivideoplay' in srv:
                 servidor = 'directo'
                 other = 'mivideoplay'
+
             elif 'peliplaymoon' in srv:
                 servidor = 'directo'
                 other = 'peliplaymoon'
+
             elif 'fmoonembed' in srv:
                 servidor = 'directo'
                 other = 'fmoonembed'
+
             elif 'embedmoon' in srv:
                 servidor = 'directo'
                 other = 'embedmoon'
+
             elif 'jodwish' in srv:
                 servidor = 'directo'
                 other = 'jodwish'
+
             elif 'swhoi' in srv:
                 servidor = 'directo'
                 other = 'swhoi'
+
             elif 'swdyu' in srv:
                 servidor = 'directo'
                 other = 'swdyu'
+
             elif 'strwish' in srv:
                 servidor = 'directo'
                 other = 'strwish'
+
             elif 'vidhidepre' in srv:
                 servidor = 'directo'
                 other = 'vidhidepre'
+
             elif 'playerwish' in srv:
                 servidor = 'directo'
                 other = 'playerwish'
+
             elif 'fastream' in srv:
                 servidor = 'directo'
                 other = 'fastream'
@@ -456,9 +467,11 @@ def findvideos(item):
                 if 'wish' in srv:
                     servidor = 'directo'
                     other = 'streamwish'
+
                 elif 'vidhide' in srv:
                     servidor = 'directo'
                     other = 'vidhidepro'
+
                 else:
                     servidor = 'directo'
                     other = 'indeterminado'
@@ -506,7 +519,6 @@ def play(item):
         if '//e/' in url: url = url.replace('//e/', '/e/')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()

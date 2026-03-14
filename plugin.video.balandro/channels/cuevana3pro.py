@@ -11,7 +11,7 @@ from lib.pyberishaes import GibberishAES
 from lib import decrypters
 
 
-host = 'https://dh1.cuevana3.vip'
+host = 'https://cuevanapro.org'
 
 
 # ~ por si viene de enlaces guardados
@@ -27,7 +27,8 @@ ant_hosts = ['https://wwa3.cuevana3.vip', 'https://wlw.cuevana3.vip', 'https://w
              'https://me3.cuevana3.vip', 'https://me4.cuevana3.vip', 'https://mia.cuevana3.vip',
              'https://max.cuevana3.vip', 'https://zx1.cuevana3.vip', 'https://zz.cuevana3.vip',
              'https://gx.cuevana3.vip', 'https://tv.cuevana3.vip', 'https://tv8.cuevana3.vip',
-             'https://b1.cuevana3.vip', 'https://sw.cuevana3.vip', 'https://cuevana3.vip']
+             'https://b1.cuevana3.vip', 'https://sw.cuevana3.vip', 'https://cuevana3.vip',
+             'https://dh1.cuevana3.vip']
 
 
 domain = config.get_setting('dominio', 'cuevana3pro', default='')
@@ -446,7 +447,7 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '</i>.*?Temporada ' + str(item.contentSeason) + '(.*?)</div> </div>')
+    bloque = scrapertools.find_single_match(data, '</i>.*?Temporada ' + str(item.contentSeason) + '(.*?)</i></div></a></div></div>')
 
     matches = re.compile('<a href="(.*?)".*?<div class="flex items-center">.*?">(.*?)</span>.*?<span class="text.*?">(.*?)</span>', re.DOTALL).findall(bloque)
 
@@ -567,9 +568,6 @@ def findvideos(item):
                         if embed.startswith('//'):embed  = 'https:' + embed
 
                         servidor = servertools.get_server_from_url(embed)
-                        servidor = servertools.corregir_servidor(servidor)
-
-                        embed = servertools.normalize_url(servidor, embed)
 
                         lang = scrapertools.find_single_match(match, '<span class="title">(.*?)</span>')
                         if not lang: lang = scrapertools.find_single_match(match, "<span class='title'>(.*?)</span>")
@@ -602,9 +600,6 @@ def findvideos(item):
                                 if url.startswith('//'): url = 'https:' + url
 
                                 servidor = servertools.get_server_from_url(url)
-                                servidor = servertools.corregir_servidor(servidor)
-
-                                url = servertools.normalize_url(servidor, url)
 
                                 lang = scrapertools.find_single_match(match, '<span class="title">(.*?)</span>')
                                 if not lang: lang = scrapertools.find_single_match(match, "<span class='title'>(.*?)</span>")
@@ -677,9 +672,6 @@ def findvideos(item):
                                 if url.startswith('//'): url = 'https:' + url
 
                                 servidor = servertools.get_server_from_url(url)
-                                servidor = servertools.corregir_servidor(servidor)
-
-                                url = servertools.normalize_url(servidor, url)
 
                                 other = ''
                                 if servidor == 'various': other = servertools.corregir_other(url)
@@ -712,9 +704,6 @@ def findvideos(item):
                         if url.startswith('//'): url = 'https:' + url
 
                         servidor = servertools.get_server_from_url(url)
-                        servidor = servertools.corregir_servidor(servidor)
-
-                        url = servertools.normalize_url(servidor, url)
 
                         other = ''
                         if servidor == 'various': other = servertools.corregir_other(url)
@@ -779,9 +768,6 @@ def findvideos(item):
                     if url.startswith('//'): url = 'https:' + url
 
                     servidor = servertools.get_server_from_url(url)
-                    servidor = servertools.corregir_servidor(servidor)
-
-                    url = servertools.normalize_url(servidor, url)
 
                     other = ''
                     if servidor == 'various': other = servertools.corregir_other(url)
@@ -793,9 +779,6 @@ def findvideos(item):
 
         if not '//embed69.' in url and not '//xupalace.' in url:
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
-
-            url = servertools.normalize_url(servidor, url)
 
             other = ''
             if servidor == 'various': other = servertools.corregir_other(url)
@@ -884,14 +867,11 @@ def findvideos(item):
 
                 if url:
                     servidor = servertools.get_server_from_url(url)
-                    servidor = servertools.corregir_servidor(servidor)
 
                     if servertools.is_server_available(servidor):
                         if not servertools.is_server_enabled(servidor): continue
                     else:
                         if not config.get_setting('developer_mode', default=False): continue
-
-                    url = servertools.normalize_url(servidor, url)
 
                     itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang ))
 
@@ -917,19 +897,16 @@ def findvideos(item):
                     else: lang = '?'
 
                     servidor = servertools.get_server_from_url(matchx)
-                    servidor = servertools.corregir_servidor(servidor)
 
                     if servertools.is_server_available(servidor):
                         if not servertools.is_server_enabled(servidor): continue
                     else:
                         if not config.get_setting('developer_mode', default=False): continue
 
-                    url = servertools.normalize_url(servidor, matchx)
-
                     other = ''
                     if servidor == 'various': other = servertools.corregir_other(url)
 
-                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = matchx,
                                          language = lang, other = other ))
 
                 continue
@@ -1039,7 +1016,6 @@ def findvideos(item):
         elif 'uploadfox' in url: continue
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
@@ -1129,9 +1105,6 @@ def play(item):
                 return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
-
-            url = servertools.normalize_url(servidor, url)
 
             if servidor == 'directo':
                 new_server = servertools.corregir_other(url).lower()
@@ -1148,7 +1121,6 @@ def play(item):
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

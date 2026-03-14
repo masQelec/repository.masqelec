@@ -379,7 +379,8 @@ def findvideos(item):
 
         language = IDIOMAS.get(lang, lang)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', durl = data_url, language = language, other = other.capitalize() ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', durl = data_url,
+                              language = language, other = other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:
@@ -412,7 +413,6 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

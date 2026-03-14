@@ -481,7 +481,6 @@ def manto_params(item):
         config.set_setting('channel_cinecalidadla_dominio', '')
         config.set_setting('channel_cinecalidadlol_dominio', '')
         config.set_setting('channel_cuevana2_dominio', '')
-        config.set_setting('channel_cuevana2esp_dominio', '')
         config.set_setting('channel_cuevana3pro_dominio', '')
 
         config.set_setting('channel_divxtotal_dominio', '')
@@ -504,7 +503,6 @@ def manto_params(item):
         config.set_setting('channel_hdfull_hdfull_password', '')
         config.set_setting('channel_hdfull_hdfull_username', '')
 
-        config.set_setting('channel_henaojara_dominio', '')
         config.set_setting('channel_homecine_dominio', '')
 
         config.set_setting('channel_mejortorrentapp_dominio', '')
@@ -525,6 +523,7 @@ def manto_params(item):
         config.set_setting('channel_serieskao_dominio', '')
         config.set_setting('channel_seriespapayato_dominio', '')
         config.set_setting('channel_seriesplus_dominio', '')
+        config.set_setting('channel_sflix_dominio', '')
         config.set_setting('channel_srnovelas_dominio', '')
         config.set_setting('channel_subtorrents_dominio', '')
 
@@ -602,7 +601,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '144.0.7559.60')  # ~ 20/1/26
+        config.set_setting('chrome_last_version', '145.0.7632.77')  # ~ 19/2/26
 
         config.set_setting('debug', '0')
 
@@ -1708,10 +1707,6 @@ def opciones_cuevana2(item):
     item.from_channel = 'cuevana2'
     opciones_domains_common(item)
 
-def opciones_cuevana2esp(item):
-    item.from_channel = 'cuevana2esp'
-    opciones_domains_common(item)
-
 def opciones_cuevana3pro(item):
     item.from_channel = 'cuevana3pro'
     opciones_domains_common(item)
@@ -1766,10 +1761,6 @@ def opciones_grantorrent(item):
 
 def opciones_hdfull(item):
     item.from_channel = 'hdfull'
-    opciones_domains_common(item)
-
-def opciones_henaojara(item):
-    item.from_channel = 'henaojara'
     opciones_domains_common(item)
 
 def opciones_homecine(item):
@@ -1834,6 +1825,10 @@ def opciones_seriespapayato(item):
 
 def opciones_seriesplus(item):
     item.from_channel = 'seriesplus'
+    opciones_domains_common(item)
+
+def opciones_sflix(item):
+    item.from_channel = 'sflix'
     opciones_domains_common(item)
 
 def opciones_srnovelas(item):
@@ -1920,8 +1915,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'cuevana2': domains.manto_domain_cuevana2(item)
 
-            elif item.from_channel == 'cuevana2esp': domains.manto_domain_cuevana2esp(item)
-
             elif item.from_channel == 'cuevana3pro': domains.manto_domain_cuevana3pro(item)
 
             elif item.from_channel == 'divxtotal': domains.manto_domain_divxtotal(item)
@@ -1949,8 +1942,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'grantorrent': domains.manto_domain_grantorrent(item)
 
             elif item.from_channel == 'hdfull': domains.manto_domain_hdfull(item)
-
-            elif item.from_channel == 'henaojara': domains.manto_domain_henaojara(item)
 
             elif item.from_channel == 'homecine': domains.manto_domain_homecine(item)
 
@@ -1984,6 +1975,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'seriesplus': domains.manto_domain_seriesplus(item)
 
+            elif item.from_channel == 'sflix': domains.manto_domain_sflix(item)
+
             elif item.from_channel == 'srnovelas': domains.manto_domain_srnovelas(item)
 
             elif item.from_channel == 'subtorrents': domains.manto_domain_subtorrents(item)
@@ -2009,8 +2002,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'cinecalidadlol': domains.test_domain_cinecalidadlol(item)
 
             elif item.from_channel == 'cuevana2': domains.test_domain_cuevana2(item)
-
-            elif item.from_channel == 'cuevana2esp': domains.test_domain_cuevana2esp(item)
 
             elif item.from_channel == 'cuevana3pro': domains.test_domain_cuevana3pro(item)
 
@@ -2039,8 +2030,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'grantorrent': domains.test_domain_grantorrent(item)
 
             elif item.from_channel == 'hdfull': domains.test_domain_hdfull(item)
-
-            elif item.from_channel == 'henaojara': domains.test_domain_henaojara(item)
 
             elif item.from_channel == 'homecine': domains.test_domain_homecine(item)
 
@@ -2074,6 +2063,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'seriesplus': domains.test_domain_seriesplus(item)
 
+            elif item.from_channel == 'sflix': domains.test_domain_sflix(item)
+
             elif item.from_channel == 'srnovelas': domains.test_domain_srnovelas(item)
 
             elif item.from_channel == 'subtorrents': domains.test_domain_subtorrents(item)
@@ -2104,8 +2095,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'hdfull': helper.show_help_hdfull(item)
 
-            elif item.from_channel == 'henaojara': helper.show_help_henaojara(item)
-
             elif item.from_channel == 'homecine': helper.show_help_homecine(item)
 
             elif item.from_channel == 'peliculaspro': helper.show_help_peliculaspro(item)
@@ -2115,6 +2104,8 @@ def opciones_domains_common(item):
             elif item.from_channel == 'seriespapayato': helper.show_help_seriespapayato(item)
 
             elif item.from_channel == 'seriesplus': helper.show_help_seriesplus(item)
+
+            elif item.from_channel == 'sflix': helper.show_help_sflix(item)
 
             elif item.from_channel == 'srnovelas': helper.show_help_srnovelas(item)
 

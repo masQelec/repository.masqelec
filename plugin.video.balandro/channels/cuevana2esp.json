@@ -3,7 +3,7 @@
   "name": "Cuevana2Esp",
   "thumbnail": "cuevana2esp.png",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["current", "clons", "suggested", "news", "rankings", "lasts"],
+  "clusters": ["news", "rankings", "lasts"],
 
-  "notes": "Películas por géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Web CERRADA. Películas por géneros."
 }

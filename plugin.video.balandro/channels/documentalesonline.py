@@ -221,7 +221,6 @@ def findvideos(item):
             other = str(i)
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if not 'http' in url: url = 'https:' + url
 

@@ -376,7 +376,6 @@ def findvideos(item):
         url = match
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(url)
 
         if '/ok.ru' in url: servidor = 'okru'
         elif '/drive.' in url: servidor = 'gvideo'

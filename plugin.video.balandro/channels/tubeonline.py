@@ -88,7 +88,7 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    for x in range(current_year, 1979, -1):
+    for x in range(current_year, 1949, -1):
         url = host + 'fecha-estreno/' + str(x) + '/'
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color='deepskyblue' ))
@@ -145,11 +145,12 @@ def list_all(item):
 
     if itemlist:
         if '<div class="pagination">' in data:
-            next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?href="(.*?)".*?>Pelis y Series Online')
+            if "class='icon-caret-right'" in data:
+                next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?href="(.*?)".*?>Pelis y Series Online')
 
-            if next_page:
-                if '/page/' in next_page:
-                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
+                if next_page:
+                    if '/page/' in next_page:
+                        itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -209,15 +210,28 @@ def play(item):
     if url:
         if '/powvideo.' in url:
             return 'Powvideo [COLOR tan]No soportado[/COLOR]'
+
         elif '/streamplay.' in url:
             return 'Streamplay [COLOR tan]No soportado[/COLOR]'
+
+        elif 'streamsb' in url or 'playersb' in url:
+            return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
+
+        elif 'openload' in url or 'streamango' in url or 'vidlox' in url or 'jetload' in url or 'verystream' in url or 'streamcherry' in url or 'gounlimited' in url or 'streamix' in url or 'viewsb' in url or 'flix555' in url or '.stormo.' in url or '.spruto.' in url or '/biter.' in url or '/streamin.' in url or '/filebebo.' in url or '/streamcloud.' in url or '/videofiles.' in url or '/kingvid.' in url or '/allvid.' in url or '/goo.' in url:
+            return 'Servidor [COLOR goldenrod]Obsoleto[/COLOR]'
+
+        elif '.fembed.' in url:
+            return 'Servidor [COLOR goldenrod]Fuera de Servicio[/COLOR]'
 
         if '/ups2up.' in url: return itemlist
         elif '/goo.' in url: return itemlist
         elif '/strmbolt.' in url: return itemlist
 
+        elif '/flashservice.' in url: return itemlist
+        elif '/xhamster.' in url: return itemlist
+        elif '/www.xvideos.' in url: return itemlist
+
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 
@@ -226,6 +240,8 @@ def play(item):
             if new_server.startswith("http"):
                 if not config.get_setting('developer_mode', default=False): return itemlist
             servidor = new_server
+
+        if '/cineymaxtopvideos.' in url: servidor = 'directo'
 
         itemlist.append(item.clone(server = servidor, url = url))
 
@@ -271,11 +287,12 @@ def list_search(item):
 
     if itemlist:
         if '<div class="pagination">' in data:
-            next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?' + "href='(.*?)'.*?>Pelis y Series Online")
+            if "class='icon-caret-right'" in data:
+                next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?<span class="current">.*?' + "href='(.*?)'.*?>Pelis y Series Online")
 
-            if next_page:
-                if '/page/' in next_page:
-                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_search', text_color='coral' ))
+                if next_page:
+                    if '/page/' in next_page:
+                        itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_search', text_color='coral' ))
 
     return itemlist
 

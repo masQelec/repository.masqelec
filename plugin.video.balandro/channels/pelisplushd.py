@@ -526,9 +526,6 @@ def findvideos(item):
         if url.startswith('/'): url = host[:-1] + url
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
 
         link_other = ''
 
@@ -557,9 +554,6 @@ def findvideos(item):
         if url.startswith('/'): url = host[:-1] + url
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
 
         link_other = ''
 
@@ -625,9 +619,6 @@ def findvideos(item):
             url = 'https://goodstream.one/video/embed/' + embed
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
 
         other = ''
         if servidor == 'various': other = servertools.corregir_other(url)
@@ -701,9 +692,6 @@ def play(item):
                 elif '/plustream.' in url: continue
 
                 servidor = servertools.get_server_from_url(url)
-                servidor = servertools.corregir_servidor(servidor)
-
-                url = servertools.normalize_url(servidor, url)
 
                 if servidor == 'directo':
                     new_server = servertools.corregir_other(url).lower()
@@ -719,7 +707,6 @@ def play(item):
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()

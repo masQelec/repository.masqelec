@@ -408,7 +408,8 @@ def episodios(item):
 
     if itemlist:
         if len(matches) > ((item.page + 1) * item.perpage):
-            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page = item.page + 1, perpage = item.perpage, i = i, text_color='coral' ))
+            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page = item.page + 1, perpage = item.perpage,
+                            i = i, text_color='coral' ))
 
     return itemlist
 
@@ -426,7 +427,6 @@ def findvideos(item):
         if item.link.startswith("//"): item.link = 'https:' + item.link
 
         servidor = servertools.get_server_from_url(item.link)
-        servidor = servertools.corregir_servidor(servidor)
 
         if '/ok.ru' in item.link: servidor = 'okru'
         elif '/drive.' in item.link: servidor = 'gvideo'
@@ -449,7 +449,6 @@ def findvideos(item):
 
         if not url == '#':
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(url)
 
             if '/ok.ru' in url: servidor = 'okru'
             elif '/drive.' in url: servidor = 'gvideo'
@@ -472,7 +471,6 @@ def findvideos(item):
             if link.startswith("//"): link = 'https:' + link
 
             servidor = servertools.get_server_from_url(link)
-            servidor = servertools.corregir_servidor(servidor)
 
             if '/ok.ru' in link: servidor = 'okru'
             elif '/drive.' in link: servidor = 'gvideo'

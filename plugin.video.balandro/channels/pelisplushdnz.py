@@ -675,16 +675,13 @@ def findvideos(item):
 
                     if url:
                         servidor = servertools.get_server_from_url(url)
-                        servidor = servertools.corregir_servidor(servidor)
 
                         if servertools.is_server_available(servidor):
                             if not servertools.is_server_enabled(servidor): continue
                         else:
                             if not config.get_setting('developer_mode', default=False): continue
 
-                        url = servertools.normalize_url(servidor, url)
-
-                        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url=url, language=lang ))
+                        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language=lang ))
 
                     continue
 
@@ -708,19 +705,17 @@ def findvideos(item):
                         else: lang = '?'
 
                         servidor = servertools.get_server_from_url(matchx)
-                        servidor = servertools.corregir_servidor(servidor)
 
                         if servertools.is_server_available(servidor):
                            if not servertools.is_server_enabled(servidor): continue
                         else:
                             if not config.get_setting('developer_mode', default=False): continue
 
-                        url = servertools.normalize_url(servidor, matchx)
-
                         other = ''
                         if servidor == 'various': other = servertools.corregir_other(url)
 
-                        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url=url, language=lang, other=other ))
+                        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = matchx,
+                                             language=lang, other=other ))
 
                     continue
 
@@ -738,16 +733,13 @@ def findvideos(item):
 
                 if url:
                     servidor = servertools.get_server_from_url(url)
-                    servidor = servertools.corregir_servidor(servidor)
 
                     if servertools.is_server_available(servidor):
                         if not servertools.is_server_enabled(servidor): continue
                     else:
                         if not config.get_setting('developer_mode', default=False): continue
 
-                    url = servertools.normalize_url(servidor, url)
-
-                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url=url, language=lang ))
+                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language=lang ))
 
                 continue
 
@@ -771,19 +763,17 @@ def findvideos(item):
                     else: lang = '?'
 
                     servidor = servertools.get_server_from_url(matchx)
-                    servidor = servertools.corregir_servidor(servidor)
 
                     if servertools.is_server_available(servidor):
                         if not servertools.is_server_enabled(servidor): continue
                     else:
                         if not config.get_setting('developer_mode', default=False): continue
 
-                    url = servertools.normalize_url(servidor, matchx)
-
                     other = ''
                     if servidor == 'various': other = servertools.corregir_other(url)
 
-                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url=url, language=lang, other=other ))
+                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = matchx,
+                                          language=lang, other=other ))
 
                 continue
 
@@ -795,9 +785,6 @@ def findvideos(item):
             elif 'api.mycdn.moe/dl/?uptobox=' in url: url = url.replace('api.mycdn.moe/dl/?uptobox=', 'uptobox.com/')
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
-
-            url = servertools.normalize_url(servidor, url)
 
             link_other = ''
 
@@ -876,9 +863,6 @@ def play(item):
         if '/streamsito.com/uqlink.php?id=' in url: url = url.replace('/streamsito.com/uqlink.php?id=', '/uqload.com/embed-')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
 
         if '/plustream.' in url or '/xupalace.' in url:
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
@@ -890,6 +874,8 @@ def play(item):
             if new_server.startswith("http"):
                 if not config.get_setting('developer_mode', default=False): return itemlist
             servidor = new_server
+
+        url = servertools.normalize_url(servidor, url)
 
         itemlist.append(item.clone( url = url, server = servidor ))
 

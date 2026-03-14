@@ -122,7 +122,7 @@ def findvideos(item):
 
         srv = other.lower().strip()
 
-        if other == 'hqq': continue
+        if other == 'hqq': srv = 'waaw'
 
         servidor = servertools.corregir_servidor(srv)
 
@@ -130,7 +130,8 @@ def findvideos(item):
 
         if servidor == srv: other = ''
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, other = other.capitalize() ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor,
+                              language = lang, other = other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:
@@ -153,7 +154,6 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

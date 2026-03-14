@@ -333,7 +333,6 @@ def findvideos(item):
             if url.startswith('https://player.ojearanime.com/'): url = url.replace('/player.ojearanime.com/', '/waaw.to/')
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             url = servertools.normalize_url(servidor, url)
 
@@ -357,7 +356,6 @@ def findvideos(item):
             if url.startswith('https://player.ojearanime.com/'): url = url.replace('/player.ojearanime.com/', '/waaw.to/')
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             url = servertools.normalize_url(servidor, url)
 
@@ -381,7 +379,6 @@ def findvideos(item):
             if url.startswith('https://player.ojearanime.com/'): url = url.replace('/player.ojearanime.com/', '/waaw.to/')
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             url = servertools.normalize_url(servidor, url)
 

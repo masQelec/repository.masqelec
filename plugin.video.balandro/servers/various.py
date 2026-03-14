@@ -164,7 +164,7 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('//yadi.ru', '/yadi.sk/').replace('//yadi.com', '/yadi.sk/').replace('//yadi.disk', '/yadi.sk/')
 
-    elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url or 'sfastwish' in page_url or 'doodporn' in page_url or 'flaswish' in page_url or 'obeywish' in page_url or 'cdnwish' in page_url or 'asnwish' in page_url or 'flastwish' in page_url or 'jodwish' in page_url or 'swhoi' in page_url or 'fsdcmo' in page_url or 'swdyu' in page_url or 'wishonly' in page_url or 'playerwish' in page_url or 'hlswish' in page_url or 'wish' in page_url or 'iplayerhls' in page_url or 'hlsflast' in page_url or 'ghbrisk' in page_url or 'cybervynx' in page_url or 'streamhg' in page_url or 'hlsflex' in page_url or 'dhcplay' in page_url or 'stbhg' in page_url or 'gradehgplus' in page_url or 'tryzendm' in page_url or 'hglink' in page_url or 'hailindihg' in page_url or 'guxhag' in page_url or 'habetar' in page_url or 'yuguaab' in page_url  or 'xenolyzb' in page_url or 'hgplaycdn' in page_url or 'davioad' in page_url or 'haxloppd' in page_url or 'dumbalag' in page_url or 'kravaxxa' in page_url or 'hgbazooka' in page_url or 'uasopt' in page_url:
+    elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url or 'sfastwish' in page_url or 'doodporn' in page_url or 'flaswish' in page_url or 'obeywish' in page_url or 'cdnwish' in page_url or 'asnwish' in page_url or 'flastwish' in page_url or 'jodwish' in page_url or 'swhoi' in page_url or 'fsdcmo' in page_url or 'swdyu' in page_url or 'wishonly' in page_url or 'playerwish' in page_url or 'hlswish' in page_url or 'wish' in page_url or 'iplayerhls' in page_url or 'hlsflast' in page_url or 'ghbrisk' in page_url or 'cybervynx' in page_url or 'streamhg' in page_url or 'hlsflex' in page_url or 'dhcplay' in page_url or 'stbhg' in page_url or 'gradehgplus' in page_url or 'tryzendm' in page_url or 'hglink' in page_url or 'hailindihg' in page_url or 'guxhag' in page_url or 'habetar' in page_url or 'yuguaab' in page_url  or 'xenolyzb' in page_url or 'hgplaycdn' in page_url or 'davioad' in page_url or 'haxloppd' in page_url or 'dumbalag' in page_url or 'kravaxxa' in page_url or 'hgbazooka' in page_url or 'uasopt' in page_url or 'hgcloud' in page_url or 'vibuxer' in page_url or 'hanerix' in page_url or 'masukestin' in page_url:
           txt_server = 'Streamwish'
 
           page_url = page_url.replace('/streamwish.com/', '/streamwish.to/').replace('/streamwish.top/', '/streamwish.to/').replace('/streamwish.site/', '/streamwish.to/').replace('/strwish.xyz/', '/streamwish.to/').replace('/strwish.com/', '/streamwish.to/').replace('/embedwish.com/', '/streamwish.to/').replace('/wishembed.pro/', '/streamwish.to/')
@@ -188,6 +188,12 @@ def get_video_url(page_url, url_referer=''):
           page_url = page_url.replace('/dumbalag.com/', '/streamwish.to/').replace('/kravaxxa.com/', '/streamwish.to/').replace('/hgbazooka.com/', '/streamwish.to/').replace('/cavanhabg.com/', '/streamwish.to/')
 
           page_url = page_url.replace('/uasopt.com/', '/streamwish.to/')
+		  
+          page_url = page_url.replace('/hgcloud.to/', '/streamwish.to/')
+
+          page_url = page_url.replace('/vibuxer.com/', '/streamwish.to/').replace('/hanerix.com/', '/streamwish.to/').replace('/masukestin.com/', '/streamwish.to/')
+
+          page_url = page_url.replace('/audinifer.com/', '/streamwish.to/')
 
     elif 'desiupload' in page_url:
           txt_server = 'Desiupload'
@@ -295,7 +301,7 @@ def get_video_url(page_url, url_referer=''):
     elif txt_server == 'Unknow': return 'Desconocido'
 
     # ~ FILELIONS
-    if txt_server == '-Filelions':
+    if txt_server == 'Filelions':
         # ~ 28/8/2025  FILELIONS pq falla ResolveUrl
         page_url = page_url.replace('/filelions.to/', '/taylorplayer.com/')
 
@@ -439,10 +445,12 @@ def vidhide(page_url):
     try:
         dec_data = jsunpack.unpack(enc_data)
 
-        m3u8 = scrapertools.find_single_match(dec_data, '"hls4":"([^"]+)"')
+        m3u8 = scrapertools.find_single_match(dec_data, '"hls2":"([^"]+)"')
+        if not m3u8: m3u8 = scrapertools.find_single_match(dec_data, '"hls4":"([^"]+)"')
 
         if "master.m3u8" in m3u8:
-            m3u8 = host + m3u8
+            if not 'http' in m3u8:
+                m3u8 = host + m3u8
 
             datos = httptools.downloadpage(m3u8).data
 
@@ -458,7 +466,7 @@ def vidhide(page_url):
 
                     url = url.replace('master.m3u8', '').strip()
 
-                    url += "|Referer=%s/&Origin=%s" % (host, host)
+                    url += "|Referer=%s/Origin=%s" % (host, host)
 
                     videos.append(["m3u %s" % qlty, url])
         else:
@@ -474,16 +482,22 @@ def wish(page_url):
 
     videos = []
 
-    page_url = page_url.replace('/streamwish.to/', '/yuguaab.com/')
+    _page_url = page_url.replace('/streamwish.to/', '/yuguaab.com/')
 
-    page_url = page_url.replace('\\', '').strip()
+    _page_url = page_url.replace('\\', '').strip()
 
-    try:
-        page_url = httptools.downloadpage(page_url, follow_redirects=False).headers["location"]
-    except:
-        pass
+    try: page_url = httptools.downloadpage(_page_url, follow_redirects=False).headers["location"]
+    except: page_url = page_url.replace('/streamwish.to/', '/vibuxer.com/')
 
     data = httptools.downloadpage(page_url).data
+
+    if '>Page is loading, please wait...<' in data:
+        if config.get_setting('servers_time', default=True):
+            platformtools.dialog_notification('Re-Accediendo a', '[COLOR cyan][B]Streamwish[/B][/COLOR]')
+
+        time.sleep(int(espera))
+
+        data = httptools.downloadpage(page_url).data
 
     if "Not Found" in data or "File was deleted" in data or "is no longer available" in data or "Video temporarily not available" in data:
         return 'non_exist'

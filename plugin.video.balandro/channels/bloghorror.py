@@ -218,15 +218,17 @@ def findvideos(item):
         other = other.replace('de toda la vida', '').strip()
 
         if url.endswith('.torrent'): servidor = 'torrent'
+
         elif url.startswith('magnet:?'):
             servidor = 'torrent'
             if not idioma: other = 'Magnet'
+
         elif '/tinyurl.' in url:
             servidor = 'directo'
             other = 'mega'
+
         else:
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
         lng = ''
 
@@ -255,9 +257,6 @@ def findvideos(item):
         if tipo.lower() == 'subtitulos': continue
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
 
         link_other = ''
         if servidor == 'various': link_other = servertools.corregir_other(url)
@@ -283,7 +282,6 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

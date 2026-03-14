@@ -66,6 +66,12 @@ def get_video_url(page_url, url_referer=''):
     if not xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
         return 'Falta ResolveUrl'
 
+    path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'waaw.py'))
+
+    existe = filetools.exists(path)
+    if not existe:
+        return 'El Plugin No existe en Resolveurl'
+
     if config.get_setting('servers_time', default=True):
         platformtools.dialog_notification('Cargando [COLOR cyan][B]Waaw[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))

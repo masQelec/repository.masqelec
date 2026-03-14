@@ -639,7 +639,6 @@ def play(item):
         if '/player.streamhj.top/' in url: url = url.replace('/player.streamhj.top/', '/netu.to/')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

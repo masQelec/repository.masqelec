@@ -329,7 +329,6 @@ def findvideos(item):
 
     if '/youtu' in item.url or '/www.youtube' in item.url:
         servidor = servertools.get_server_from_url(item.url)
-        servidor = servertools.corregir_servidor(servidor)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = item.url ))
         return itemlist
@@ -369,7 +368,6 @@ def findvideos(item):
         else: lang = '?'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang ))
 
@@ -400,7 +398,6 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

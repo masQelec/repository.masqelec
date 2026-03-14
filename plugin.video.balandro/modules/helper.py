@@ -682,6 +682,8 @@ def submnu_fuente(item):
 
     itemlist.append(item.clone( action='', title= ' - Fuente ' + _scripts, thumbnail=config.get_thumb('addon'), folder=False ))
 
+    itemlist.append(item.clone( action='', title= '   - Carpeta [COLOR yellowgreen][B]Comunes[/COLOR]: [COLOR gold]Resources Language, Requests y Skin Confluence[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
+
     if not PY3:
         itemlist.append(item.clone( action='', title= '   - Carpeta [COLOR yellowgreen][B]Kodi18[/COLOR]: [COLOR gold]Otros repositorios y plugins [/COLOR] hasta [COLOR goldenrod] 18.x[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
     else:
@@ -743,7 +745,7 @@ def submnu_fuente(item):
             tex_yt = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_yt = '  [COLOR red]No instalado[/COLOR]'
 
-    itemlist.append(item.clone( action='', title= ' - [COLOR yellow][B]plugin.video.youtube ' + tex_yt + '[/B][/COLOR]', thumbnail=config.get_thumb('youtube'), folder=False ))
+    itemlist.append(item.clone( action='', title= ' - [COLOR yellow][B]YouTube ' + tex_yt + '[/B][/COLOR]', thumbnail=config.get_thumb('youtube'), folder=False ))
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
         try:
@@ -753,7 +755,7 @@ def submnu_fuente(item):
             tex_mr = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_mr = '  [COLOR red]No instalado[/COLOR]'
 
-    itemlist.append(item.clone( action='', title= ' - [COLOR yellow][B]script.module.resolveurl ' + tex_mr + '[/B][/COLOR]', thumbnail=config.get_thumb('resolveurl'), folder=False ))
+    itemlist.append(item.clone( action='', title= ' - [COLOR yellow][B]ResolveUrl ' + tex_mr + '[/B][/COLOR]', thumbnail=config.get_thumb('resolveurl'), folder=False ))
 
     itemlist.append(item.clone( action='', title= '[B][I]REPOSITORIOS:[/I][/B]', text_color='tomato', folder=False, thumbnail=config.get_thumb('kodiaddons') ))
 
@@ -767,7 +769,7 @@ def submnu_fuente(item):
                     tex_rp = '  [COLOR gray]Desactivado[/COLOR]'
             else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
-            itemlist.append(item.clone( action='', title= ' - [COLOR yellow][B]repository.elementum ' + tex_rp + '[/B][/COLOR] (hasta K18.x)', thumbnail=config.get_thumb('elementumrepo'), folder=False ))
+            itemlist.append(item.clone( action='', title= ' - [COLOR yellow][B]Repository Elementum ' + tex_rp + '[/B][/COLOR] (hasta K18.x)', thumbnail=config.get_thumb('elementumrepo'), folder=False ))
 
         if xbmc.getCondVisibility('System.HasAddon("repository.elementumorg")'):
             try:
@@ -777,7 +779,7 @@ def submnu_fuente(item):
                 tex_rp = '  [COLOR gray]Desactivado[/COLOR]'
         else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
-        itemlist.append(item.clone( action='', title= ' - [COLOR yellow][B]repository.elementumorg ' + tex_rp + '[/B][/COLOR]', thumbnail=config.get_thumb('elementumrepo'), folder=False ))
+        itemlist.append(item.clone( action='', title= ' - [COLOR yellow][B]Repository Elementumorg ' + tex_rp + '[/B][/COLOR]', thumbnail=config.get_thumb('elementumrepo'), folder=False ))
 
     if xbmc.getCondVisibility('System.HasAddon("repository.resolveurl")'):
         try:
@@ -787,7 +789,7 @@ def submnu_fuente(item):
             tex_rp = '  [COLOR gray]Desactivado[/COLOR]'
     else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
-    itemlist.append(item.clone( action='', title= ' - [COLOR yellow][B]repository.resolveurl ' + tex_rp + '[/B][/COLOR]', thumbnail=config.get_thumb('resolveurlrepo'), folder=False ))
+    itemlist.append(item.clone( action='', title= ' - [COLOR yellow][B]Repository Resolveurl ' + tex_rp + '[/B][/COLOR]', thumbnail=config.get_thumb('resolveurlrepo'), folder=False ))
 
     return itemlist
 
@@ -1081,7 +1083,7 @@ def submnu_canales(item):
 
     itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales son [COLOR aquamarine][B]Principales[/COLOR] con [COLOR turquoise]Clones[/B][/COLOR] Asociados', clons = True ))
 
-    itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales son [COLOR turquoise][B]Clones[/B][/COLOR] (Clon del Canal [COLOR violet][B]Principal[/B][/COLOR])', clones = True ))
+    itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales son [COLOR turquoise][B]Clones[/B][/COLOR] (Clon del Canal [COLOR aquamarine][B]Principal[/B][/COLOR])', clones = True ))
 
     itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales son [COLOR grey][B]Privados[/B][/COLOR]', tipo = 'all', privates = True ))
 
@@ -1437,7 +1439,7 @@ def show_infos_play(item):
 
     itemlist.append(item.clone( action='', title='[COLOR salmon][B]PLAY Cuestiones Preliminares:[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
-    itemlist.append(item.clone( channel='submnuteam', action='resumen_servidores', title= ' - Resumen y Distribución Servidores', thumbnail=config.get_thumb('bolt') ))
+    itemlist.append(item.clone( channel='submnuteam', action='resumen_servidores', title= ' - [COLOR fuchsia][B]Resumen y Distribución Servidores[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
 
     if txt_status:
         if con_incidencias:
@@ -2806,10 +2808,6 @@ def show_help_hdfull(item):
     item.notice = 'hdfull'
     show_help_canales(item)
 
-def show_help_henaojara(item):
-    item.notice = 'henaojara'
-    show_help_canales(item)
-
 def show_help_homecine(item):
     item.notice = 'homecine'
     show_help_canales(item)
@@ -2856,10 +2854,6 @@ def show_help_pelispanda(item):
 
 def show_help_pelisyseries(item):
     item.notice = 'pelisyseries'
-    show_help_canales(item)
-
-def show_help_rarbg(item):
-    item.notice = 'rarbg'
     show_help_canales(item)
 
 def show_help_rojotorrent(item):
@@ -3057,14 +3051,6 @@ def show_help_canales(item):
 
         txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
 
-    elif item.notice == 'henaojara':
-        txt += '[CR][B][COLOR paleturquoise]Desde Diciembre/2025[/COLOR] [COLOR red]la Web Obliga a Registrase[/COLOR][/B][CR]'
-
-        if config.get_setting('channel_henaojara_proxies', default=''):
-	        txt += '[CR][B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
-
-        txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
-
     elif item.notice == 'homecine':
         if config.get_setting('channel_homecine_proxies', default=''):
 	        txt += '[CR][B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
@@ -3201,6 +3187,7 @@ def show_help_canales(item):
 
     if config.get_setting('proxies_extended', default=False):
         txt += '  [COLOR gold][B]Free-proxy-list.anon[/B][/COLOR] Proveedoores Lista Ampliada[CR]'
+        txt += '  [COLOR gold][B]Hidemium[/B][/COLOR] Proveedoores Lista Ampliada[CR]'
 
     if config.get_setting('proxies_vias', default=False):
         txt += '[COLOR violet][B]  Openproxy,  Github[/B][/COLOR] Proveedores Lista Vias Alternativas'
@@ -3993,7 +3980,9 @@ def show_help_proxies(item):
     txt += '[CR][CR][COLOR gold][B]¿ Cuales son los proveedores Recomendados ?[/B][/COLOR][CR]'
 
     txt += '[COLOR chartreuse][B]Mmpx12,  Pproxyscrape.com,  Uus-proxy.org[/COLOR]'
-    if config.get_setting('proxies_extended', default=False): txt += '[COLOR chartreuse][B],  Free-proxy-list.anon[/B][/COLOR]'
+    if config.get_setting('proxies_extended', default=False):
+        txt += '[COLOR chartreuse][B],  Free-proxy-list.anon[/B][/COLOR]'
+        txt += '[COLOR chartreuse][B],  Hidemium[/B][/COLOR]'
 
     txt += '[CR][CR][COLOR gold][B]¿ Como quitar los proxies en un canal determinado ?[/B][/COLOR][CR]'
     txt += 'Pulsación sostenida sobre el texto [COLOR red][B]Configurar proxies a usar ... [/B][/COLOR]dentro del canal y ahí aparecerá un [COLOR yellow][B]Menú Contextual[/B][/COLOR] con esa opción,'
@@ -4883,15 +4872,15 @@ def show_help_providers(item):
         txt += '  [COLOR red][B]free-proxy-list.anon[COLOR lime]  recomendado[/B][/COLOR][CR]'
         txt += '  [COLOR gold]free-proxy-list.com[/COLOR][CR]'
         txt += '  [COLOR gold]free-proxy-list.uk[/COLOR][CR]'
-        txt += '  [COLOR gold]free-proxy-list.uk[/COLOR][CR]'
         txt += '  [COLOR gold]github[/COLOR][CR]'
+        txt += '  [COLOR red][B]hidemium[COLOR lime]  recomendado[/B][/COLOR][CR]'
         txt += '  [COLOR gold]proxy-daily[/COLOR][CR]'
         txt += '  [COLOR gold]proxy-list.org[/COLOR][CR]'
         txt += '  [COLOR gold]proxyhub[/COLOR][CR]'
         txt += '  [COLOR gold]proxyranker[/COLOR][CR]'
-        txt += '  [COLOR gold]xroxy[/COLOR][CR]'
         txt += '  [COLOR gold]socks[/COLOR][CR]'
         txt += '  [COLOR gold]squidproxyserver[/COLOR][CR]'
+        txt += '  [COLOR gold]xroxy[/COLOR][CR]'
 
     if item.ampliada:
         if not config.get_setting('proxies_extended', default=False):
@@ -4919,6 +4908,7 @@ def show_help_recommended(item):
         txt += '[CR][COLOR yellowgreen][B]Lista Ampliada de proveedores:[/B][/COLOR][CR]'
 
         txt += '  [COLOR gold][B]Free-proxy-list.anon[/B][/COLOR][CR]'
+        txt += '  [COLOR gold][B]Hidemium[/B][/COLOR][CR]'
 
     txt += '[CR][COLOR chocolate][B]Atención:[/B][/COLOR]'
 
@@ -4939,6 +4929,7 @@ def show_help_recommended(item):
 
     platformtools.dialog_textviewer('Proveedores Recomendados de proxies', txt)
 
+
 def show_help_providers2(item):
     logger.info()
 
@@ -4951,9 +4942,9 @@ def show_help_yourlist(item):
 
     txt = ' - [COLOR yellow][B]Cuestión Preliminar:[/B][/COLOR][CR]'
 
-    txt += '    [COLOR darkcyan][B]No necesita efectuar ninguna acción especial al respecto,[CR]'
+    txt += '    [COLOR goldenrod][B]No necesita efectuar ninguna acción especial al respecto,[CR]'
     txt += '    Porque, cada vez que haya una Revisión de esa Lista,[CR]'
-    txt += '    ya viene integrada, dentro del correspondiente Fix ó Versión.[/B][/COLOR][CR]'
+    txt += '    ya viene integrada, dentro del correspondiente Fix ó Versión del Add-On.[/B][/COLOR][CR]'
 
     txt += '[CR] - [COLOR yellow][B]Acceso al Foro:[/B][/COLOR][CR]'
     txt += '   ' + _foro + '[CR]'
@@ -4965,7 +4956,7 @@ def show_help_yourlist(item):
     txt += '[CR][CR] - [COLOR yellow][B]Requisitos:[/B][/COLOR][CR]'
 
     txt += '    Para gestionar una Lista Personalizada,[CR]'
-    txt += '    Opcionalmente necesitará tener un [COLOR goldenrod][B]Programa Descompresor[/B][/COLOR] de archivos instalado en su equipo[CR]'
+    txt += '    [COLOR darkcyan][B]Opcionalmente[/B][/COLOR] necesitará tener un [COLOR goldenrod][B]Programa Descompresor[/B][/COLOR] de archivos instalado en su equipo[CR]'
     txt += '    y así podrá obtener el fichero descomprimido [COLOR gold][B]Lista-proxies.txt[/B][/COLOR][CR][CR]'
 
     txt += '    [COLOR cyan][B]Si no obtiene el fichero Des-comprimido, durante el [/B][/COLOR][COLOR yellow][B]Procedimiento[/B][/COLOR][COLOR cyan][B], se le solicitará[CR]'
@@ -4980,7 +4971,7 @@ def show_help_yourlist(item):
     txt += '    Activar su uso en los [COLOR goldenrod][B]Ajustes[/B][/COLOR] de Balandro, Categoría [COLOR red][B]Proxies[/B][/COLOR], Apartado [COLOR chartreuse][B]Lista Personalizada[/B][/COLOR]'
 
     txt += '[CR][CR] - [COLOR yellow][B]Procedimiento:[/B][/COLOR][CR]'
-    txt += '    Descargar desde Adjuntos en el Foro [COLOR violet][B]Lista-proxies.zip[/B][/COLOR] y opcionalmente descomprimirlo donde le interese.[CR]'
+    txt += '    Descargar desde Adjuntos en el Foro [COLOR violet][B]Lista-proxies.zip[/B][/COLOR] y [COLOR darkcyan][B]Opcionalmente[/B][/COLOR] descomprimirlo donde le interese.[CR]'
 
     txt += '    Durante el proceso de obtención de Proxies, se solicitará, la ubicación del fichero[CR]'
     txt += '    [COLOR gold][B]Lista-proxies.txt[/B][/COLOR] ó [COLOR violet][B]Lista-proxies.zip[/B][/COLOR]'
@@ -4993,7 +4984,7 @@ def show_help_yourlist(item):
     txt += '[CR]     Si generaís vuestra lista personalizada, seguir la estructura de 1 proxy por línea,[CR]'
     txt += '     Ver la composición en el fichero adjunto, una vez descomprimido.'
 
-    platformtools.dialog_textviewer('Información Gestión fichero Lista-Proxies.txt', txt)
+    platformtools.dialog_textviewer('Información Gestión Fichero Lista-Proxies.txt', txt)
 
 
 def proxies_show_vias(item):
@@ -5009,10 +5000,10 @@ def proxies_show_vias(item):
     txt += ' [COLOR cyan][B]    1 [COLOR yellow][B]Openproxy.space socks4[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B]    2 [COLOR yellow][B]Openproxy.space socks5[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B]    3 [COLOR yellow][B]Vpnoverview.com[/B][/COLOR][CR]'
-    txt += ' [COLOR cyan][B]    4 [COLOR yellow][B]Proxydb.net http[/B][/COLOR][CR]'
-    txt += ' [COLOR cyan][B]    5 [COLOR yellow][B]Proxydb.net https[/B][/COLOR][CR]'
-    txt += ' [COLOR cyan][B]    6 [COLOR yellow][B]Proxydb.net socks4[/B][/COLOR][CR]'
-    txt += ' [COLOR cyan][B]    7 [COLOR yellow][B]Proxydb.net socks5[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B]    4 [COLOR yellow][B]Fyvri all[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B]    5 [COLOR yellow][B]Fyvri http[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B]    6 [COLOR yellow][B]Fyvri https[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B]    7 [COLOR yellow][B]Fyvri socks4[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B]    8 [COLOR yellow][B]Netzwelt.de[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B]    9 [COLOR yellow][B]Proxy-list.download http[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 10 [COLOR yellow][B]Proxy-list.download https[/B][/COLOR][CR]'
@@ -5020,9 +5011,9 @@ def proxies_show_vias(item):
     txt += ' [COLOR cyan][B] 12 [COLOR yellow][B]Proxy-list.download socks5[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 13 [COLOR yellow][B]Freeproxy.world[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 14 [COLOR yellow][B]Freeproxy.world anonymity[/B][/COLOR][CR]'
-    txt += ' [COLOR cyan][B] 15 [COLOR yellow][B]Hidemyna.me.en[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 15 [COLOR yellow][B]Hidemy.io[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 16 [COLOR yellow][B]List.proxylistplus.com[/B][/COLOR][CR]'
-    txt += ' [COLOR cyan][B] 17 [COLOR yellow][B]Proxyservers.pro[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 17 [COLOR yellow][B]Niek[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 18 [COLOR yellow][B]TheSpeedX[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 19 [COLOR yellow][B]Proxyscan.io http[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 20 [COLOR yellow][B]Proxyscan.io all[/B][/COLOR][CR]'
@@ -5032,7 +5023,7 @@ def proxies_show_vias(item):
     txt += ' [COLOR cyan][B] 24 [COLOR yellow][B]Proxy-list.download v1 socks4[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 25 [COLOR yellow][B]Proxy-list.download v1 socks5[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 26 [COLOR yellow][B]Monosans[/B][/COLOR][CR]'
-    txt += ' [COLOR cyan][B] 27 [COLOR yellow][B]Jjetkai[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 27 [COLOR yellow][B]Jetkai[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 28 [COLOR yellow][B]Sunny9577[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 29 [COLOR yellow][B]Proxy4parsing[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 30 [COLOR yellow][B]Hendrikbgr[/B][/COLOR][CR]'
@@ -5060,9 +5051,16 @@ def proxies_show_vias(item):
     txt += ' [COLOR cyan][B] 52 [COLOR yellow][B]Proxyscrape https[COLOR lime]  recomendado[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 53 [COLOR yellow][B]Markavale[/B][/COLOR][CR]'
     txt += ' [COLOR cyan][B] 54 [COLOR yellow][B]Proxyscan.io socks4[/B][/COLOR][CR]'
-    txt += ' [COLOR cyan][B] 55 [COLOR yellow][B]Proxyscan.io socks5[/B][/COLOR]'
+    txt += ' [COLOR cyan][B] 55 [COLOR yellow][B]Proxyscan.io socks5[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 56 [COLOR yellow][B]Fyvri socks5[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 57 [COLOR yellow][B]MuRongPIG[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 58 [COLOR yellow][B]Vakhov http[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 59 [COLOR yellow][B]Vakhov https[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 60 [COLOR yellow][B]Vakhov socks4[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 61 [COLOR yellow][B]Vakhov socks5[/B][/COLOR][CR]'
+    txt += ' [COLOR cyan][B] 62 [COLOR yellow][B]Hidemium[COLOR lime]  recomendado[/B][/COLOR]'
 
-    platformtools.dialog_textviewer('Proveedores Vías Alternativas de proxies', txt)
+    platformtools.dialog_textviewer('Proveedores Vías Alternativas de proxies z-tplus', txt)
 
 
 def show_help_clean(item):
@@ -5473,6 +5471,27 @@ def show_changelog(item):
 def show_msgfixed(item):
     logger.info()
 
+    cab = 'Mensajes Fijados en Telegram Balandro'
+
+    opciones_nro = [
+            ('00 - [COLOR yellow][B]TODOS LOS MENSAJES[/B][/COLOR]'),
+            ('01 - [COLOR yellow][B]COMUNICADO BALANDRO TEAM[/B][/COLOR]'),
+            ('02 - [COLOR yellow][B]COMUNICADO OFICIAL BALANDRO[/B][/COLOR]'),
+            ('03 - [COLOR yellow][B]OPCIONES TELEGRAM BALANDRO ASESOR[/B][/COLOR]'),
+            ('04 - [COLOR yellow][B]INSTALACION BALANDRO[/B][/COLOR]'),
+            ('05 - [COLOR yellow][B]DESCARGA E INSTALACION DEL ADDON DE VIDEO BALANDRO[/B][/COLOR]'),
+            ('06 - [COLOR yellow][B]BALANDRO REPRODUCCIONES[/B][/COLOR]'),
+            ('07 - [COLOR yellow][B]GRUPO PRIVADO/PUBLICO TELEGRAM BALANDRO ASESOR[/B][/COLOR]'),
+            ('08 - [COLOR yellow][B]QUITAR LOS PROXIES DE UN CANAL[/B][/COLOR]'),
+            ('09 - [COLOR yellow][B]GESTION DE PROXIES[/B][/COLOR]'),
+            ('10 - [COLOR yellow][B]SI APARECIERA LA VENTANA DE ERROR INESPERADO[/B][/COLOR]'),
+            ('11 - [COLOR yellow][B]INSTALACION DE ADDONS EXTERNOS[/B][/COLOR]'),
+            ('12 - [COLOR yellow][B]IDIOMAS (AUDIOS)[/B][/COLOR]'),
+            ('13 - [COLOR yellow][B]ULTIMA VERSION DE BALANDRO[/B][/COLOR]'),
+            ('14 - [COLOR yellow][B]ACCESO A LOS MENSAJES FIJADOS DESDE EL FORO[/B][/COLOR]'),
+            ('15 - [COLOR yellow][B]HISTORIAL DE TELEGRAM[/B][/COLOR]')
+            ]
+
     txt = ''
 
     try:
@@ -5481,7 +5500,36 @@ def show_msgfixed(item):
        try: txt = open(os.path.join(config.get_runtime_path(), 'msgfixed.txt'), encoding="utf8").read()
        except: pass
 
-    if txt: platformtools.dialog_textviewer('Balandro Telegram Asesor Mensajes Fijados', txt)
+    if txt:
+        ret = platformtools.dialog_select('Indice Mensajes Fijados en Telegram Balandro Asesor', opciones_nro)
+
+        if ret == -1: return
+
+        opcion = opciones_nro[ret]
+
+        nro_msg = opcion.split(" - ")[0]
+        nro_msg = nro_msg.strip()
+
+        if not nro_msg == '00':
+            nro = False
+
+            lines = ''
+
+            msg_fixed = '[COLOR chartreuse][B]Mensaje Fijado ' + nro_msg + '[/COLOR]'
+
+            with open(os.path.join(config.get_runtime_path(), 'msgfixed.txt'), encoding="utf8" ) as f:
+                 for line in f:
+                     if msg_fixed in line: nro = True
+
+                     elif '[COLOR chartreuse][B]Mensaje Fijado' in line: nro = False
+
+                     if nro: lines += line
+
+                 if lines:
+                     cab = msg_fixed.replace('[COLOR chartreuse][B]', '').replace('[/COLOR]', '') + ' en Telegram Balandro Asesor'
+                     txt = lines
+
+    if txt: platformtools.dialog_textviewer(cab, txt)
 
 
 def show_dev_notes(item):
@@ -5900,13 +5948,13 @@ def show_help_prales(item):
     if item.pral:
         txt += '[B][COLOR gold]Canal Principal del Clon [COLOR yellowgreen]' + item.category + '[/COLOR]:[/B][CR]'
 
-        if item.category == 'Cuevana2': txt += '[B][COLOR yellow]Cuevana2Esp[/COLOR][/B]'
-
-        elif item.category == 'DivxATope' or item.category == 'DonTorrent21' or item.category == 'DonTorrentsIn' or item.category == 'EliteDivx' or item.category == 'LilaTorrent' or item.category == 'MejorTorrentApp' or item.category == 'MejorTorrentIn' or item.category == 'NaranjaTorrent' or item.category == 'ReinvenTorrent' or item.category == 'RojoTorrent' or item.category == 'TomaDivx' or item.category == 'TodoTorrents' or item.category == 'VerdeTorrent': txt += '[B][COLOR yellow]DonTorrents[/COLOR][/B]'
+        if item.category == 'DivxATope' or item.category == 'DonTorrent21' or item.category == 'DonTorrentsIn' or item.category == 'EliteDivx' or item.category == 'LilaTorrent' or item.category == 'MejorTorrentApp' or item.category == 'MejorTorrentIn' or item.category == 'NaranjaTorrent' or item.category == 'ReinvenTorrent' or item.category == 'RojoTorrent' or item.category == 'TomaDivx' or item.category == 'TodoTorrents' or item.category == 'VerdeTorrent': txt += '[B][COLOR yellow]DonTorrents[/COLOR][/B]'
 
         elif item.category == 'DoramasFlixIn' or item.category == 'DoramasFlixIo': txt += '[B][COLOR yellow]DoramasFlix[/COLOR][/B]'
 
         elif item.category == 'EliteTorrentNz': txt += '[B][COLOR yellow]EliteTorrent[/COLOR][/B]'
+
+        elif item.category == 'GatoTv': txt += '[B][COLOR yellow]SeriesGato[/COLOR][/B]'
 
         elif item.category == 'Gnula24' or item.category == 'Gnula24H' or item.category == 'SeriesPlus': txt += '[B][COLOR yellow]Series24[/COLOR][/B]'
 
@@ -5924,16 +5972,7 @@ def show_help_prales(item):
 
         txt += '[B][COLOR gold]Clones del Canal [COLOR yellowgreen]' + item.category + '[/COLOR]:[/B][CR]'
 
-        if item.category == 'Cuevana2Esp':
-            datos = channeltools.get_channel_parameters(item.category.lower())
-            if datos['active']:
-                if config.get_setting('channel_cuevana2_proxies', default=''):
-	                txt += '[CR]  [B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR][CR]'
-
-                datos = channeltools.get_channel_parameters('cuevana2')
-                if datos['active']: txt += '   [B][COLOR yellow]Cuevana2[/COLOR][/B][CR]'
-
-        elif item.category == 'DonTorrents':
+        if item.category == 'DonTorrents':
             datos = channeltools.get_channel_parameters(item.category.lower())
             if datos['active']:
                 if config.get_setting('channel_dontorrents_proxies', default=''):
@@ -5969,11 +6008,11 @@ def show_help_prales(item):
                 datos = channeltools.get_channel_parameters('rojotorrent')
                 if datos['active']: txt += '   [B][COLOR yellow]RojoTorrent[/COLOR][/B][CR]'
 
-                datos = channeltools.get_channel_parameters('tomadivx')
-                if datos['active']: txt += '   [B][COLOR yellow]TomaDivx[/COLOR][/B][CR]'
-
                 datos = channeltools.get_channel_parameters('todotorrents')
                 if datos['active']: txt += '   [B][COLOR yellow]TodoTorrents[/COLOR][/B][CR]'
+
+                datos = channeltools.get_channel_parameters('tomadivx')
+                if datos['active']: txt += '   [B][COLOR yellow]TomaDivx[/COLOR][/B][CR]'
 
                 datos = channeltools.get_channel_parameters('verdetorrent')
                 if datos['active']: txt += '   [B][COLOR yellow]VerdeTorrent[/COLOR][/B][CR]'
@@ -6041,6 +6080,15 @@ def show_help_prales(item):
 
                 datos = channeltools.get_channel_parameters('mundodonghuaxyz')
                 if datos['active']: txt += '   [B][COLOR yellow]MundoDonghuaXyz[/COLOR][/B][CR]'
+
+        elif item.category == 'SeriesGato':
+            datos = channeltools.get_channel_parameters(item.category.lower())
+            if datos['active']:
+                if config.get_setting('channel_seriesgato_proxies', default=''):
+	                 txt += '[CR]  [B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR][CR]'
+
+                datos = channeltools.get_channel_parameters('gatotv')
+                if datos['active']: txt += '   [B][COLOR yellow]GatoTv[/COLOR][/B][CR]'
 
         elif item.category == 'SeriesKao':
             datos = channeltools.get_channel_parameters(item.category.lower())
@@ -7268,13 +7316,6 @@ def show_test(item):
            if tex_dom: tex_dom = tex_dom + '   Cuevana2: ' + cuevana2_dominio + '[CR]'
            else: tex_dom = '[CR]   Cuevana2: ' + cuevana2_dominio + '[CR]'
 
-    datos = channeltools.get_channel_parameters('cuevana2esp')
-    if datos['active']:
-        cuevana2esp_dominio = config.get_setting('channel_cuevana2esp_dominio', default='')
-        if cuevana2esp_dominio:
-           if tex_dom: tex_dom = tex_dom + '   Cuevana2Esp: ' + cuevana2esp_dominio + '[CR]'
-           else: tex_dom = '[CR]   Cuevana2Esp: ' + cuevana2esp_dominio + '[CR]'
-
     datos = channeltools.get_channel_parameters('cuevana3pro')
     if datos['active']:
         cuevana3pro_dominio = config.get_setting('channel_cuevana3pro_dominio', default='')
@@ -7387,13 +7428,6 @@ def show_test(item):
            if tex_dom: tex_dom = tex_dom + '   HdFull: ' + hdfull_dominio + '[CR]'
            else: tex_dom = '[CR]   HdFull: ' + hdfull_dominio + '[CR]'
 
-    datos = channeltools.get_channel_parameters('henaojara')
-    if datos['active']:
-        henaojara_dominio = config.get_setting('channel_henaojara_dominio', default='')
-        if henaojara_dominio:
-           if tex_dom: tex_dom = tex_dom + '   HenaOjara: ' + henaojara_dominio + '[CR]'
-           else: tex_dom = '[CR]   HenaOjara: ' + henaojara_dominio + '[CR]'
-
     datos = channeltools.get_channel_parameters('homecine')
     if datos['active']:
         homecine_dominio = config.get_setting('channel_homecine_dominio', default='')
@@ -7505,6 +7539,13 @@ def show_test(item):
         if seriesplus_dominio:
            if tex_dom: tex_dom = tex_dom + '   SeriesPlus: ' + seriesplus_dominio + '[CR]'
            else: tex_dom = '[CR]   SeriesPlus: ' + seriesplus_dominio + '[CR]'
+
+    datos = channeltools.get_channel_parameters('sflix')
+    if datos['active']:
+        sflix_dominio = config.get_setting('channel_sflix_dominio', default='')
+        if sflix_dominio:
+           if tex_dom: tex_dom = tex_dom + '   SFlix: ' + sflix_dominio + '[CR]'
+           else: tex_dom = '[CR]   SFlix: ' + sflix_dominio + '[CR]'
 
     datos = channeltools.get_channel_parameters('srnovelas')
     if datos['active']:

@@ -338,7 +338,6 @@ def findvideos(item):
            age = 'Magnet'
         else:
            servidor = servertools.get_server_from_url(url)
-           servidor = servertools.corregir_servidor(servidor)
 
            url = servertools.normalize_url(servidor, url)
 
@@ -383,7 +382,6 @@ def findvideos(item):
                elif url.startswith('magnet:?'): servidor = 'torrent'
                else:
                   servidor = servertools.get_server_from_url(url)
-                  servidor = servertools.corregir_servidor(servidor)
 
                   url = servertools.normalize_url(servidor, url)
 

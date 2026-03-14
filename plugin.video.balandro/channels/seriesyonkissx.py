@@ -21,11 +21,11 @@ per_page = '20'
 
 rut_movies = host + 'wp-api/v1/tops?postType=movies&range=day&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
 rut_series = host + 'wp-api/v1/tops?postType=tvshows&range=day&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
-rut_animes = host + 'wp-api/v1/tops?postType=animes&range=day&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
 
-ten_movies = host + 'wp-api/v1/tops?postType=movies&range=week&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
-ten_series = host + 'wp-api/v1/tops?postType=tvshows&range=week&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
-ten_animes = host + 'wp-api/v1/tops?postType=animes&range=week&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
+ten_movies = host + 'wp-api/v1/tops?postType=movies&range=month&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
+ten_series = host + 'wp-api/v1/tops?postType=tvshows&range=month&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
+
+rut_animes = host + 'wp-api/v1/listing/animes?postType=animes&range=day&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
 
 
 def item_configurar_proxies(item):
@@ -73,7 +73,7 @@ def do_downloadpage(url, post=None, headers=None):
             data = httptools.downloadpage(url, post=post, headers=headers).data
 
         if not data:
-            if not '?s=' in url:
+            if not '/search?' in url:
                 if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('SeriesYonkisSx', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
@@ -165,9 +165,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', tipo = 'Animes', search_type = 'tvshow', text_color = 'springgreen' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = rut_animes, search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Tendencias', action = 'list_all', url = ten_animes, tipo = 'Animes', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = rut_animes, tipo = 'Animes', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', tipo = 'Animes', search_type = 'tvshow' ))
 
@@ -291,6 +289,8 @@ def list_all(item):
 
         if not url or not title: continue
 
+        _id = scrapertools.find_single_match(match, '(.*?),')
+
         thumb = scrapertools.find_single_match(match, '"featured":"(.*?)"')
 
         year = scrapertools.find_single_match(match, '"release_date":"(.*?)-').strip()
@@ -318,7 +318,7 @@ def list_all(item):
 
             url = host + 'peliculas/' + url
 
-            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo,
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, _id = _id, thumbnail = thumb, fmt_sufijo = sufijo,
                                         contentType = 'movie', contentTitle = titulo, infoLabels = {'year': year} ))
 
         if tipo == 'tvshow':
@@ -333,7 +333,7 @@ def list_all(item):
             else:
                 url = host + 'series/' + url
 
-            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo,
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, _id = _id, thumbnail = thumb, fmt_sufijo = sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -363,7 +363,10 @@ def temporadas(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    _id = scrapertools.find_single_match(data, "<link rel='shortlink'.*?href='.*?p=(.*?)'")
+    if item._id: _id = item._id
+    else:
+       _id = scrapertools.find_single_match(data, "<link rel='shortlink'.*?href='.*?p=(.*?)'")
+       if not _id: _id = scrapertools.find_single_match(data, "<link rel='shortlink'.*?href='.*?p=(.*?)'")
 
     if not _id: return itemlist
 
@@ -406,11 +409,16 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    _id = scrapertools.find_single_match(data, "<link rel='shortlink'.*?href='.*?p=(.*?)'")
+    if item._id: _id = item._id
+    else:
+       _id = scrapertools.find_single_match(data, "<link rel='shortlink'.*?href='.*?p=(.*?)'")
+       if not _id: _id = scrapertools.find_single_match(data, "<link rel='shortlink'.*?href='.*?p=(.*?)'")
 
     if not _id: return itemlist
 
-    url = host + 'wp-api/v1/single/episodes/list?_id=' +_id + '&season=' + str(item.contentSeason) + '&postsPerPage=' + per_page + '&page=1'
+    if item.page == 0: item.page = 1
+
+    url = host + 'wp-api/v1/single/episodes/list?_id=' +_id + '&season=' + str(item.contentSeason) + '&postsPerPage=' + per_page + '&page=' + str(item.page)
 
     data = do_downloadpage(url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
@@ -467,6 +475,8 @@ def episodios(item):
                 else: item.perpage = 50
 
     for _id, title, slug, thumb, epis in matches:
+        title = clean_title(title)
+
         epis = epis.replace(']', '').replace('}', '').strip()
 
         if not epis: epis = 1
@@ -488,6 +498,15 @@ def episodios(item):
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
+    if itemlist:
+        next_page = scrapertools.find_single_match(str(data), '"next_page_url":"(.*?)"')
+
+        if next_page:
+            next_page = next_page.replace('\\/','/')
+
+            itemlist.append(item.clone( title="Siguientes ...", action="episodios", url = item.url, page = item.page + 1,
+                            perpage = item.perpage, text_color='coral' ))
+
     return itemlist
 
 
@@ -498,12 +517,16 @@ def findvideos(item):
     url = item.url
 
     if not '?postId=' in item.url:
-        data = do_downloadpage(item.url)
-        data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+        if item._id:
+            _id = item._id
+            _id = _id.replace('"', '').strip()
+        else:
+           data = do_downloadpage(item.url)
+           data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-        _id = scrapertools.find_single_match(data, "<link rel='shortlink'.*?href='.*?p=(.*?)'")
+           _id = scrapertools.find_single_match(data, "<link rel='shortlink'.*?href='.*?p=(.*?)'")
 
-        if not _id: return itemlist
+           if not _id: return itemlist
 
         url = host + 'wp-api/v1/player?postId=' + _id + '&demo=0'
 
@@ -530,9 +553,13 @@ def findvideos(item):
         url = url.replace('\\/', '/')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
-        url = servertools.normalize_url(servidor, url)
+        if '/acortalink.' in url: servidor = 'directo'
+
+        if servertools.is_server_available(servidor):
+            if not servertools.is_server_enabled(servidor): continue
+        else:
+            if not config.get_setting('developer_mode', default=False): continue
 
         other = ''
         if servidor == 'various': other = servertools.corregir_other(url)
@@ -549,8 +576,6 @@ def findvideos(item):
 
         age = ''
         if '/acortalink.' in url:
-            servidor = 'directo'
-
             age = srv.capitalize()
 
             if not age == 'Torrent':
@@ -583,6 +608,8 @@ def play(item):
     logger.info()
     itemlist = []
 
+    servidor = item.server
+
     url = item.url
 
     if item.url.endswith('.torrent'):
@@ -603,6 +630,8 @@ def play(item):
                 itemlist.append(item.clone( url = file_local, server = 'torrent' ))
         else:
             itemlist.append(item.clone( url = item.url, server = 'torrent' ))
+
+        return itemlist
 
     else:
         if 'magnet' in item.other:
@@ -649,9 +678,9 @@ def play(item):
                    new_server = servertools.get_server_from_url(url_base64)
                    new_server = servertools.corregir_other(new_server)				   
 
-                   if not new_server == 'directo':
+                   if url_base64:
                        url = url_base64
-                       item.server = new_server
+                       servidor = new_server
 
     if url:
         if url.startswith("https://sb"):
@@ -660,13 +689,15 @@ def play(item):
         elif '/acortalink.' in url:
            return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
 
-        if item.server == 'directo':
+        if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
             if new_server.startswith("http"):
                 if not config.get_setting('developer_mode', default=False): return itemlist
             servidor = new_server
 
-        itemlist.append(item.clone(url = url, server = item.server))
+        url = servertools.normalize_url(servidor, url)
+
+        itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 

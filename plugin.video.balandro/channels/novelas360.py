@@ -398,7 +398,6 @@ def findvideos(item):
         url = url.replace('&amp;', '&')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         other = ''
 

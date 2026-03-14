@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True
-
 import re
 
 from platformcode import config, logger, platformtools
@@ -12,38 +7,6 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 from lib import decrypters
-
-
-LINUX = False
-BR = False
-BR2 = False
-
-if PY3:
-    try:
-       import xbmc
-       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
-    except: pass
-
-try:
-   if LINUX:
-       try:
-          from lib import balandroresolver2 as balandroresolver
-          BR2 = True
-       except: pass
-   else:
-       if PY3:
-           from lib import balandroresolver
-           BR = true
-       else:
-          try:
-             from lib import balandroresolver2 as balandroresolver
-             BR2 = True
-          except: pass
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-      BR2 = True
-   except: pass
 
 
 host = 'https://seriesretro.com/'
@@ -110,23 +73,6 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                     data = httptools.downloadpage_proxy('seriesretro', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-
-                if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-                else:
-                   if hay_proxies:
-                       data = httptools.downloadpage_proxy('seriesretro', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-                   else:
-                       data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-            except:
-                pass
 
     if '<title>Just a moment...</title>' in data:
         if not '?s=' in url:
@@ -792,7 +738,6 @@ def play(item):
             return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()

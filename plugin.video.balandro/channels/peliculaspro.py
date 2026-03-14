@@ -1,47 +1,10 @@
 ﻿# -*- coding: utf-8 -*-
 
-import sys
-
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True
-
 import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
-
-
-LINUX = False
-BR = False
-BR2 = False
-
-if PY3:
-    try:
-       import xbmc
-       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
-    except: pass
-
-try:
-   if LINUX:
-       try:
-          from lib import balandroresolver2 as balandroresolver
-          BR2 = True
-       except: pass
-   else:
-       if PY3:
-           from lib import balandroresolver
-           BR = true
-       else:
-          try:
-             from lib import balandroresolver2 as balandroresolver
-             BR2 = True
-          except: pass
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-      BR2 = True
-   except: pass
 
 
 host = 'https://peliculaspro.org/'
@@ -121,23 +84,6 @@ def do_downloadpage(url, post=None, headers=None):
                     data = httptools.downloadpage_proxy('peliculaspro', url, post=post, headers=headers, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-
-                if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('peliculaspro', url, post=post, headers=headers, timeout=timeout).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-            except:
-                pass
 
     if '<title>Just a moment...</title>' in data:
         if not '?s=' in url:
@@ -445,12 +391,8 @@ def findvideos(item):
 
     ses = 0
 
-    i = 0
-
     for opt, url in matches:
         ses += 1
-
-        i += 1
 
         srv, lang = scrapertools.find_single_match(data, 'href="#options-' + str(opt)+ '">.*?<span class="server">(.*?)-(.*?)</span>')
 
@@ -462,14 +404,15 @@ def findvideos(item):
         idioma = IDIOMAS.get(lang, lang)
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         other = ''
 
         if servidor:
             if srv.startswith("sb"): continue
+
             elif srv == 'vanfem': continue
             elif srv == 'freepelis': continue
+            elif srv == 'streamcrypt': continue
 
             elif srv == 'streamz': servidor = srv
             elif srv == 'doods': servidor = 'doodstream'
@@ -479,21 +422,20 @@ def findvideos(item):
             elif srv == 'vidoza': servidor = 'vidoza'
             elif srv == 'pelisfree': servidor = 'waaw'
 
-            elif srv == 'streamcrypt': other = srv + ' ' + str(i)
-
             else:
                 if servidor == srv: srv = ''
 
                 elif servidor == 'directo': other = servertools.corregir_other(srv)
                 elif servidor == 'various': other = servertools.corregir_other(srv)
 
-                else: other = srv + ' ' + str(i)
+                else: other = srv
 
                 if 'li>' in idioma:
                     idioma = ''
                     other = ''
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, language = idioma, other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url,
+                              language = idioma, other = other ))
 
     # ~ downloads
     bloque = scrapertools.find_single_match(data, '<table>(.*?)</table>')
@@ -526,7 +468,7 @@ def findvideos(item):
                other = ''
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url,
-                              language = idioma, quality = qlty, other = other ))
+                              language = idioma, quality = qlty, other = other, age = 'D' ))
 
     if not itemlist:
         if not ses == 0:
@@ -554,17 +496,18 @@ def play(item):
 
     if url.startswith(host_player):
         if '/?trhide=' in url or '/?trdownload=' in url:
-            url = ''
-
             headers = {'Referer': item.url}
 
+            hay_proxies = False
+            if config.get_setting('channel_peliculaspro_proxies', default=''): hay_proxies = True
+
             try:
-                if config.get_setting('channel_peliculaspro_proxies', default=''):
+                if hay_proxies:
                     url = httptools.downloadpage_proxy('peliculaspro', item.url, headers=headers, follow_redirects=False).headers['location']
                 else:
                     url = httptools.downloadpage(item.url, headers=headers, follow_redirects=False).headers['location']
             except:
-                pass
+                url = ''
 
         else:
             data = do_downloadpage(item.url)
@@ -572,10 +515,13 @@ def play(item):
             url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
 
             if '/?trhide=' in url or '/?trdownload=' in url:
+                hay_proxies = False
+                if config.get_setting('channel_peliculaspro_proxies', default=''): hay_proxies = True
+
                 headers = {'Referer': item.url}
 
                 try:
-                    if config.get_setting('channel_peliculaspro_proxies', default=''):
+                    if hay_proxies:
                         url = httptools.downloadpage_proxy('peliculaspro', url, headers=headers, follow_redirects=False).headers['location']
                     else:
                         url = httptools.downloadpage(url, headers=headers, follow_redirects=False).headers['location']
@@ -596,25 +542,15 @@ def play(item):
 
             if not url: url = scrapertools.find_single_match(data, '<a class="fake-player-container" href="(.*?)"')
 
-    elif url.startswith('https://streamcrypt.net/'):
-        url = httptools.downloadpage(url, follow_redirects=False).headers.get('location', '')
-
-        if url:
-            url = url.replace('?id=', '?p=2&id=')
-            url = httptools.downloadpage(url, follow_redirects=False).headers.get('location', '')
-        else:
-            data = do_downloadpage(url)
-            url = scrapertools.find_single_match(data, "window.open.*?'(.*?)'")
-
     if '/peliculaspro.' in url: url = ''
 
     elif url == '/blank.html': url = ''
 
     if url:
-        if url.startswith('https://pelisfree.site/'): url = url.replace('/pelisfree.site/', '/waaw.to/')
+        if url.startswith('https://pelisfree.site/'):
+            url = url.replace('/pelisfree.site/', '/waaw.to/')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()

@@ -607,7 +607,7 @@ def list_search(item):
         sufijo = ''
         if item.search_type == 'all': 
             sufijo = contentType
-            if sufijo == "documentary": sufijo = '[COLOR yellowgreen](documental)[/COLOR]'
+            if sufijo == "documentary": sufijo = '[COLOR cyan]Documental[/COLOR]'
 
         if contentType == 'tvshow':
             SerieName = corregir_SerieName(title)

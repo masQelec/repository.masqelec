@@ -531,9 +531,6 @@ def findvideos(item):
         if '/pelisplus.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
 
         link_other = ''
         if servidor == 'various': link_other = servertools.corregir_other(url)
@@ -571,6 +568,8 @@ def play(item):
             if new_server.startswith("http"):
                 if not config.get_setting('developer_mode', default=False): return itemlist
             servidor = new_server
+
+        url = servertools.normalize_url(servidor, url)
 
         itemlist.append(item.clone(url = url, server = item.server))
 

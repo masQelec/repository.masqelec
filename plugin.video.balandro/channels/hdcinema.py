@@ -420,8 +420,12 @@ def findvideos(item):
             url = link.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
             url = link.replace('amp;#038;', '&').replace('#038;', '&').replace('amp;', '&')
 
+            other = ''
+            if servidor == 'various': other = servertools.corregir_other(srv)
+            elif servidor == 'zures': other = servertools.corregir_zures(srv)
+
             itemlist.append(Item(channel = item.channel, action = 'play', server=servidor, title = '', url=url,
-                                 language=IDIOMAS.get(lng, lng) ))
+                                 language=IDIOMAS.get(lng, lng), other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -454,7 +458,6 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

@@ -14,6 +14,38 @@ from lib import decrypters
 host = 'https://ver.pelis28.net/'
 
 
+def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_pelis28re_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None):
     if not headers:
        if '/genero/'in url: headers = {'Referer': url}
@@ -21,14 +53,54 @@ def do_downloadpage(url, post=None, headers=None):
     raise_weberror = True
     if '/peliculas/' in url: raise_weberror = False
 
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    hay_proxies = False
+    if config.get_setting('channel_pelis28re_proxies', default=''): hay_proxies = True
+
+    timeout = None
+    if host in url:
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
+
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+    else:
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('pelis28re', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+        if not data:
+            if not '/?s=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('Pelis28Re', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('pelis28re', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     return data
+
+
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
+                                from_channel='pelis28re', folder=False, text_color='chartreuse' ))
+
+    itemlist.append(item_configurar_proxies(item))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
 
 
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -41,6 +113,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -59,6 +133,8 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -482,7 +558,74 @@ def findvideos(item):
                     if '.eyJs' in link: age = ''
 
                     itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes, age=age,
-                                          language=lang, other=other ))
+                                          language=lang, other=other.capitalize() ))
+
+                continue
+
+        elif '/saidochesto.' in lnk:
+              data4 = do_downloadpage(lnk)
+
+              options = scrapertools.find_multiple_matches(data4, '<li onclick="go_to_player(.*?)</li>')
+
+              for option in options:
+                  ses += 1
+
+                  if 'data-lang="2"' in option: lang = 'Vose'
+                  elif 'data-lang="0"' in option: lang = 'Lat'
+                  elif 'data-lang="1"' in option: lang = 'Esp'
+                  else: lang = '?'
+
+                  url = scrapertools.find_single_match(str(option), "'(.*?)'")
+
+                  if not url: continue
+
+                  if '.novercine.' in url: continue
+                  elif '.cuevana3.' in url: continue
+                  elif '-ukr-' in url: continue
+                  elif '/plustream.' in url: continue
+                  elif '/xupalace.' in url: continue
+
+                  elif '/1fichier.' in url: continue
+                  elif '/short.' in url: continue
+
+                  elif '/filemooon.' in url: continue
+
+                  other = ''
+
+                  if 'netu' in url or 'waaw' in url or 'hqq' in url:
+                      video = scrapertools.find_single_match(url, '/e/(.*?)$').strip()
+                      if video: url = 'https://waaw.to/watch_video.php?v=' + video
+
+                  if '/Smoothpre.' in url:
+                      url = url.replace('/Smoothpre.', '/smoothpre.')
+
+                  servidor = servertools.get_server_from_url(url)
+
+                  if servertools.is_server_available(servidor):
+                      if not servertools.is_server_enabled(servidor): continue
+                  else:
+                      if not config.get_setting('developer_mode', default=False): continue
+
+                  if '/vimeos.' in url:
+                      servidor = 'zures'
+                      other = 'Vimeos'
+
+                  if servidor == 'directo':
+                      try:
+                         if '//' in url: other = url.split('//')[1]
+                         else: other = url.split('/')[1]
+
+                         other = other.split('/')[0]
+                      except:
+                         other = url
+
+                  if servidor == 'various': other = servertools.corregir_other(url)
+                  elif servidor == 'zures': other = servertools.corregir_zures(url)
+
+                  itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                                        language = lang, other = other.capitalize() ))
+
+              continue
 
         if item.contentType == 'episode':
             if not vid:
@@ -534,7 +677,6 @@ def findvideos(item):
                             url = url.replace('/Smoothpre.', '/smoothpre.')
 
                         servidor = servertools.get_server_from_url(url)
-                        servidor = servertools.corregir_servidor(servidor)
 
                         if servertools.is_server_available(servidor):
                             if not servertools.is_server_enabled(servidor): continue
@@ -555,14 +697,14 @@ def findvideos(item):
                                other = url
 
                         if servidor == 'various': other = servertools.corregir_other(url)
+                        elif servidor == 'zures': other = servertools.corregir_zures(url)
 
                         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                              language = lang, other = other ))
+                                              language = lang, other = other.capitalize() ))
 
                     continue
 
                 servidor = servertools.get_server_from_url(lnk)
-                servidor = servertools.corregir_servidor(servidor)
 
                 if '/Smoothpre.' in lnk:
                     lnk = lnk.replace('/Smoothpre.', '/smoothpre.')
@@ -586,9 +728,10 @@ def findvideos(item):
                        other = lnk
 
                 if servidor == 'various': other = servertools.corregir_other(lnk)
+                elif servidor == 'zures': other = servertools.corregir_zures(lnk)
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = lnk,
-                                      language = 'Lat', other = other ))
+                                      language = 'Lat', other = other.capitalize() ))
 
                 continue
 
@@ -614,7 +757,6 @@ def findvideos(item):
                     lnk = lnk.replace('/Smoothpre.', '/smoothpre.')
 
                 servidor = servertools.get_server_from_url(lnk)
-                servidor = servertools.corregir_servidor(servidor)
 
                 if servertools.is_server_available(servidor):
                     if not servertools.is_server_enabled(servidor): continue
@@ -635,9 +777,10 @@ def findvideos(item):
                        other = lnk
 
                 if servidor == 'various': other = servertools.corregir_other(lnk)
+                elif servidor == 'zures': other = servertools.corregir_zures(lnk)
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = lnk,
-                                      language = 'Lat', other = other ))
+                                      language = 'Lat', other = other.capitalize() ))
 
                 continue
 
@@ -684,7 +827,6 @@ def findvideos(item):
                 url = url.replace('/Smoothpre.', '/smoothpre.')
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             if servertools.is_server_available(servidor):
                 if not servertools.is_server_enabled(servidor): continue
@@ -705,9 +847,10 @@ def findvideos(item):
                    other = url
 
             if servidor == 'various': other = servertools.corregir_other(url)
+            elif servidor == 'zures': other = servertools.corregir_zures(url)
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                  language = lang, other = other ))
+                                  language = lang, other = other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:
@@ -777,7 +920,6 @@ def play(item):
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()

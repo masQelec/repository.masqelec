@@ -415,7 +415,6 @@ def findvideos(item):
         url = base64.b64decode(url).decode("utf-8")
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         other = ''
         if servidor == 'various': other = servertools.corregir_other(url)

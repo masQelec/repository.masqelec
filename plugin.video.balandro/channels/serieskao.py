@@ -494,7 +494,6 @@ def findvideos(item):
 
             if url:
                 servidor = servertools.get_server_from_url(url)
-                servidor = servertools.corregir_servidor(servidor)
 
                 if servertools.is_server_available(servidor):
                     if not servertools.is_server_enabled(servidor): url = ''
@@ -502,8 +501,6 @@ def findvideos(item):
                     if not config.get_setting('developer_mode', default=False): url = ''
 
                 if url: 
-                    url = servertools.normalize_url(servidor, url)
-
                     itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url=url, language=lang ))
 
         elif '/video/' in link:
@@ -526,14 +523,11 @@ def findvideos(item):
                 else: lang = '?'
 
                 servidor = servertools.get_server_from_url(matchx)
-                servidor = servertools.corregir_servidor(servidor)
 
                 if servertools.is_server_available(servidor):
                     if not servertools.is_server_enabled(servidor): continue
                 else:
                     if not config.get_setting('developer_mode', default=False): continue
-
-                url = servertools.normalize_url(servidor, matchx)
 
                 other = ''
                 if servidor == 'various': other = servertools.corregir_other(url)
@@ -550,9 +544,6 @@ def findvideos(item):
 
         if url:
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
-
-            url = servertools.normalize_url(servidor, url)
 
             other = ''
             if servidor == 'various': other = servertools.corregir_other(url)
@@ -629,7 +620,8 @@ def findvideos(item):
 
             if other == servidor: other = ''
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lng, other = other.capitalize() ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                                  language = lng, other = other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:
@@ -684,7 +676,6 @@ def play(item):
 
     elif not item.server == 'directo':
         servidor = servertools.get_server_from_url(item.url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, item.url)
 
@@ -697,7 +688,6 @@ def play(item):
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

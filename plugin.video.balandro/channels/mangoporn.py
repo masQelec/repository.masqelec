@@ -179,7 +179,6 @@ def findvideos(item):
             url = url.replace('/netu.wiztube.xyz/player/embed_player.php?', '/waaw.to/watch_video.php?v=').replace('&autoplay=yes', '').strip()
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             other = ''
 
@@ -214,7 +213,6 @@ def findvideos(item):
                 url = url.replace('//filemoon.sx/download/', '//filemoon.sx/d/')
 
                 servidor = servertools.get_server_from_url(url)
-                servidor = servertools.corregir_servidor(servidor)
 
                 other = 'D'
 
@@ -249,7 +247,6 @@ def play(item):
         if not url: return itemlist
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
     itemlist.append(item.clone(server = servidor, url = url))
 

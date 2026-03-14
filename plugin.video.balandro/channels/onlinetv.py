@@ -500,34 +500,37 @@ def findvideos(item):
 
                         servidor = servertools.corregir_servidor(srv)
 
+                        other = ''
+                        if servidor == 'various': other = servertools.corregir_other(srv)
+                        elif servidor == 'zures': other = servertools.corregir_zures(srv)
+
                         if servertools.is_server_available(servidor):
                             if not servertools.is_server_enabled(servidor): continue
                         else:
                             if not config.get_setting('developer_mode', default=False): continue
 
-                        other = ''
-
-                        if servidor == 'various': other = servertools.corregir_other(srv)
-
                         if '.eyJs' in link: age = ''
 
                         itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '',
-                                                         crypto=link, bytes=e_bytes, age=age, language=lang, other=other ))
+                                                         crypto=link, bytes=e_bytes, age=age, language=lang, other=other.capitalize() ))
 
                     continue
 
                 url = url.replace('/younetu.com/player/', '/waaw.to/')
 
                 servidor = servertools.get_server_from_url(url)
-                servidor = servertools.corregir_servidor(servidor)
-
-                url = servertools.normalize_url(servidor, url)
 
                 other = ''
                 if servidor == 'various': other = servertools.corregir_other(url)
+                elif servidor == 'zures': other = servertools.corregir_zures(url)
+
+                if servertools.is_server_available(servidor):
+                    if not servertools.is_server_enabled(servidor): continue
+                else:
+                    if not config.get_setting('developer_mode', default=False): continue
 
                 itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                     language = IDIOMAS.get(lang,lang), other = other ))
+                                     language = IDIOMAS.get(lang,lang), other = other.capitalize() ))
 
     # ~ Descargas requieren registrarse
 
@@ -587,13 +590,14 @@ def play(item):
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
             if new_server.startswith("http"):
                 if not config.get_setting('developer_mode', default=False): return itemlist
             servidor = new_server
+
+        url = servertools.normalize_url(servidor, url)
 
         itemlist.append(item.clone(url = url, server = servidor))
 

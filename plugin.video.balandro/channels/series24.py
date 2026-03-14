@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://cc5w.series24.cc/'
+host = 'https://cvw5.series24.cc/'
 
 
 # ~ por si viene de enlaces guardados
@@ -15,7 +15,7 @@ ant_hosts = ['https://www.series24.cc/', 'https://www1.series24.cc/', 'https://w
             'https://ww2.series24.cc/', 'https://www11.series24.cc/', 'https://w-ww.series24.cc/',
             'https://ww-w.series24.cc/', 'https://www.series24.cc/', 'https://wv5n.series24.cc/',
             'https://wv5b.series24.cc/', 'https://wc5n.series24.cc/', 'https://cv5w.series24.cc/',
-            'https://c5vw.series24.cc/']
+            'https://c5vw.series24.cc/', 'https://cc5w.series24.cc/']
 
 
 domain = config.get_setting('dominio', 'series24', default='')
@@ -549,18 +549,15 @@ def findvideos(item):
         if 'ul.to' in url: continue
         elif '.oboom.' in url: continue
 
-        servidor = servertools.get_server_from_url(url, disabled_servers=True)
+        servidor = servertools.get_server_from_url(url)
 
         if servidor is None: continue
-
-        servidor = servertools.corregir_servidor(servidor)
+        elif not servidor: continue
 
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
         else:
             if not config.get_setting('developer_mode', default=False): continue
-
-        url = servertools.normalize_url(servidor, url)
 
         if url:
             qlty = scrapertools.find_single_match(match, "<strong class='quality'>(.*?)</strong>")
@@ -601,7 +598,6 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 

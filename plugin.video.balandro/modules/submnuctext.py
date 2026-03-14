@@ -297,16 +297,13 @@ def submnu_news(item):
     elif config.get_setting('channels_link_pyse', default=False): presentar = True
 
     if presentar:
-        if config.get_setting('mnu_sugeridos', default=True):
-            itemlist.append(item.clone( title = '[B]Recomendaciones:[/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='darksalmon' ))
+        itemlist.append(item.clone( title = '[B]Novedades Películas, Series y Documentales:[/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='darksalmon' ))
 
-            if config.get_setting('mnu_pelis', default=True) or config.get_setting('channels_link_pyse', default=False):
-                itemlist.append(item.clone( title = ' - [B]Películas[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('movie'), extra = 'movies', search_type = 'movies', text_color='deepskyblue' ))
+        if config.get_setting('mnu_pelis', default=True) or config.get_setting('channels_link_pyse', default=False):
+            itemlist.append(item.clone( title = ' - [B]Películas[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('movie'), extra = 'movies', search_type = 'movies', text_color='deepskyblue' ))
 
-            if config.get_setting('mnu_series', default=True) or config.get_setting('channels_link_pyse', default=False):
-                itemlist.append(item.clone( title = ' - [B]Series[/B]', channel='novelty', action='mainlist', context=context_usual, news='lasts', thumbnail=config.get_thumb('tvshow'), extra = 'tvshows', search_type = 'tvshow', text_color='hotpink' ))
-
-                itemlist.append(item.clone( title = ' - [B]Episodios[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('tvshow'), extra = 'episodes', search_type = 'tvshow', text_color='hotpink' ))
+        if config.get_setting('mnu_series', default=True) or config.get_setting('channels_link_pyse', default=False):
+            itemlist.append(item.clone( title = ' - [B]Series[/B]', channel='novelty', action='mainlist', context=context_usual, news='lasts', thumbnail=config.get_thumb('tvshow'), extra = 'tvshows', search_type = 'tvshow', text_color='hotpink' ))
 
         if not config.get_setting('mnu_simple', default=False):
             if config.get_setting('mnu_documentales', default=True):
@@ -317,6 +314,11 @@ def submnu_news(item):
 
             if config.get_setting('mnu_torrents', default=True):
                 itemlist.append(item.clone( title = ' - [B]Torrents[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('torrents'), extra = 'torrents', search_type = 'movie', text_color='blue' ))
+
+        if config.get_setting('mnu_series', default=True) or config.get_setting('channels_link_pyse', default=False):
+            itemlist.append(item.clone( title = '[B]Novedades Episodios:[/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='darksalmon' ))
+
+            itemlist.append(item.clone( title = ' - [B]Series[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('tvshow'), extra = 'episodes', search_type = 'tvshow', text_color='hotpink' ))
 
             if config.get_setting('mnu_doramas', default=True):
                 itemlist.append(item.clone( title = ' - [B]Doramas[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('computer'), extra = 'doramas', search_type = 'tvshow', text_color='firebrick' ))
@@ -1137,8 +1139,6 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'cuevana2': domains.manto_domain_cuevana2(item)
 
-    elif item.from_channel == 'cuevana2esp': domains.manto_domain_cuevana2esp(item)
-
     elif item.from_channel == 'cuevana3pro': domains.manto_domain_cuevana3pro(item)
 
     elif item.from_channel == 'divxtotal': domains.manto_domain_divxtotal(item)
@@ -1166,8 +1166,6 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'grantorrent': domains.manto_domain_grantorrent(item)
 
     elif item.from_channel == 'hdfull': domains.manto_domain_hdfull(item)
-
-    elif item.from_channel == 'henaojara': domains.manto_domain_henaojara(item)
 
     elif item.from_channel == 'homecine': domains.manto_domain_homecine(item)
 
@@ -1200,6 +1198,8 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'seriespapayato': domains.manto_domain_seriespapayato(item)
 
     elif item.from_channel == 'seriesplus': domains.manto_domain_seriesplus(item)
+
+    elif item.from_channel == 'sflix': domains.manto_domain_sflix(item)
 
     elif item.from_channel == 'srnovelas': domains.manto_domain_srnovelas(item)
 
@@ -1336,7 +1336,7 @@ def _proxies(item):
         item.channel = 'cinehdplus'
         cinehdplus.configurar_proxies(item)
 
-        if config.get_setting('channel_cinehdplusproxies') is None: refrescar = False
+        if config.get_setting('channel_cinehdplus_proxies') is None: refrescar = False
 
     elif item.from_channel == 'cinemitas':
         from channels import cinemitas
@@ -1359,13 +1359,6 @@ def _proxies(item):
 
         if config.get_setting('channel_cuevana2_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'cuevana2esp':
-        from channels import cuevana2esp
-        item.channel = 'cuevana2esp'
-        cuevana2esp.configurar_proxies(item)
-
-        if config.get_setting('channel_cuevana2esp_proxies') is None: refrescar = False
-
     elif item.from_channel == 'cuevana3pro':
         from channels import cuevana3pro
         item.channel = 'cuevana3pro'
@@ -1375,10 +1368,17 @@ def _proxies(item):
 
     elif item.from_channel == 'cuevana3run':
         from channels import cuevana3run
-        item.channel = 'cuevana3pro'
+        item.channel = 'cuevana3run'
         cuevana3run.configurar_proxies(item)
 
         if config.get_setting('channel_cuevana3run_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'cuevanavip':
+        from channels import cuevanavip
+        item.channel = 'cuevanavip'
+        cuevanavip.configurar_proxies(item)
+
+        if config.get_setting('channel_cuevanavip_proxies') is None: refrescar = False
 
     elif item.from_channel == 'detodo':
         from channels import detodo
@@ -1471,19 +1471,19 @@ def _proxies(item):
 
         if config.get_setting('channel_eztv_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'filmoves':
-        from channels import filmoves
-        item.channel = 'filmoves'
-        filmoves.configurar_proxies(item)
-
-        if config.get_setting('channel_filmoves_proxies') is None: refrescar = False
-
     elif item.from_channel == 'flixcorn':
         from channels import flixcorn
         item.channel = 'flixcorn'
         flixcorn.configurar_proxies(item)
 
         if config.get_setting('channel_flixcorn_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'gatotv':
+        from channels import gatotv
+        item.channel = 'gatotv'
+        gatotv.configurar_proxies(item)
+
+        if config.get_setting('channel_gatotv_proxies') is None: refrescar = False
 
     elif item.from_channel == 'gnula':
         from channels import gnula
@@ -1541,19 +1541,19 @@ def _proxies(item):
 
         if config.get_setting('channel_hdfull_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'henaojara':
-        from channels import henaojara
-        item.channel = 'henaojara'
-        henaojara.configurar_proxies(item)
-
-        if config.get_setting('channel_henaojara_proxies') is None: refrescar = False
-
     elif item.from_channel == 'homecine':
         from channels import homecine
         item.channel = 'homecine'
         homecine.configurar_proxies(item)
 
         if config.get_setting('channel_homecine_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'ikucomics':
+        from channels import ikucomics
+        item.channel = 'ikucomics'
+        ikucomics.configurar_proxies(item)
+
+        if config.get_setting('channel_ikucomics_proxies') is None: refrescar = False
 
     elif item.from_channel == 'jkanime':
         from channels import jkanime
@@ -1667,6 +1667,13 @@ def _proxies(item):
 
         if config.get_setting('channel_peliculaspro_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'pelis28re':
+        from channels import pelis28re
+        item.channel = 'pelis28re'
+        pelis28re.configurar_proxies(item)
+
+        if config.get_setting('channel_pelis28re_proxies') is None: refrescar = False
+
     elif item.from_channel == 'pelisflix':
         from channels import pelisflix
         item.channel = 'pelisflix'
@@ -1744,13 +1751,6 @@ def _proxies(item):
 
         if config.get_setting('channel_poseidonhd2_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'rarbg':
-        from channels import rarbg
-        item.channel = 'rarbg'
-        rarbg.configurar_proxies(item)
-
-        if config.get_setting('channel_rarbg_proxies') is None: refrescar = False
-
     elif item.from_channel == 'reinventorrent':
         from channels import reinventorrent
         item.channel = 'reinventorrent'
@@ -1778,6 +1778,13 @@ def _proxies(item):
         series24.configurar_proxies(item)
 
         if config.get_setting('channel_series24_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'seriesgato':
+        from channels import seriesgato
+        item.channel = 'seriesgato'
+        seriesgato.configurar_proxies(item)
+
+        if config.get_setting('channel_seriesgato_proxies') is None: refrescar = False
 
     elif item.from_channel == 'seriesonline':
         from channels import seriesonline
@@ -1906,10 +1913,9 @@ def _proxies(item):
         if config.get_setting('channel_zonaleros_proxies') is None: refrescar = False
 
     else:
-        if item.channels_new_proxies:
-            platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Falta _Proxies[/B][/COLOR]' % color_alert)
+        platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Falta _Proxies[/B][/COLOR]' % color_alert)
 
-            refrescar = False
+        refrescar = False
 
     channels_unsatisfactory = config.get_setting('developer_test_channels', default='')
     if channels_unsatisfactory == 'unsatisfactory': refrescar = False
@@ -1921,7 +1927,7 @@ def _proxies(item):
 
 def _search_new_proxies(item):
     if item.channels_new_proxies:
-        if platformtools.dialog_yesno(config.__addon_name, '[COLOR yellow][B]Solo se tendrán en cuenta para las próximas búsquedas[/B][/COLOR]','[COLOR red][B]¿ Desea efectuar una nueva búsqueda de proxies en Todos esos canales ?[/B][/COLOR]'):
+        if platformtools.dialog_yesno(config.__addon_name, '[COLOR yellow][B]Solo se tendrán en cuenta para las Próximas Búsquedas[/B][/COLOR]','[COLOR red][B]¿ Desea efectuar una Nueva Búsqueda de Proxies en Todos esos Canales ?[/B][/COLOR]'):
             for channel in item.channels_new_proxies:
                 item.from_channel = channel
                 item.module_search = True

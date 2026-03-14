@@ -478,7 +478,6 @@ def findvideos(item):
         ses += 1
 
         servidor = servertools.get_server_from_url(lnk)
-        servidor = servertools.corregir_servidor(servidor)
 
         lnk = servertools.normalize_url(servidor, lnk)
 

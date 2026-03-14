@@ -3,7 +3,7 @@
   "name": "TuCineClasico",
   "thumbnail": "tucineclasico.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["movie"],
@@ -11,7 +11,7 @@
   "categories": ["movie"],
   "language": ["cast", "vose"],
 
-  "clusters": ["suggested", "classic", "rankings", "years", "kids", "vos"],
+  "clusters": ["classic", "rankings", "years", "kids", "vos"],
 
-  "notes": "Películas clásicas por géneros, año."
+  "notes": "Web CERRADA. Películas clásicas por géneros."
 }

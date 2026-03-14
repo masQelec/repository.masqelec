@@ -584,7 +584,6 @@ def play(item):
             return 'Servidor [COLOR red]Fuera de Servicio[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 
