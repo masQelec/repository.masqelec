@@ -494,8 +494,6 @@ def manto_params(item):
         config.set_setting('channel_entrepeliculasyseries_dominio', '')
 
         config.set_setting('channel_gnula_dominio', '')
-        config.set_setting('channel_gnula24_dominio', '')
-        config.set_setting('channel_gnula24h_dominio', '')
         config.set_setting('channel_grantorrent_dominio', '')
 
         config.set_setting('channel_hdfull_dominio', '')
@@ -512,24 +510,20 @@ def manto_params(item):
         config.set_setting('channel_pelisforte_dominio', '')
         config.set_setting('channel_pelismart_dominio', '')
         config.set_setting('channel_pelispanda_dominio', '')
-        config.set_setting('channel_pelispediaws_dominio', '')
         config.set_setting('channel_pelisplushd_dominio', '')
         config.set_setting('channel_pelisplushdlat_dominio', '')
         config.set_setting('channel_pelisplushdnz_dominio', '')
 
         config.set_setting('channel_poseidonhd2_dominio', '')
 
-        config.set_setting('channel_series24_dominio', '')
         config.set_setting('channel_serieskao_dominio', '')
         config.set_setting('channel_seriespapayato_dominio', '')
-        config.set_setting('channel_seriesplus_dominio', '')
         config.set_setting('channel_sflix_dominio', '')
         config.set_setting('channel_srnovelas_dominio', '')
         config.set_setting('channel_subtorrents_dominio', '')
 
         config.set_setting('channel_todotorrents_dominio', '')
 
-        config.set_setting('channel_vernovelas_dominio', '')
         config.set_setting('channel_veronline_dominio', '')
 
         config.set_setting('autoplay_max_links', '10')
@@ -601,7 +595,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '145.0.7632.77')  # ~ 19/2/26
+        config.set_setting('chrome_last_version', '148.0.7778.56')  # ~ 25/4/26
 
         config.set_setting('debug', '0')
 
@@ -1058,6 +1052,14 @@ def manto_temporales(item):
         existe = filetools.exists(path)
         if existe: hay_temporales = True
 
+        path = os.path.join(config.get_data_path(), 'canales.log')
+        existe = filetools.exists(path)
+        if existe: hay_temporales = True
+
+        path = os.path.join(config.get_data_path(), 'servidores.log')
+        existe = filetools.exists(path)
+        if existe: hay_temporales = True
+
     else:
         path = os.path.join(config.get_data_path(), 'info_channels.csv')
         existe = filetools.exists(path)
@@ -1113,6 +1115,14 @@ def manto_temporales(item):
             existe = filetools.exists(path)
             if existe: filetools.remove(path)
 
+            path = os.path.join(config.get_data_path(), 'canales.log')
+            existe = filetools.exists(path)
+            if existe: filetools.remove(path)
+
+            path = os.path.join(config.get_data_path(), 'servidores.log')
+            existe = filetools.exists(path)
+            if existe: filetools.remove(path)
+
         else:
             path = os.path.join(config.get_data_path(), 'info_channels.csv')
             existe = filetools.exists(path)
@@ -1165,6 +1175,14 @@ def manto_logs(item):
     existe = filetools.exists(path)
     if existe: hay_logs = True
 
+    path = os.path.join(config.get_data_path(), 'canales.log')
+    existe = filetools.exists(path)
+    if existe: hay_logs = True
+
+    path = os.path.join(config.get_data_path(), 'servidores.log')
+    existe = filetools.exists(path)
+    if existe: hay_logs = True
+
     if hay_logs == False:
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay ficheros Logs[/COLOR][/B]' % color_alert)
         return
@@ -1181,6 +1199,14 @@ def manto_logs(item):
         if existe: filetools.remove(path)
 
         path = os.path.join(config.get_data_path(), 'proxies.log')
+        existe = filetools.exists(path)
+        if existe: filetools.remove(path)
+
+        path = os.path.join(config.get_data_path(), 'canales.log')
+        existe = filetools.exists(path)
+        if existe: filetools.remove(path)
+
+        path = os.path.join(config.get_data_path(), 'servidores.log')
         existe = filetools.exists(path)
         if existe: filetools.remove(path)
 
@@ -1747,14 +1773,6 @@ def opciones_gnula(item):
     item.from_channel = 'gnula'
     opciones_domains_common(item)
 
-def opciones_gnula24(item):
-    item.from_channel = 'gnula24'
-    opciones_domains_common(item)
-
-def opciones_gnula24h(item):
-    item.from_channel = 'gnula24h'
-    opciones_domains_common(item)
-
 def opciones_grantorrent(item):
     item.from_channel = 'grantorrent'
     opciones_domains_common(item)
@@ -1791,10 +1809,6 @@ def opciones_pelispanda(item):
     item.from_channel = 'pelispanda'
     opciones_domains_common(item)
 
-def opciones_pelispediaws(item):
-    item.from_channel = 'pelispediaws'
-    opciones_domains_common(item)
-
 def opciones_pelisplushd(item):
     item.from_channel = 'pelisplushd'
     opciones_domains_common(item)
@@ -1811,20 +1825,12 @@ def opciones_poseidonhd2(item):
     item.from_channel = 'poseidonhd2'
     opciones_domains_common(item)
 
-def opciones_series24(item):
-    item.from_channel = 'series24'
-    opciones_domains_common(item)
-
 def opciones_serieskao(item):
     item.from_channel = 'serieskao'
     opciones_domains_common(item)
 
 def opciones_seriespapayato(item):
     item.from_channel = 'seriespapayato'
-    opciones_domains_common(item)
-
-def opciones_seriesplus(item):
-    item.from_channel = 'seriesplus'
     opciones_domains_common(item)
 
 def opciones_sflix(item):
@@ -1841,10 +1847,6 @@ def opciones_subtorrents(item):
 
 def opciones_todotorrents(item):
     item.from_channel = 'todotorrents'
-    opciones_domains_common(item)
-
-def opciones_vernovelas(item):
-    item.from_channel = 'vernovelas'
     opciones_domains_common(item)
 
 def opciones_veronline(item):
@@ -1935,10 +1937,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'gnula': domains.manto_domain_gnula(item)
 
-            elif item.from_channel == 'gnula24': domains.manto_domain_gnula24(item)
-
-            elif item.from_channel == 'gnula24h': domains.manto_domain_gnula24h(item)
-
             elif item.from_channel == 'grantorrent': domains.manto_domain_grantorrent(item)
 
             elif item.from_channel == 'hdfull': domains.manto_domain_hdfull(item)
@@ -1957,8 +1955,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'pelispanda': domains.manto_domain_pelispanda(item)
 
-            elif item.from_channel == 'pelispediaws': domains.manto_domain_pelispediaws(item)
-
             elif item.from_channel == 'pelisplushd': domains.manto_domain_pelisplushd(item)
 
             elif item.from_channel == 'pelisplushdlat': domains.manto_domain_pelisplushdlat(item)
@@ -1967,13 +1963,9 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'poseidonhd2': domains.manto_domain_poseidonhd2(item)
 
-            elif item.from_channel == 'series24': domains.manto_domain_series24(item)
-
             elif item.from_channel == 'serieskao': domains.manto_domain_serieskao(item)
 
             elif item.from_channel == 'seriespapayato': domains.manto_domain_seriespapayato(item)
-
-            elif item.from_channel == 'seriesplus': domains.manto_domain_seriesplus(item)
 
             elif item.from_channel == 'sflix': domains.manto_domain_sflix(item)
 
@@ -1982,8 +1974,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'subtorrents': domains.manto_domain_subtorrents(item)
 
             elif item.from_channel == 'todotorrents': domains.manto_domain_todotorrents(item)
-
-            elif item.from_channel == 'vernovelas': domains.manto_domain_vernovelas(item)
 
             elif item.from_channel == 'veronline': domains.manto_domain_veronline(item)
 
@@ -2023,10 +2013,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'gnula': domains.test_domain_gnula(item)
 
-            elif item.from_channel == 'gnula24': domains.test_domain_gnula24(item)
-
-            elif item.from_channel == 'gnula24h': domains.test_domain_gnula24h(item)
-
             elif item.from_channel == 'grantorrent': domains.test_domain_grantorrent(item)
 
             elif item.from_channel == 'hdfull': domains.test_domain_hdfull(item)
@@ -2045,8 +2031,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'pelispanda': domains.manto_domain_pelispanda(item)
 
-            elif item.from_channel == 'pelispediaws': domains.test_domain_pelispediaws(item)
-
             elif item.from_channel == 'pelisplushd': domains.test_domain_pelisplushd(item)
 
             elif item.from_channel == 'pelisplushdlat': domains.test_domain_pelisplushdlat(item)
@@ -2055,13 +2039,9 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'poseidonhd2': domains.test_domain_poseidonhd2(item)
 
-            elif item.from_channel == 'series24': domains.test_domain_series24(item)
-
             elif item.from_channel == 'serieskao': domains.test_domain_serieskao(item)
 
             elif item.from_channel == 'seriespapayato': domains.test_domain_seriespapayato(item)
-
-            elif item.from_channel == 'seriesplus': domains.test_domain_seriesplus(item)
 
             elif item.from_channel == 'sflix': domains.test_domain_sflix(item)
 
@@ -2070,8 +2050,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'subtorrents': domains.test_domain_subtorrents(item)
 
             elif item.from_channel == 'todotorrents': domains.test_domain_todotorrents(item)
-
-            elif item.from_channel == 'vernovelas': domains.test_domain_vernovelas(item)
 
             elif item.from_channel == 'veronline': domains.test_domain_veronline(item)
 
@@ -2091,8 +2069,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'gnula': helper.show_help_gnula(item)
 
-            elif item.from_channel == 'gnula24h': helper.show_help_gnula24h(item)
-
             elif item.from_channel == 'hdfull': helper.show_help_hdfull(item)
 
             elif item.from_channel == 'homecine': helper.show_help_homecine(item)
@@ -2102,8 +2078,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'pelisforte': helper.show_help_pelisforte(item)
 
             elif item.from_channel == 'seriespapayato': helper.show_help_seriespapayato(item)
-
-            elif item.from_channel == 'seriesplus': helper.show_help_seriesplus(item)
 
             elif item.from_channel == 'sflix': helper.show_help_sflix(item)
 

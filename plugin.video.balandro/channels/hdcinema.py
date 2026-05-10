@@ -75,7 +75,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     if '<title>Just a moment...</title>' in data:
-        if not 'buscar?p=1&q=' in url:
+        if not '/?s=' in url:
             platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
         return ''
 
@@ -270,6 +270,9 @@ def temporadas(item):
         nro_tempo = tempo
 
         title = 'Temporada ' + nro_tempo
+
+        if tempo == '0':
+            if config.get_setting('channels_especiales', default=True): continue
 
         if len(temporadas) == 1:
             if config.get_setting('channels_seasons', default=True):

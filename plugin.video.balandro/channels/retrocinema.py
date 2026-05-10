@@ -13,6 +13,20 @@ host = 'https://online.historiadelcine.es/'
 perpage = 25
 
 
+def do_downloadpage(url, post=None, headers=None):
+    data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    if not data:
+        if not '/?s=' in url:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('RetroCinema', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
+
+            timeout = config.get_setting('channels_repeat', default=30)
+
+            data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    return data
+
+
 def mainlist(item):
     return mainlist_pelis(item)
 
@@ -33,7 +47,7 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(host).data
+    data = do_downloadpage(host)
 
     bloque = scrapertools.find_single_match(data, '<ul id="menu-main"(.*?)</ul>')
 
@@ -53,7 +67,7 @@ def list_all(item):
 
     if not item.page: item.page = 0
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     if '>Últimas películas clásicas añadidas<' in data:
         data = scrapertools.find_single_match(data, '>Últimas películas clásicas añadidas<(.*?)<div class="copyright-bar">')
@@ -99,7 +113,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     if 'Película completa en español' in data: lang = 'Esp'
     else: lang = '?'
@@ -146,17 +160,15 @@ def list_search(item):
     logger.info()
     itemlist = []
 
-    if not item.page: item.page = 0
+    post = {'Referer': host, 'Content-Disposition': 'form-data', 'action': 'zeus_ajax_search', 'nonce': '8dd2cfb37b', 'search': item.tex, 'type': 'post'}
 
-    post = {'Content-Disposition': 'form-data', 'action': 'zeus_ajax_search', 'nonce': 'b71c4ac2ed', 'search': item.tex}
-
-    data = httptools.downloadpage(host + 'wp-admin/admin-ajax.php', post = post).data
+    data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post)
 
     matches = re.compile('<li>(.*?)</li>', re.DOTALL).findall(data)
 
     num_matches = len(matches)
 
-    for article in matches[item.page * perpage:]:
+    for article in matches:
         url = scrapertools.find_single_match(article, ' href="(.*?)"')
 
         title = scrapertools.find_single_match(article, 'alt="(.*?)"')
@@ -182,6 +194,7 @@ def list_search(item):
 def search(item, texto):
     logger.info()
     try:
+        item.url = host + '?s='
         item.tex = texto.replace(" ", "+")
         return list_search(item)
     except:

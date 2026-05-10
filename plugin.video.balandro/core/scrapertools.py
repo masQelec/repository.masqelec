@@ -3,7 +3,6 @@
 import re, time
 
 from platformcode import logger, config
-from core import httptools
 
 
 PY3 = False

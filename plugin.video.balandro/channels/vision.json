@@ -1,0 +1,17 @@
+{
+  "id": "vision",
+  "name": "Vision",
+  "thumbnail": "vision.jpg",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["suggested", "news", "rankings", "years", "languages", "qualityes", "kids", "docs", "vos"],
+
+  "notes": "Películas por géneros."
+}

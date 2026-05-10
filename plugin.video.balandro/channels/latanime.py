@@ -305,11 +305,13 @@ def list_all(item):
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
-            title = title.replace(' S1 ', '[COLOR tan] Temp. 1 [/COLOR]').replace(' S2 ', '[COLOR tan] Temp. 2 [/COLOR]').replace(' S3 ', '[COLOR tan] Temp. 3 [/COLOR]').replace(' S4 ', '[COLOR tan] Temp. 4 [/COLOR]')
+            titulo = title
 
-            title = title.replace(' S5 ', '[COLOR tan] Temp. 5 [/COLOR]').replace(' S6 ', '[COLOR tan] Temp. 6 [/COLOR]').replace(' S7 ', '[COLOR tan] Temp. 7 [/COLOR]').replace(' S8 ', '[COLOR tan] Temp. 8 [/COLOR]')
+            titulo = titulo.replace(' S1 ', '[COLOR tan] Temp. 1 [/COLOR]').replace(' S2 ', '[COLOR tan] Temp. 2 [/COLOR]').replace(' S3 ', '[COLOR tan] Temp. 3 [/COLOR]').replace(' S4 ', '[COLOR tan] Temp. 4 [/COLOR]')
 
-            title = title.replace(' S9 ', '[COLOR tan] Temp. 9 [/COLOR]')
+            titulo = titulo.replace(' S5 ', '[COLOR tan] Temp. 5 [/COLOR]').replace(' S6 ', '[COLOR tan] Temp. 6 [/COLOR]').replace(' S7 ', '[COLOR tan] Temp. 7 [/COLOR]').replace(' S8 ', '[COLOR tan] Temp. 8 [/COLOR]')
+
+            titulo = titulo.replace(' S9 ', '[COLOR tan] Temp. 9 [/COLOR]')
 
             season = 1
 
@@ -322,7 +324,7 @@ def list_all(item):
             elif ' S8 ' in title: season = 8
             elif ' S9 ' in title: season = 9
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+            itemlist.append(item.clone( action='episodios', url=url, title=titulo, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = SerieName, contentSeason = season, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -615,7 +617,7 @@ def _epis(item):
 
 def search(item, texto):
     logger.info()
-    try:
+    try: 
         item.url = host + 'buscar?p=1&q=' + texto.replace(" ", "+")
         return list_all(item)
     except:

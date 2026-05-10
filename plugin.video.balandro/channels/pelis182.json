@@ -6,12 +6,12 @@
   "active": true,
 
   "searchable": true,
-  "search_types": ["movie"],
+  "search_types": ["all", "movie", "tvshow"],
 
-  "categories": ["movie"],
+  "categories": ["movie", "tvshow"],
   "language": ["lat"],
 
   "clusters": ["onlyone", "kids"],
 
-  "notes": "Películas por géneros."
+  "notes": "Películas por géneros. También Series."
 }

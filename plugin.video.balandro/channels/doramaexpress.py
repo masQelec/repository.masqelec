@@ -145,8 +145,8 @@ def list_all(item):
 
     bloque = data
 
-    if '>Añadido recientemente<' in data:
-        bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)<footer>')
+    if '>Recently Added<' in data:
+        bloque = scrapertools.find_single_match(data, '>Recently Added<(.*?)<footer>')
 
     matches = re.compile('<div id="item-(.*?)</div> </div></div>').findall(bloque)
 
@@ -326,7 +326,7 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
-    temporadas = re.compile("data-snum='(.*?)'", re.DOTALL).findall(data)
+    temporadas = re.compile('data-season="(.*?)"', re.DOTALL).findall(data)
 
     for tempo in temporadas:
         if not tempo: continue
@@ -360,11 +360,11 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, "<ul id='season-listep-" + str(item.contentSeason) + "'.*?" + '(.*?)</ul>')
+    data = str(data).replace('</span> </div> </div> </div> </div> ', '</FINAL>')
 
-    patron = "href='(.*?)'.*?<img src='(.*?)'.*?alt='(.*?)'.*?<span class='ep-title'>(.*?)</span>"
+    bloque = scrapertools.find_single_match(str(data), '<div id="ypp-season-' + str(item.contentSeason) + '"(.*?)</FINAL>')
 
-    matches = re.compile(patron, re.DOTALL).findall(bloque)
+    matches = re.compile('data-ep-num="(.*?)".*?' + "href='(.*?)'.*?" + '<img src="(.*?)"', re.DOTALL).findall(bloque)
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
@@ -411,24 +411,11 @@ def episodios(item):
                     item.perpage = sum_parts
                 else: item.perpage = 50
 
-    for url, thumb, epis, title in matches[item.page * item.perpage:]:
-        epis = epis.replace('Episodio', '').replace('episodio', '').replace('Capitulo', '').replace('capitulo', '').strip()
-
-        try:
-            epis_i = int(epis)
-        except:
-            title_i = title.replace('Episodio', '').replace('episodio', '').replace('Capitulo', '').replace('capitulo', '').strip()
-
-            try:
-                epis_i = int(title_i)
-                epis = epis_i
-            except:
-                epis = ''
-
+    for epis, url, thumb in matches[item.page * item.perpage:]:
         if not epis: epis = 1
 
         if item.search_type == 'movie': titulo = item.contentTitle
-        else: titulo = str(item.contentSeason) + 'x'+ str(epis) + ' ' + title + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+        else: titulo = str(item.contentSeason) + 'x'+ str(epis) + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
 
         titulo = titulo.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
@@ -436,7 +423,7 @@ def episodios(item):
 
         titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
@@ -484,6 +471,8 @@ def findvideos(item):
         elif url == 'Pronto/': continue
 
         if url:
+            if '.youtube.' in url: continue
+
             ses += 1
 
             if '/short.' in url: continue
@@ -514,7 +503,44 @@ def findvideos(item):
                 if servidor == 'various': other = servertools.corregir_other(url)
                 elif servidor == 'zures': other = servertools.corregir_zures(url)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other ))
+            force_input = ''
+
+            if other == 'Lulustream': force_input = True
+
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url, 
+                                  language = lang, other = other, force_input = force_input ))
+
+
+    matches = re.compile('data-url="(.*?)"', re.DOTALL).findall(data)
+
+    for url in matches:
+        if '.youtube.' in url: continue
+
+        ses += 1
+
+        if '/short.' in url: continue
+
+        servidor = servertools.get_server_from_url(url)
+
+        if servertools.is_server_available(servidor):
+            if not servertools.is_server_enabled(servidor): continue
+        else:
+            if not config.get_setting('developer_mode', default=False): continue
+
+        lang = '?'
+
+        other = ''
+
+        if not servidor == 'directo':
+            if servidor == 'various': other = servertools.corregir_other(url)
+            elif servidor == 'zures': other = servertools.corregir_zures(url)
+
+        force_input = ''
+
+        if other == 'Lulustream': force_input = True
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url,
+                              language = lang, other = other, force_input = force_input ))
 
     if not itemlist:
         if not ses == 0:

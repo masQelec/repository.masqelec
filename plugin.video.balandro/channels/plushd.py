@@ -528,8 +528,6 @@ def findvideos(item):
 
         if not 'http' in url: continue
 
-        if '/pelisplus.' in url: continue
-
         servidor = servertools.get_server_from_url(url)
 
         link_other = ''
@@ -557,12 +555,11 @@ def play(item):
     logger.info()
     itemlist = []
 
+    servidor = item.server
+
     url = item.url
 
     if url:
-        if '/pelisplus' in url:
-            return 'Servidor [COLOR goldenrod]No soportado[/COLOR]'
-
         if item.server == 'directo':
             new_server = servertools.corregir_other(url).lower()
             if new_server.startswith("http"):

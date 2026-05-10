@@ -4,7 +4,17 @@
 
 [COLOR yellow][B]2026[/B][/COLOR]
 
-[COLOR yellow]4.0.26[/COLOR] [COLOR darkorange] 23 de Febrero de 2026[/COLOR][COLOR cyan] Ultima Version[/COLOR]
+[COLOR yellow]4.0.28[/COLOR] [COLOR darkorange] 28 de Abril de 2026[/COLOR][COLOR cyan] Ultima Version[/COLOR]
+    Correcciones: Errores detectados
+    Generos: Re-configurados
+    Canales y Servidores: Sin variaciones
+
+4.0.27 [COLOR darkorange] 31 de Marzo de 2026[/COLOR]
+    Correcciones: Errores detectados
+    Generos: Re-configurados
+    Canales y Servidores: Sin variaciones
+
+4.0.26 [COLOR darkorange] 23 de Febrero de 2026[/COLOR]
     Correcciones: Errores detectados
     Generos: Re-configurados
     Canales y Servidores: Sin variaciones

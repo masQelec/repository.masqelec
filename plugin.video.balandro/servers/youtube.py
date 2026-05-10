@@ -375,6 +375,9 @@ def extract_videos(video_id, ini_page_url):
                             elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                                 return 'Fichero sin link al vídeo ó restringido'
 
+                            elif 'Cloudflare challenge' in trace:
+                                return 'Cloudflare Challenge Check'
+
                         elif 'HTTP Error 404: Not Found' in trace or '404 Not Found' in trace:
                             return 'Archivo inexistente'
 
@@ -561,6 +564,9 @@ def extract_videos(video_id, ini_page_url):
 
                         elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                             return 'Fichero sin link al vídeo ó restringido'
+
+                        elif 'Cloudflare challenge' in trace:
+                            return 'Cloudflare Challenge Check'
 
                     elif 'HTTP Error 404: Not Found' in trace or '404 Not Found' in trace:
                         return 'Archivo inexistente'

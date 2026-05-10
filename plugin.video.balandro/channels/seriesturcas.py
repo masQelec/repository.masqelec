@@ -340,6 +340,15 @@ def play(item):
     return itemlist
 
 
+def _epis(item):
+    logger.info()
+
+    item.url = host + 'capitulos/'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
+
+
 def search(item, texto):
     logger.info()
     try:

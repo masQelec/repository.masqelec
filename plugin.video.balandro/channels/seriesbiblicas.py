@@ -253,6 +253,8 @@ def temporadas(item):
         elif '<center>' in tempo: tempo = scrapertools.find_single_match(tempo, '(.*?)</div>').strip()
         elif '</div>' in tempo: tempo = tempo.replace('</div>', '').strip()
 
+        if '<br' in tempo: tempo = tempo.split("<br")[0]
+
         title = 'Temporada ' + tempo
 
         if len(temporadas) == 1:

@@ -471,6 +471,10 @@ def findvideos(item):
 
             srv = srv.capitalize()
 
+            force_input = ''
+
+            if srv == 'Lulustream': force_input = True
+
             age = 'crypto'
             if '.eyJs' in encrypt: age = ''
 
@@ -478,7 +482,7 @@ def findvideos(item):
                 if age == 'crypto': continue
 
             itemlist.append(Item( channel = item.channel, action = 'play', server='directo', title = '', crypto=encrypt, bytes=d_bytes,
-                                  language=lang, other=srv, age=age ))
+                                  language=lang, other=srv, age=age, force_input = force_input ))
 
     # ~ download
     bloque = scrapertools.find_single_match(data, 'data-dwn=(.*?)>Descargar<')
@@ -545,7 +549,11 @@ def findvideos(item):
         if servidor == 'various': other = servertools.corregir_other(url)
         elif not servidor == 'directo': other = ''
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
+        force_input = ''
+
+        if other == 'Lulustream': force_input = True
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, url=url, language=lang, other=other, force_input=force_input ))
 
     if not itemlist:
         if not ses == 0:

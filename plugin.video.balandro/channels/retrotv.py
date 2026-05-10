@@ -42,6 +42,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'Animación', action ='list_all', url = host + 'category/animacion/?tr_post_type=1', search_type = 'movie', text_color='greenyellow' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
@@ -60,7 +62,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host + 'lista-de-series/episodios-agregados-actualizados/', search_type = 'tvshow', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'Animación', action ='list_all', url = host + 'category/animacion/', search_type = 'tvshow', text_color='greenyellow' ))
+    itemlist.append(item.clone( title = 'Animación', action ='list_all', url = host + 'category/animacion/?tr_post_type=2', search_type = 'tvshow', text_color='greenyellow' ))
 
     itemlist.append(item.clone( title = 'Live action', action ='list_all', url = host + 'category/liveaction/', search_type = 'tvshow', text_color='moccasin' ))
 
@@ -81,9 +83,9 @@ def generos(item):
 
     data = do_downloadpage(host)
 
-    patron = 'class="menu-item menu-item-type-taxonomy menu-item-object-category.*?<a href="(.*?)">(.*?)</a>'
+    bloque = scrapertools.find_single_match(data, '<ul class="sub-menu">(.*?)</ul>')
 
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    matches = re.compile('<a href="(.*?)">(.*?)</a>', re.DOTALL).findall(bloque)
 
     for url, title in matches:
         title = title.replace('&amp;', '&')
@@ -318,7 +320,7 @@ def episodios(item):
 
     bloque = scrapertools.find_single_match(data, ' data-tab="' + season + '">.*?<tbody>(.*?)</tbody>' )
 
-    matches = scrapertools.find_multiple_matches(bloque, '<tr>(.*?)</tr>')
+    matches = scrapertools.find_multiple_matches(bloque, '<tr(.*?)</tr>')
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
@@ -504,12 +506,12 @@ def play(item):
         if item.other == 'd':
             url = httptools.downloadpage(url, follow_redirects=False, only_headers=True).headers.get('location', '')
         else:
-            data = httptools.downloadpage(url).data
+            data = do_downloadpage(url)
 
             if item.other == 'anavids':
                 url = scrapertools.find_single_match(data.lower(), '<iframe src="(.*?)"')
 
-                data = httptools.downloadpage(url).data
+                data = do_downloadpage(url)
 
                 url = scrapertools.find_single_match(str(data), 'sources.*?"(.*?)"')
             else:
@@ -518,7 +520,7 @@ def play(item):
                 if 'blenditall' in url:
                     referer_url = url
 
-                    data = httptools.downloadpage(url, headers = {'Referer': 'https://blenditall.com/'}).data
+                    data = do_downloadpage(url, headers = {'Referer': 'https://blenditall.com/'})
 
                     urlb = scrapertools.find_single_match(data, '"file".*?"(.*?)"')
                     urlb = urlb.replace('\\/', '/')
@@ -532,7 +534,7 @@ def play(item):
                             itemlist.append(item.clone(server = 'blenditall', url=url))
                             return itemlist
 
-                        data = httptools.downloadpage(urlb, headers = {'Referer': 'https://blenditall.com/'}).data
+                        data = do_downloadpage(urlb, headers = {'Referer': 'https://blenditall.com/'})
 
                         new_url = scrapertools.find_single_match(data, '//blenditall.com/playlist.m3u8?data=(.*?)$')
 
@@ -548,7 +550,7 @@ def play(item):
 
     if url:
         if '/ouo.' in url:
-            return 'Servidor con [COLOR red]CloudFlare ReCaptcha[/COLOR]'
+            return 'Servidor [COLOR red]CloudFlare ReCaptcha[/COLOR]'
 
         if url.startswith('//') == True: url = 'https:' + url
 
@@ -561,6 +563,7 @@ def play(item):
             servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
+
         itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist

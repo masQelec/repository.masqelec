@@ -241,9 +241,13 @@ def play(item):
                 if not config.get_setting('developer_mode', default=False): return itemlist
             servidor = new_server
 
+        force_input = ''
+
+        if '/lulustream.' in url: force_input = True
+
         if '/cineymaxtopvideos.' in url: servidor = 'directo'
 
-        itemlist.append(item.clone(server = servidor, url = url))
+        itemlist.append(item.clone(server = servidor, url = url, force_input = force_input))
 
     return itemlist
 

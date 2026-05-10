@@ -37,6 +37,8 @@ team = False
 if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')): team = True
 elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')): team = True
 elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')): team = True
+elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developerwebs.py')): team = True
+elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developerrelease.py')): team = True
 
 config.set_setting('developer_team', team)
 
@@ -72,7 +74,6 @@ config.set_setting('kver', kver)
 config.set_setting('PY3', PY3)
 
 config.set_setting('ses_pin', False)
-
 
 con_incidencias = ''
 no_accesibles = ''
@@ -565,7 +566,7 @@ def mainlist(item):
         elif config.get_setting('channels_link_pyse', default=False): presentar = True
 
         if presentar:
-            itemlist.append(item.clone( channel='submnuctext', action='submnu_news', title='[B]Novedades[/B]', context=context_cfg_search, extra = 'all',thumbnail=config.get_thumb('novedades'), fanart=fanart, mnupral = 'main', text_color='darksalmon' ))
+            itemlist.append(item.clone( channel='submnuctext', action='submnu_news', title='[B]Novedades[/B]', context=context_cfg_search, extra = 'all', thumbnail=config.get_thumb('novedades'), fanart=fanart, mnupral = 'main', text_color='darksalmon' ))
 
     if config.get_setting('sub_mnu_special', default=True):
         itemlist.append(item.clone( channel='submnuctext', action='submnu_special', title='[B]Especiales[/B]', context=context_cfg_search, extra='all', thumbnail=config.get_thumb('heart'), fanart=fanart, mnupral = 'main', text_color='pink' ))
@@ -814,6 +815,9 @@ def channels(item):
         if config.get_setting('sub_mnu_favoritos', default=False):
             itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[B]Favoritos[/B]', context=context_cfg_search, thumbnail=config.get_thumb('star'), fanart=fanart, text_color='plum' ))
 
+        if config.get_setting('sub_mnu_news', default=True):
+            itemlist.append(item.clone( channel='submnuctext', action='submnu_news', title='[B]Novedades[/B]', context=context_cfg_search, extra = 'documentaries', thumbnail=config.get_thumb('novedades'), fanart=fanart, text_color='darksalmon' ))
+
         if config.get_setting('sub_mnu_special', default=True):
             itemlist.append(item.clone( channel='submnuctext', action='submnu_special', title='[B]Especiales[/B]', context=context_cfg_search, extra='documentaries', thumbnail=config.get_thumb('heart'), fanart=fanart, text_color='pink' ))
 
@@ -871,6 +875,9 @@ def channels(item):
 
         if config.get_setting('sub_mnu_favoritos', default=False):
             itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[B]Favoritos[/B]', context=context_cfg_search, thumbnail=config.get_thumb('star'), fanart=fanart, text_color='plum' ))
+
+        if config.get_setting('sub_mnu_news', default=True):
+            itemlist.append(item.clone( channel='submnuctext', action='submnu_news', title='[B]Novedades[/B]', context=context_cfg_search, extra = 'torrents', thumbnail=config.get_thumb('novedades'), fanart=fanart, text_color='darksalmon' ))
 
         itemlist.append(item.clone( channel='submnuctext', action='submnu_channels', title='[B]Buscar[/B]', context=context_buscar, extra = 'torrents', thumbnail=config.get_thumb('search'), fanart=fanart, text_color='yellow' ))
 
@@ -962,6 +969,9 @@ def channels(item):
             if config.get_setting('sub_mnu_favoritos', default=False):
                 itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[B]Favoritos[/B]', context=context_cfg_search, thumbnail=config.get_thumb('star'), fanart=fanart, text_color='plum' ))
 
+            if config.get_setting('sub_mnu_news', default=True):
+                itemlist.append(item.clone( channel='submnuctext', action='submnu_news', title='[B]Novedades[/B]', context=context_cfg_search, extra = 'infantil', thumbnail=config.get_thumb('novedades'), fanart=fanart, text_color='darksalmon' ))
+
             if config.get_setting('sub_mnu_special', default=True):
                 itemlist.append(item.clone( channel='submnuctext', action='submnu_special', title='[B]Especiales[/B]', context=context_cfg_search, extra='infantil', thumbnail=config.get_thumb('heart'), fanart=fanart, text_color='pink' ))
 
@@ -984,6 +994,9 @@ def channels(item):
             if config.get_setting('sub_mnu_favoritos', default=False):
                 itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[B]Favoritos[/B]', context=context_cfg_search, thumbnail=config.get_thumb('star'), fanart=fanart, text_color='plum' ))
 
+            if config.get_setting('sub_mnu_news', default=True):
+                itemlist.append(item.clone( channel='submnuctext', action='submnu_news', title='[B]Novedades[/B]', context=context_cfg_search, extra = 'tales', thumbnail=config.get_thumb('novedades'), fanart=fanart, text_color='darksalmon' ))
+
             itemlist.append(item.clone( channel='submnuctext', action='submnu_channels', title='[B]Buscar[/B]', context=context_buscar, extra = 'tales', thumbnail=config.get_thumb('search'), fanart=fanart, text_color='yellow' ))
 
             itemlist.append(item.clone( channel='groups', action='ch_groups', title = '[COLOR limegreen][B]Todos[/B][/COLOR][B] los canales con contenido de Novelas[/B]', group = 'tales', fanart=fanart ))
@@ -996,6 +1009,9 @@ def channels(item):
 
             if config.get_setting('sub_mnu_favoritos', default=False):
                 itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[B]Favoritos[/B]', context=context_cfg_search, thumbnail=config.get_thumb('star'), fanart=fanart, text_color='plum' ))
+
+            if config.get_setting('sub_mnu_news', default=True):
+                itemlist.append(item.clone( channel='submnuctext', action='submnu_news', title='[B]Novedades[/B]', context=context_cfg_search, extra = 'dorama', thumbnail=config.get_thumb('novedades'), fanart=fanart, text_color='darksalmon' ))
 
             itemlist.append(item.clone( channel='submnuctext', action='submnu_channels', title='[B]Buscar[/B]', context=context_buscar, extra = 'dorama', thumbnail=config.get_thumb('search'), fanart=fanart, text_color='yellow' ))
 
@@ -1033,6 +1049,9 @@ def channels(item):
                 itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[B]Favoritos[/B]', context=context_cfg_search, thumbnail=config.get_thumb('star'), fanart=fanart, text_color='plum' ))
 
             if item.extra == 'adults':
+                if config.get_setting('sub_mnu_news', default=True):
+                    itemlist.append(item.clone( channel='submnuctext', action='submnu_news', title='[B]Novedades[/B]', context=context_cfg_search, extra = 'adult', thumbnail=config.get_thumb('novedades'), fanart=fanart, text_color='darksalmon' ))
+
                 itemlist.append(Item( channel='search', action='search', title='[B]Buscar [COLOR orange]vídeo[/COLOR][/B] ...', extra = '+18', search_video = 'adult', thumbnail=config.get_thumb('search'), fanart=fanart, text_color='yellow' ))
 
                 itemlist.append(item.clone( channel='groups', action='ch_groups', title = '[COLOR orange][B]Todos[/B][/COLOR] los canales que pueden tener vídeos para Adultos', group = 'adults', pral = 'adults', thumbnail=config.get_thumb('stack'), fanart=fanart ))
@@ -1040,6 +1059,9 @@ def channels(item):
                 itemlist.append(item.clone( action='', title='[B]- [I]Adultos:[/I][/B]', context=context_adultos, plot=item.category, thumbnail=config.get_thumb('adults'), fanart=fanart, text_color='orange' ))
 
             if item.extra == 'anime':
+                if config.get_setting('sub_mnu_news', default=True):
+                    itemlist.append(item.clone( channel='submnuctext', action='submnu_news', title='[B]Novedades[/B]', context=context_cfg_search, extra = 'anime', thumbnail=config.get_thumb('novedades'), fanart=fanart, text_color='darksalmon' ))
+
                 itemlist.append(item.clone( channel='submnuctext', action='submnu_channels', title='[B]Buscar[/B]', context=context_buscar, extra = 'anime', thumbnail=config.get_thumb('search'), fanart=fanart, text_color='yellow' ))
 
                 itemlist.append(item.clone( channel='groups', action='ch_groups', title = '[COLOR springgreen][B]Todos[/B][/COLOR] los canales con contenido Anime', group = 'anime', thumbnail=config.get_thumb('stack'), fanart=fanart  ))
@@ -1207,30 +1229,41 @@ def channels(item):
                         if 'exclusivamente en novelas' in ch['notes']: continue
 
            else:
-              if not config.get_setting('mnu_documentales', default=True):
-                  if str(ch['search_types']) == "['documentary']": continue
 
-              if not config.get_setting('mnu_infantiles', default=True):
-                  if 'infantil' in ch['clusters']: continue
+              if not item.extra == 'all':
+                  if not config.get_setting('mnu_documentales', default=True):
+                      if str(ch['search_types']) == "['documentary']": continue
 
-              if not config.get_setting('mnu_novelas', default=True):
-                  if 'exclusivamente en novelas' in ch['notes']: continue
-                  elif 'tales' in ch['clusters']: continue
+                  if not config.get_setting('mnu_infantiles', default=True):
+                      if not item.extra == 'prefereds':
+                          if 'infantil' in ch['clusters']: continue
 
-              if not config.get_setting('mnu_torrents', default=True):
-                  if 'enlaces torrent exclusivamente' in ch['notes']: continue
+                  if not config.get_setting('mnu_novelas', default=True):
+                      if 'exclusivamente en novelas' in ch['notes']: continue
 
-              if not config.get_setting('mnu_doramas', default=True):
-                  if ch['searchable'] == False: continue
-                  elif 'dorama' in ch['clusters']: continue
+                      elif not item.extra == 'prefereds':
+                         if 'tales' in ch['clusters']: continue
 
-              if not config.get_setting('mnu_animes', default=True):
-                  if ch['searchable'] == False: continue
-                  elif 'anime' in ch['clusters']: continue
+                  if not config.get_setting('mnu_torrents', default=True):
+                      if 'enlaces torrent exclusivamente' in ch['notes']: continue
 
-              if not config.get_setting('mnu_adultos', default=True):
-                  if ch['searchable'] == False: continue
-                  elif 'adults' in ch['clusters']: continue
+                  if not config.get_setting('mnu_doramas', default=True):
+                      if ch['searchable'] == False: continue
+
+                      elif not item.extra == 'prefereds':
+                         if 'dorama' in ch['clusters']: continue
+
+                  if not config.get_setting('mnu_animes', default=True):
+                      if ch['searchable'] == False: continue
+
+                      elif not item.extra == 'prefereds':
+                         if 'anime' in ch['clusters']: continue
+
+                  if not config.get_setting('mnu_adultos', default=True):
+                      if ch['searchable'] == False: continue
+
+                      elif not item.extra == 'prefereds':
+                         if 'adults' in ch['clusters']: continue
 
         context = []
 

@@ -380,7 +380,10 @@ def last_epis(item):
 
         SerieName = SerieName.strip()
 
+        logger.info("check-00-pro: %s" % article)
+
         s_t = scrapertools.find_single_match(article, '<!-- Episode Badge -->.*?">(.*?)</div>')
+        if not s_t: s_t = scrapertools.find_single_match(article, 'font-bold shadow-lg">(.*?)</div>')
 
         season = scrapertools.find_single_match(s_t, 'T(.*?)E').strip()
         if not season: season = 1
@@ -904,7 +907,7 @@ def findvideos(item):
                         if not config.get_setting('developer_mode', default=False): continue
 
                     other = ''
-                    if servidor == 'various': other = servertools.corregir_other(url)
+                    if servidor == 'various': other = servertools.corregir_other(matchx)
 
                     itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = matchx,
                                          language = lang, other = other ))

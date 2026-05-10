@@ -211,6 +211,15 @@ def findvideos(item):
     return itemlist
 
 
+def _lasts(item):
+    logger.info()
+
+    item.url = host  + 'tele/novelas/'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
+
+
 def search(item, texto):
     logger.info()
     try:

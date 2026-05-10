@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www1.seriesgato.ws/'
+host = 'https://seriesonline.ws/'
 
 
 def item_configurar_proxies(item):
@@ -43,6 +43,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://www1.seriesgato.ws/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     hay_proxies = False
     if config.get_setting('channel_gatotv_proxies', default=''): hay_proxies = True
 
@@ -494,6 +500,9 @@ def play(item):
         url_play = new_url
 
     if url_play:
+        if '/powvideo.' in url_play or '/streamplay.' in url_play:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
         servidor = servertools.get_server_from_url(url_play)
 
         url_play = servertools.normalize_url(servidor, url_play)

@@ -13,7 +13,7 @@ else:
     translatePath = xbmc.translatePath
 
 
-import os, xbmc, random, time
+import os, xbmc, re, time
 
 from platformcode import config, logger, platformtools
 from core import filetools, httptools, scrapertools
@@ -21,12 +21,15 @@ from core import filetools, httptools, scrapertools
 
 host = 'https://doodstream.com'
 
+player = 'https://playmogo.com'
 
 espera = config.get_setting('servers_waiting', default=6)
 
 color_exec = config.get_setting('notification_exec_color', default='cyan')
 el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
 el_srv += ('ResolveUrl[/B][/COLOR]')
+
+color_alert = config.get_setting('notification_alert_color', default='red')
 
 
 def import_libs(module):
@@ -59,16 +62,14 @@ def get_video_url(page_url, url_referer=''):
 
     ini_page_url = page_url
 
-    page_url = page_url.replace('/dood.cx/', '/dood.so/')
-
     page_url = page_url.replace('/d/', '/e/')
 
     data = httptools.downloadpage(page_url, headers={"Referer": host}).data
 
-    if '<title>Video not found' in data:
+    if 'Video not found' in data:
         return "Archivo inexistente ó eliminado"
 
-    if '<title>Access denied' in data or '<title>Attention Required! | Cloudflare</title>' in data:
+    if 'Just a moment...' in data:
         path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'doodstream.py'))
 
         existe = filetools.exists(path)
@@ -103,6 +104,7 @@ def get_video_url(page_url, url_referer=''):
             except:
                 import traceback
                 logger.error(traceback.format_exc())
+                logger.info("check-00-traceback: %s" % traceback)
 
                 if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
                     trace = traceback.format_exc()
@@ -111,6 +113,9 @@ def get_video_url(page_url, url_referer=''):
 
                     elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                         return 'Fichero sin link al vídeo ó restringido'
+
+                    elif 'Cloudflare challenge' in trace:
+                        return 'Cloudflare Challenge Check'
 
                 elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
                     return 'Archivo inexistente'
@@ -123,76 +128,42 @@ def get_video_url(page_url, url_referer=''):
         else:
            return 'Falta ResolveUrl'
 
-    url = scrapertools.find_single_match(data, "get\('(/pass_md5/[^']+)")
-    if url:
-        data2 = httptools.downloadpage(host + url, headers={'Referer': page_url}).data
-        if not data2:
-            data2 = httptools.downloadpage(host + url, headers={'Referer': page_url}).data
+    js_code = scrapertools.find_single_match(data, ("(function\s?makePlay.*?})"))
 
-            # ~ return 'Vídeo sin resolver'
-            if not data2: data2 = '<title>Access denied'
+    if js_code:
+        js_code = re.sub("\s+\+\s+Date.now\(\)", '', js_code)
 
-        if '<title>Access denied' in data2 or '<title>Attention Required! | Cloudflare</title>' in data2:
-            if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-                path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'doodstream.py'))
+        try:
+            import js2py
+            existe = True
+        except:
+            existe = False
 
-                existe = filetools.exists(path)
-                if not existe:
-                    return 'El Plugin No existe en Resolveurl'
+        if not existe:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Falta script.module.js2py[/COLOR][/B]' % color_alert)
 
+        if existe:
+            js = js2py.eval_js(js_code)
+
+            makeplay = js() + str(int(time.time()*1000))
+
+            if makeplay:
                 if config.get_setting('servers_time', default=True):
-                    platformtools.dialog_notification('Cargando [COLOR cyan][B]Doodstream[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
+                    platformtools.dialog_notification('Cargando [COLOR cyan][B]Dood[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
                     time.sleep(int(espera))
 
-                try:
-                    import_libs('script.module.resolveurl')
+                url = scrapertools.find_single_match(data, "\$.get\('(/pass[^']+)'")
 
-                    import resolveurl
-                    page_url = ini_page_url
-                    resuelto = resolveurl.resolve(page_url)
+                if url:
+                    data2 = httptools.downloadpage(player + '/' + url, headers={'Referer': page_url}).data
 
-                    if resuelto:
-                        video_urls.append(['mp4', resuelto])
+                    new_url = re.sub(r'\s+', '', data2)
+
+                    if new_url:
+                        url = new_url + makeplay + '|Referer=' + page_url.replace(host, player)
+
+                        video_urls.append(['mp4', url])
                         return video_urls
-
-                    color_exec = config.get_setting('notification_exec_color', default='cyan')
-                    el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
-                    el_srv += ('ResolveUrl[/B][/COLOR]')
-                    platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
-
-                    page_url = ini_page_url
-
-                    return 'ResolveUrl No se pudo Reproducir el Vídeo'
-
-                except:
-                   import traceback
-                   logger.error(traceback.format_exc())
-
-                   if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
-                       trace = traceback.format_exc()
-                       if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
-                           return 'Archivo inexistente ó eliminado'
-
-                       elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
-                           return 'Fichero sin link al vídeo ó restringido'
-
-                   elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
-                       return 'Archivo inexistente'
-
-                   elif '<urlopen error' in traceback.format_exc():
-                       return 'No se puede establecer la conexión'
-
-                   return 'Sin Respuesta ResolveUrl'
-
-            else:
-               return 'Falta ResolveUrl'
-
-        token = scrapertools.find_single_match(data2, '"?token=([^"&]+)')
-        if not token:
-            a = ''.join([random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') for i in range(10)])
-            a += '?token=' + token + '&expiry=' + str(int(time.time()*1000))
-
-            video_urls.append(['mp4', data2 + a + '|Referer=%s' % page_url])
 
     if not video_urls:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
@@ -237,6 +208,9 @@ def get_video_url(page_url, url_referer=''):
 
                    elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                        return 'Fichero sin link al vídeo ó restringido'
+
+                   elif 'Cloudflare challenge' in trace:
+                       return 'Cloudflare Challenge Check'
 
                elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
                    return 'Archivo inexistente'

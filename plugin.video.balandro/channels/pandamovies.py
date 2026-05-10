@@ -211,16 +211,11 @@ def findvideos(item):
         elif '/freepopnews.' in url: continue
         elif '/filepv.' in url: continue
         elif '/vinovo.' in url: continue
-        elif '/p.' in url: continue
 
-        elif '.player4me.' in url: continue
-        elif '.embedseek.' in url: continue
-        elif '.rpmplay.' in url: continue
         elif '.seekplayer.' in url: continue
         elif '.streamkithmc.' in url: continue
         elif '.streamkitagg.' in url: continue
         elif '.cloudwarebrh.' in url: continue
-        elif '.upns.' in url: continue
         elif '.video-twimg.' in url: continue
 
         elif '/nitroflare.' in url: continue
@@ -228,6 +223,8 @@ def findvideos(item):
 
         elif '/pooptv.' in url: continue
         elif '=pooptv.me' in url: continue
+
+        ref = url
 
         servidor = servertools.get_server_from_url(url)
 
@@ -238,8 +235,16 @@ def findvideos(item):
         if servidor == 'various': other = servertools.corregir_other(url)
         elif servidor == 'zures': other = servertools.corregir_zures(url)
 
-        itemlist.append(Item( channel = item.channel, action='play', title='', url=url, server=servidor,
-                              language = 'Vo', other = other.capitalize() ))
+        force_input = ''
+        if other == 'Lulustream': force_input = True
+
+        if servidor == 'kinoger':
+            if config.get_setting('developer_team'): other = url
+        else: ref = ''
+
+        if not servidor == 'directo':
+            itemlist.append(Item( channel = item.channel, action='play', title='', server=servidor, url=url, ref=ref,
+                                  language = 'Vo', other = other.capitalize(), force_input=force_input ))
 
     if not itemlist:
         if not ses == 0:

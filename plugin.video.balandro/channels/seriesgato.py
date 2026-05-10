@@ -494,6 +494,9 @@ def play(item):
         url_play = new_url
 
     if url_play:
+        if '/powvideo.' in url_play or '/streamplay.' in url_play:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
         servidor = servertools.get_server_from_url(url_play)
 
         url_play = servertools.normalize_url(servidor, url_play)

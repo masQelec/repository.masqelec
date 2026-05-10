@@ -57,6 +57,8 @@ def get_video_url(page_url, url_referer=''):
 
     ini_page_url = page_url
 
+    if url_referer: ini_page_url = url_referer
+
     resp = httptools.downloadpage(page_url)
 
     if resp.code == 404:
@@ -65,25 +67,38 @@ def get_video_url(page_url, url_referer=''):
     data = resp.data
 
     try:
-        import pyaes
+       import_libs('script.module.pyaes')
 
-        edata = binascii.unhexlify(data[:-1])
-        key = b'\x6b\x69\x65\x6d\x74\x69\x65\x6e\x6d\x75\x61\x39\x31\x31\x63\x61'
-        iv = b'\x31\x32\x33\x34\x35\x36\x37\x38\x39\x30\x6f\x69\x75\x79\x74\x72'
+       import pyaes
 
-        decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(key, iv))
-        ddata = decrypter.feed(edata)
-        ddata += decrypter.feed()
+       id_url = scrapertools.find_single_match(page_url, '/#(.*?)$')
 
-        ddata = ddata.decode('utf-8')
-        ddata = jsontools.load(ddata)
+       if id_url:
+           new_url = page_url.split("/#")[0]
+ 
+           new_url = new_url + '/api/v1/video?id=' + id_url
 
-        url = scrapertools.find_multiple_matches(ddata, "source'([^']+)'")
+           data = httptools.downloadpage(new_url).data
 
-        if url:
-            url += "|User-Agent={0}&Referer={1}/&Origin={1}".format(httptools.get_user_agent(), page_url)
+       edata = binascii.unhexlify(data[:-1])
 
-            video_urls.append(['m3u8', url])
+       key = b'\x6b\x69\x65\x6d\x74\x69\x65\x6e\x6d\x75\x61\x39\x31\x31\x63\x61'
+       iv = b'\x31\x32\x33\x34\x35\x36\x37\x38\x39\x30\x6f\x69\x75\x79\x74\x72'
+
+       decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(key, iv))
+
+       ddata = decrypter.feed(edata)
+       ddata += decrypter.feed()
+
+       ddata = ddata.decode('utf-8')
+       ddata = jsontools.load(ddata)
+
+       url = scrapertools.find_single_match(str(ddata), "'source': '(.*?)'")
+
+       if url:
+           url += "|User-Agent={0}&Referer={1}/&Origin={1}".format(httptools.get_user_agent(), page_url)
+
+           video_urls.append(['m3u8', url])
     except:
         pass
 
@@ -107,7 +122,10 @@ def get_video_url(page_url, url_referer=''):
                 resuelto = resolveurl.resolve(page_url)
 
                 if resuelto:
-                    video_urls.append(['mp4', resuelto])
+                    if '.m3u8' in resuelto: video_urls.append(['m3u8', resuelto])
+                    elif '.m3u' in resuelto: video_urls.append(['m3u', resuelto])
+                    elif '.mp4' in resuelto: video_urls.append(['mp4', resuelto])
+                    else: video_urls.append(['', resuelto])
                     return video_urls
 
                 color_exec = config.get_setting('notification_exec_color', default='cyan')
@@ -130,6 +148,9 @@ def get_video_url(page_url, url_referer=''):
 
                     elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace or 'No playable video found' in trace:
                         return 'Fichero sin link al vídeo ó restringido'
+
+                    elif 'Cloudflare challenge' in trace:
+                        return 'Cloudflare Challenge Check'
 
                 elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
                     return 'Archivo inexistente'

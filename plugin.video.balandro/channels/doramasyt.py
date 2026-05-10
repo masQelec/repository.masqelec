@@ -516,7 +516,7 @@ def findvideos(item):
              if srv == 'vgembedcom': srv = 'vembed'
 
              elif 'com/' in srv or 'wish' in srv:
-                other = 'wish'
+                other = 'streamwish'
                 srv = 'various'
 
              elif 'filemoon' in srv:
@@ -524,11 +524,15 @@ def findvideos(item):
                 srv = 'various'
 
              elif 'lulu' in srv:
-                other = srv
+                other = 'lulustream'
                 srv = 'various'
 
              elif 'listeamed' in srv:
                 other = srv
+                srv = 'various'
+
+             elif 'd-s' in srv:
+                other = 'hexupload'
                 srv = 'various'
 
         if servertools.is_server_available(srv):
@@ -536,11 +540,15 @@ def findvideos(item):
         else:
             if not config.get_setting('developer_mode', default=False): continue
 
+        force_input = ''
+
+        if other == 'lulustream': force_input = True
+
         if not srv == 'directo':
             if not srv == 'various': other = ''
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', d_play = d_play,
-                              language = 'Vose', other = other.capitalize() ))
+                              language = 'Vose', other = other.capitalize(), force_input = force_input ))
 
     # download
     bloque = scrapertools.find_single_match(data, '>Descargas<(.*?)</div>')
@@ -572,7 +580,7 @@ def findvideos(item):
            elif '/mega.nz/' in url: srv = 'mega'
 
         elif 'com/' in srv or 'wish' in srv:
-             other = 'wish'
+             other = 'streamwish'
              srv = 'various'
 
         elif 'filemoon' in srv:
@@ -580,7 +588,11 @@ def findvideos(item):
              srv = 'various'
 
         elif 'lulu' in srv:
-             other = srv
+             other = 'lulustream'
+             srv = 'various'
+
+        elif 'd-s' in srv:
+             other = 'hexupload'
              srv = 'various'
 
         if servertools.is_server_available(srv):
@@ -588,8 +600,12 @@ def findvideos(item):
         else:
            if not config.get_setting('developer_mode', default=False): continue
 
+        force_input = ''
+
+        if other == 'lulustream': force_input = True
+
         itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', url = url,
-                              language = 'Vose', other = other.capitalize() ))
+                              language = 'Vose', other = other.capitalize(), force_input = force_input ))
 
     if not itemlist:
         if not ses == 0:
@@ -607,9 +623,12 @@ def play(item):
         itemlist.append(item.clone( url = item.url, server = item.server ))
         return itemlist
 
-    item.d_play = item.d_play.replace('" data-usa-api="1', '&token=<?php echo Session::get(')
+    item.d_play = item.d_play.split('"data-usa-api=')[0] #, '&token=<?php echo Session::get(')
 
-    player = host + 'reproductor?video=' + item.d_play
+    if "eyJpdi" in item.d_play:
+        player = host + 'reproductor?video=' + item.d_play + '&token=<?php echo Session::get('
+    else:
+        player = host + 'reproductor?video=' + item.d_play
 
     data = do_downloadpage(player)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)

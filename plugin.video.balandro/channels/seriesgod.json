@@ -3,7 +3,7 @@
   "name": "SeriesGod",
   "thumbnail": "seriesgod.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["onlyone", "years", "kids", "docs", "vos"],
 
-  "notes": "Series por Géneros."
+  "notes": "Web CERRADA. Series por Géneros."
 }

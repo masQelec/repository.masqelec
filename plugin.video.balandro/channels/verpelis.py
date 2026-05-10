@@ -291,9 +291,29 @@ def findvideos(item):
 
         embed = scrapertools.find_single_match(data1, '"embed_url":"(.*?)"')
 
-        if not embed: continue
+        if not embed:
+            data1 = do_downloadpage(host + 'wp-json/dooplayer/v2/' + dpost + '/' + dtype + '/' + dnume, headers= {'Referer': item.url} )
+
+            embed = scrapertools.find_single_match(data1, '"embed_url":"(.*?)"')
+
+            if not embed: continue
 
         embed = embed.replace('\\/', '/')
+
+        url = embed
+
+        servidor = servertools.get_server_from_url(url)
+
+        if not servidor == 'directo':
+            other = ''
+
+            if servidor == 'various': other = servertools.corregir_other(url)
+            elif servidor == 'zures': other = servertools.corregir_zures(url)
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                                  language = '?', other = other ))
+
+            continue
 
         datae = do_downloadpage(embed)
 
@@ -309,10 +329,13 @@ def findvideos(item):
             if url:
                 servidor = servertools.get_server_from_url(url)
 
-                link_other = ''
+                other = ''
+
+                if servidor == 'various': other = servertools.corregir_other(url)
+                elif servidor == 'zures': other = servertools.corregir_zures(url)
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                      language = IDIOMAS.get(lang, lang), other = link_other ))
+                                      language = IDIOMAS.get(lang, lang), other = other ))
 
     # ~ Downloads
     matches = re.compile("<tr id='link-(.*?)</tr>", re.DOTALL).findall(data)

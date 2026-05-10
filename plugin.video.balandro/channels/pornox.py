@@ -247,25 +247,32 @@ def findvideos(item):
 
     bloque = scrapertools.find_single_match(data, '<div class="info-block"(.*?)</form>')
 
-    pornstars = scrapertools.find_multiple_matches(bloque, '/(?:pornstars|models|model|pornosztarok)/[A-z0-9-]+(?:/|)')
+    if bloque:
+        pornstars = scrapertools.find_multiple_matches(bloque, '/(?:pornstars|models|model|pornosztarok)/[A-z0-9-]+(?:/|)')
 
-    for x, value in enumerate(pornstars):
-        pornstars[x] = host[:-1] + value
+        for x, value in enumerate(pornstars):
+            pornstars[x] = host[:-1] + value
 
-        pornstar = ' & '.join(pornstars)
+            pornstar = ' & '.join(pornstars)
 
-        pornstar = "[COLOR orange]%s[/COLOR]" % pornstar
+            pornstar = "[COLOR orange]%s[/COLOR]" % pornstar
 
-        lista = item.contentTitle.split()
+            lista = item.contentTitle.split()
 
-        if item._hd:
-            lista.insert (2, pornstar)
-        else:
-            lista.insert (1, pornstar)
+            if item._hd:
+                lista.insert (2, pornstar)
+            else:
+                lista.insert (1, pornstar)
 
-        item.contentTitle = ' '.join(lista)
+            item.contentTitle = ' '.join(lista)
 
-    itemlist.append(Item( channel = item.channel, action='play', title='', server = 'ktp', url = item.url, language = 'Vo') )
+        itemlist.append(Item( channel = item.channel, action='play', title='', server = 'ktp', url = item.url, language = 'Vo') )
+
+    else:
+        url = scrapertools.find_single_match(data, '<source src="(.*?)"')
+
+        if url:
+            itemlist.append(Item( channel = item.channel, action='play', title='', server = 'directo', url = url, language = 'Vo') )
 
     return itemlist
 

@@ -488,7 +488,12 @@ def findvideos(item):
         if servidor == 'various': other = servertools.corregir_other(url)
         elif servidor == 'zures': other = servertools.corregir_zures(url)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = lng, other = other ))
+        force_input = ''
+
+        if other == 'Lulustream': force_input = True
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url,
+                              language = lng, other = other, force_input = force_input ))
 
     # ~ Encrypt
     encrypt = scrapertools.find_single_match(data, 'data-encrypt="(.*?)"')
@@ -522,7 +527,12 @@ def findvideos(item):
             if servidor == 'various': other = servertools.corregir_other(url)
             elif servidor == 'zures': other = servertools.corregir_zures(url)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = lng, other = other ))
+            force_input = ''
+
+            if other == 'Lulustream': force_input = True
+
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url,
+                                  language = lng, other = other, force_input = force_input ))
 
     if not itemlist:
         if not ses == 0:

@@ -7,12 +7,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://seriesflixhd.info/'
+host = 'https://seriesflixhd.sbs/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://seriesflix.wtf/', 'https://seriesflixhd.one/', 'https://seriesflixhd.fun/',
-            'https://seriesflixhd.help/']
+            'https://seriesflixhd.help/', 'https://seriesflixhd.info/', 'https://seriesflixhd.shop/',
+            'https://seriesflixhd.wiki/', 'https://seriesflixhd.beer/']
 
 
 domain = config.get_setting('dominio', 'sflix', default='')
@@ -150,8 +151,6 @@ def list_all(item):
         title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '').replace('&amp;', '&')
 
         title = title.replace('Poster', '').strip()
-
-        if not host in url: url = host[:-1] + url
 
         itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
                                     contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
@@ -395,7 +394,7 @@ def play(item):
             if not url: url = new_url
             else: url = url.replace('/tmdbcdn.lat/', '/waaw.to/').replace('/latlat.xyz/', '/waaw.to/')
 
-    if '/nuuuppp.' in url:
+    if '/nuuuppp.' in url or '/nupload.' in url:
         return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
     if url:

@@ -89,9 +89,9 @@ def acciones(item):
     itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
                                 from_channel='osjonosu', folder=False, text_color='chartreuse' ))
 
-    itemlist.append(Item( channel='helper', action='show_help_osjonosu', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('osjonosu') ))
-
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_osjonosu', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('osjonosu') ))
 
     platformtools.itemlist_refresh()
 
@@ -525,24 +525,6 @@ def get_video_url(url):
         else: logger.error("Osjonosu get_video_url")
 
     return video_urls
-
-
-def _news(item):
-    logger.info()
-
-    item.url = host + 'tendencias/?get=movies'
-    item.search_type = 'movie'
-
-    return list_all(item)
-
-
-def _lasts(item):
-    logger.info()
-
-    item.url = host + 'tendencias/?get=tv'
-    item.search_type = 'tvshow'
-
-    return list_all(item)
 
 
 def search(item, texto):

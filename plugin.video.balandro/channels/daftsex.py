@@ -157,7 +157,7 @@ def findvideos(item):
         if 'php?q=' in url: url = url.split('php?q=')
 
         if url:
-            if not url.endswith('.mp4'):
+            if not '.mp4' in url:
                 url_decode = base64.b64decode(url[-1]).decode("utf8")
                 url = urllib.unquote(url_decode)
 

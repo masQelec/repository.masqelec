@@ -75,13 +75,15 @@ def get_video_url(page_url, url_referer=''):
 
             data = jsontools.load(resp.data)
 
-            _player =  scrapertools.find_single_match(resp.data, '"auto":.*?"url":"(.*?)"')
+            _player = scrapertools.find_single_match(resp.data, '"auto":.*?"url":"(.*?)"')
 
             if _player:
-                _player = _player.replace('\\/', '/').replace('=35104', '=')
+                _player = _player.replace('\\/', '/')
 
-                video_urls.append(['m3u8', _player, 0])
-                return video_urls[::-1]
+                _player += '|Referer=https://geo.dailymotion.com/'
+
+                video_urls.append(['m3u8', _player])
+                return video_urls
 
     try:
         sub_data = data['subtitles'].get('data', '')
@@ -105,7 +107,10 @@ def get_video_url(page_url, url_referer=''):
                 resuelto = resolveurl.resolve(page_url)
 
                 if resuelto:
-                    video_urls.append(['mp4', resuelto])
+                    if '.m3u8' in resuelto: video_urls.append(['m3u8', resuelto])
+                    elif '.m3u' in resuelto: video_urls.append(['m3u', resuelto])
+                    elif '.mp4' in resuelto: video_urls.append(['mp4', resuelto])
+                    else: video_urls.append(['', resuelto])
                     return video_urls
 
                 color_exec = config.get_setting('notification_exec_color', default='cyan')
@@ -130,7 +135,7 @@ def get_video_url(page_url, url_referer=''):
                         return 'Fichero sin link al vídeo ó restringido'
 
                     elif 'Cloudflare challenge' in trace:
-                        return 'Cloudflare Challenge Protection'
+                        return 'Cloudflare Challenge Check'
 
                 elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
                     return 'Archivo inexistente'
@@ -187,7 +192,10 @@ def get_video_url(page_url, url_referer=''):
                 resuelto = resolveurl.resolve(page_url)
 
                 if resuelto:
-                    video_urls.append(['mp4', resuelto])
+                    if '.m3u8' in resuelto: video_urls.append(['m3u8', resuelto])
+                    elif '.m3u' in resuelto: video_urls.append(['m3u', resuelto])
+                    elif '.mp4' in resuelto: video_urls.append(['mp4', resuelto])
+                    else: video_urls.append(['', resuelto])
                     return video_urls
 
                 color_exec = config.get_setting('notification_exec_color', default='cyan')
@@ -212,7 +220,7 @@ def get_video_url(page_url, url_referer=''):
                         return 'Fichero sin link al vídeo ó restringido'
 
                     elif 'Cloudflare challenge' in trace:
-                        return 'Cloudflare Challenge Protection'
+                        return 'Cloudflare Challenge Check'
 
                 elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
                     return 'Archivo inexistente'

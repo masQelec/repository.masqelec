@@ -99,6 +99,8 @@ def get_video_url(page_url, url_referer=''):
         return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
     elif "notFound" in data:
         return 'Archivo inexistente ó eliminado'
+    elif "The video is blocked" in data:
+        return 'Archivo bloqueado'
 
     data = scrapertools.decodeHtmlentities(data).replace('\\', '')
 

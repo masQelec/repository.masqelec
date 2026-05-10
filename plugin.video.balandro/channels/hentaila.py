@@ -192,6 +192,14 @@ def findvideos(item):
     return itemlist
 
 
+def _lasts(item):
+    logger.info()
+
+    item.url = host + 'catalogo?order=latest_released'
+
+    return list_all(item)
+
+
 def search(item, texto):
     logger.info()
     try:

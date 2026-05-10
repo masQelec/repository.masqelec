@@ -7,14 +7,14 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www3.animeflv.net/'
+host = 'https://www4.animeflv.net/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www1.animeflv.ws/', 'https://www10.animeflv.cc/', 'https://www3.animeflv.cc/',
              'https://ww3.animeflv.cc/', 'https://animeflv.bz/', 'https://www1.animeflv.bz/',
              'https://www2.animeflv.bz/', 'https://animeflv.so/', 'https://animeflv.vc/',
-             'https://animeflv.sh/', 'https://animeflv.ws/']
+             'https://animeflv.sh/', 'https://animeflv.ws/', 'https://www3.animeflv.net/']
 
 
 domain = config.get_setting('dominio', 'animeflv', default='')

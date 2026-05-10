@@ -57,7 +57,7 @@ def get_video_url(page_url, url_referer=''):
 
     data = httptools.downloadpage(page_url).data
 
-    if ">File not found<" in data:
+    if ">File not found<" in data or ">File Not Found<" in data:
         return "Archivo inexistente ó eliminado"
 
     msg_error = scrapertools.find_single_match(data, "<li class='no-side-margin'>([^<]+)</li>")
@@ -130,6 +130,9 @@ def get_video_url(page_url, url_referer=''):
                     elif 'File cannot be located or removed' in trace:
                        return 'Acceso Denegado CloudFlare'
 
+                    elif 'Cloudflare challenge' in trace:
+                       return 'Cloudflare Challenge Check'
+
                 elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
                     return 'Archivo inexistente'
 
@@ -196,8 +199,11 @@ def get_video_url(page_url, url_referer=''):
                    elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                        return 'Fichero sin link al vídeo ó restringido'
 
+                   elif 'Cloudflare challenge' in trace:
+                       return 'Cloudflare Challenge Check'
+
                    elif 'File cannot be located or removed' in trace:
-                      return 'Acceso Denegado CloudFlare'
+                       return 'Acceso Denegado CloudFlare'
 
                elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
                    return 'Archivo inexistente'

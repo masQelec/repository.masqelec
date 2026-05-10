@@ -336,12 +336,16 @@ def findvideos(item):
 
             url = servertools.normalize_url(servidor, url)
 
-            link_other = ''
-            if servidor == 'various': link_other = servertools.corregir_other(url)
+            other = ''
+            if servidor == 'various': other = servertools.corregir_other(url)
+
+            force_input = ''
+
+            if other == 'Lulustream': force_input = True
 
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, 
-                                      language = lang, other = link_other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url,
+                                      language = lang, other = other, force_input = force_input ))
 
     if blk_sub:
         matches = scrapertools.find_multiple_matches(str(blk_sub), "'(.*?)'")
@@ -359,12 +363,16 @@ def findvideos(item):
 
             url = servertools.normalize_url(servidor, url)
 
-            link_other = ''
-            if servidor == 'various': link_other = servertools.corregir_other(url)
+            other = ''
+            if servidor == 'various': other = servertools.corregir_other(url)
+
+            force_input = ''
+
+            if other == 'Lulustream': force_input = True
 
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, 
-                                      language = lang, other = link_other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url,
+                                      language = lang, other = other, force_input = force_input ))
 
     if blk_esp:
         matches = scrapertools.find_multiple_matches(str(blk_esp), "'(.*?)'")
@@ -382,12 +390,16 @@ def findvideos(item):
 
             url = servertools.normalize_url(servidor, url)
 
-            link_other = ''
-            if servidor == 'various': link_other = servertools.corregir_other(url)
+            other = ''
+            if servidor == 'various': other = servertools.corregir_other(url)
+
+            force_input = ''
+
+            if other == 'Lulustream': force_input = True
 
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, 
-                                      language = lang, other = link_other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url,
+                                      language = lang, other = other, force_input = force_input ))
 
     if not itemlist:
         if not ses == 0:
@@ -419,8 +431,22 @@ def list_search(item):
 
         SerieName = corregir_SerieName(title)
 
+        season = 1
+
+        if 'Season' in title:
+            if '2nd' in title: season = 2
+            elif '3rd' in title: season = 3
+            elif '4th' in title: season = 4
+            elif '5th' in title: season = 5
+            elif '6th' in title: season = 6
+            elif '7th' in title: season = 7
+            elif '8th' in title: season = 8
+            elif '9th' in title: season = 9
+
+        title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]')
+
         itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, page = 0,
-                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':'-'} ))
+                                    contentType = 'tvshow', contentSeason = season, contentSerieName = SerieName, infoLabels={'year':'-'} ))
 
     tmdb.set_infoLabels(itemlist)
 

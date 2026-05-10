@@ -178,6 +178,14 @@ def findvideos(item):
     return itemlist
 
 
+def _lasts(item):
+    logger.info()
+
+    item.url = host + 'latest-updates/'
+
+    return list_all(item)
+
+
 def search(item, texto):
     logger.info()
     try:

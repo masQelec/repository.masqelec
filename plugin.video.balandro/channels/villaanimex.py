@@ -43,9 +43,9 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Últimos animes', action = 'list_last', url = host, search_type = 'tvshow', text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'animes?estado[]=1?page=1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'animes?estado[]=1&page=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Finalizados', action = 'list_all', url = host + 'animes?estado[]=2?page=1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Finalizados', action = 'list_all', url = host + 'animes?estado[]=2&page=1', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Cortos', action = 'list_all', url = host + 'animes?tipo[]=5&estado[]=2',  search_type = 'tvshow' ))
 
@@ -136,7 +136,13 @@ def list_all(item):
 
         if not url or not title: continue
 
-        thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
+        if 'ver${val.' in title: continue
+
+        url = host + url
+
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
+        thumb = host[:-1] + thumb
 
         year = scrapertools.find_single_match(match, '<span class="bg-primary text-white text-xs px-2 py-1 rounded">(.*?)</span>')
         if not year: year = '-'
@@ -152,16 +158,29 @@ def list_all(item):
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
-            title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
-            title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
+            titulo = title
+
+            titulo = titulo.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
+            titulo = titulo.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
             season = scrapertools.find_single_match(url, '-temporada-(.*?)$')
 
             if not season: season = scrapertools.find_single_match(match, 'alt=".*?Temporada(.*?)"').strip()
 
-            if not season: season = 1
+            if not season:
+                season = 1
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo = sufijo, 
+                if 'Season' in title:
+                    if '2nd' in title: season = 2
+                    elif '3rd' in title: season = 3
+                    elif '4th' in title: season = 4
+                    elif '5th' in title: season = 5
+                    elif '6th' in title: season = 6
+                    elif '7th' in title: season = 7
+                    elif '8th' in title: season = 8
+                    elif '9th' in title: season = 9
+
+            itemlist.append(item.clone( action='episodios', url=url, title=titulo, thumbnail=thumb, fmt_sufijo = sufijo, 
                                         contentType = 'tvshow', contentSerieName = SerieName, contentSeason = season, infoLabels={'year': year} ))
 
         if tipo == 'movie':
@@ -193,7 +212,7 @@ def last_epis(item):
 
     bloque = scrapertools.find_single_match(data, '>Últimos capítulos(.*?)>Series recientes')
 
-    matches = re.compile('<article>(.*?)</article>', re.DOTALL).findall(bloque)
+    matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
 
     for match in matches:
         title = scrapertools.find_single_match(match, 'alt="(.*?)"')
@@ -201,6 +220,8 @@ def last_epis(item):
         url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
         if not url or not title: continue
+
+        url = host + url
 
         title = title.replace('&quot;', '').replace('&amp;', '').strip()
 
@@ -249,7 +270,7 @@ def list_last(item):
 
     bloque = scrapertools.find_single_match(data, '>Series recientes(.*?)</section>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<article>(.*?)</article>')
+    matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
     for match in matches:
         title = scrapertools.find_single_match(match, 'alt="(.*?)"')
@@ -258,12 +279,16 @@ def list_last(item):
 
         if not url or not title: continue
 
+        url = host + url
+
         title = title.replace('&quot;', '').replace('&amp;', '').strip()
 
         SerieName = corregir_SerieName(title)
 
-        title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
-        title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
+        titulo = title
+
+        titulo = titulo.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
+        titulo = titulo.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
@@ -273,9 +298,20 @@ def list_last(item):
 
         if not season: season = scrapertools.find_single_match(match, 'alt=".*?Temporada(.*?)"').strip()
 
-        if not season: season = 1
+        if not season:
+            season = 1
 
-        itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
+            if 'Season' in title:
+                if '2nd' in title: season = 2
+                elif '3rd' in title: season = 3
+                elif '4th' in title: season = 4
+                elif '5th' in title: season = 5
+                elif '6th' in title: season = 6
+                elif '7th' in title: season = 7
+                elif '8th' in title: season = 8
+                elif '9th' in title: season = 9
+
+        itemlist.append(item.clone( action='episodios', url=url, title=titulo, thumbnail=thumb,
                                     contentType = 'tvshow', contentSerieName = SerieName, contentSeason = season, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -295,7 +331,7 @@ def episodios(item):
     hay_proximo = False
     if '>Próximo episodio' in data: hay_proximo = True
 
-    matches = re.compile('<article>(.*?)</article>', re.DOTALL).findall(data)
+    matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
 
     if not matches:
         if '>Próximamente<' in data:

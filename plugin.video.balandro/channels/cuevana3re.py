@@ -380,7 +380,7 @@ def findvideos(item):
 
 
 def puntuar_calidad(txt):
-    orden = ['CAMRip', 'CAM', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'BDRip', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', 'Full HD', 'HD', 'WEBRip 1080p', 'WEB-DL 4k', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
+    orden = ['CAMRip', 'CAM', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'BDRip', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', 'Full HD', 'HD', 'HDTV', 'WEBRip 1080p', 'WEB-DL 4k', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
 

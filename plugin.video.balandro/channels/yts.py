@@ -22,6 +22,11 @@ def do_downloadpage(url, post=None):
 
     data = httptools.downloadpage(url, post=post).data
 
+    if '<title>Just a moment...</title>' in data:
+        if not '/all/all/0/latest/0/all' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
     return data
 
 

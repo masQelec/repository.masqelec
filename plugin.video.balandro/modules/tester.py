@@ -85,7 +85,7 @@ txt_coffs = '[COLOR gold][B]Puede Marcar el canal como Desactivado[/B][/COLOR][C
 txt_erase = '[COLOR orangered][B]Podrían Eliminarse los Proxies del Canal, pueden No necesitarse.[/B][/COLOR]'
 txt_quita = '[COLOR orange][B]podrían Eliminarse los Proxies del Canal, al parecer No se necesitan[/B][/COLOR]'
 txt_suspe = '[CR]account: [COLOR goldenrod][B]Suspendida[/B][/COLOR][CR]'
-txt_reach = '[CR]status: [COLOR red[B]Suspendida[/B][/COLOR][CR]'
+txt_reach = '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR][CR]'
 txt_legal = 'legal: [COLOR springgreen][B]Copyright infringement[/B][/COLOR]'
 txt_sorry = '[CR]sorry: [COLOR springgreen][B]Contact your hosting Provider[/B][/COLOR]'
 txt_false = '[COLOR springgreen][B]Falso Positivo.[/B][/COLOR][COLOR goldenrod][B] Parece que está redireccionando a otra Web.[/B][/COLOR]'
@@ -119,7 +119,7 @@ channels_poe = [
 
 channels_despised = ['pandramaio', 'peliculasflix', 'ytsmx']
 
-servers_poe = ['directo', 'm3u8hls', 'torrent']
+servers_poe = ['directo', 'm3u8hls', 'torrent', 'vk']
 
 
 def test_channel(channel_name):
@@ -179,9 +179,13 @@ def test_channel(channel_name):
 
     txt += '[COLOR moccasin][B]Parámetros:[/B][/COLOR][CR]'
 
-    txt += 'id: ' + str(params['id']) + '[CR]'
-    txt += 'channel: ' + str(params['name']) + '[CR]'
-    txt += 'active: ' + str(params['active']) + '[CR]'
+    txt += 'id: [COLOR gold]' + str(params['id']) + '[/COLOR][CR]'
+    txt += 'channel: [COLOR yellow][B]' + str(params['name']) + '[/B][/COLOR][CR]'
+
+    if params['active'] == True:
+        txt += 'active: [COLOR cyan][B]' + str(params['active']) + '[/B][/COLOR][CR]'
+    else:
+        txt += 'active: [COLOR red][B]' + str(params['active']) + '[/B][/COLOR][CR]'
 
     search_types = str(params['search_types'])
     search_types = search_types.replace('[', '').replace(']', '').replace("'", '').strip()
@@ -545,11 +549,7 @@ def test_channel(channel_name):
 
             elif channel_id == 'mundodonghua': txt_clons = 'MundoDonghua'
 
-            elif channel_id == 'series24': txt_clons = 'Gnula24, Gnula24h, SeriesPlus'
-
             elif channel_id == 'serieskao': txt_clons = 'PelisPlusHdNz'
-
-            elif channel_id == 'veronline': txt_clons = 'OnlineTv, SeriesOnline, Star, VerSerieOnline'
 
             if txt_clons:
                 txt_diag  += '[CR]clones: [COLOR gold][B]' + txt_clons + '[/B][/COLOR]'
@@ -565,29 +565,22 @@ def test_channel(channel_name):
             elif channel_id == 'elitedivx': txt_clones = 'DonTorrents'
             elif channel_id == 'elitetorrentnz': txt_clones = 'EliteTorrent'
             elif channel_id == 'gatotv': txt_clones = 'SeriesGato'
-            elif channel_id == 'gnula24': txt_clones = 'Series24'
-            elif channel_id == 'gnula24h': txt_clones = 'Series24'
             elif channel_id == 'lilatorrent': txt_clones = 'DonTorrents'
             elif channel_id == 'megadedeoficial': txt_clones = 'EntrePeliculasySeries'
             elif channel_id == 'mejortorrentapp': txt_clones = 'DonTorrents'
             elif channel_id == 'mejortorrentin': txt_clones = 'DonTorrents'
             elif channel_id == 'mundodonghuaxyz': txt_clones = 'MundoDonghua'
             elif channel_id == 'naranjatorrent': txt_clones = 'DonTorrents'
-            elif channel_id == 'onlinetv': txt_clones = 'VerOnline'
             elif channel_id == 'pelisgratishd': txt_clones = 'EntrePeliculasySeries'
             elif channel_id == 'pelispediais': txt_clones = 'HomeCine'
             elif channel_id == 'pelisplushdnz': txt_clones = 'SeriesKao'
             elif channel_id == 'reinventorrent': txt_clones = 'DonTorrents'
             elif channel_id == 'rojotorrent': txt_clones = 'DonTorrents'
-            elif channel_id == 'seriesplus': txt_clones = 'Series24'
             elif channel_id == 'serieskao': txt_clones = 'PelisPlusHdNz'
             elif channel_id == 'seriesmetron': txt_clones = 'HomeCine'
-            elif channel_id == 'seriesonline': txt_clones = 'VerOnline'
-            elif channel_id == 'star': txt_clones = 'VerOnline'
             elif channel_id == 'tomadivx': txt_clones = 'DonTorrents'
             elif channel_id == 'todotorrents': txt_clones = 'DonTorrents'
             elif channel_id == 'verdetorrent': txt_clones = 'DonTorrents'
-            elif channel_id == 'verserieonline': txt_clones = 'VerOnline'
 
             if txt_clones:
                 txt_diag  += '[CR]clone: ' + '[COLOR turquoise][B]Clon del Canal Principal[/COLOR][COLOR gold] ' + txt_clones + '[/B][/COLOR]'
@@ -795,20 +788,34 @@ def test_channel(channel_name):
 
        if dominio: host = dominio
        else:
-          try:
-             data = filetools.read(filename_py)
-          except:
-             if not channel_name == 'test_providers':
-                 el_canal = ('Falta [B][COLOR %s]' + channel_py) % color_alert
-                 platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-                 return
+          if config.get_setting('developer_team'):
+              if not channel_name == 'test_providers':
+                  webs_log = os.path.join(config.get_data_path(), 'webs.log')
+                  existe = filetools.exists(webs_log)
 
-          if channel_name == 'test_providers': data = ''
+                  if existe:
+                      dataw = filetools.read(webs_log)
 
-          if data == False:
-             el_canal = ('Falta [B][COLOR %s]' + channel_py) % color_alert
-             platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-             return
+                      host = scrapertools.find_single_match(dataw, channel_name + '  "(.*?)"')
+
+                      if host:
+                          platformtools.dialog_notification(config.__addon_name + ' [COLOR palegreen][B]' + channel_name + '[/COLOR][/B]', '[COLOR cyan][B]' + host + '[/COLOR][/B]')
+
+          if not host:
+              try:
+                 data = filetools.read(filename_py)
+              except:
+                 if not channel_name == 'test_providers':
+                     el_canal = ('Falta [B][COLOR %s]' + channel_py) % color_alert
+                     platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+                     return
+
+              if channel_name == 'test_providers': data = ''
+
+              if data == False:
+                  el_canal = ('Falta [B][COLOR %s]' + channel_py) % color_alert
+                  platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+                  return
 
           if not host:
               if channel_id == 'hdfull':
@@ -993,7 +1000,7 @@ def test_channel(channel_name):
                     if 'invalid:' in txt:
                         if 'CloudFlare Human Verify' in txt: avis_causas = '[COLOR goldenrod][B]CloudFlare Human Verify.[/B][/COLOR]'
 
-                        elif txt_sorry in txt or txt_suspe in txt: avis_causas = '[COLOR goldenrod][B]La Cuenta está Suspendida.[/B][/COLOR]'
+                        elif txt_sorry in txt or txt_suspe in txt: avis_causas = '[COLOR goldenrod][/COLOR]'
 
                         platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + channel_name.capitalize() + '[/B][/COLOR]', '[COLOR red][B][I]El test del Canal NO ha resultado Satisfactorio.[/I][/B][/COLOR]', avis_causas, '[COLOR cyan][B]Por favor, compruebe la información del Test del Canal.[/B][/COLOR]')
                         avisado = True
@@ -1429,6 +1436,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
             elif '/cgi-sys/defaultwebpage.cgi' in str(response.data): txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
             elif '>This site is currently suspended<' in response.data: txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
+            elif '>This website has been suspended!<' in response.data: txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
 
             elif '>The domain has expired and may be available at' in response.data: txt += '[CR]web: [COLOR red][B]Dominio Expirado[/B][/COLOR]'
             elif 'Renew Now' in response.data: txt += '[CR]web: [COLOR red][B]Dominio Expirado[/B][/COLOR]'
@@ -1536,6 +1544,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                 if '<title>Account Suspended</title>' in response.data: txt += '[CR]status: [COLOR goldenrod][B]Suspendida[/B][/COLOR]'
                 elif '>This site is currently suspended<' in response.data: txt += '[CR]status: [COLOR goldenrod][B]Suspendida[/B][/COLOR]'
+                elif '>This website has been suspended!<' in response.data: txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
                 elif 'The website is under maintenance' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
                 elif 'The server is temporarily busy' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
                 elif 'This site is currently under construction' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
@@ -1991,7 +2000,7 @@ def test_server(server_name):
 
     txt += '[COLOR moccasin][B]Parámetros:[/B][/COLOR][CR]'
 
-    txt += 'server: ' + server_name + '[CR][CR]'
+    txt += 'server: [COLOR gold][B]' + server_name + '[/B][/COLOR][CR][CR]'
 
     try:
        patterns = dict_server['find_videos']['patterns']
@@ -2177,6 +2186,12 @@ def acces_server(server_name, url, txt, follow_redirects=None):
                        if len(response.data) > 0:
                            txt += '[CR][COLOR moccasin][B]Datos:[/B][/COLOR][CR]'
                            txt += str(response.data).strip() + '[CR]'
+
+            if not 'Datos:' in txt:
+                if len(response.data) > 0:
+                    txt += '[CR][CR][COLOR moccasin][B]Datos:[/B][/COLOR][CR]'
+                    txt += str(response.data).strip() + '[CR][CR]'
+
     else:
         if  '<span class="error-description">Access denied</span>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
         elif ">The page you’re looking for could have been deleted or never have existed" in response.data: txt += '[CR]acces: [COLOR orangered][B]Web Sin Información [COLOR red]Borrada ó Inexistente[/B][/COLOR]'

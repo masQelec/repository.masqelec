@@ -403,7 +403,11 @@ def play(item):
 
         url = servertools.normalize_url(servidor, url)
 
-        itemlist.append(item.clone(url = url, server = servidor))
+        force_input = ''
+
+        if '/lulustream.' in url: force_input = True
+
+        itemlist.append(item.clone(url = url, server = servidor, force_input = force_input ))
 
     return itemlist
 

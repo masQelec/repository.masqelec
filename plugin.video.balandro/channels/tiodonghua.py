@@ -116,7 +116,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
-    itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
+    itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'all', text_color='springgreen' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'donghua/', group = 'donghua', search_type = 'tvshow' )) 
 
@@ -678,6 +678,70 @@ def play(item):
     return itemlist
 
 
+def list_search(item): 
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    bloque = scrapertools.find_single_match(data, '>Resultados encontrados(.*?)<script>')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+
+        if not url or not title: continue
+
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
+        title = title.replace('&#8217;s', "'s").replace('&#8211;', '').replace('&#8217;', '').replace('&#8220;', '').replace('&#8221;', '').replace('&#038;', '').strip()
+
+        year = scrapertools.find_single_match(match, '<span class="year">(.*?)</span>')
+ 
+        if not year: year = '-'
+
+        SerieName = corregir_SerieName(title)
+
+        season = 1
+
+        if '>T2' in match: season = 2
+        elif '>T3' in match: season = 3
+        elif '>T4' in match: season = 4
+        elif '>T5' in match: season = 5
+        elif '>T6' in match: season = 6
+        elif '>T7' in match: season = 7
+        elif '>T8' in match: season = 8
+        elif '>T9' in match: season = 9
+
+        elif 'Temporada 2' in match: season = 2
+        elif 'Temporada 3' in match: season = 3
+        elif 'Temporada 4' in match: season = 4
+        elif 'Temporada 5' in match: season = 5
+        elif 'Temporada 6' in match: season = 6
+        elif 'Temporada 7' in match: season = 7
+        elif 'Temporada 8' in match: season = 8
+        elif 'Temporada 9' in match: season = 9
+
+        tipo = 'movie' if '/peliculas/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'movie':
+            itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
+                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+        else:
+            title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
+
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
+                                        contentType = 'tvshow', contentSerieName = SerieName, contentSeason = season, infoLabels={'year': year} ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
 def corregir_SerieName(SerieName):
     logger.info()
 
@@ -750,7 +814,7 @@ def search(item, texto):
     logger.info()
     try:
         item.url =  host + "?s=" + texto.replace(" ", "+")
-        return list_all(item)
+        return list_search(item)
     except:
         import sys
         for line in sys.exc_info():

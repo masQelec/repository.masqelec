@@ -10,9 +10,7 @@ else:
     import urllib.error as urllib2
 
 
-import os
-
-import traceback
+import os, traceback
 
 
 from platformcode import config
@@ -200,7 +198,7 @@ if tipo_channel != '':
         # ~ Grab server response errors
         elif hasattr(e, 'code'):
             logger.error("Codigo de error HTTP: %d" % e.code)
-            platformtools.dialog_ok(config.__addon_name, "El sitio Web no funciona Correctamente (error http %d)" % e.code)
+            platformtools.dialog_ok(config.__addon_name, "El sitio Web no Funciona Correctamente (error http %d)" % e.code)
 
     except WebErrorException as e:
         logger.error(traceback.format_exc())
@@ -221,8 +219,8 @@ if tipo_channel != '':
 
             release = '[COLOR goldenrod][B]' + config.get_addon_version().replace('.fix', '-Fix') + str(last_ver) + ' '
 
-            platformtools.dialog_ok(release + '[COLOR red][B]Error en el canal [COLOR yellow]' + item.channel.capitalize() + '[/B][/COLOR]', 
-                                    '[COLOR yellowgreen][B]La Web asociada al Canal, parece no estar Disponible[/B][/COLOR], Intentélo de nuevo pasados unos minutos, y si el problema persiste compruebe mediante un Navegador de Internet la Web: [COLOR cyan][B]%s[/B][/COLOR]' % (e) )
+            platformtools.dialog_ok(release + ' [COLOR red][B]Error en el Canal[/COLOR] [COLOR yellow]' + item.channel.capitalize() + '[/B][/COLOR]', 
+                                    '[COLOR yellowgreen][B]La Web asociada al Canal, parece No estar Disponible[/B][/COLOR], Intentélo de Nuevo pasados unos minutos, y si el Problema Persiste compruebe mediante un Navegador de Internet la Web: [COLOR cyan][B]%s[/B][/COLOR]' % (e) )
 
     except:
         logger.error(traceback.format_exc())
@@ -236,10 +234,10 @@ if tipo_channel != '':
         release = '[COLOR goldenrod][B]' + config.get_addon_version().replace('.fix', '-Fix') + str(last_ver) + ' '
 
         if item.channel in ['mainmenu', 'actions', 'domains', 'downloads', 'favoritos', 'filmaffinitylists', 'filters', 'generos', 'groups', 'helper', 'proxysearch', 'search', 'submnuctext', 'submnuteam', 'tester', 'tmdblists', 'tracking']:
-            platformtools.dialog_ok(release + '[COLOR red][B]Error Inesperado en [COLOR gold]' + item.channel.capitalize() + '[/B][/COLOR]',
-                                    '[COLOR moccasin][B]Puede estar Corrupto su Fichero de [COLOR chocolate][B]Ajustes[/COLOR][COLOR goldenrod][B] de [/B][/COLOR][COLOR yellow][B]Balandro[/B][/COLOR], Pruebe a [COLOR cyan][B]Re-Instalar el Add-On[/B][/COLOR][COLOR goldenrod][B] (consulte nuestro Telegram ó Foro)[/B][/COLOR][COLOR moccasin][B], ó [/COLOR][COLOR darkcyan][B]bien hay un Error en el Add-On/Modulo.[/B][/COLOR] [COLOR chartreuse][B]Para más detalles, vea el Fichero Log de su Media Center en la Ayuda.[/B][/COLOR]')
+            platformtools.dialog_ok(release + ' [COLOR red][B]Error Inesperado en[/COLOR] [COLOR gold]' + item.channel.capitalize() + '[/B][/COLOR]',
+                                    '[COLOR moccasin][B]Puede estar Corrupto su Fichero de [/COLOR][COLOR chocolate]Ajustes[/COLOR][COLOR goldenrod] de [/COLOR][COLOR yellow]Balandro[/B][/COLOR], Pruebe a [COLOR cyan][B]Re-Instalar el Add-On[/COLOR][COLOR goldenrod] (consulte nuestro Telegram ó Foro)[/COLOR][COLOR moccasin], ó [/COLOR][COLOR darkcyan]bien hay un Error en el Add-On/Modulo.[/COLOR] [COLOR chartreuse]Para más detalles, vea el Fichero Log de su Media Center en la Ayuda.[/B][/COLOR]')
         else:
-            platformtools.dialog_ok(release + ' [COLOR red]Error Inesperado en [COLOR yellow]' + item.channel.capitalize() + '[/B][/COLOR]',
-                                    '[COLOR moccasin][B]Puede ser a un fallo de Conexión[/B][/COLOR], ó [COLOR cyan][B]la Web asociada al Canal varió su estructura[/B][/COLOR], ó [COLOR goldenrod][B]estar Corrupto su Fichero de [COLOR chocolate][B]Ajustes[/COLOR][COLOR goldenrod][B] de [/B][/COLOR][COLOR yellow][B]Balandro[/B][/COLOR][COLOR moccasin], ó [/COLOR][COLOR darkcyan][B]Hay un Error en el Add-On.[/B][/COLOR] [COLOR chartreuse][B]Para más detalles, vea el Fichero Log de su Media Center en la Ayuda.[/B][/COLOR]')
+            platformtools.dialog_ok(release + ' [COLOR red]Error Imprevisto en[/COLOR] [COLOR yellow]' + item.channel.capitalize() + '[/B][/COLOR]',
+                                    '[COLOR moccasin][B]Puede ser un Fallo de Conexión[/COLOR], ó [COLOR cyan]la Web asociada al Canal varió su estructura[/COLOR], [COLOR moccasin]ó [/COLOR][COLOR darkcyan]Hay un Error en el Add-On.[/COLOR] [COLOR chartreuse]Para más detalles, vea el Fichero Log de su Media Center en la Ayuda.[/B][/COLOR]')
 
 logger.info('[COLOR blue]Ending with %s[/COLOR]' % sys.argv[1])

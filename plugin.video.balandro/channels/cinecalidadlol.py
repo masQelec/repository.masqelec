@@ -14,7 +14,7 @@ from core import httptools, scrapertools, servertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www.cinecalidad.ec/'
+host = 'https://www.cinecalidad.am/'
 
 
 _players = ['https://cinecalidad.', '.cinecalidad.']
@@ -52,7 +52,7 @@ ant_hosts = ['https://cinecalidad.lol/', 'https://cinecalidad.link/', 'https://w
              'https://wwa.cinecalidad.gg/', 'https://aww.cinecalidad.gg/', 'https://waw.cinecalidad.gg/',
              'https://wwz.cinecalidad.gg/', 'https://wwu.cinecalidad.gg/', 'https://wuw.cinecalidad.gg/',
              'https://wee.cinecalidad.gg/', 'https://eew.cinecalidad.gg/', 'https://wwx.cinecalidad.gg/',
-             'https://xww.cinecalidad.gg/', 'https://wxw.cinecalidad.gg/', 'https://www.cinecalidad.am/']
+             'https://xww.cinecalidad.gg/', 'https://wxw.cinecalidad.gg/', 'https://www.cinecalidad.ec/']
 
 
 domain = config.get_setting('dominio', 'cinecalidadlol', default='')

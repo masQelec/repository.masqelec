@@ -133,6 +133,14 @@ def findvideos(item):
     return sorted(itemlist, key=lambda it: it.sort)
 
 
+def _lasts(item):
+    logger.info()
+
+    item.url = host + 'newest-clips/1.html'
+
+    return list_all(item)
+
+
 def search(item, texto):
     logger.info()
     try:

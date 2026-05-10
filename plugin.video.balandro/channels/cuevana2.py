@@ -342,6 +342,9 @@ def temporadas(item):
     for tempo in temporadas:
         title = 'Temporada ' + tempo
 
+        if tempo == '0':
+            if config.get_setting('channels_especiales', default=True): continue
+
         if len(temporadas) == 1:
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')

@@ -1,7 +1,6 @@
-BALANDRO TEAM  Enero de 2026
+[COLOR firebrick][B]BALANDRO TEAM[/COLOR]  [COLOR yellow]Abril de 2026[/B][/COLOR]
 
-DESARROLLO NORMAS GENERALES
-============================
+[COLOR goldenrod][B]DESARROLLO NORMAS GENERALES[/B][/COLOR]
 
 - Preferidos en bases de datos sqlite pero no integrada en el Media Center
 
@@ -84,9 +83,7 @@ DESARROLLO NORMAS GENERALES
     lo cual permite controlar las marcas de visto/no visto de Kodi.
   - Servicio de busqueda de nuevos episodios configurable cada n horas o ejecutable manualmente.
 
-
-DESARROLLO CANALES
-===================
+[COLOR goldenrod][B]DESARROLLO CANALES[/B][/COLOR]
 
 - A parte del mainlist, hay que implementar mainlist_pelis y/o mainlist_series.
 - Intentar que sean lo más simples y genericos posibles.
@@ -103,12 +100,10 @@ DESARROLLO CANALES
   - Tener en cuenta item.search_type si se puede buscar por peliculas, series o ambas a la vez.
   - Si se busca por ambas, diferenciar las series de las peliculas en el listado, rellenando fmt_sufijo con 'movie' o 'tvshow'.
 
-
 - Si hay listado por generos, llamar generos a la funcion que muestra el listado de generos. Idem para years con anios.
   - Generar url de busqueda dentro de la propia rutina (no depender de item.url, solamente de search_type)
   - Tener en cuenta item.search_type si hay diferentes generos para peliculas y series.
   - Está unificada la manera de obtener los generos/years/categorias/etc. de cada canal.
-
 
 - Listados de peliculas, series, documentales
   - Habria que poder resolver llamando a tmdb (titulo+year, titulo+thumbnail_imdb, ...). A las malas con year='-'
@@ -122,7 +117,6 @@ DESARROLLO CANALES
     Usar fmt_sufijo para diferenciar peliculas/series en listados mixtos (por busquedas)
   - Si el listado tiene demasiados items (+ de 30?) controlar una paginacion interna (ej: canalpelis, etc.)
 
-
 - Funcion findvideos:
   - No hacer ninguna llamada a tmdb ni obtener datos de la pelicula/serie, solamente rellenar los enlaces a videos.
   - Siempre que la web lo permita intentar obtener language, quality, age (cuando se modifico) y other (otras notas, como descarga directa, MB, ...)
@@ -134,7 +128,6 @@ DESARROLLO CANALES
   - Si hay "age" preferible que los enlaces esten ordenados por ese valor mostrando los más recientes primero (pq es más probable que funcionen).
     Luego en el filtrado de servertools se reordenarán por idioma manteniendo el orden previo.
   - Descartar enlaces de "descarga" ?
-
 
 - Json del canal:
   - Para categories de momento solo se usa 'movie','tvshow'. TODO que hacer o que otras categorias definir...
@@ -158,7 +151,6 @@ DESARROLLO CANALES
     - obligatorio y en funcion de las opciones del canal
 
 - Canales que necesitan proxies: (ejemplos: gnula, etc.)
-
   Json canal:
       obligatorio en "notes"
       'Puede requerir el uso de proxies en funcion del pais/operadora desde el que se accede.'
@@ -174,9 +166,7 @@ DESARROLLO CANALES
 
    y finalmente substituir las llamadas a httptools.downloadpage(...) por httptools.downloadpage_proxy(item.channel, ...)
 
-
-CRITERIOS SELECCION NUEVAS WEBS/CANALES
-=======================================
+[COLOR goldenrod][B]CRITERIOS SELECCION NUEVAS WEBS/CANALES[/B][/COLOR]
 
 - que la web sea estable y no tarde demasiado en responder.
 - que no se necesiten recaptchas.

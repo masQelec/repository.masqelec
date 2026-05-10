@@ -69,15 +69,6 @@ def do_downloadpage(url, post=None, headers=None):
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-         if not url.startswith(host):
-             data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-         else:
-             if hay_proxies:
-                 data = httptools.downloadpage_proxy('animejl', url, post=post, headers=headers, timeout=timeout).data
-             else:
-                 data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-
     if '<title>Just a moment...</title>' in data:
         if not '/animes?q=' in url:
             platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
@@ -507,9 +498,13 @@ def findvideos(item):
             if servidor == 'various': other = servertools.corregir_other(url)
             elif servidor == 'zures': other = servertools.corregir_zures(url)
 
+            force_input = ''
+
+            if other == 'Lulustream': force_input = True
+
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                      language = lang, other = other.capitalize() ))
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url,
+                                      language = lang, other = other.capitalize(), force_input = force_input ))
 
     # ~ descargas  no se tratan por anomizador
 

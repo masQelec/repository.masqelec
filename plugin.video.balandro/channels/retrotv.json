@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["suggested", "infantil", "classic", "lists", "years", "lasts", "kids"],
+  "clusters": ["infantil", "classic", "lists", "years", "lasts", "kids"],
 
   "notes": "Películas por géneros. Series clásicas, por Géneros. Series en idioma orignal de emisión."
 }

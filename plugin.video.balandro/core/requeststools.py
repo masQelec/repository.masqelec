@@ -31,9 +31,9 @@ else:
 color_alert = config.get_setting('notification_alert_color', default='red')
 
 
-# ~ 19/2/26
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.26 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.77 Safari/537.36"
+# ~ 25/4/26
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.7727.117 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.56 Safari/537.36"
 
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
@@ -62,6 +62,13 @@ def read(url, channel):
         return ''
 
     if not url: return ''
+
+    if not 'http' in url:
+        if not url.startswith == 'magnet:':
+            if config.get_setting('developer_team'):
+                platformtools.dialog_ok(config.__addon_name + ' -  RequestTools', '[B][COLOR palegreen]Revisar Url Incompleta[/COLOR][/B]', url)
+
+            return ''
 
     # ~ Sin proxies
     if not channel:

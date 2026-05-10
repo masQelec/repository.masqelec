@@ -41,6 +41,8 @@ search_no_accesibles = config.get_setting('search_no_accesibles', default=False)
 _foro = "[COLOR plum][B][I] www.mimediacenter.info/foro/ [/I][/B][/COLOR]"
 _telegram = "[COLOR lightblue][B][I] t.me/balandro_asesor [/I][/B][/COLOR]"
 
+_scripts = "[COLOR mediumaquamarine][B][I] repobal.github.io/base/scripts/ [/I][/B][/COLOR]"
+
 _team = "[COLOR hotpink][B][I] t.me/balandro_team [/I][/B][/COLOR]"
 
 tests_all_webs = []
@@ -595,7 +597,7 @@ def submnu_addons_info(item):
 
     itemlist.append(item.clone( channel='helper', action='show_help_vias', title= 'Vía alternativa [COLOR goldenrod][B]ResolveUrl[/B][/COLOR]', only_resolve=True, thumbnail=config.get_thumb('resolveurl') ))
 
-    itemlist.append(item.clone( channel='helper', action='show_help_vias', title= 'Vía alternativa [COLOR goldenrod][B]Youtube[/B][/COLOR]', only_youtube=True, thumbnail=config.get_thumb('youtube') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_vias', title= 'Vía alternativa [COLOR goldenrod][B]YouTube[/B][/COLOR]', only_youtube=True, thumbnail=config.get_thumb('youtube') ))
 
     itemlist.append(item.clone( channel='helper', action='show_help_torrents', title= '¿ Dónde obtener los Add-Ons para [COLOR gold][B]Clientes/Motores[/B][/COLOR] torrents ?', thumbnail=config.get_thumb('tools') ))
 
@@ -618,17 +620,19 @@ def submnu_addons_info(item):
                except:
                    tex_tor += '  [COLOR gray]Desactivado[/COLOR]'
 
+           else: tex_tor += '  [COLOR red]No instalado[/COLOR]'
+
         itemlist.append(item.clone( action = '', title= ' - Cliente/Motor Torrent asignado ' + '[COLOR fuchsia][B] ' + tex_tor + '[/B][/COLOR]', thumbnail=config.get_thumb('torrents') ))
 
         if xbmc.getCondVisibility('System.HasAddon("script.elementum.burst")'):
             try:
                 cod_version = xbmcaddon.Addon("script.elementum.burst").getAddonInfo("version").strip()
-                tex_tor = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+                tex_bur = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
             except:
-                tex_tor = '  [COLOR gray]Desactivado[/COLOR]'
-        else: tex_tor = '  [COLOR red]No instalado[/COLOR]'
+                tex_bur = '  [COLOR gray]Desactivado[/COLOR]'
+        else: tex_bur = '  [COLOR red]No instalado[/COLOR]'
 
-        itemlist.append(item.clone( action = '', title= ' - [COLOR fuchsia][B]Elementum Burst[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_tor + '[/B][/COLOR]', thumbnail=config.get_thumb('elementum') ))
+        itemlist.append(item.clone( action = '', title= ' - [COLOR fuchsia][B]Elementum Burst[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_bur + '[/B][/COLOR]', thumbnail=config.get_thumb('elementum') ))
 
     if xbmc.getCondVisibility('System.HasAddon("inputstream.adaptive")'):
         try:
@@ -725,6 +729,8 @@ def submnu_addons_info(item):
 
         itemlist.append(item.clone( action='submnu_resto_addons', title='[COLOR yellowgreen][B][I]ADD-ONS INSTALADOS CON DATOS[/I][/B][/COLOR]', thumbnail=config.get_thumb('kodiaddons') ))
 
+        itemlist.append(item.clone( action='addons_especiales', title='[COLOR palegreen][B][I]ADD-ONS ESPECIALES COMUNES[/I][/B][/COLOR]', thumbnail=config.get_thumb('kodiaddons') ))
+
     return itemlist
 
 
@@ -771,14 +777,21 @@ def submnu_resto_addons(item):
         addon = addon.replace('script', '[COLOR orange]script[/COLOR]')
         addon = addon.replace('skin', '[COLOR aquamarine]skin[/COLOR]')
         addon = addon.replace('service', '[COLOR violet]service[/COLOR]')
-        addon = addon.replace('resource', '[COLOR magenta]resource[/COLOR]')
+
+        addon = addon.replace('requests', '[COLOR palegreen]requests[/COLOR]')
+        addon = addon.replace('js2py', '[COLOR orangered]js2py[/COLOR]')
+
+        addon = addon.replace('resource', '[COLOR tomato]resource[/COLOR]')
 
         addon = addon.replace('github', '[COLOR yellowgreen]github[/COLOR]')
 
         addon = addon.replace('inputstream', '[COLOR fuchsia]inputstream[/COLOR]')
 
         addon = addon.replace('resolveurl', '[COLOR fuchsia]resolveurl[/COLOR]')
+
+        addon = addon.replace('elementumorg', '[COLOR fuchsia]elementumorg[/COLOR]')
         addon = addon.replace('elementum', '[COLOR fuchsia]elementum[/COLOR]')
+
         addon = addon.replace('youtube', '[COLOR fuchsia]youtube[/COLOR]')
 
         addon = addon.replace('balandro', '[COLOR yellow]balandro[/COLOR]')
@@ -792,6 +805,67 @@ def submnu_resto_addons(item):
     else: tex_cab = 'Add-Ons Instalados con Datos'
 
     platformtools.dialog_textviewer(tex_cab, txt)
+
+
+def addons_especiales(item):
+    logger.info()
+    itemlist = []
+
+    txt = 'Si necesitase Instalar alguno de ellos, los localizará en Nuestra Fuente:[CR]'
+
+    txt += _scripts + '[CR]'
+
+    txt += '[CR][COLOR yellow][B]Vienen Integrados en Kodi:[/B][/COLOR][CR]'
+
+    if xbmc.getCondVisibility('System.HasAddon("script.module.js2py")'):
+        try:
+            cod_version = xbmcaddon.Addon("script.module.js2py").getAddonInfo("version").strip()
+            tex_js2 = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_js2 = '  [COLOR gray]Desactivado[/COLOR]'
+
+    else: tex_js2 = '  [COLOR red]No integrado[/COLOR]'
+
+    txt += ' - [COLOR orangered]script.module.js2py[/COLOR][B]' + tex_js2 + '[/B][CR]'
+
+    if xbmc.getCondVisibility('System.HasAddon("script.module.requests")'):
+        try:
+            cod_version = xbmcaddon.Addon("script.module.requests").getAddonInfo("version").strip()
+            tex_req = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_req = '  [COLOR gray]Desactivado[/COLOR]'
+
+    else: tex_req = '  [COLOR red]No integrado[/COLOR]'
+
+    txt += ' - [COLOR palegreen]script.module.requests[/COLOR][B]' + tex_req + '[/B][CR]'
+
+    txt += '[CR][COLOR yellow][B]Idiomas Opcionales para Kodi:[/B][/COLOR][CR]'
+
+    if xbmc.getCondVisibility('System.HasAddon("resource.language.es_es")'):
+        try:
+            cod_version = xbmcaddon.Addon("resource.language.es_es").getAddonInfo("version").strip()
+            tex_lng = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_lng = '  [COLOR gray]Desactivado[/COLOR]'
+
+    else: tex_lng = '  [COLOR red]No instalado[/COLOR]'
+
+    txt += ' - [COLOR tomato]resource.language.es_es[/COLOR][B]' + tex_lng + '[/B][CR]'
+
+    txt += '[CR][COLOR yellow][B]Skins Opcionales para Kodi:[/B][/COLOR][CR]'
+
+    if xbmc.getCondVisibility('System.HasAddon("skin.confluence")'):
+        try:
+            cod_version = xbmcaddon.Addon("skin.confluence").getAddonInfo("version").strip()
+            tex_skc = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        except:
+            tex_skc = '  [COLOR gray]Desactivado[/COLOR]'
+
+    else: tex_skc = '  [COLOR red]No instalado[/COLOR]'
+
+    txt += ' - [COLOR aquamarine]skin.confluence[/COLOR] [B]' + tex_skc + '[/B][CR]'
+
+    platformtools.dialog_textviewer('Add-Ons Especiales Comunes', txt)
 
 
 def submnu_sistema(item):
@@ -932,7 +1006,7 @@ def submnu_sistema_info(item):
 
         itemlist.append(item.clone( channel='actions',  action='resumen_fix', title= ' - [COLOR darkcyan][B]Resumen[/B][/COLOR] Fix Instalado', thumbnail=config.get_thumb('news') ))
 
-        itemlist.append(item.clone( channel='actions', action='manto_last_fix', title= " - Eliminar fichero control 'Fix'", thumbnail=config.get_thumb('keyboard'), text_color='red' ))
+        itemlist.append(item.clone( channel='actions', action='manto_last_fix', title= ' - [COLOR red][B]Eliminar[/B][/COLOR] fichero control Fix', thumbnail=config.get_thumb('keyboard') ))
 
     itemlist.append(item.clone( channel='helper',  action='show_sets', title= 'Visualizar sus [COLOR chocolate][B]Ajustes[/B][/COLOR] Personalizados', thumbnail=config.get_thumb('folder') ))
 
@@ -948,6 +1022,8 @@ def submnu_logs(item):
     if os.path.exists(os.path.join(config.get_data_path(), 'servers_todo.log')): presentar = True
     elif os.path.exists(os.path.join(config.get_data_path(), 'qualities_todo.log')): presentar = True
     elif os.path.exists(os.path.join(config.get_data_path(), 'proxies.log')): presentar = True
+    elif os.path.exists(os.path.join(config.get_data_path(), 'canales.log')): presentar = True
+    elif os.path.exists(os.path.join(config.get_data_path(), 'servidores.log')): presentar = True
 
     if presentar:
         itemlist.append(item.clone( action='', title='[B]LOGS:[/B]', thumbnail=config.get_thumb('tools'), text_color='limegreen' ))
@@ -967,7 +1043,21 @@ def submnu_logs(item):
 
             itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver', todo = 'proxies.log', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
 
+        if os.path.exists(os.path.join(config.get_data_path(), 'canales.log')) or os.path.exists(os.path.join(config.get_data_path(), 'servidores.log')):
+            itemlist.append(item.clone( action='', title='[B][I]INSATISFACTORIOS:[/I][/B]', text_color='limegreen' ))
+
+            if os.path.exists(os.path.join(config.get_data_path(), 'canales.log')):
+                itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver canales', todo = 'canales.log', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
+
+            if os.path.exists(os.path.join(config.get_data_path(), 'servidores.log')):
+                itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver servidores', todo = 'servidores.log', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
+
         itemlist.append(item.clone( channel='actions', action='manto_temporales', title='Eliminar Todos los LOGS', _logs = True, thumbnail=config.get_thumb('keyboard'), text_color='red' ))
+
+        if config.get_setting('developer_team'):
+            itemlist.append(item.clone( action='', title='[B][I]WEBS/HOST:[/I][/B]', text_color='limegreen' ))
+
+            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver canales', todo = 'webs.log', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
 
     if item.helper: platformtools.itemlist_refresh()
 
@@ -1064,6 +1154,12 @@ def submnu_gestionar(item):
             if os.path.exists(os.path.join(config.get_data_path(), 'developer.sqlite')):
                 itemlist.append(item.clone( channel='developertools', action='mainlist', title=' - [COLOR olive][B]Queries[/B][/COLOR] Canales y Servidores', thumbnail=config.get_thumb('tools') ))
 
+        if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developerwebs.py')):
+            itemlist.append(item.clone( channel='developerwebs', action='mainlist', title=' - [COLOR cyan][B]Webs/Hosts[/B][/COLOR] de los Canales', thumbnail=config.get_thumb('tools') ))
+
+        if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developerrelease.py')):
+            itemlist.append(item.clone( channel='developerrelease', action='mainlist', title=' - [COLOR yellow][B]Release[/B][/COLOR] de la Versión', thumbnail=config.get_thumb('tools') ))
+
     return itemlist
 
 
@@ -1075,7 +1171,7 @@ def submnu_proxies(item):
 
     itemlist.append(item.clone( action='submnu_proxies_info', title='[COLOR green][B]Información[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
-    itemlist.append(item.clone( action='', title='[B][I]TESTS:[/I][/B]', text_color='red' ))
+    itemlist.append(item.clone( action='', title='[B][I]TESTS PROVIDERS:[/I][/B]', text_color='red' ))
 
     itemlist.append(item.clone( action='test_providers', title= ' - [COLOR yellowgreen][B]Tests[/B][/COLOR] Proveedores', thumbnail=config.get_thumb('flame') ))
 
@@ -1152,23 +1248,27 @@ def submnu_canales(item):
         if con_problemas:
             itemlist.append(item.clone( action='resumen_con_problemas', title='Canales [COLOR tomato][B]Con Problemas[/B][/COLOR]' ))
 
-    itemlist.append(item.clone( action='', title='[B][I]TESTS:[/I][/B]', text_color='gold' ))
+    itemlist.append(item.clone( action='', title='[B][I]TEST TODOS:[/I][/B]', text_color='gold' ))
 
     itemlist.append(item.clone( action='test_all_webs', title=' - Posibles [B][COLOR gold]Insatisfactorios[/B][/COLOR]', unsatisfactory = True ))
 
-    itemlist.append(item.clone( action='test_all_webs', title=' - Posibles [COLOR gold]Insatisfactorios[/COLOR] Solo los canales [B][COLOR aquamarine]Sugeridos[/B][/COLOR]', extra='sugeridos', thumbnail=config.get_thumb('suggested'), unsatisfactory = True ))
+    itemlist.append(item.clone( action='test_all_webs', title=' - Excepto los Canales que sean [COLOR turquoise][B]Clones[/B][/COLOR]', extra='no_clones', unsatisfactory = True ))
 
-    itemlist.append(item.clone( action='test_all_webs', title=' - Posibles [COLOR gold]Insatisfactorios[/COLOR] Solo los canales que sean [B][COLOR turquoise]Clones[/B][/COLOR]', extra='clones', unsatisfactory = True  ))
+    itemlist.append(item.clone( action='test_all_webs', title=' - Canales [COLOR darkcyan][B]Activos[/B][/COLOR]' ))
 
-    itemlist.append(item.clone( action='test_all_webs', title=' - Posibles [COLOR gold]Insatisfactorios[/COLOR] Excepto los canales que sean [B][COLOR turquoise]Clones[/B][/COLOR]', extra='no_clones', unsatisfactory = True ))
+    itemlist.append(item.clone( action='', title='[B][I]TEST SELECTIVOS:[/I][/B]', text_color='gold' ))
 
-    itemlist.append(item.clone( action='test_alfabetico', title=' - Posibles [COLOR gold]Insatisfactorios[/COLOR] desde un Canal [B][COLOR powderblue]Letra inicial[/B][/COLOR]', unsatisfactory = True ))
+    itemlist.append(item.clone( action='test_all_webs', title=' - Solo los Canales [COLOR aquamarine][B]Sugeridos[/B][/COLOR]', extra='sugeridos', thumbnail=config.get_thumb('suggested'), unsatisfactory = True ))
 
-    itemlist.append(item.clone( action='test_all_webs', title=' - Todos los Canales [COLOR darkcyan][B]Activos[/B][/COLOR]' ))
+    itemlist.append(item.clone( action='test_all_webs', title=' - Solo los Canales que sean [COLOR paleturquoise][B]Principales[/B][/COLOR] con [COLOR turquoise][B]Clones[/B][/COLOR]', extra='clons', unsatisfactory = True  ))
 
-    itemlist.append(item.clone( action='test_one_channel', title=' - Un canal Concreto' ))
+    itemlist.append(item.clone( action='test_all_webs', title=' - Solo los Canales que sean [COLOR turquoise][B]Clones[/B][/COLOR]', extra='clones', unsatisfactory = True  ))
 
-    itemlist.append(item.clone( action='test_one_channel', title= ' - Canales Temporalmente [B][COLOR springgreen]Inactivos[/B][/COLOR]', temp_no_active = True ))
+    itemlist.append(item.clone( action='test_alfabetico', title=' - Desde un Canal [COLOR powderblue][B]Letra Inicial[/B][/COLOR]', unsatisfactory = True ))
+
+    itemlist.append(item.clone( action='test_one_channel', title=' - Un Canal Concreto' ))
+
+    itemlist.append(item.clone( action='test_one_channel', title= ' - Canales Temporalmente [COLOR springgreen][B]Inactivos[/B][/COLOR]', temp_no_active = True ))
 
     return itemlist
 
@@ -1227,19 +1327,21 @@ def submnu_servidores(item):
 
     itemlist.append(item.clone( action='resumen_servidores', title='[COLOR fuchsia]Resúmenes y Distribución[/COLOR]' ))
 
-    itemlist.append(item.clone( action='', title='[B][I]TESTS:[/I][/B]', text_color='fuchsia' ))
-
     if txt_status:
         if srv_pending:
             itemlist.append(item.clone( action='resumen_pending', title=' - [COLOR tan][B]Con Incidencias[/B][/COLOR]' ))
 
-    itemlist.append(item.clone( action='test_all_srvs', title=' - Posibles [B][COLOR fuchsia]Insatisfactorios[/B][/COLOR]', unsatisfactory = True ))
+    itemlist.append(item.clone( action='', title='[B][I]TEST TODOS:[/I][/B]', text_color='fuchsia' ))
 
-    itemlist.append(item.clone( action='test_alfabetico', title=' - Posibles [COLOR fuchsia]Insatisfactorios[/COLOR] desde un Servidor [B][COLOR powderblue]Letra inicial[/B][/COLOR]', unsatisfactory = True ))
+    itemlist.append(item.clone( action='test_all_srvs', title=' - Posibles [COLOR fuchsia][B]Insatisfactorios[/B][/COLOR]', unsatisfactory = True ))
 
-    itemlist.append(item.clone( action='test_all_srvs', title=' - Todos los Servidores [COLOR darkcyan][B]Activos[/B][/COLOR]' ))
+    itemlist.append(item.clone( action='test_all_srvs', title=' - Servidores [COLOR darkcyan][B]Activos[/B][/COLOR]' ))
 
-    itemlist.append(item.clone( action='test_one_server', title=' - Un servidor Concreto' ))
+    itemlist.append(item.clone( action='', title='[B][I]TEST SELECTIVOS:[/I][/B]', text_color='fuchsia' ))
+
+    itemlist.append(item.clone( action='test_alfabetico', title=' - Desde un Servidor [COLOR powderblue][B]Letra Inicial[/B][/COLOR]', unsatisfactory = True ))
+
+    itemlist.append(item.clone( action='test_one_server', title=' - Un Servidor Concreto' ))
 
     return itemlist
 
@@ -1269,26 +1371,31 @@ def submnu_developers(item):
 
     itemlist.append(item.clone( action='', title='[B]DEVELOPERS:[/B]', text_color='firebrick' ))
 
-    itemlist.append(item.clone( channel='helper', action='show_help_notice', title= '[COLOR aqua][B]Comunicado[/B][/COLOR] Oficial de Balandro', thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_notice', title='[COLOR aqua][B]Comunicado[/B][/COLOR] Oficial de Balandro', thumbnail=config.get_thumb('news') ))
 
-    itemlist.append(item.clone( channel='helper', action='show_dev_notes', title= '[COLOR gold][B]Notas[/B][/COLOR] para Developers (desarrolladores)', thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( channel='helper', action='show_dev_notes', title='[COLOR gold][B]Notas[/B][/COLOR] para Developers (desarrolladores)', thumbnail=config.get_thumb('news') ))
 
-    itemlist.append(item.clone( action='copy_dev', title= 'Obtener una Copia del fichero dev-notes.txt', thumbnail=config.get_thumb('folder'), text_color='yellowgreen' ))
+    itemlist.append(item.clone( action='copy_dev', title= 'Obtener Copia del Fihero de [COLOR gold][B]Notas[/B][/COLOR] para Desarrolladores', thumbnail=config.get_thumb('folder'), text_color='yellowgreen' ))
 
-    itemlist.append(item.clone( action='', title= '[COLOR firebrick][B][I]FUENTES:[/I][/B][/COLOR]', folder=False ))
+    itemlist.append(item.clone( action='', title='[COLOR firebrick][B][I]FUENTES:[/I][/B][/COLOR]', folder=False ))
 
-    itemlist.append(item.clone( action='', title= ' - Fuentes [COLOR darkorange][B]github.com/repobal[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
+    itemlist.append(item.clone( action='', title=' - Fuentes [COLOR darkorange][B]github.com/repobal[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
 
-    itemlist.append(item.clone( action='', title= '[COLOR firebrick][B][I]Developers Telegram:[/I][/B][/COLOR]', folder=False ))
+    if config.get_setting('developer_team'):
+        itemlist.append(item.clone( action='', title='[COLOR firebrick][B][I]GESTIONAR:[/I][/B][/COLOR]', folder=False ))
 
-    itemlist.append(item.clone( action='', title= ' - Team ' + _team + ' Equipo de Desarrollo', folder=False, thumbnail=config.get_thumb('telegram') ))
+        itemlist.append(item.clone( action='submnu_gestionar', title= 'Gestiones Varias del Add-On', thumbnail=config.get_thumb('computer'), text_color='palegreen' ))
 
-    itemlist.append(item.clone( action='', title= '[COLOR firebrick][B][I]INCORPORACIONES:[/B][/I][/COLOR]', folder=False ))
+    itemlist.append(item.clone( action='', title='[COLOR firebrick][B][I]Developers Telegram:[/I][/B][/COLOR]', folder=False ))
+
+    itemlist.append(item.clone( action='', title=' - Team ' + _team + ' Equipo de Desarrollo', folder=False, thumbnail=config.get_thumb('telegram') ))
+
+    itemlist.append(item.clone( action='', title='[COLOR firebrick][B][I]INCORPORACIONES:[/B][/I][/COLOR]', folder=False ))
 
     itemlist.append(item.clone( action='', title=' - [COLOR yellow][B][I]Solicitudes solo con Enlace de Invitación[/I][/B][/COLOR]', folder=False, thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(item.clone( action='', title= ' - Foro ' + _foro, thumbnail=config.get_thumb('foro'), folder=False ))
-    itemlist.append(item.clone( action='', title= ' - Telegram ' + _telegram, thumbnail=config.get_thumb('telegram'), folder=False ))
+    itemlist.append(item.clone( action='', title=' - Foro ' + _foro, thumbnail=config.get_thumb('foro'), folder=False ))
+    itemlist.append(item.clone( action='', title=' - Telegram ' + _telegram, thumbnail=config.get_thumb('telegram'), folder=False ))
 
     return itemlist
 
@@ -1611,10 +1718,11 @@ def test_all_webs(item):
         if item.extra == 'sugeridos': text = '¿ Iniciar Test Web Solo de los Canales [B][COLOR aquamarine]Sugeridos[/B][/COLOR] ?'
         elif item.extra == 'clones': text = '¿ Iniciar Test Web Solo de los Canales que sean [B][COLOR turquoise]Clones[/B][/COLOR] ?'
         elif item.extra == 'no_clones': text = '¿ Iniciar Test Web de los Canales Excepto los que sean [B][COLOR turquoise]Clones[/B][/COLOR] ?'
+        elif item.extra == 'clons': text = '¿ Iniciar Test Web Solo de los Canales que sean [B][COLOR paleturquoise]Principales[/B][/COLOR] con Clones ?'
         elif item.unsatisfactory: text = '¿ Iniciar Test Web de los Posibles Canales [B][COLOR gold]Insatisfactorios[/B][/COLOR] ?'
         else: text = '¿ Iniciar Test Web de [B][COLOR gold]TODOS[/B][/COLOR] los Canales ?'
 
-        if not platformtools.dialog_yesno(config.__addon_name, text): return
+        if not platformtools.dialog_yesno(config.__addon_name + ' - Canales', text): return
 
     if item.unsatisfactory: config.set_setting('developer_test_channels', 'unsatisfactory')
 
@@ -1639,6 +1747,8 @@ def test_all_webs(item):
             if not 'clone' in ch['clusters']: continue
         elif item.extra == 'no_clones':
             if 'clone' in ch['clusters']: continue
+        elif item.extra == 'clons':
+            if not 'clons' in ch['clusters']: continue
 
         if config.get_setting('mnu_simple', default=False):
             if 'enlaces torrent exclusivamente' in ch['notes']: continue
@@ -1702,12 +1812,45 @@ def test_all_webs(item):
                             if ' con proxies ' in str(txt):
                                 platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado Buscando Nuevos Proxies.[/B][/COLOR]')
                                 tests_all_webs.append(ch['name'] + '  Sin Nuevos Proxies')
+                                continue
                         else:
                             rememorize = True
 
                 elif 'Sin proxies' in str(txt):
                     if 'CloudFlare Human Verify' in txt:
-                        tests_all_webs.append(ch['name'] + ' CloudFlare Human Verify')
+                        tests_all_webs.append(ch['name'] + '  CloudFlare Human Verify')
+                        continue
+
+                    elif '[CR]robot: [COLOR indianred][B]CloudFlare[/B][/COLOR]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Robot Protection')
+                        continue
+
+                    elif '[B]Host error NO responde[/B]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Sin Respuesta del Host')
+                        continue
+
+                    elif '[B]No se puede acceder a este sitio web.[/B]' in txt:
+                        tests_all_webs.append(ch['name'] + '  No se Puede acceder al sitio Web')
+                        continue
+
+                    elif '[B]La Cuenta está Suspendida.[/B]' in txt or '[B]Suspendida[/B]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Cuenta Suspendida')
+                        continue
+
+                    elif '[B]Dominio Expirado[/B]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Dominio Expirado')
+                        continue
+
+                    elif '[B]Copyright infringement[/B]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Copyright infringement')
+                        continue
+
+                    elif 'sucess: [COLOR red][B]False[/B]' in txt or '[CR]length: 0[CR]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Acceso Sin datos')
+                        continue
+
+                    elif '[I]El test del Canal NO ha resultado Satisfactorio.[/I]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Resultado Insatisfactorio')
                         continue
 
                     if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR chartreuse][B]Quizás necesite Proxies.[/B][/COLOR] ¿ Desea Iniciar la Búsqueda de Proxies en el Canal ?'):
@@ -1723,6 +1866,7 @@ def test_all_webs(item):
                             if 'Sin proxies' in str(txt):
                                 platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado Buscando Nuevos Proxies.[/B][/COLOR]')
                                 tests_all_webs.append(ch['name'] + '  Sin Nuevos Proxies')
+                                continue
                         else:
                             rememorize = True
 
@@ -1740,6 +1884,7 @@ def test_all_webs(item):
                                 if 'invalid:' in str(txt):
                                     platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado el Acceso sin Host Válido en los datos.[/B][/COLOR]')
                                     tests_all_webs.append(ch['name'] + '  Acceso Sin Host Valido')
+                                    continue
 
             elif 'Falso Positivo.' in str(txt):
                 platformtools.dialog_textviewer(ch['name'], txt)
@@ -1758,12 +1903,45 @@ def test_all_webs(item):
                             if ' con proxies ' in str(txt):
                                 platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado Buscando Nuevos Proxies.[/B][/COLOR]')
                                 tests_all_webs.append(ch['name'] + '  Sin Solucion Buscando Nuevos Proxies')
+                                continue
                         else:
                             rememorize = True
 
                 elif 'Sin proxies' in str(txt):
                     if 'CloudFlare Human Verify' in txt:
-                        tests_all_webs.append(ch['name'] + ' CloudFlare Human Verify')
+                        tests_all_webs.append(ch['name'] + '  CloudFlare Human Verify')
+                        continue
+
+                    elif '[CR]robot: [COLOR indianred][B]CloudFlare[/B][/COLOR]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Robot Protection')
+                        continue
+
+                    elif '[B]Host error NO responde[/B]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Sin Respuesta del Host')
+                        continue
+
+                    elif '[B]No se puede acceder a este sitio web.[/B]' in txt:
+                        tests_all_webs.append(ch['name'] + '  No se Puede acceder al sitio Web')
+                        continue
+
+                    elif '[B]La Cuenta está Suspendida.[/B]' in txt or '[B]Suspendida[/B]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Cuenta Suspendida')
+                        continue
+
+                    elif '[B]Dominio Expirado[/B]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Dominio Expirado')
+                        continue
+
+                    elif '[B]Copyright infringement[/B]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Copyright infringement')
+                        continue
+
+                    elif 'sucess: [COLOR red][B]False[/B]' in txt or '[CR]length: 0[CR]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Acceso Sin datos')
+                        continue
+
+                    elif '[I]El test del Canal NO ha resultado Satisfactorio.[/I]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Resultado Insatisfactorio')
                         continue
 
                     if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR chartreuse][B]Quizás necesite Proxies.[/B][/COLOR] ¿ Desea Iniciar la Búsqueda de Proxies en el Canal ?'):
@@ -1779,6 +1957,7 @@ def test_all_webs(item):
                             if 'Sin proxies' in str(txt):
                                 platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado Buscando Nuevos Proxies.[/B][/COLOR]')
                                 tests_all_webs.append(ch['name'] + '  Sin Solucion Buscando Nuevos Proxies')
+                                continue
                         else:
                             rememorize = True
 
@@ -1832,6 +2011,7 @@ def test_all_webs(item):
                             if 'Falso Positivo.' in str(txt):
                                 platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado el Falso Positivo.[/B][/COLOR]')
                                 tests_all_webs.append(ch['name'] + '  Sin Solucion Falso Positivo')
+                                continue
 
             if ' al parecer No se necesitan' in str(txt):
                 if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]¿ Desea Quitar los Proxies del Canal ?[/B][/COLOR], porqué parece que NO se necesitan.'):
@@ -1856,124 +2036,191 @@ def test_all_webs(item):
                                 config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
 
         else:
-           if 'CloudFlare Human Verify' in txt:
-               tests_all_webs.append(ch['name'] + ' CloudFlare Human Verify')
-               continue
 
-           elif 'code: [COLOR [COLOR orangered][B]301' in str(txt) or 'code: [COLOR [COLOR orangered][B]308' in str(txt):
-               tests_all_webs.append(ch['name'] + '  Codigo Respuesta 301 o 308')
-               continue
+            if 'CloudFlare Human Verify' in txt:
+                tests_all_webs.append(ch['name'] + '  CloudFlare Human Verify')
+                continue
 
-           elif 'code: [COLOR [COLOR orangered][B]302' in str(txt) or 'code: [COLOR [COLOR orangered][B]307' in str(txt):
-               tests_all_webs.append(ch['name'] + '  Codigo Respuesta 302 o 307')
-               continue
+            elif '[CR]robot: [COLOR indianred][B]CloudFlare[/B][/COLOR]' in txt:
+                tests_all_webs.append(ch['name'] + '  Robot Protection')
+                continue
 
-           elif '[B]Unknow[/B]' in str(txt):
-               tests_all_webs.append(ch['name'] + '  Error Desconocido Comprobar')
-               continue
+            elif '[B]Host error NO responde[/B]' in txt:
+                tests_all_webs.append(ch['name'] + '  Sin Respuesta del Host')
+                continue
 
-           elif 'Podría estar Correcto' in str(txt):
-               tests_all_webs.append(ch['name'] + '  Podria Estar Correcto')
-               continue
+            elif '[B]No se puede acceder a este sitio web.[/B]' in txt:
+                tests_all_webs.append(ch['name'] + '  No se Puede acceder al sitio Web')
+                continue
 
-           if txt_status:
-               if con_incidencias:
-                   host_incid = ch['name']
+            elif '[B]La Cuenta está Suspendida.[/B]' in txt or '[B]Suspendida[/B]' in txt:
+                tests_all_webs.append(ch['name'] + '  Cuenta Suspendida')
+                continue
 
-                   if host_incid in str(con_incidencias):
-                       incidencia = ''
+            elif '[B]Dominio Expirado[/B]' in txt:
+                tests_all_webs.append(ch['name'] + '  Dominio Expirado')
+                continue
 
-                       incids = scrapertools.find_multiple_matches(str(con_incidencias), '[COLOR moccasin](.*?)[/B][/COLOR]')
+            elif '[B]Copyright infringement[/B]' in txt:
+                tests_all_webs.append(ch['name'] + '  Copyright infringement')
+                continue
 
-                       for incid in incids:
-                           if not ' ' + host_incid + ' ' in str(incid): continue
+            elif 'code: [COLOR orangered][B]301' in txt or 'code: [COLOR orangered][B]308' in txt:
+                tests_all_webs.append(ch['name'] + '  Nuevo Dominio Temporal')
+                continue
 
-                           incidencia = incid
-                           break
+            elif 'code: [COLOR orangered][B]302' in txt or 'code: [COLOR orangered][B]307' in txt:
+                tests_all_webs.append(ch['name'] + '  Nuevo Dominio Permanente')
+                continue
 
-                       if incidencia:
-                           tests_all_webs.append(ch['name'] + '  Con Incidencia')
-                           continue
+            elif 'Podría estar Correcto' in txt:
+                tests_all_webs.append(ch['name'] + '  Podria Estar Correcto')
+                continue
 
-               if no_accesibles:
-                   host_incid = ch['name']
+            elif '[B]Unknow[/B]' in txt:
+                tests_all_webs.append(ch['name'] + '  Error Desconocido Comprobar')
+                continue
 
-                   if host_incid in str(no_accesibles):
-                       incidencia = ''
+            elif 'sucess: [COLOR red][B]False[/B]' in txt or '[CR]length: 0[CR]' in txt:
+                tests_all_webs.append(ch['name'] + '  Acceso Sin datos')
+                continue
 
-                       incids = scrapertools.find_multiple_matches(str(no_accesibles), '[COLOR moccasin](.*?)[/B][/COLOR]')
+            elif '[I]El test del Canal NO ha resultado Satisfactorio.[/I]' in txt:
+                tests_all_webs.append(ch['name'] + '  Resultado Insatisfactorio')
+                continue
 
-                       for incid in incids:
+            if txt_status:
+                if con_incidencias:
+                    host_incid = ch['name']
+
+                    if host_incid in str(con_incidencias):
+                        incidencia = ''
+
+                        incids = scrapertools.find_multiple_matches(str(con_incidencias), '[COLOR moccasin](.*?)[/B][/COLOR]')
+
+                        for incid in incids:
                             if not ' ' + host_incid + ' ' in str(incid): continue
 
                             incidencia = incid
                             break
 
-                       if incidencia:
-                           tests_all_webs.append(ch['name'] + '  No Accesible')
-                           continue
-
-               if con_problemas:
-                   host_incid = ch['name']
-
-                   if host_incid in str(con_problemas):
-                       incidencia = ''
-
-                       incids = scrapertools.find_multiple_matches(str(con_problemas), '[COLOR moccasin](.*?)[/B][/COLOR]')
-
-                       for incid in incids:
-                            if not ' ' + host_incid + ' ' in str(incid): continue
-
-                            incidencia = incid
-                            break
-
-                       if incidencia:
-                           tests_all_webs.append(ch['name'] + '  Con Problema')
-                           continue
-
-           if 'nuevo:' in txt:
-               tests_all_webs.append(ch['name'] + '  Nuevo Dominio Verificar')
-           else:
-               if ' con proxies ' in str(txt):
-                   if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]¿ Desea Iniciar una nueva Búsqueda de Proxies en el Canal ?[/B][/COLOR]'):
-                       _proxies(item, ch['id'])
-
-                       try: txt = tester.test_channel(ch['name'])
-                       except:
-                            platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[B][COLOR %s]Error comprobación, Canal Ignorado[/B][/COLOR]' % color_alert)
-                            tests_all_webs.append(ch['name'] + '  Error Comprobacion Iniciar Nueva Busqueda de Proxies')
+                        if incidencia:
+                            tests_all_webs.append(ch['name'] + '  Con Incidencia')
                             continue
 
-                       if not 'code: [COLOR springgreen][B]200' in str(txt):
-                           if ' con proxies ' in str(txt):
-                               platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado Buscando Nuevos Proxies.[/B][/COLOR]')
-                               tests_all_webs.append(ch['name'] + '  Sin Solucion Buscando Nuevos Proxies')
-                       else:
-                           rememorize = True
+                if no_accesibles:
+                    host_incid = ch['name']
 
-               elif 'Sin proxies' in str(txt):
-                   if 'CloudFlare Human Verify' in txt:
-                       tests_all_webs.append(ch['name'] + ' CloudFlare Human Verify')
-                       continue
+                    if host_incid in str(no_accesibles):
+                        incidencia = ''
 
-                   if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR chartreuse][B]Quizás necesite Proxies.[/B][/COLOR] ¿ Desea Iniciar la Búsqueda de Proxies en el Canal ?'):
-                       _proxies(item, ch['id'])
+                        incids = scrapertools.find_multiple_matches(str(no_accesibles), '[COLOR moccasin](.*?)[/B][/COLOR]')
 
-                       try: txt = tester.test_channel(ch['name'])
-                       except:
-                            platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[B][COLOR %s]Error comprobación, Canal Ignorado[/B][/COLOR]' % color_alert)
-                            tests_all_webs.append(ch['name'] + '  Error Comprobacion Quizas Necesite Proxies')
+                        for incid in incids:
+                             if not ' ' + host_incid + ' ' in str(incid): continue
+
+                             incidencia = incid
+                             break
+
+                        if incidencia:
+                            tests_all_webs.append(ch['name'] + '  No Accesible')
                             continue
 
-                       if not 'code: [COLOR springgreen][B]200' in str(txt):
-                           if 'Sin proxies' in str(txt):
-                               platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado Buscando Nuevos Proxies.[/B][/COLOR]')
-                               tests_all_webs.append(ch['name'] + '  Sin Solucion Buscando Nuevos Proxies')
-                       else:
-                           rememorize = True
+                if con_problemas:
+                    host_incid = ch['name']
 
-               else:
-                   tests_all_webs.append(ch['name'] + '  Verificar Canal')
+                    if host_incid in str(con_problemas):
+                        incidencia = ''
+
+                        incids = scrapertools.find_multiple_matches(str(con_problemas), '[COLOR moccasin](.*?)[/B][/COLOR]')
+
+                        for incid in incids:
+                             if not ' ' + host_incid + ' ' in str(incid): continue
+
+                             incidencia = incid
+                             break
+
+                        if incidencia:
+                            tests_all_webs.append(ch['name'] + '  Con Problema')
+                            continue
+
+            if 'nuevo:' in txt:
+                tests_all_webs.append(ch['name'] + '  Nuevo Dominio Verificar')
+            else:
+                if ' con proxies ' in str(txt):
+                    if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]¿ Desea Iniciar una nueva Búsqueda de Proxies en el Canal ?[/B][/COLOR]'):
+                        _proxies(item, ch['id'])
+
+                        try: txt = tester.test_channel(ch['name'])
+                        except:
+                             platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[B][COLOR  %s]Error comprobación, Canal Ignorado[/B][/COLOR]' % color_alert)
+                             tests_all_webs.append(ch['name'] + '  Error Comprobacion Iniciar Nueva Busqueda de Proxies')
+                             continue
+
+                        if not 'code: [COLOR springgreen][B]200' in str(txt):
+                            if ' con proxies ' in str(txt):
+                                platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha  solucionado Buscando Nuevos Proxies.[/B][/COLOR]')
+                                tests_all_webs.append(ch['name'] + '  Sin Solucion Buscando Nuevos Proxies')
+                                continue
+                        else:
+                            rememorize = True
+
+                elif 'Sin proxies' in str(txt):
+                    if 'CloudFlare Human Verify' in txt:
+                        tests_all_webs.append(ch['name'] + '  CloudFlare Human Verify')
+                        continue
+
+                    elif '[CR]robot: [COLOR indianred][B]CloudFlare[/B][/COLOR]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Robot Protection')
+                        continue
+
+                    elif '[B]Host error NO responde[/B]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Sin Respuesta del Host')
+                        continue
+
+                    elif '[B]No se puede acceder a este sitio web.[/B]' in txt:
+                        tests_all_webs.append(ch['name'] + '  No se Puede acceder al sitio Web')
+                        continue
+
+                    elif '[B]La Cuenta está Suspendida.[/B]' in txt or '[B]Suspendida[/B]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Cuenta Suspendida')
+                        continue
+
+                    elif '[B]Dominio Expirado[/B]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Dominio Expirado')
+                        continue
+
+                    elif '[B]Copyright infringement[/B]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Copyright infringement')
+                        continue
+
+                    elif 'sucess: [COLOR red][B]False[/B]' in txt or '[CR]length: 0[CR]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Acceso Sin datos')
+                        continue
+
+                    elif '[I]El test del Canal NO ha resultado Satisfactorio.[/I]' in txt:
+                        tests_all_webs.append(ch['name'] + '  Resultado Insatisfactorio')
+                        continue
+
+                    if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR chartreuse][B]Quizás necesite Proxies.[/B][/COLOR] ¿ Desea Iniciar la Búsqueda de Proxies en el Canal ?'):
+                        _proxies(item, ch['id'])
+
+                        try: txt = tester.test_channel(ch['name'])
+                        except:
+                             platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B] ' + ch['name'] + '[/COLOR][/B]', '[B][COLOR %s]Error comprobación, Canal Ignorado[/B][/COLOR]' % color_alert)
+                             tests_all_webs.append(ch['name'] + '  Error Comprobacion Quizas Necesite Proxies')
+                             continue
+
+                        if not 'code: [COLOR springgreen][B]200' in str(txt):
+                            if 'Sin proxies' in str(txt):
+                                platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado Buscando Nuevos Proxies.[/B][/COLOR]')
+                                tests_all_webs.append(ch['name'] + '  Sin Solucion Buscando Nuevos Proxies')
+                                continue
+                        else:
+                            rememorize = True
+
+                else:
+                    tests_all_webs.append(ch['name'] + '  Verificar Canal')
 
         if rememorize:
             proxies = config.get_setting('proxies', ch['id'], default='').strip()
@@ -2055,7 +2302,7 @@ def test_all_srvs(item):
         if item.unsatisfactory: text = '¿ Iniciar Test Web de los Posibles Servidores [B][COLOR fuchsia]Insatisfactorios[/B][/COLOR] ?'
         else: text = '¿ Iniciar Test Web de [B][COLOR fuchsia]TODOS[/B][/COLOR] los Servidores ?'
 
-        if not platformtools.dialog_yesno(config.__addon_name, text): return
+        if not platformtools.dialog_yesno(config.__addon_name + ' - Servidores', text): return
 
     if item.unsatisfactory: config.set_setting('developer_test_servers', 'unsatisfactory')
 
@@ -2114,10 +2361,10 @@ def test_all_srvs(item):
                 try: txt = tester.test_server(dict_server['name'])
                 except:
                      platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B]' + dict_server['name'] + '[/B][/COLOR]', '[B][COLOR %s]Error comprobación, Servidor ignorado[/B][/COLOR]' % color_alert)
-                     tests_all_srvs.append(dict_server['name'])
+                     tests_all_srvs.append(dict_server['name'] + '  Error Comprobacion Servidor')
                      continue
             else:
-                tests_all_srvs.append(dict_server['name'])
+                tests_all_srvs.append(dict_server['name'] + '  Error Servidor Ignorado')
                 continue
 
         if txt_status:
@@ -2136,13 +2383,61 @@ def test_all_srvs(item):
                          break
 
                     if incidencia:
-                        tests_all_srvs.append(dict_server['name'])
+                        tests_all_srvs.append(dict_server['name'] + '  Con Incidencia')
                         continue
 
         if not txt: continue
 
         if not 'code: [COLOR springgreen][B]200' in str(txt):
-            tests_all_srvs.append(dict_server['name'])
+            if '[B]Copyright infringement[/B]' in txt:
+                tests_all_srvs.append(dict_server['name'] + '  Copyright infringement')
+                continue
+
+            elif 'nuevo:' in txt:
+                tests_all_srvs.append(dict_server['name'] + '  Nuevo Dominio Verificar')
+                continue
+
+            elif '[B]Cloudflare[/B][/COLOR][COLOR red][B] Protection[/B]' in txt:
+                tests_all_srvs.append(dict_server['name'] + '  CloudFlare Protection')
+                continue
+
+            elif '[B]Host error NO responde[/B]' in txt:
+                tests_all_srvs.append(dict_server['name'] + '  Sin Respuesta del Host')
+                continue
+
+            elif '[B]No se puede acceder a este sitio web.[/B]' in txt:
+                tests_all_srvs.append(dict_server['name'] + '  No se Puede acceder al sitio Web')
+                continue
+
+            elif '[B]Dominio Expirado[/B]' in txt:
+                tests_all_srvs.append(dict_server['name'] + '  Dominio Expirado')
+                continue
+
+            elif 'code: [COLOR orangered][B]301' in txt or 'code: [COLOR orangered][B]308' in txt:
+                tests_all_srvs.append(dict_server['name'] + '  Nuevo Dominio Temporal')
+                continue
+
+            elif 'Podría estar Correcto' in txt:
+                tests_all_srvs.append(dict_server['name'] + '  Podria Estar Correcto')
+                continue
+
+            elif 'code: [COLOR orangered][B]302' in txt or 'code: [COLOR orangered][B]307' in txt:
+                tests_all_srvs.append(dict_server['name'] + '  Nuevo Dominio Permanente')
+                continue
+
+            elif '[B]Unknow[/B]' in txt:
+                tests_all_srvs.append(dict_server['name'] + '  Error Desconocido Comprobar')
+                continue
+
+            elif 'sucess: [COLOR red][B]False[/B]' in txt or '[CR]length: 0[CR]' in txt:
+                tests_all_srvs.append(dict_server['name'] + '  Acceso Sin datos')
+                continue
+
+            elif '[I]El test del Servidor NO ha resultado Satisfactorio.[/I]' in txt:
+                tests_all_srvs.append(dict_server['name'] + '  Resultado Insatisfactorio')
+                continue
+
+            tests_all_srvs.append(dict_server['name'] + '  Error Servidor')
 
     if i == 0:
         platformtools.dialog_ok(config.__addon_name, 'Sin Servidores Testeados')
@@ -2197,7 +2492,7 @@ def show_addons(item):
         addons = addons.replace('script', '[COLOR orange]script[/COLOR]')
         addons = addons.replace('skin', '[COLOR aquamarine]skin[/COLOR]')
         addons = addons.replace('service', '[COLOR violet]service[/COLOR]')
-        addons = addons.replace('resource', '[COLOR magenta]resource[/COLOR]')
+        addons = addons.replace('resource', '[COLOR tomato]resource[/COLOR]')
 
         addons = addons.replace('inputstream', '[COLOR fuchsia]inputstream[/COLOR]')
         addons = addons.replace('resolveurl', '[COLOR fuchsia]resolveurl[/COLOR]')
@@ -2233,17 +2528,19 @@ def show_help_addons(item):
            except:
                tex_tor += '  [COLOR gray]Desactivado[/COLOR]'
 
+       else: tex_tor += '  [COLOR red]No instalado[/COLOR]'
+
     txt += ' - Cliente/Motor Torrent ' + '[COLOR fuchsia][B] ' + tex_tor + '[/B][/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("script.elementum.burst")'):
         try:
             cod_version = xbmcaddon.Addon("script.elementum.burst").getAddonInfo("version").strip()
-            tex_tor = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            tex_bur = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
         except:
-            tex_tor = '  [COLOR gray]Desactivado[/COLOR]'
-    else: tex_tor = '  [COLOR red]No instalado[/COLOR]'
+            tex_bur = '  [COLOR gray]Desactivado[/COLOR]'
+    else: tex_bur = '  [COLOR red]No instalado[/COLOR]'
 
-    txt += ' - [COLOR fuchsia][B]Elementum Burst[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_tor + '[/B][/COLOR][CR]'
+    txt += ' - [COLOR fuchsia][B]Elementum Burst[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_bur + '[/B][/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("inputstream.adaptive")'):
         try:
@@ -2338,17 +2635,19 @@ def show_help_torrents(item):
            except:
                tex_tor += '  [COLOR gray]Desactivado[/COLOR]'
 
+       else: tex_tor += '  [COLOR red]No instalado[/COLOR]'
+
     txt += ' - Cliente/Motor Torrent ' + '[COLOR fuchsia][B] ' + tex_tor + '[/B][/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("script.elementum.burst")'):
         try:
             cod_version = xbmcaddon.Addon("script.elementum.burst").getAddonInfo("version").strip()
-            tex_tor = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            tex_bur = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
         except:
-            tex_tor = '  [COLOR gray]Desactivado[/COLOR]'
-    else: tex_tor = '  [COLOR red]No instalado[/COLOR]'
+            tex_bur = '  [COLOR gray]Desactivado[/COLOR]'
+    else: tex_bur = '  [COLOR red]No instalado[/COLOR]'
 
-    txt += ' - [COLOR fuchsia][B]Elementum Burst[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_tor + '[/B][/COLOR][CR]'
+    txt += ' - [COLOR fuchsia][B]Elementum Burst[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_bur + '[/B][/COLOR][CR]'
 
     if not PY3:
         if xbmc.getCondVisibility('System.HasAddon("repository.elementum")'):
@@ -2393,6 +2692,8 @@ def show_help_players(item):
                    tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
                except:
                    tex_tor += '  [COLOR gray]Desactivado[/COLOR]'
+
+           else: tex_tor += '  [COLOR red]No instalado[/COLOR]'
 
         txt += ' - Cliente/Motor Torrent asignado ' + '[COLOR fuchsia][B] ' + tex_tor + '[/B][/COLOR][CR]'
 
@@ -2468,7 +2769,7 @@ def show_help_players(item):
 
         txt += ' - [COLOR cyan][B]Repository Elementum[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
 
-    platformtools.dialog_textviewer('Información Add-Ons y Repositorios Players', txt)
+    platformtools.dialog_textviewer('Información Add-Ons Players y Repositorios Externos', txt)
 
 
 def show_sistema(item):
@@ -2968,7 +3269,7 @@ def resumen_canales(item):
     txt += '           ' + str(activos) + ' [COLOR cyan][B]Activos[/B][/COLOR][CR]'
 
     if not inactives == 0:
-        txt += '           ' + str(inactives) + ' [COLOR palevioletred][B]Inactivos[/B][/COLOR][CR]'
+        txt += '             ' + str(inactives) + ' [COLOR palevioletred][B]Inactivos[/B][/COLOR][CR]'
 
         if not cerrados == 0: txt += '                   [COLOR darkred][B]Cerrados[/B][/COLOR] ' + str(cerrados) + '[CR]'
         if not anulados == 0: txt += '                   [COLOR darkviolet][B]Anulados[/B][/COLOR] ' + str(anulados) + '[CR]'
@@ -3075,7 +3376,7 @@ def resumen_canales(item):
     else:
         if config.get_setting('mnu_pelis', default=True):txt += '[CR]  ' + str(peliculas) + ' [COLOR deepskyblue][B]Películas[/B][/COLOR][CR]' 
 
-        if config.get_setting('mnu_series', default=True): txt += '  ' + str(series) + ' [COLOR hotpink][B]Series[/B][/COLOR][CR]'
+        if config.get_setting('mnu_series', default=True): txt += '    ' + str(series) + ' [COLOR hotpink][B]Series[/B][/COLOR][CR]'
 
         if config.get_setting('channels_link_pyse', default=False): txt += '    ' + str(pelisyseries) + ' [COLOR teal][B]Películas y Series[/B][/COLOR][CR]'
 
@@ -3086,7 +3387,7 @@ def resumen_canales(item):
         if config.get_setting('mnu_infantiles', default=True):
             if not infantiles == 0: txt += '      ' + str(infantiles) + '  [COLOR lightyellow][B]Infantiles[/B][/COLOR][CR]'
 
-        if config.get_setting('mnu_novelas', default=True): txt += '    ' + str(tales) + '  [COLOR limegreen][B]Novelas[/B][/COLOR][CR]'
+        if config.get_setting('mnu_novelas', default=True): txt += '      ' + str(tales) + '  [COLOR limegreen][B]Novelas[/B][/COLOR][CR]'
 
         if not bibles == 0: txt += '      ' + str(bibles) + '  [COLOR tan][B]Bíblicos[/B][/COLOR][CR]'
 
@@ -3125,9 +3426,9 @@ def resumen_canales(item):
 
     if config.get_setting('mnu_pelis', default=True): txt += '[CR]  ' + str(bus_pelis) + ' [COLOR deepskyblue][B]Películas[/B][/COLOR][CR]'
 
-    if config.get_setting('mnu_series', default=True): txt += '  ' + str(bus_series) + ' [COLOR hotpink][B]Series[/B][/COLOR][CR]'
+    if config.get_setting('mnu_series', default=True): txt += '    ' + str(bus_series) + ' [COLOR hotpink][B]Series[/B][/COLOR][CR]'
 
-    if config.get_setting('mnu_documentales', default=True): txt += '[CR]  ' + str(bus_tematica_documentales) + ' [COLOR cyan][B]Documentales[/B][/COLOR][CR]'
+    if config.get_setting('mnu_documentales', default=True): txt += '[CR]    ' + str(bus_tematica_documentales) + ' [COLOR cyan][B]Documentales[/B][/COLOR][CR]'
 
     if config.get_setting('mnu_torrents', default=True): txt += '    ' + str(torrents) + ' [COLOR blue][B]Torrents[/B][/COLOR][CR]'
 
@@ -3314,6 +3615,8 @@ def resumen_servidores(item):
                    aditionals += 1
                except:
                    tex_tor += '  [COLOR gray]Desactivado[/COLOR]'
+
+           else: tex_tor += '  [COLOR red]No instalado[/COLOR]'
 
         if not cliente_torrent == 'Ninguno':
             txt += '[CR]  [COLOR goldenrod][B]Torrents:[/B][/COLOR][CR]'

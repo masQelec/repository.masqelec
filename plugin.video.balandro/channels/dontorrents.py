@@ -18,10 +18,10 @@ from lib import decrypters
 host = 'https://4144-don.mirror.pm/'
 
 
-# ~ 1/2/26 last domain  'https://dontorrent.promo/'
+# ~ 6/4/26 last domain  'https://dontorrent.reisen/'
 
 # ~ Web Search
-web_search_dontorrent = 'https://dontorrent.promo/'
+web_search_dontorrent = 'https://dontorrent.reisen'
 
 # ~ Alternative Webs Findvideos
 alt_find_divxatope = 'https://divxatope.net/'
@@ -112,7 +112,8 @@ ant_hosts =  [
              'https://dontorrent.phd/', 'https://dontorrent.gripe/', 'https://dontorrent.sarl/',
              'https://dontorrent.club/',
              # ~ 2026
-             'https://dontorrent.prof/', 'https://dontorrent.info/']
+             'https://dontorrent.prof/', 'https://dontorrent.info/', 'https://dontorrent.promo/',
+             'https://dontorrent.photos/', 'https://dontorrent.cfd/', 'https://dontorrent.pink/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')
@@ -898,6 +899,16 @@ def list_search(item):
     post = {'valor': item.tex, 'Buscar': 'Buscar', 'p': str(item.page)}
 
     data = do_downloadpage(item.url, post = post, headers = headers)
+
+    new_web_search_dontorrent = scrapertools.find_single_match(data, '<meta property="og:url" content="(.*?)"')
+
+    if new_web_search_dontorrent:
+        if not new_web_search_dontorrent == web_search_dontorrent:
+            headers = {'Referer': new_web_search_dontorrent}
+
+            post = {'valor': item.tex, 'Buscar': 'Buscar', 'p': str(item.page)}
+
+            data = do_downloadpage(new_web_search_dontorrent, post = post, headers = headers)
 
     bloque = scrapertools.find_single_match(data, '>Resultados<(.*?)</nav>')
 

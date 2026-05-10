@@ -58,14 +58,15 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<div class="list-videos">(.*?)<style>')
+    bloque = scrapertools.find_single_match(data, 'id="list_videos_videos_list_search_result_items">(.*?)<div class="partners">')
+    if not bloque: bloque = scrapertools.find_single_match(data, 'id="list_videos_common_videos_list_items">(.*?)<div class="partners">')
 
-    patron = '<div class="item">.*?<a href="(.*?)".*?title="(.*?)".*?data-original="(.*?)"(.*?)</div></a>'
+    patron = '<div class="thumb item.*?<a href="(.*?)".*?title="(.*?)".*?data-original="(.*?)"(.*?)</span></a>'
 
     matches = scrapertools.find_multiple_matches(bloque, patron)
 
     for url, title, thumb, resto in matches:
-        duration = scrapertools.find_single_match(resto, '<div class="duration">(.*?)</div>').strip()
+        duration = scrapertools.find_single_match(resto, '<span class="thumb__info-item">(.*?)</span>').strip()
 
         titulo = "[COLOR tan]%s[/COLOR] %s" % (duration, title)
 
@@ -150,12 +151,12 @@ def listas(item):
     elif '/categories/' in item.url: text_color = 'violet'
     else: text_color = 'orange'
 
-    bloque = scrapertools.find_single_match(data, '<div class="main-container">(.*?)</html>')
-    if not bloque: bloque = scrapertools.find_single_match(data, '<div class="box models-list">(.*?)</html>')
+    bloque = scrapertools.find_single_match(data, 'id="list_categories_categories_list_items">(.*?)</html>')
+    if not bloque: bloque = scrapertools.find_single_match(data, 'id="list_models_models_list_items">(.*?)</html>')
 
-    if '/tags' in item.url: bloque = scrapertools.find_single_match(data, '<ul class="item">(.*?)<style>')
+    if '/tags' in item.url: bloque = scrapertools.find_single_match(data, '<ul class="item">(.*?)</html>')
 
-    patron = '<a class="item".*?href="([^"]+)".*?title="([^"]+)".*?src="([^"]+)"'
+    patron = '<a class="item thumb.*?href="(.*?)".*?title="(.*?)".*?src="(.*?)"'
 
     if '/tags/' in item.url: patron = '<a href="(.*?)".*?">(.*?)</a>(.*?)</li>'
 
@@ -241,7 +242,7 @@ def findvideos(item):
 
         item.contentTitle = ' '.join(lista)
 
-    itemlist.append(Item( channel = item.channel, action='play', title='', server = 'ktp', url = item.url, language = 'Vo') )
+    itemlist.append(Item( channel = item.channel, action='play', title='', server = 'ktp', url = item.url, language = 'Vo' ))
 
     return itemlist
 

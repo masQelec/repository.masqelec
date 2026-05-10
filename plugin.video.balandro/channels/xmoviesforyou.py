@@ -113,7 +113,7 @@ def findvideos(item):
             if servidor == 'various': other = servertools.corregir_other(url)
             elif servidor == 'zures': other = servertools.corregir_zures(url)
 
-            itemlist.append(Item( channel = item.channel, action='play', title='', url=url, server = servidor,
+            itemlist.append(Item( channel = item.channel, action='play', title='', url=url, server=servidor,
                                   language = 'Vo', other = other.capitalize()) )
 
     if not itemlist:

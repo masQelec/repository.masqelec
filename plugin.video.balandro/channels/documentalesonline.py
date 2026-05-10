@@ -224,8 +224,10 @@ def findvideos(item):
 
         if not 'http' in url: url = 'https:' + url
 
+        url = url.replace('/www.youtube-nocookie.com/', '/www.youtube.com/')
+
         if servidor and servidor != 'directo':
-            itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', url = url, language = 'Esp', other = other ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url, language = 'Esp', other = other ))
 
     if not itemlist:
         if not ses == 0:

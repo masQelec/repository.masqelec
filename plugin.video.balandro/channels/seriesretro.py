@@ -581,6 +581,8 @@ def findvideos(item):
 
         other = 'D'
 
+        url = scrapertools.find_single_match(match, ' href="(.*?)"')
+
         if servidor == '0': servidor = 'directo'
         elif ' - ' in servidor: 'directo'
 
@@ -595,8 +597,6 @@ def findvideos(item):
             if servidor == 'various': other = servertools.corregir_other(url)
             elif servidor == 'zures': other = servertools.corregir_zures(url)
             else: servidor = servertools.corregir_servidor(servidor)
-
-        url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
         if url.endswith('.torrent'): servidor = 'torrent'
         elif 'magnet:?' in url: servidor = 'torrent'

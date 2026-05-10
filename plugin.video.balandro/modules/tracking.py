@@ -424,7 +424,9 @@ def serie_temporadas(item):
         titulo = '[COLOR tan]Temporada %d[/COLOR]' % season
         nombre = valor_infolabel('temporada_nombre', infolabels)
 
-        if nombre != '' and nombre != titulo and nombre != 'Season %d' % season: titulo += ' ' + nombre
+        if nombre != '' and nombre != titulo and nombre != 'Season %d' % season:
+            txt_temp = titulo.replace('[COLOR tan]','').replace('[/COLOR]', '')
+            if not nombre == txt_temp: titulo += ' ' + nombre
 
         thumbnail = valor_infolabel_informado(['temporada_poster','thumbnail'], infolabels)
         if thumbnail == '': thumbnail = item.thumbnail

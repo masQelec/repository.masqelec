@@ -3,7 +3,7 @@
   "name": "Zures",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Allviid,  Amdahost,  Asianload,  Asianplay,  Bigshare,  Bigwarp,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohd,  Oneupload,  Pandafiles,  Rovideo,  Savefiles,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamix, Streamoupload,  Streamup,  SwiftLoad,  Turbovid,  Tusfiles,  Udrop,  Updown,  Uploadbaz,  Uploadflix,  Uploadhub,  Uploady,  Upvid,  Veev,  Veoh,  Vidbasic,  Vidbob,  Videa,  Vidlook,  Vidmx,  Vidnest, Vido,  Vidpro,  Vidstore,  Vidtube,  Vimeos,  Vipss,  Vkprime,  Wecima,  Worlduploads,  Ztreamhub)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Allviid,  Amdahost,  Asianload,  Asianplay,  Bigshare,  Bigwarp,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohd,  Oneupload,  Pandafiles,  Rovideo,  Savefiles,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamix, Streamoupload,  Streamup,  SwiftLoad,  Turbovid,  Tusfiles,  Udrop,  Updown,  Uploadbaz,  Uploadflix,  Uploadhub,  Uploady,  Upvid,  Veev,  Veoh,  Vidara,  Vidbasic,  Vidbob,  Videa,  Vidlook,  Vidmx,  Vidnest, Vido,  Vidpro,  Vidstore,  Vidtube,  Vimeos,  Vipss,  Vkprime,  Wecima,  Worlduploads,  Ztreamhub)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -293,6 +293,18 @@
         "url": "https://vidnest.io/embed-\\1.html"
       },
       {
+        "pattern": "https://vidnest.io/(?:e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://vidnest.io/embed-\\1.html"
+      },
+      {
+        "pattern": "https://vidnest.live/embed-([0-9a-zA-Z]+).html",
+        "url": "https://vidnest.io/embed-\\1.html"
+      },
+      {
+        "pattern": "https://vidnest.live/(?:e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://vidnest.io/embed-\\1.html"
+      },
+      {
         "pattern": "https://bigshare.io/(?:watch/|)([0-9a-zA-Z]+).html",
         "url": "https://bigshare.io/watch/\\1"
       },
@@ -303,6 +315,14 @@
       {
         "pattern": "https://stmix.io/(?:e/|/v)([0-9a-zA-Z]+)",
         "url": "https:/streamix.so/v/\\1"
+      },
+      {
+        "pattern": "https://vidara.so/(?:e/|/v)([0-9a-zA-Z]+)",
+        "url": "https:/vidara.so/v/\\1"
+      },
+      {
+        "pattern": "https://vidara.to/(?:e/|/v)([0-9a-zA-Z]+)",
+        "url": "https:/vidara.to/v/\\1"
       }
     ]
   }

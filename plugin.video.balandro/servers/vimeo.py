@@ -113,6 +113,9 @@ def get_video_url(page_url, url_referer=''):
                     elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                         return 'Fichero sin link al vídeo ó restringido'
 
+                    elif 'Cloudflare challenge' in trace:
+                        return 'Cloudflare Challenge Check'
+
                 elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
                     return 'Archivo inexistente'
 

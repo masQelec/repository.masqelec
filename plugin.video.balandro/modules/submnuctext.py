@@ -281,15 +281,37 @@ def submnu_news(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='', title='[B]NOVEDADES:[/B]', context=context_cfg_search, thumbnail=config.get_thumb('novedades'), text_color='darksalmon' ))
+    tit = '[B]NOVEDADES:[/B]'
 
-    itemlist.append(item.clone( channel='helper', action='show_help_audios', title= '[COLOR green][B]Información[/B][/COLOR] [COLOR cyan][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news'), fanart=fanart ))
+    if item.extra == 'movies': tit = '[B]NOVEDADES PELÍCULAS:[/B]'
+    elif item.extra == 'tvshows': tit = '[B]NOVEDADES SERIES:[/B]'
+    elif item.extra == 'groups': tit = '[B]NOVEDADES GRUPOS:[/B]'
+    elif item.extra == 'documentaries': tit = '[B]NOVEDADES DOCUMENTALES:[/B]'
+    elif item.extra == 'infantil': tit = '[B]NOVEDADES INFANTILES:[/B]'
+    elif item.extra == 'tales': tit = '[B]NOVEDADES NOVELAS:[/B]'
+    elif item.extra == 'torrents': tit = '[B]NOVEDADES TORRENTS:[/B]'
+    elif item.extra == 'dorama': tit = '[B]NOVEDADES DORAMAS:[/B]'
+    elif item.extra == 'anime': tit = '[B]NOVEDADES ANIMES:[/B]'
+    elif item.extra == 'adult': tit = '[B]NOVEDADES ADULTOS:[/B]'
+
+    itemlist.append(item.clone( action='', title = tit, context=context_cfg_search, thumbnail=config.get_thumb('novedades'), text_color='darksalmon' ))
+
+    itemlist.append(item.clone( channel='helper', action='show_help_audios', title= '[COLOR green][B]Información[/B][/COLOR] [COLOR tomato][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news'), fanart=fanart ))
 
     if config.get_setting('sub_mnu_favoritos', default=False):
         if  item.mnupral == 'main':
              itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[B]Favoritos[/B]', context=context_cfg_search, thumbnail=config.get_thumb('star'), fanart=fanart, text_color='plum' ))
 
-    itemlist.append(item.clone( action='submnu_channels', title='[COLOR yellow][B]Buscar[/B][/COLOR]', context=context_buscar, extra = item.extra, thumbnail=config.get_thumb('search'), fanart=fanart ))
+    if not item.noopc_buscar:
+        itemlist.append(item.clone( action='submnu_channels', title='[COLOR yellow][B]Buscar[/B][/COLOR]', context=context_buscar, extra = item.extra, thumbnail=config.get_thumb('search'), fanart=fanart ))
+
+    if item.extra == 'adult':
+        if config.get_setting('mnu_adultos', default=True):
+            itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] Novedades Adultos:[/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='darksalmon' ))
+
+            itemlist.append(item.clone( title = ' - [B]Adultos[/B]', channel='novelty', action='mainlist', context=context_usual, news='lasts', thumbnail=config.get_thumb('tvshow'), extra = 'adults', search_type = 'tvshow', text_color='orange' ))
+
+        return itemlist
 
     presentar = False
     if config.get_setting('mnu_pelis', default=True): presentar = True
@@ -297,44 +319,74 @@ def submnu_news(item):
     elif config.get_setting('channels_link_pyse', default=False): presentar = True
 
     if presentar:
-        itemlist.append(item.clone( title = '[B]Novedades Películas, Series y Documentales:[/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='darksalmon' ))
+        if not item.extra == 'tales' and not item.extra == 'dorama' and not item.extra == 'anime':
+            itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] Novedades Películas, Series y Otros:[/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='darksalmon' ))
 
-        if config.get_setting('mnu_pelis', default=True) or config.get_setting('channels_link_pyse', default=False):
-            itemlist.append(item.clone( title = ' - [B]Películas[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('movie'), extra = 'movies', search_type = 'movies', text_color='deepskyblue' ))
+        presentar_todo = True
+        if item.extra == 'documentaries': presentar_todo = False
 
-        if config.get_setting('mnu_series', default=True) or config.get_setting('channels_link_pyse', default=False):
-            itemlist.append(item.clone( title = ' - [B]Series[/B]', channel='novelty', action='mainlist', context=context_usual, news='lasts', thumbnail=config.get_thumb('tvshow'), extra = 'tvshows', search_type = 'tvshow', text_color='hotpink' ))
+        if presentar_todo:
+            if not item.extra == 'tales' and not item.extra == 'dorama' and not item.extra == 'anime' and not item.extra == 'tvshows': 
+                if config.get_setting('mnu_pelis', default=True) or config.get_setting('channels_link_pyse', default=False):
+                    extra = 'movies'
+                    if item.extra == 'torrents': extra = 'torrents'
+
+                    itemlist.append(item.clone( title = ' - [B]Películas[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('movie'), extra = extra, search_type = 'movies', text_color='deepskyblue' ))
+
+            if not item.extra == 'tales' and not item.extra == 'dorama' and not item.extra == 'anime' and not item.extra == 'torrents' and not item.extra == 'movies':
+                if config.get_setting('mnu_series', default=True) or config.get_setting('channels_link_pyse', default=False):
+                    itemlist.append(item.clone( title = ' - [B]Series[/B]', channel='novelty', action='mainlist', context=context_usual, news='lasts', thumbnail=config.get_thumb('tvshow'), extra = 'tvshows', search_type = 'tvshow', text_color='hotpink' ))
 
         if not config.get_setting('mnu_simple', default=False):
             if config.get_setting('mnu_documentales', default=True):
-                itemlist.append(item.clone( title = ' - [B]Documentales[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('documentary'), extra = 'documentaries', search_type = 'documentary', text_color='cyan' ))
+                if not item.extra == 'infantil' and not item.extra == 'tales' and not item.extra == 'dorama' and not item.extra == 'anime' and not item.extra == 'torrents' and not item.extra == 'tvshows' and not item.extra == 'movies': 
+                    itemlist.append(item.clone( title = ' - [B]Documentales[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('documentary'), extra = 'documentaries', search_type = 'documentary', text_color='cyan' ))
 
-            if config.get_setting('mnu_infantiles', default=True):
-                itemlist.append(item.clone( title = ' - [B]Infantiles[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('booklet'), extra = 'infantiles', search_type = 'movie', text_color='lightyellow' ))
+            if presentar_todo:
+                if config.get_setting('mnu_infantiles', default=True):
+                    if not item.extra == 'tales' and not item.extra == 'dorama' and not item.extra == 'anime'and not item.extra == 'torrents' and not item.extra == 'tvshows':
+                        itemlist.append(item.clone( title = ' - [B]Infantiles[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('booklet'), extra = 'infantiles', search_type = 'movie', text_color='lightyellow' ))
 
-            if config.get_setting('mnu_torrents', default=True):
-                itemlist.append(item.clone( title = ' - [B]Torrents[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('torrents'), extra = 'torrents', search_type = 'movie', text_color='blue' ))
+                if not item.extra == 'infantil' and not item.extra == 'tales' and not item.extra == 'dorama' and not item.extra == 'anime' and not item.extra == 'torrents' and not item.extra == 'movies': 
+                    if config.get_setting('mnu_novelas', default=True):
+                        itemlist.append(item.clone( title = ' - [B]Novelas[/B]', channel='novelty', action='mainlist', context=context_usual, news='lasts', thumbnail=config.get_thumb('booklet'), extra = 'novelas', search_type = 'tvshow', text_color='limegreen' ))
 
-        if config.get_setting('mnu_series', default=True) or config.get_setting('channels_link_pyse', default=False):
-            itemlist.append(item.clone( title = '[B]Novedades Episodios:[/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='darksalmon' ))
+                    if not item.extra == 'tales' and not item.extra == 'dorama'and not item.extra == 'torrents' and not item.extra == 'tvshows' and not item.extra == 'movies':
+                        if config.get_setting('mnu_torrents', default=True):
+                            itemlist.append(item.clone( title = ' - [B]Torrents[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('torrents'), extra = 'torrents', search_type = 'movie', text_color='blue' ))
 
-            itemlist.append(item.clone( title = ' - [B]Series[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('tvshow'), extra = 'episodes', search_type = 'tvshow', text_color='hotpink' ))
+        if presentar_todo:
+            if config.get_setting('mnu_series', default=True) or config.get_setting('channels_link_pyse', default=False):
+                if not item.extra == 'torrents' and not item.extra == 'movies':
+                    itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] Novedades Episodios:[/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='darksalmon' ))
 
-            if config.get_setting('mnu_doramas', default=True):
-                itemlist.append(item.clone( title = ' - [B]Doramas[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('computer'), extra = 'doramas', search_type = 'tvshow', text_color='firebrick' ))
+                    if not item.extra == 'dorama' and not item.extra == 'anime':
+                        itemlist.append(item.clone( title = ' - [B]Series[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('tvshow'), extra = 'episodes', search_type = 'tvshow', text_color='hotpink' ))
 
-            if config.get_setting('mnu_animes', default=True):
-                itemlist.append(item.clone( title = ' - [B]Animes[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('anime'), extra = 'animes', search_type = 'tvshow', text_color='springgreen' ))
+                    if not item.extra == 'infantil':
+                        if not item.extra == 'tales' and not item.extra == 'dorama' and not item.extra == 'anime':
+                            if config.get_setting('mnu_novelas', default=True):
+                                itemlist.append(item.clone( title = ' - [B]Novelas[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('booklet'), extra = 'epis_novelas', search_type = 'tvshow', text_color='limegreen' ))
 
-        itemlist.append(item.clone( title = '[B]Canales:[/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='gold' ))
+                        if config.get_setting('mnu_doramas', default=True):
+                            if not item.extra == 'tales' and not item.extra == 'anime' and not item.extra == 'tvshows':
+                                itemlist.append(item.clone( title = ' - [B]Doramas[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('computer'), extra = 'doramas', search_type = 'tvshow', text_color='firebrick' ))
 
-        if config.get_setting('mnu_pelis', default=True) or config.get_setting('channels_link_pyse', default=False):
-            if item.extra == 'all' or item.extra == 'mixed' or item.extra == 'movies' or item.extra == 'groups':
-                itemlist.append(item.clone( channel='groups', action = 'ch_groups', title = ' - De [COLOR deepskyblue][B]Películas[/B][/COLOR] con Estrenos y/ó Novedades', thumbnail=config.get_thumb('movie'), group = 'news', extra = 'movies', ))
+                        if not item.extra == 'tales' and not item.extra == 'dorama' and not item.extra == 'tvshows':
+                            if config.get_setting('mnu_animes', default=True):
+                                itemlist.append(item.clone( title = ' - [B]Animes[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('anime'), extra = 'animes', search_type = 'tvshow', text_color='springgreen' ))
 
-        if config.get_setting('mnu_series', default=True) or config.get_setting('channels_link_pyse', default=False):
-            if item.extra == 'all' or item.extra == 'mixed' or item.extra == 'tvshows' or item.extra == 'groups':
-               itemlist.append(item.clone( channel='groups', action = 'ch_groups', title = ' - De [COLOR hotpink][B]Series[/B][/COLOR] con Nuevos Episodios y/ó Últimos', thumbnail=config.get_thumb('tvshow'), group = 'lasts', extra = 'tvshows' ))
+            if item.extra == 'all' or item.extra == 'mixed' or item.extra == 'infantil' or item.extra == 'groups':
+                itemlist.append(item.clone( title = '[B][COLOR darksalmon]Novedades[/COLOR] en Canales:[/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='gold' ))
+
+                if config.get_setting('mnu_pelis', default=True) or config.get_setting('channels_link_pyse', default=False):
+                    itemlist.append(item.clone( channel='groups', action = 'ch_groups', title = ' - De [COLOR deepskyblue][B]Películas[/B][/COLOR] con Estrenos y/ó Novedades', thumbnail=config.get_thumb('movie'), group = 'news', extra = 'movies', ))
+
+                if config.get_setting('mnu_series', default=True) or config.get_setting('channels_link_pyse', default=False):
+                   itemlist.append(item.clone( channel='groups', action = 'ch_groups', title = ' - De [COLOR hotpink][B]Series[/B][/COLOR] con Nuevos Episodios y/ó Últimos', thumbnail=config.get_thumb('tvshow'), group = 'lasts', extra = 'tvshows' ))
+
+                if config.get_setting('mnu_adultos', default=True):
+                    itemlist.append(item.clone( title = ' - De [COLOR orange][B]Adultos[/B][/COLOR]', channel='novelty', action='mainlist', news='lasts', thumbnail=config.get_thumb('adults'), extra = 'adults', search_type = 'all' ))
 
     presentar = False
     if config.get_setting('mnu_simple', default=False): presentar = True
@@ -344,27 +396,36 @@ def submnu_news(item):
     elif config.get_setting('search_extra_main', default=False): presentar = True
 
     if presentar:
-        itemlist.append(item.clone( action='', title= '[B]Cartelera:[/B]', folder=False, text_color='yellowgreen' ))
+        presentar_todo = True
+        if item.extra == 'documentaries': presentar_todo = False
 
-        itemlist.append(item.clone( channel='tmdblists', action='listado', title= ' - [COLOR deepskyblue][B]Películas[/B][/COLOR] en cartelera [COLOR violet][B]TMDB[/B][/COLOR]', thumbnail=thumb_tmdb, search_type='movie', extra = 'now_playing' ))
+        if presentar_todo:
+            if not item.extra == 'tales' and not item.extra == 'dorama' and not item.extra == 'anime' and not item.extra == 'tvshows':
+                itemlist.append(item.clone( action='', title= '[B]Cartelera:[/B]', folder=False, text_color='palegreen' ))
 
-        itemlist.append(item.clone( channel='filmaffinitylists', action='list_all', url = host_filmaffinity + 'cat_new_th_es.html', title= ' - [COLOR deepskyblue][B]Películas[/B][/COLOR] en cartelera [COLOR violet][B]Filmaffinity[/B][/COLOR]', thumbnail=thumb_filmaffinity, search_type='movie' ))
+                itemlist.append(item.clone( channel='tmdblists', action='listado', title= ' - [COLOR deepskyblue][B]Películas[/B][/COLOR] en [COLOR violet][B]TMDB[/B][/COLOR]', thumbnail=thumb_tmdb, search_type='movie', extra = 'now_playing' ))
 
-        itemlist.append(item.clone( action='', title= '[B]Listas de Películas:[/B]', folder=False, text_color='yellowgreen' ))
+                itemlist.append(item.clone( channel='filmaffinitylists', action='list_all', url = host_filmaffinity + 'cat_new_th_es.html', title= ' - [COLOR deepskyblue][B]Películas[/B][/COLOR] en [COLOR violet][B]Filmaffinity[/B][/COLOR]', thumbnail=thumb_filmaffinity, search_type='movie' ))
 
-        itemlist.append(item.clone( channel='filmaffinitylists', action='_fear', title=' - [B]Fear[/B] (año actual)', text_color='deepskyblue', search_type = 'movie', year = str(current_year), thumbnail=config.get_thumb('fear'), fanart=fanart, plot = 'Películas del género Terror del Año Actual de Filmaffinitylists' ))
+            if not item.extra == 'infantil' and not item.extra == 'tales' and not item.extra == 'dorama' and not item.extra == 'anime' and not item.extra == 'torrents' and not item.extra == 'tvshows' : 
+                itemlist.append(item.clone( action='', title= '[B][COLOR darksalmon]Novedades[/COLOR] Horror:[/B]', folder=False, text_color='orange' ))
 
-        itemlist.append(item.clone( channel='tmdblists', action='descubre_genre_anio', title=' - [B]Terror[/B]', text_color='deepskyblue', extra = 27, year = str(current_year), search_type = 'movie', thumbnail=config.get_thumb('terror'), fanart=fanart, plot = 'Películas del género Terror de Tmdb' ))
+                itemlist.append(item.clone( channel='filmaffinitylists', action='_fear', title=' - [B]Fear[/B] (año actual)', text_color='deepskyblue', search_type = 'movie', year = str(current_year), thumbnail=config.get_thumb('fear'), fanart=fanart, plot = 'Películas del género Terror del Año Actual de Filmaffinitylists' ))
 
-        itemlist.append(item.clone( title = ' -  [B]A la venta en [COLOR violet]Filmaffinity[/B][/COLOR]', channel='filmaffinitylists', action = 'list_all', url = host_filmaffinity + 'cat_new_sa_es.html', text_color='deepskyblue', search_type = 'all', thumbnail=thumb_filmaffinity ))
+                itemlist.append(item.clone( channel='tmdblists', action='descubre_genre_anio', title=' - [B]Terror[/B]', text_color='deepskyblue', extra = 27, year = str(current_year), search_type = 'movie', thumbnail=config.get_thumb('terror'), fanart=fanart, plot = 'Películas del género Terror de Tmdb' ))
 
-        itemlist.append(item.clone( title = ' -  [B]En alquiler en [COLOR violet]Filmaffinity[/B][/COLOR]', channel='filmaffinitylists', action = 'list_all', url = host_filmaffinity + 'cat_new_re_es.html', search_type = 'all', text_color='deepskyblue', thumbnail=thumb_filmaffinity ))
+                itemlist.append(item.clone( action='', title= '[B][COLOR darksalmon]Novedades[/COLOR] Listas de Películas y Series:[/B]', folder=False, text_color='teal' ))
 
-        itemlist.append(item.clone( action='', title= '[B]Listas de Películas y Series:[/B]', folder=False, text_color='teal' ))
+                itemlist.append(item.clone( channel='filmaffinitylists', action='_halloween', title=' - [B]Halloween[/B]', text_color='deepskyblue', search_type = 'movie', thumbnail=config.get_thumb('halloween'), fanart=fanart, plot = 'Películas y Series del tema Halloween de Filmaffinitylists' ))
 
-        itemlist.append(item.clone( channel='filmaffinitylists', action='_halloween', title=' - [B]Halloween[/B]', text_color='deepskyblue', search_type = 'movie', thumbnail=config.get_thumb('halloween'), fanart=fanart, plot = 'Películas y Series del tema Halloween de Filmaffinitylists' ))
+                itemlist.append(item.clone( channel='filmaffinitylists', action='_navidad', title=' - Navidad', thumbnail=config.get_thumb('navidad'), plot = 'Películas y Series del tema Navidad de Filmaffinitylists', text_color = 'dodgerblue' ))
 
-        itemlist.append(item.clone( channel='filmaffinitylists', action='_navidad', title=' - Navidad', thumbnail=config.get_thumb('navidad'), plot = 'Películas y Series del tema Navidad de Filmaffinitylists', text_color = 'dodgerblue' ))
+                if not item.extra == 'movies':
+                    itemlist.append(item.clone( title = '[B][COLOR darksalmon]Novedades[/COLOR] Filmaffinity:[/B]', action = '', thumbnail=config.get_thumb('novedades'), text_color='violet' ))
+
+                    itemlist.append(item.clone( title = ' - [COLOR teal][B]Películas y Series[/B][/COLOR] a la venta', channel='filmaffinitylists', action = 'list_all', url = host_filmaffinity + 'cat_new_sa_es.html', search_type = 'all', thumbnail=thumb_filmaffinity ))
+
+                    itemlist.append(item.clone( title = ' - [COLOR teal][B]Películas y Series[/B][/COLOR] en alquiler', channel='filmaffinitylists', action = 'list_all', url = host_filmaffinity + 'cat_new_re_es.html', search_type = 'all', thumbnail=thumb_filmaffinity ))
 
     return itemlist
 
@@ -380,11 +441,12 @@ def submnu_genres(item):
         if  item.mnupral == 'main':
              itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[B]Favoritos[/B]', context=context_cfg_search, thumbnail=config.get_thumb('star'), fanart=fanart, text_color='plum' ))
 
-    itemlist.append(item.clone( action='submnu_news', title='[B]Novedades[/B]', extra = 'all', thumbnail=config.get_thumb('novedades'), text_color='darksalmon' ))
+    if not item.noopc_buscar:
+        itemlist.append(item.clone( action='submnu_news', title='[B]Novedades[/B]', extra = 'all', thumbnail=config.get_thumb('novedades'), text_color='darksalmon' ))
 
-    itemlist.append(item.clone( action='submnu_special', title='[B]Especiales[/B]', context=context_cfg_search, extra='all', thumbnail=config.get_thumb('heart'), text_color='pink' ))
+        itemlist.append(item.clone( action='submnu_special', title='[B]Especiales[/B]', context=context_cfg_search, extra='all', thumbnail=config.get_thumb('heart'), text_color='pink' ))
 
-    itemlist.append(item.clone( channel='generos', action='mainlist', title='[B]Géneros[/B]', context=context_generos, thumbnail=config.get_thumb('genres'), text_color='thistle' ))
+        itemlist.append(item.clone( channel='generos', action='mainlist', title='[B]Géneros[/B]', context=context_generos, thumbnail=config.get_thumb('genres'), text_color='thistle' ))
 
     itemlist.append(item.clone( action='submnu_channels', title='[B]Buscar[/B]', context=context_buscar, extra = 'all', thumbnail=config.get_thumb('search'), text_color='yellow' ))
 
@@ -413,14 +475,28 @@ def submnu_special(item):
 
     itemlist.append(item.clone( action='', title='[B]ESPECIALES:[/B]', context=context_cfg_search, folder=False, text_color='pink' ))
 
+    itemlist.append(item.clone( channel='helper', action='show_help_audios', title= '[COLOR green][B]Información[/B][/COLOR] [COLOR tomato][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news'), fanart=fanart ))
+
     if config.get_setting('sub_mnu_favoritos', default=False):
         if  item.mnupral == 'main':
              itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[B]Favoritos[/B]', context=context_cfg_search, thumbnail=config.get_thumb('star'), fanart=fanart, text_color='plum' ))
 
-    itemlist.append(item.clone( action='submnu_channels', title='[COLOR yellow][B]Buscar[/B][/COLOR]', context=context_buscar, extra = item.extra, thumbnail=config.get_thumb('search') ))
+    if not item.noopc_buscar:
+        itemlist.append(item.clone( action='submnu_channels', title='[COLOR yellow][B]Buscar[/B][/COLOR]', context=context_buscar, extra = item.extra, thumbnail=config.get_thumb('search') ))
+
+    if item.extra == 'all' or item.extra == 'movies':
+        itemlist.append(item.clone( action='', title= '[B]Cartelera:[/B]', folder=False, text_color='palegreen' ))
+
+        itemlist.append(item.clone( channel='tmdblists', action='listado', title= ' - [COLOR deepskyblue]Películas[/COLOR] en [COLOR violet]TMDB[/COLOR]', thumbnail=thumb_tmdb, search_type='movie', extra = 'now_playing' ))
+
+        itemlist.append(item.clone( channel='filmaffinitylists', action='list_all', url = host_filmaffinity + 'cat_new_th_es.html', title= ' - [COLOR deepskyblue]Películas[/COLOR] en [COLOR violet]Filmaffinity[/COLOR]', thumbnail=thumb_filmaffinity, search_type='movie' ))
 
     if item.extra == 'all' or item.extra == 'mixed' or item.extra == 'movies':
         itemlist.append(item.clone( action='', title = '[COLOR deepskyblue][B]Películas Recomendadas:[/B][/COLOR]', thumbnail=config.get_thumb('movie'), folder=False ))
+
+        itemlist.append(item.clone( channel='tmdblists', action='listado', search_type='movie', extra = 'popular', title=' - Más populares', thumbnail=config.get_thumb('besttvshows'), text_color='slateblue' ))
+
+        itemlist.append(item.clone( channel='tmdblists', action='listado', search_type='movie', extra = 'top_rated', title=' - Mejor valoradas', thumbnail=config.get_thumb('besttvshows'), text_color='darkcyan' ))
 
         thumb_cinedeantes = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'cinedeantes.jpg')
         itemlist.append(item.clone( channel='cinedeantes', action='list_all', title=' - Joyas del cine clásico', url = 'https://cinedeantes2.weebly.com/joyas-del-cine.html', thumbnail=thumb_cinedeantes, search_type = 'movie', text_color='dodgerblue' ))
@@ -430,7 +506,7 @@ def submnu_special(item):
 
         itemlist.append(item.clone( channel='zoowomaniacos', action='_culto', title=' - Cine de culto', thumbnail=thumb_zoowomaniacos, search_type = 'movie', text_color='moccasin' ))
 
-        itemlist.append(item.clone( channel='zoowomaniacos', action='generos', title=' - Géneros', thumbnail=thumb_zoowomaniacos, search_type = 'movie', text_color='thistle' ))
+        itemlist.append(item.clone( channel='zoowomaniacos', action='generos', title=' - Géneros (Zoowomaniacos)', thumbnail=thumb_zoowomaniacos, search_type = 'movie', text_color='thistle' ))
 
         thumb_sigloxx = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'sigloxx.jpg')
         itemlist.append(item.clone( channel='sigloxx', action='youtubes', title=' - Seleccion YouTube', thumbnail=thumb_sigloxx, search_type = 'movie', text_color='olivedrab' ))
@@ -457,7 +533,11 @@ def submnu_special(item):
 
             itemlist.append(item.clone( channel='filmaffinitylists', action='_navidad', title=' - Navidad', thumbnail=config.get_thumb('navidad'), text_color = 'dodgerblue', plot = 'Películas y Series del tema Navidad de Filmaffinitylists' ))
 
-            itemlist.append(item.clone( channel='filmaffinitylists', title = ' - Por tema', action = 'temas', url = host_filmaffinity + 'topics.php', thumbnail=config.get_thumb('listthemes'), search_type = 'movie', text_color='moccasin' ))
+            itemlist.append(item.clone( channel='filmaffinitylists', title = ' - Por tema [COLOR violet]Filmaffinity[/COLOR]', action = 'temas', url = host_filmaffinity + 'topics.php', thumbnail=config.get_thumb('listthemes'), search_type = 'movie', text_color='moccasin' ))
+
+            itemlist.append(item.clone( channel='tmdblists', action='generos', search_type='movie', title=' - [COLOR teal]Películas[/COLOR] por género [COLOR violet]TMDB[/COLOR]', thumbnail=config.get_thumb('listgenres'), plot = 'Películas por géneros en Tmdb', text_color='mediumaquamarine' ))
+
+            itemlist.append(item.clone( channel='tmdblists', action='anios', search_type='movie', title=' - [COLOR teal]Películas[/COLOR] por año [COLOR violet]TMDB[/COLOR]', thumbnail=config.get_thumb('listyears'), plot = 'Películas por años en Tmdb', text_color='orange' ))
 
             itemlist.append(item.clone( action='', title= '[B]Premios y Festivales:[/B]', folder=False, text_color='darkgoldenrod' ))
 
@@ -483,11 +563,11 @@ def submnu_special(item):
             elif config.get_setting('search_extra_main', default=False): presentar = True
 
             if presentar:
-                itemlist.append(item.clone( action='', title= '[B]Listas de Series:[/B]', folder=False, text_color='yellowgreen' ))
+                itemlist.append(item.clone( action='', title= '[B]Listas de Series:[/B]', folder=False, text_color='limegreen' ))
 
                 itemlist.append(item.clone( channel='filmaffinitylists', action='emmy_ediciones', title=' - Premios Emmy', url = host_filmaffinity +'award_data.php?award_id=emmy&year=', text_color='hotpink', thumbnail=config.get_thumb('emmys'), plot = 'Las Series nominadas/galardonadas en los premios Emmy' ))
 
-                itemlist.append(item.clone( channel='filmaffinitylists', title = ' - Por tema', action = 'temas', url = host_filmaffinity + 'topics.php', thumbnail=config.get_thumb('listthemes'), search_type = 'tvshow', text_color='moccasin' ))
+                itemlist.append(item.clone( channel='filmaffinitylists', title = ' - Por tema [COLOR violet]Filmaffinity[/COLOR]', action = 'temas', url = host_filmaffinity + 'topics.php', thumbnail=config.get_thumb('listthemes'), search_type = 'tvshow', text_color='moccasin' ))
 
     if item.extra == 'all' or item.extra == 'mixed' or item.extra == 'documentaries':
         itemlist.append(item.clone( action='', title = '[COLOR cyan][B]Documentales Recomendados:[/B][/COLOR]', thumbnail=config.get_thumb('documentary'), folder=False ))
@@ -903,6 +983,8 @@ def show_infos(item):
 
     itemlist.append(item.clone( action='', title='[COLOR fuchsia][B]PERSONALIZAR Cuestiones Preliminares:[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
+    itemlist.append(item.clone( channel='helper', action='show_help_bucle', title=' - Las Búsquedas hacen [COLOR yellow][B]Bucle [COLOR yellowgreen](piden de nuevo el texto a buscar)[/COLOR][/B]', thumbnail=config.get_thumb('news') ))
+
     itemlist.append(item.clone( channel='helper', action='show_help_search', title=' - [COLOR green][B]Información [COLOR yellow]Búsquedas[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( channel='helper', action='show_help_audios', title= ' - [COLOR green][B]Información[/B][/COLOR] [COLOR cyan][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news') ))
@@ -1159,10 +1241,6 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'gnula': domains.manto_domain_gnula(item)
 
-    elif item.from_channel == 'gnula24': domains.manto_domain_gnula24(item)
-
-    elif item.from_channel == 'gnula24h': domains.manto_domain_gnula24h(item)
-
     elif item.from_channel == 'grantorrent': domains.manto_domain_grantorrent(item)
 
     elif item.from_channel == 'hdfull': domains.manto_domain_hdfull(item)
@@ -1181,8 +1259,6 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'pelispanda': domains.manto_domain_pelispanda(item)
 
-    elif item.from_channel == 'pelispediaws': domains.manto_domain_pelispediaws(item)
-
     elif item.from_channel == 'pelisplushd': domains.manto_domain_pelisplushd(item)
 
     elif item.from_channel == 'pelisplushdlat': domains.manto_domain_pelisplushdlat(item)
@@ -1191,13 +1267,9 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'poseidonhd2': domains.manto_domain_poseidonhd2(item)
 
-    elif item.from_channel == 'series24': domains.manto_domain_series24(item)
-
     elif item.from_channel == 'serieskao': domains.manto_domain_serieskao(item)
 
     elif item.from_channel == 'seriespapayato': domains.manto_domain_seriespapayato(item)
-
-    elif item.from_channel == 'seriesplus': domains.manto_domain_seriesplus(item)
 
     elif item.from_channel == 'sflix': domains.manto_domain_sflix(item)
 
@@ -1206,8 +1278,6 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'subtorrents': domains.manto_domain_subtorrents(item)
 
     elif item.from_channel == 'todotorrents': domains.manto_domain_todotorrents(item)
-
-    elif item.from_channel == 'vernovelas': domains.manto_domain_vernovelas(item)
 
     elif item.from_channel == 'veronline': domains.manto_domain_veronline(item)
 
@@ -1331,12 +1401,12 @@ def _proxies(item):
 
         if config.get_setting('channel_cinecalidadlol_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'cinehdplus':
-        from channels import cinehdplus
-        item.channel = 'cinehdplus'
-        cinehdplus.configurar_proxies(item)
+    elif item.from_channel == 'cinecalidadrs':
+        from channels import cinecalidadrs
+        item.channel = 'cinecalidadrs'
+        cinecalidadrs.configurar_proxies(item)
 
-        if config.get_setting('channel_cinehdplus_proxies') is None: refrescar = False
+        if config.get_setting('channel_cinecalidadrs_proxies') is None: refrescar = False
 
     elif item.from_channel == 'cinemitas':
         from channels import cinemitas
@@ -1471,13 +1541,6 @@ def _proxies(item):
 
         if config.get_setting('channel_eztv_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'flixcorn':
-        from channels import flixcorn
-        item.channel = 'flixcorn'
-        flixcorn.configurar_proxies(item)
-
-        if config.get_setting('channel_flixcorn_proxies') is None: refrescar = False
-
     elif item.from_channel == 'gatotv':
         from channels import gatotv
         item.channel = 'gatotv'
@@ -1491,20 +1554,6 @@ def _proxies(item):
         gnula.configurar_proxies(item)
 
         if config.get_setting('channel_gnula_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'gnula24':
-        from channels import gnula24
-        item.channel = 'gnula24'
-        gnula24.configurar_proxies(item)
-
-        if config.get_setting('channel_gnula24_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'gnula24h':
-        from channels import gnula24h
-        item.channel = 'gnula24h'
-        gnula24h.configurar_proxies(item)
-
-        if config.get_setting('channel_gnula24h_proxies') is None: refrescar = False
 
     elif item.from_channel == 'gnulacenter':
         from channels import gnulacenter
@@ -1625,26 +1674,12 @@ def _proxies(item):
 
         if config.get_setting('channel_naranjatorrent_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'onlinetv':
-        from channels import onlinetv
-        item.channel = 'onlinetv'
-        onlinetv.configurar_proxies(item)
-
-        if config.get_setting('channel_onlinetv_proxies') is None: refrescar = False
-
     elif item.from_channel == 'osjonosu':
         from channels import osjonosu
         item.channel = 'osjonosu'
         osjonosu.configurar_proxies(item)
 
         if config.get_setting('channel_osjonosu_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'papayaseries':
-        from channels import papayaseries
-        item.channel = 'papayaseries'
-        papayaseries.configurar_proxies(item)
-
-        if config.get_setting('channel_papayaseries_proxies') is None: refrescar = False
 
     elif item.from_channel == 'pasateatorrent':
         from channels import pasateatorrent
@@ -1772,13 +1807,6 @@ def _proxies(item):
 
         if config.get_setting('channel_rojotorrent_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'series24':
-        from channels import series24
-        item.channel = 'series24'
-        series24.configurar_proxies(item)
-
-        if config.get_setting('channel_series24_proxies') is None: refrescar = False
-
     elif item.from_channel == 'seriesgato':
         from channels import seriesgato
         item.channel = 'seriesgato'
@@ -1786,26 +1814,12 @@ def _proxies(item):
 
         if config.get_setting('channel_seriesgato_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'seriesonline':
-        from channels import seriesonline
-        item.channel = 'seriesonline'
-        seriesonline.configurar_proxies(item)
-
-        if config.get_setting('channel_seriesonline_proxies') is None: refrescar = False
-
     elif item.from_channel == 'seriespapayato':
         from channels import seriespapayato
         item.channel = 'seriespapayato'
         seriespapayato.configurar_proxies(item)
 
         if config.get_setting('channel_seriespapayato_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'seriesplus':
-        from channels import seriesplus
-        item.channel = 'seriesplus'
-        seriesplus.configurar_proxies(item)
-
-        if config.get_setting('channel_seriesplus_proxies') is None: refrescar = False
 
     elif item.from_channel == 'seriesretro':
         from channels import seriesretro
@@ -1835,13 +1849,6 @@ def _proxies(item):
 
         if config.get_setting('channel_srnovelas_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'star':
-        from channels import star
-        item.channel = 'star'
-        star.configurar_proxies(item)
-
-        if config.get_setting('channel_star_proxies') is None: refrescar = False
-
     elif item.from_channel == 'subtorrents':
         from channels import subtorrents
         item.channel = 'subtorrents'
@@ -1869,13 +1876,6 @@ def _proxies(item):
         tomadivx.configurar_proxies(item)
 
         if config.get_setting('channel_tomadivx_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'tubepelis':
-        from channels import tubepelis
-        item.channel = 'tubepelis'
-        tubepelis.configurar_proxies(item)
-
-        if config.get_setting('channel_tubepelis_proxies') is None: refrescar = False
 
     elif item.from_channel == 'ultrapelis':
         from channels import ultrapelis

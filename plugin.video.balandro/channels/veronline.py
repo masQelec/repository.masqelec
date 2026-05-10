@@ -11,19 +11,7 @@ from lib.pyberishaes import GibberishAES
 from lib import decrypters
 
 
-host = 'https://www.veronline.cfd/'
-
-
-# ~ por si viene de enlaces guardados
-ant_hosts = ['https://www.veronline.sh/', 'https://www.veronline.cc/', 'https://www.veronline.in/',
-             'https://www.veronline.mov/', 'https://www.veronline.bond/']
-
-domain = config.get_setting('dominio', 'veronline', default='')
-
-if domain:
-    if domain == host: config.set_setting('dominio', '', 'veronline')
-    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'veronline')
-    else: host = domain
+host = 'https://www.veronline.tax/'
 
 
 def item_configurar_proxies(item):
@@ -37,7 +25,7 @@ def item_configurar_proxies(item):
     tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
     context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
 
-    if config.get_setting('channel_veronline_proxies', default=''):
+    if config.get_setting('channel_onlinetv_proxies', default=''):
         tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
         context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
 
@@ -60,13 +48,15 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://www.veronline.cloud/']
+
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
     if '/series-online/año/' in url: raise_weberror = False
 
     hay_proxies = False
-    if config.get_setting('channel_veronline_proxies', default=''): hay_proxies = True
+    if config.get_setting('channel_onlinetv_proxies', default=''): hay_proxies = True
 
     timeout = None
     if host in url:
@@ -76,18 +66,18 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     else:
         if hay_proxies:
-            data = httptools.downloadpage_proxy('veronline', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+            data = httptools.downloadpage_proxy('onlinetv', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
         else:
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
         if not data:
             if not 'recherche?q=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('VerOnline', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('OnlineTv', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
                 if hay_proxies:
-                    data = httptools.downloadpage_proxy('veronline', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                    data = httptools.downloadpage_proxy('onlinetv', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
@@ -98,28 +88,10 @@ def acciones(item):
     logger.info()
     itemlist = []
 
-    domain_memo = config.get_setting('dominio', 'veronline', default='')
-
-    if domain_memo: url = domain_memo
-    else: url = host
-
-    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
-
-    itemlist.append(item.clone( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
-
-    itemlist.append(item.clone( channel='domains', action='test_domain_veronline', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
-                                from_channel='veronline', folder=False, text_color='chartreuse' ))
-
-    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
-    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
-
-    itemlist.append(item.clone( channel='domains', action='manto_domain_veronline', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+    itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
+                                from_channel='onlinetv', folder=False, text_color='chartreuse' ))
 
     itemlist.append(item_configurar_proxies(item))
-
-    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cuales son sus Clones[/B]', text_color='turquoise' ))
-
-    itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'veronline' ))
 
     platformtools.itemlist_refresh()
 
@@ -226,9 +198,9 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<span>Veronline.</span>(.*?)>mas vistas<')
+    bloque = scrapertools.find_single_match(data, '<span>Veronline.tax</span>(.*?)>mas vistas<')
 
-    if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline.</span>(.*?)>mas vistas<')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline.tax</span>(.*?)>mas vistas<')
 
     if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline</span>(.*?)>mas vistas<')
     if not bloque: bloque = scrapertools.find_single_match(data, '<span>Veronline</span>(.*?)>mas vistas<')
@@ -246,7 +218,7 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
-        title = title.replace('online gratis', '').replace(' online', '').replace('&#039;', "'").replace('&amp;', '&').strip()
+        title = title.replace('online gratis', '').replace('&#039;', "'").replace('&amp;', '&').replace(' online', '').strip()
 
         year = '-'
         if '/series-online/año/' in item.url:
@@ -257,7 +229,6 @@ def list_all(item):
                if '/page-' in year: year = scrapertools.find_single_match(year, "(.*?)/page-")
 
         if not year: year = '-'
-
         itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb,
                                     contentType='tvshow', contentSerieName=title,  infoLabels = {'year': year} ))
 
@@ -373,37 +344,37 @@ def episodios(item):
         if config.get_setting('channels_charges', default=True):
             item.perpage = sum_parts
             if sum_parts >= 100:
-                platformtools.dialog_notification('VerOnline', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                platformtools.dialog_notification('OnlineTv', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
-                platformtools.dialog_notification('VerOnline', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                platformtools.dialog_notification('OnlineTv', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
         else:
             item.perpage = sum_parts
 
             if sum_parts >= 1000:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('VerOnline', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    platformtools.dialog_notification('OnlineTv', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
                     item.perpage = 500
 
             elif sum_parts >= 500:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('VerOnline', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    platformtools.dialog_notification('OnlineTv', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
                     item.perpage = 250
 
             elif sum_parts >= 250:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]125[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('VerOnline', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
+                    platformtools.dialog_notification('OnlineTv', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
                     item.perpage = 125
 
             elif sum_parts >= 125:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]75[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('VerOnline', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
+                    platformtools.dialog_notification('OnlineTv', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
                     item.perpage = 75
 
             elif sum_parts > 50:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
-                    platformtools.dialog_notification('VerOnline', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    platformtools.dialog_notification('OnlineTv', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
                     item.perpage = sum_parts
                 else: item.perpage = 50
 
@@ -469,13 +440,13 @@ def findvideos(item):
 
             try:
                 hay_proxies = False
-                if config.get_setting('channel_veronline_proxies', default=''): hay_proxies = True
+                if config.get_setting('channel_onlinetv_proxies', default=''): hay_proxies = True
 
                 timeout = None
                 if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
 
                 if hay_proxies:
-                    url = httptools.downloadpage_proxy('veronline', d_url, follow_redirects=False, timeout=timeout).headers['location']
+                    url = httptools.downloadpage_proxy('onlinetv', d_url, follow_redirects=False, timeout=timeout).headers['location']
                 else:
                     url = httptools.downloadpage(d_url, follow_redirects=False, timeout=timeout).headers['location']
             except:
@@ -527,11 +498,6 @@ def findvideos(item):
 
                         servidor = servertools.corregir_servidor(srv)
 
-                        if servertools.is_server_available(servidor):
-                            if not servertools.is_server_enabled(servidor): continue
-                        else:
-                            if not config.get_setting('developer_mode', default=False): continue
-
                         other = ''
                         if servidor == 'various': other = servertools.corregir_other(srv)
                         elif servidor == 'zures': other = servertools.corregir_zures(srv)
@@ -543,7 +509,7 @@ def findvideos(item):
 
                         if '.eyJs' in link: age = ''
 
-                        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '',
+                        itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '',
                                                          crypto=link, bytes=e_bytes, age=age, language=lang, other=other.capitalize() ))
 
                     continue

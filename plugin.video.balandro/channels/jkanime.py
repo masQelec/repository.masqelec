@@ -125,6 +125,8 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'top', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'En latino', action = 'list_dir', url = host + 'directorio?categoria=latino', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'En emisión', action = 'list_dir', url = host + 'directorio?estado=emision', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Finalizados', action = 'list_dir', url = host + 'directorio?estado=finalizados', search_type = 'tvshow' ))
 
@@ -133,14 +135,40 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Donghuas', action = 'list_dir', url = host + 'directorio?categoria=donghua', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Especiales', action = 'list_dir', url = host + 'directorio?tipo=especiales', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Proximamente', action = 'list_dir', url = host + 'directorio?estado=estrenos', search_type = 'tvshow', text_color='yellowgreen' ))
+
     itemlist.append(item.clone( title = 'Películas', action = 'list_dir', url = host + 'directorio?tipo=peliculas', search_type = 'movie', text_color = 'deepskyblue' ))
+
+    itemlist.append(item.clone( title = 'Por demografía', action = 'demografias', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Por estación', action = 'estaciones', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'tvshow' ))
 
     return itemlist
+
+
+def demografias(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(host + 'directorio')
+
+    bloque = scrapertools.find_single_match(data, '>Demografia<(.*?)</select>')
+
+    matches = re.compile("<option value='(.*?)'.*? >(.*?)</option>").findall(bloque)
+
+    for val, title in matches:
+        url = host + 'directorio?demografia=' + val
+
+        itemlist.append(item.clone( action = "list_dir", title = title, url = url, text_color='moccasin' ))
+
+    return sorted(itemlist, key=lambda x: x.title)
 
 
 def generos(item):
@@ -154,6 +182,8 @@ def generos(item):
     matches = re.compile("<option value='(.*?)'.*? >(.*?)</option>").findall(bloque)
 
     for val, title in matches:
+        if title == 'Español Latino': continue
+
         url = host + 'directorio?genero=' + val
 
         itemlist.append(item.clone( action = "list_dir", title = title, url = url, text_color='springgreen' ))
@@ -176,6 +206,24 @@ def anios(item):
     return itemlist
 
 
+def estaciones(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(host + 'directorio')
+
+    bloque = scrapertools.find_single_match(data, '>Temporada<(.*?)</select>')
+
+    matches = re.compile("<option value='(.*?)'.*? >(.*?)</option>").findall(bloque)
+
+    for val, title in matches:
+        url = host + 'directorio?demografia=' + val
+
+        itemlist.append(item.clone( action = "list_dir", title = title, url = url, text_color='palegreen' ))
+
+    return itemlist
+
+
 def alfabetico(item):
     logger.info()
     itemlist = []
@@ -194,7 +242,8 @@ def list_dir(item):
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = re.compile('{"id":(.*?)short_title"').findall(data)
-
+    if not matches: matches = re.compile('{"id":(.*?)title"').findall(data)
+ 
     for match in matches:
         url = scrapertools.find_single_match(match, '"slug":"(.*?)"')
 
@@ -214,7 +263,7 @@ def list_dir(item):
         if year: title = title.replace('(' + year + ')', '')
         else: year = '-'
 
-        tipo = 'tvshow' if '"TV"' in match or '"OVA"' in match or '"ONA"' in match or '"Serie"' in match else 'movie'
+        tipo = 'tvshow' if '"TV"' in match or '"OVA"' in match or '"ONA"' in match or '"Serie"' in match or '"Especial"' in match else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'tvshow':
@@ -260,9 +309,10 @@ def list_dir(item):
         next_page = scrapertools.find_single_match(data, '<li class="page-item active".*?href="(.*?)".*?"')
 
         if next_page:
-            next_page = next_page.replace('&amp;', '&')
+            if not next_page == '{slug}':
+                next_page = next_page.replace('&amp;', '&')
 
-            itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_dir', text_color = 'coral' ))
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_dir', text_color = 'coral' ))
 
     return itemlist
 

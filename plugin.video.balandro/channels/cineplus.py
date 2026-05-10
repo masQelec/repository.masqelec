@@ -314,8 +314,12 @@ def findvideos(item):
             if servidor == 'various': other = servertools.corregir_other(url)
             elif servidor == 'zures': other = servertools.corregir_zures(url)
 
+            force_input = ''
+
+            if other == 'Lulustream': force_input = True
+
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                  language = IDIOMAS.get(lang, lang), other = other ))
+                                  language = IDIOMAS.get(lang, lang), other = other, force_input = force_input ))
 
     else:
         bloque = scrapertools.find_single_match(data, "const videosPorIdioma =(.*?)</script>")
@@ -340,8 +344,12 @@ def findvideos(item):
             if servidor == 'various': other = servertools.corregir_other(url)
             elif servidor == 'zures': other = servertools.corregir_zures(url)
 
+            force_input = ''
+
+            if other == 'Lulustream': force_input = True
+
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                  language = 'Lat', other = other ))
+                                  language = 'Lat', other = other, force_input = force_input ))
 
         blk_esp = scrapertools.find_single_match(bloque, '"esp":(.*?)"sub":')
 
@@ -363,8 +371,12 @@ def findvideos(item):
             if servidor == 'various': other = servertools.corregir_other(url)
             elif servidor == 'zures': other = servertools.corregir_zures(url)
 
+            force_input = ''
+
+            if other == 'Lulustream': force_input = True
+
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                  language = 'Esp', other = other ))
+                                  language = 'Esp', other = other, force_input = force_input ))
 
         blk_sub = scrapertools.find_single_match(bloque, '"sub":(.*?);')
 
@@ -386,8 +398,12 @@ def findvideos(item):
             if servidor == 'various': other = servertools.corregir_other(url)
             elif servidor == 'zures': other = servertools.corregir_zures(url)
 
+            force_input = ''
+
+            if other == 'Lulustream': force_input = True
+
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                  language = 'Vose', other = other ))
+                                  language = 'Vose', other = other, force_input = force_input ))
 
     if not itemlist:
         if not ses == 0:

@@ -164,17 +164,25 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', '', data)
 
-    bloque = scrapertools.find_single_match(data, '>Video Sources(.*?)</div></div></div></div')
+    bloque = scrapertools.find_single_match(data, '>Video Sources(.*?)<script>')
 
     matches = re.compile('href="(.*?)"', re.DOTALL).findall(bloque)
 
     ses = 0
 
     for url in matches:
-        ses += 1
-
         if url:
             if url == '#': continue
+
+            ses += 1
+
+            if '.seekplayer.' in url: continue
+            elif '.streamkithmc.' in url: continue
+            elif '.streamkitagg.' in url: continue
+            elif '.cloudwarebrh.' in url: continue
+            elif '.video-twimg.' in url: continue
+
+            ref = url
 
             url = url.replace('/netu.wiztube.xyz/player/embed_player.php?', '/waaw.to/watch_video.php?v=').replace('&autoplay=yes', '').strip()
 
@@ -185,22 +193,29 @@ def findvideos(item):
             if servidor == 'various': other = servertools.corregir_other(url)
             elif servidor == 'zures': other = servertools.corregir_zures(url)
 
+            force_input = ''
+            if other == 'Lulustream': force_input = True
+
+            if servidor == 'kinoger':
+                if config.get_setting('developer_team'): other = url
+            else: ref = ''
+
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                      language = 'Vo', other = other.capitalize() ))
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url, ref=ref,
+                                      language = 'Vo', other = other.capitalize(), force_input=force_input ))
 
     # ~  Download
     if '>Download Sources' in data:
-        bloque = scrapertools.find_single_match(data, '>Download Sources(.*?)</div></div></div></div')
+        bloque = scrapertools.find_single_match(data, '>Download Sources(.*?)</ul></div></div></div')
 
         matches = re.compile('href="(.*?)"', re.DOTALL).findall(bloque)
 
         for url in matches:
-            ses += 1
-
             if 'link=' in url: url = scrapertools.find_single_match(url, 'link=(.*?)$')
 
             if url:
+                ses += 1
+
                 if '/rapidgator.' in url: continue
                 elif '/nitro.' in url: continue
                 elif '/nitroflare.' in url: continue
@@ -210,18 +225,35 @@ def findvideos(item):
                 elif '/hitfile.' in url: continue
                 elif '/frdl.' in url: continue
 
+                elif '/drivevideo.' in url: continue
+                elif '/snowdayonline.' in url: continue
+                elif '/freepopnews.' in url: continue
+                elif '/filepv.' in url: continue
+                elif '/vinovo.' in url: continue
+
                 url = url.replace('//filemoon.sx/download/', '//filemoon.sx/d/')
 
+                ref = url
+
                 servidor = servertools.get_server_from_url(url)
+
+                url = servertools.normalize_url(servidor, url)
 
                 other = 'D'
 
                 if servidor == 'various': other = servertools.corregir_other(url) + ' ' + other
                 elif servidor == 'zures': other = servertools.corregir_zures(url) + ' ' + other
 
+                force_input = ''
+                if other == 'Lulustream': force_input = True
+
+                if servidor == 'kinoger':
+                    if config.get_setting('developer_team'): other = url
+                else: ref = ''
+
                 if not servidor == 'directo':
-                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                          language = 'Vo', other = other.capitalize() ))
+                    itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url, ref=ref,
+                                          language = 'Vo', other = other.capitalize(), force_input=force_input ))
 
     if not itemlist:
         if not ses == 0:
@@ -248,7 +280,7 @@ def play(item):
 
         servidor = servertools.get_server_from_url(url)
 
-    itemlist.append(item.clone(server = servidor, url = url))
+    itemlist.append(item.clone(server = servidor, url = url, url_referer = item.ref))
 
     return itemlist
 

@@ -315,6 +315,14 @@ def get_video_url(page_url):
     return video_urls
 
 
+def _lasts(item):
+    logger.info()
+
+    item.url = host + "video?o=cm"
+
+    return list_all(item)
+
+
 def search(item, texto):
     logger.info()
     try:

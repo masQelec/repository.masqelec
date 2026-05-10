@@ -212,10 +212,10 @@ def list_all(item):
 
         title = title.replace('Poster', '').strip()
 
+        if url.startswith("/"): url = host[:-1] + url
+
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
-
-        if not host in url: url = host[:-1] + url
 
         if tipo == 'movie':
             if item.search_type != 'all':

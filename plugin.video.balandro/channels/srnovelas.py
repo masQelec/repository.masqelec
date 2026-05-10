@@ -705,6 +705,15 @@ def list_search(item):
     return itemlist
 
 
+def _epis(item):
+    logger.info()
+
+    item.url = host
+    item.search_type = 'tvshow'
+
+    return last_epis(item)
+
+
 def search(item, texto):
     logger.info()
     try:

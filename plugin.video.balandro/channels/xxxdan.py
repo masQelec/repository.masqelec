@@ -54,20 +54,16 @@ def categorias(item):
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>", "", data)
 
-    patron = '<a href="([^"]+)" rel="tag".*?'
-    patron += 'title="([^"]+)".*?'
-    patron += 'data-original="([^"]+)".*?'
+    bloque = scrapertools.find_single_match(data, '<div class="category-list">(.*?)</section>')
 
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    matches = re.compile('<a href="(.*?)".*?class="category-list__name">(.*?)</a>', re.DOTALL).findall(bloque)
 
-    for url, title, thumb in matches:
+    for url, title in matches:
         title = title.replace('ánal', 'anal').replace('ánime', 'anime').replace('árabe', 'arabe')
 
         title = title.capitalize()
 
-        url = url.replace('channel', 'channel30')
-
-        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color = 'moccasin' ))
+        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'moccasin' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -81,22 +77,21 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
-    patron = '<li><figure>\s*<a href="([^"]+)".*?'
-    patron += 'data-original="([^"]+)".*?'
-    patron += '<time datetime="\w+">([^"]+)</time>'
+    bloque = scrapertools.find_single_match(data, '</h1>(.*?)</section>')
 
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    patron = '<a href="(.*?)".*?<img src="(.*?)".*?alt="(.*?)".*?<span class="video-card__duration">(.*?)</span>'
+
+    matches = re.compile(patron, re.DOTALL).findall(bloque)
 
     num_matches = len(matches)
 
-    for url, thumb, time in matches[item.page * perpage:]:
-        title = scrapertools.find_single_match(url, host + '.*?/(.*?).html')
-
-        title = title.replace('-', ' ')
+    for url, thumb, title, time in matches[item.page * perpage:]:
+        title = title.replace('[No]', '').strip()
 
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
 
-        itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
+        itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb,
+                                    contentType = 'movie', contentTitle = title, contentExtra='adults') )
 
         if len(itemlist) >= perpage: break
 

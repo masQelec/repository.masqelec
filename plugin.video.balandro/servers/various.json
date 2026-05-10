@@ -69,6 +69,26 @@
         "url": "https://filemoon.sx/e/\\1"
       },
       {
+        "pattern": "https://bysewihe.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://bysejikuar.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://bysesukior.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://byselapuix.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://bysezoxexe.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
         "pattern": "https://byse.sx/(?:e/|d/|download/)([0-9a-zA-Z]+)",
         "url": "https://filemoon.sx/e/\\1"
       },
@@ -670,6 +690,10 @@
       },
       {
         "pattern": "https://luluvdo.com/(?:e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://lulustream.com/e/\\1"
+      },
+      {
+        "pattern": "https://luluvid.com/(?:e/|d/)([0-9a-zA-Z]+)",
         "url": "https://lulustream.com/e/\\1"
       },
       {

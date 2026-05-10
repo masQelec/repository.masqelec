@@ -119,7 +119,7 @@ def get_video_url(page_url, url_referer=''):
 
                   page_url = page_url.replace('.html', '')
 
-    elif 'filemoon' in page_url or 'fmoonembed' in page_url or 'embedmoon' in page_url or 'moonjscdn' in page_url or 'l1afav' in page_url or 'byseqekaho' in page_url or 'bysedikamoum' in page_url or 'bysevepoin' in page_url or 'byseraguci' in page_url or 'byse' in page_url:
+    elif 'filemoon' in page_url or 'fmoonembed' in page_url or 'embedmoon' in page_url or 'moonjscdn' in page_url or 'l1afav' in page_url or 'byseqekaho' in page_url or 'bysedikamoum' in page_url or 'bysevepoin' in page_url or 'byseraguci' in page_url or 'bysewihe' in page_url or 'bysejikuar' in page_url or 'byse' in page_url:
           # ~ 19/1/26  Anulado en ResolveUrl
           # ~ txt_server = 'Filemoon'
 
@@ -131,7 +131,9 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('/bysedikamoum.com/', '/filemoon.sx/').replace('/bysevepoin.com/', '/filemoon.sx/').replace('/byseraguci.com/', '/filemoon.sx/')
 
-          page_url = page_url.replace('/byse.sx/', '/filemoon.sx/')
+          page_url = page_url.replace('/bysewihe.com/', '/filemoon.sx/').replace('/bysejikuar.com/', '/filemoon.sx/').replace('/byse.sx/', '/filemoon.sx/')
+
+          page_url = page_url.replace('/bysesukior.com/', '/filemoon.sx/').replace('/byselapuix.com/', '/filemoon.sx/').replace('/bysezoxexe.com/', '/filemoon.sx/')
 
     elif 'streamhub' in page_url:
           txt_server = 'Streamhub'
@@ -247,10 +249,10 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('/vidguard.to/', '/vgembed.com/').replace('/vgfplay.com/', '/vgembed.com/').replace('/vgfplay.xyz/', '/vgembed.com/').replace('/vgplayer.xyz/', '/vgembed.com/').replace('/v6embed.xyz/', '/vgembed.com/').replace('/vembed.net/', '/vgembed.com/').replace('/vembed.org/', '/vgembed.com/').replace('/vid-guard.com/', '/vgembed.com/').replace('/embedv.net/', '/vgembed.com/').replace('/bembed.net/', '/vgembed.com/')
 
-    elif 'lulustream' in page_url or 'luluvdo' in page_url or 'streamhihi' in page_url or 'luluvdoo' in page_url or 'lulu' in page_url or 'ponmi' in page_url or 'd00ds.site' in page_url:
+    elif 'lulustream' in page_url or 'luluvdo' in page_url or 'luluvid' in page_url or 'streamhihi' in page_url or 'luluvdoo' in page_url or 'lulu' in page_url or 'ponmi' in page_url or 'd00ds.site' in page_url:
           txt_server = 'Lulustream'
 
-          page_url = page_url.replace('/luluvdo.com/', '/lulustream.com/')
+          page_url = page_url.replace('/luluvdo.com/', '/lulustream.com/').replace('/luluvid.com/', '/lulustream.com/')
           page_url = page_url.replace('/streamhihi.com/', '/lulustream.com/').replace('/luluvdoo/', '/lulustream.com/')
           page_url = page_url.replace('/lulu.st/', '/lulustream.com/').replace('/ponmi.sbs/', '/lulustream.com/')
           page_url = page_url.replace('/d00ds.site/', '/lulustream.com/')
@@ -285,7 +287,10 @@ def get_video_url(page_url, url_referer=''):
           page_url = page_url.replace('/player.twitch.tv/', '/www.twitch.tv/')
 
     elif 'vidhide' in page_url or 'stblion' in page_url or 'dhtpre' in page_url or 'dramacool' in page_url:
-          txt_server = 'Vidhidepro'
+          # ~ 8/11/25  Anulado en ResolveUrl
+          # ~ txt_server = 'Vidhidepro'
+
+          txt_server = 'Filelions'
 
           page_url = page_url.replace('/vidhide.com/', '/vidhidepro.com/').replace('/vidhidevip.com/', '/vidhidepro.com/')
 
@@ -297,6 +302,8 @@ def get_video_url(page_url, url_referer=''):
           page_url = page_url.replace('/stblion.xyz/', '/vidhidepro.com/')
           page_url = page_url.replace('/dhtpre.com/', '/vidhidepro.com/')
           page_url = page_url.replace('/dramacool.men/', '/vidhidepro.com/')
+
+          page_url = page_url.replace('/vidhidepro.com/', '/filelions.to/')
 
     elif txt_server == 'Unknow': return 'Desconocido'
 
@@ -317,21 +324,6 @@ def get_video_url(page_url, url_referer=''):
                 return 'Archivo inexistente ó eliminado'
 
             # ~ 10/4/2025  STREAMWISH pq falla ResolveUrl
-            video_urls = videos
-            return video_urls
-
-    # ~ VIDHIDEPRO
-    elif txt_server == 'Vidhidepro':
-        if config.get_setting('servers_time', default=True):
-            platformtools.dialog_notification('Accediendo a', '[COLOR cyan][B]' + txt_server + '[/B][/COLOR]')
-
-        videos = vidhide(page_url)
-
-        if videos:
-            if 'non_exist' in str(videos):
-                return 'Archivo inexistente ó eliminado'
-
-            # ~ 8/11/2025  VIDHIDE pq ya No existe en ResolveUrl
             video_urls = videos
             return video_urls
 
@@ -389,11 +381,14 @@ def get_video_url(page_url, url_referer=''):
 
         if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
             trace = traceback.format_exc()
-            if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace or 'Video removed' in trace:
+            if 'File Removed' in trace or 'File Not Found' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace or 'Video removed' in trace or 'Stream not found' in trace:
                 return 'Archivo inexistente ó eliminado'
 
-            elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
+            elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Unable to locate stream' in trace or 'Video Link Not Found' in trace or 'Not Found' in trace:
                 return 'Fichero sin link al vídeo ó restringido'
+
+            elif 'Cloudflare challenge' in trace:
+                return 'Cloudflare Challenge Check'
 
         elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
             return 'Archivo inexistente'
@@ -419,62 +414,6 @@ def hexupload(page_url):
     mp4 = scrapertools.find_single_match(resp.data, '"url":"(.*?)"')
 
     return mp4
-
-
-def vidhide(page_url):
-    # ~ 8/11/2025  No existe en ResolveUrl
-
-    videos = []
-
-    page_url = page_url.replace('/vidhidepro.com/', '/vidhidevip.com/')
-
-    page_url = page_url.replace('\\', '').strip()
-
-    host = 'https://vidhidevip.com'
-
-    resp = httptools.downloadpage(page_url)
-
-    data = resp.data
-
-    if not resp.sucess: return 'non_exist'
-
-    if "Not Found" in data or "File was deleted" in data or "is no longer available" in data: return 'non_exist'
-
-    enc_data = scrapertools.find_single_match(data, "text/javascript(?:'|\")>(eval.*?)</script>")
-
-    try:
-        dec_data = jsunpack.unpack(enc_data)
-
-        m3u8 = scrapertools.find_single_match(dec_data, '"hls2":"([^"]+)"')
-        if not m3u8: m3u8 = scrapertools.find_single_match(dec_data, '"hls4":"([^"]+)"')
-
-        if "master.m3u8" in m3u8:
-            if not 'http' in m3u8:
-                m3u8 = host + m3u8
-
-            datos = httptools.downloadpage(m3u8).data
-
-            if PY3:
-                if isinstance(datos, bytes):
-                    datos = "".join(chr(x) for x in bytes(datos))
-
-            if datos:
-                matches = re.compile('#EXT-X-STREAM-INF.*?RESOLUTION=\d+x(\d*)[^\n]*\n([^\n]*)\n', re.DOTALL).findall(datos)
-
-                for qlty, url in matches:
-                    url = m3u8 + url
-
-                    url = url.replace('master.m3u8', '').strip()
-
-                    url += "|Referer=%s/Origin=%s" % (host, host)
-
-                    videos.append(["m3u %s" % qlty, url])
-        else:
-            videos.append(["m3u", m3u8])
-    except:
-        pass
-
-    return videos
 
 
 def wish(page_url):

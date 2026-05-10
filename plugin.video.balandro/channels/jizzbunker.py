@@ -49,18 +49,20 @@ def categorias(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
-    patron  = '<li><figure>.*?<a href="([^"]+)".*?'
-    patron += '<img class="lazy" data-original="([^"]+)" alt="([^"]+)".*?'
-    patron += '<span class="score">(\d+)</span>'
+    bloque = scrapertools.find_single_match(data, '</h1>(.*?)</section>')
 
-    matches = re.compile(patron,re.DOTALL).findall(data)
+    matches = re.compile('<a href="(.*?)".*?<img src="(.*?)".*?alt="(.*?)"', re.DOTALL).findall(bloque)
 
-    for url, thumb, title, total in matches:
+    for url, thumb, title in matches:
+        if title == 'ánal': title = 'Anal'
+        elif title == 'ánime': title = 'Anime'
+        elif title == 'árabe': title = 'Arabe'
+
         title = title.capitalize()
 
         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='moccasin' ))
 
-    return itemlist
+    return sorted(itemlist,key=lambda x: x.title)
 
 
 def list_all(item):
@@ -70,11 +72,9 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
-    patron  = '<li><figure>.*?<a href="([^"]+)".*?'
-    patron += '<img class="lazy" data-original="([^"]+)" alt="([^"]+)".*?'
-    patron += '<time datetime=".*?">([^"]+)</time>'
+    bloque = scrapertools.find_single_match(data, '</h1>(.*?)</section>')
 
-    matches = re.compile(patron,re.DOTALL).findall(data)
+    matches = re.compile('<a href="(.*?)".*?<img src="(.*?)".*?alt="(.*?)".*?<span class="video-card__duration">(.*?)</span>', re.DOTALL).findall(bloque)
 
     for url, thumb, title, duration, in matches:
         title = "[COLOR tan]%s[/COLOR] %s" % (duration, title)
@@ -82,10 +82,11 @@ def list_all(item):
         itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<li><a href="([^"]+)" rel="next">&rarr;</a>')
+        if '>Siguiente &rsaquo;</a>' in data:
+            next_page = scrapertools.find_single_match(data, '<nav class="pagination".*?<span class="pagination__btn pagination__btn--active">.*?<a href="(.*?)".*?</nav>')
 
-        if next_page:
-            itemlist.append(item.clone (action='list_all', title='Siguientes ...', url=next_page, text_color = 'coral') )
+            if next_page:
+                itemlist.append(item.clone (action='list_all', title='Siguientes ...', url=next_page, text_color = 'coral') )
 
     return itemlist
 

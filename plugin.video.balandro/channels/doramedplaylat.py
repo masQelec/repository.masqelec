@@ -336,26 +336,30 @@ def findvideos(item):
 
     for url in matches:
         if '.youtube.' in url: continue
+        elif '.tmdb.' in url: continue
 
         ses += 1
 
         if 'peertubeLink' in url:
             url = url.replace('&amp;', '&')
 
+            if '/video.doramedplay.net/' in url: continue
+
             data1 = do_downloadpage(url)
 
-            data1 = data1.replace('\\/', '/')
-            data1 = data1.replace('\\"', '"')
+            if data1:
+                data1 = data1.replace('\\/', '/')
+                data1 = data1.replace('\\"', '"')
 
-            data1 = data1.replace('=\\', '=').replace('\\"', '/"')
+                data1 = data1.replace('=\\', '=').replace('\\"', '/"')
 
-            blk1 = scrapertools.find_single_match(str(data1), '"scheme":"peertube"(.*?)"player"')
+                blk1 = scrapertools.find_single_match(str(data1), '"scheme":"peertube"(.*?)"player"')
 
-            new_url = scrapertools.find_single_match(str(blk1), '/peertube/(.*?)"')
+                new_url = scrapertools.find_single_match(str(blk1), '/peertube/(.*?)"')
 
-            if new_url:
-                url = 'https;//peertube.uno/videos/embed/' + new_url
-
+                if new_url:
+                    url = 'https://peertube.uno/videos/embed/' + new_url
+ 
         servidor = servertools.get_server_from_url(url)
 
         url = servertools.normalize_url(servidor, url)

@@ -3,7 +3,7 @@
   "name": "PapayaSeries",
   "thumbnail": "papayaseries.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["notice", "kids", "vos"],
+  "clusters": ["kids", "vos"],
 
-  "notes": "Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Web ANULADA. Series por Géneros."
 }

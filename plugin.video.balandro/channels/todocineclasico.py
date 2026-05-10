@@ -164,6 +164,15 @@ def findvideos(item):
     return itemlist
 
 
+def _news(item):
+    logger.info()
+
+    item.url = host + 'collections/ultimas-películas/1'
+    item.search_type = 'movie'
+
+    return list_all(item)
+
+
 def search(item, texto):
     logger.info()
     try:

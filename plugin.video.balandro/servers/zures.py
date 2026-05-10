@@ -110,6 +110,15 @@ def get_video_url(page_url, url_referer=''):
 
           ini_page_url = page_url
 
+    elif 'vidara' in page_url:
+          txt_server = 'Streamix'
+
+          page_url = page_url.replace('/e/', '/v/')
+
+          ini_page_url = page_url
+
+          page_url = page_url + '$$' + page_url
+
     elif 'streamoupload' in page_url: txt_server = 'Streamoupload'
 
     elif 'streamup' in page_url or 'strmup' in page_url:
@@ -177,6 +186,9 @@ def get_video_url(page_url, url_referer=''):
         if '>Security verification<' in data:
             return 'CloudFlare Human Verify'
 
+        elif '>Security Check<' in data:
+            return 'CloudFlare Security Check'
+
     try:
         import_libs('script.module.resolveurl')
 
@@ -217,11 +229,14 @@ def get_video_url(page_url, url_referer=''):
 
         if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
             trace = traceback.format_exc()
-            if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace or 'Video removed' in trace:
+            if 'File Removed' in trace or 'File Not Found' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace or 'Video removed' in trace or 'Stream not found' in trace:
                 return 'Archivo inexistente ó eliminado'
 
-            elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace or 'Not Found' in trace:
+            elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Unable to locate stream' in trace or 'Video Link Not Found' in trace or 'Not Found' in trace:
                 return 'Fichero sin link al vídeo ó restringido'
+
+            elif 'Cloudflare challenge' in trace:
+                return 'Cloudflare Challenge Check'
 
         elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
             return 'Archivo inexistente'

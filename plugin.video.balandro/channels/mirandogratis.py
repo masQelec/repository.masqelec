@@ -102,23 +102,24 @@ def findvideos(item):
     ses = 0
 
     for match in matches:
-        url = scrapertools.find_multiple_matches(match, '<iframe.*?src="(.*?)"')
+        urls = scrapertools.find_multiple_matches(match, '<iframe.*?src="(.*?)"')
 
-        if url:
-            ses += 1
+        if urls:
+            for url in urls:
+                ses += 1
 
-            servidor = servertools.get_server_from_url(url)
+                servidor = servertools.get_server_from_url(url)
 
-            other = ''
-            if servidor == 'various': other = servertools.corregir_other(url)
-            elif servidor == 'zures': other = servertools.corregir_zures(url)
+                other = ''
+                if servidor == 'various': other = servertools.corregir_other(url)
+                elif servidor == 'zures': other = servertools.corregir_zures(url)
 
-            if '<strong>Audio</strong>: Español Latino' in data: lang = 'Lat'
-            elif '<strong>Audio</strong>: Castellano' in data: lang = 'Esp'
-            elif '<strong>Audio</strong>: Subtitulado' in data: lang = 'Vose'
-            else: lang = '?'
+                if '<strong>Audio</strong>: Español Latino' in data: lang = 'Lat'
+                elif '<strong>Audio</strong>: Castellano' in data: lang = 'Esp'
+                elif '<strong>Audio</strong>: Subtitulado' in data: lang = 'Vose'
+                else: lang = '?'
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:

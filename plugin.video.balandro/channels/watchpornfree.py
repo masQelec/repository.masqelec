@@ -183,6 +183,14 @@ def findvideos(item):
         ses += 1
 
         if 'vev.io' in url: continue
+        elif '/rapidgator.' in url: continue
+        elif '/uploaded.' in url: continue
+        elif '/nitro.' in url: continue
+        elif '/ddownload.' in url: continue
+        elif '/nitroflare.' in url: continue
+        elif '/katfile.' in url: continue
+        elif '/fikper.' in url: continue
+        elif '/turbobit.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
 
@@ -207,7 +215,6 @@ def findvideos(item):
             elif '/uploaded.' in url: continue
             elif '/nitro.' in url: continue
             elif '/ddownload.' in url: continue
-            elif '/hexupload.' in url: continue
             elif '/nitroflare.' in url: continue
             elif '/katfile.' in url: continue
             elif '/fikper.' in url: continue
@@ -260,6 +267,14 @@ def play(item):
     itemlist.append(item.clone(server = servidor, url = url))
 
     return itemlist
+
+
+def _lasts(item):
+    logger.info()
+
+    item.url = host + 'category/featured/'
+
+    return list_all(item)
 
 
 def search(item, texto):

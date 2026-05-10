@@ -455,9 +455,8 @@ def findvideos(item):
     for match in matches:
         ses += 1
 
-        if not '/redirect-to/' in match: continue
-
-        url = scrapertools.find_single_match(match, 'redirect=(.*?)$')
+        if '/redirect-to/' in match: url = scrapertools.find_single_match(match, 'redirect=(.*?)$')
+        else: url = match
 
         if url:
             if not 'http' in url: continue
@@ -492,6 +491,7 @@ def play(item):
 
         if new_url:
            if new_url == 'null': return itemlist
+           elif new_url == 'https://filemoon.sx/e/': return itemlist
 
            url = new_url
 

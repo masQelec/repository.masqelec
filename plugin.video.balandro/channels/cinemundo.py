@@ -45,6 +45,11 @@ def categorias(item):
     logger.info()
     itemlist = []
 
+    data = do_downloadpage(host)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    _token = scrapertools.find_single_match(str(data), "'csrf_token'" + '.*?"&csrf=(.*?)"')
+
     cats = {
         'Adolescencia',
         'Amor',
@@ -69,6 +74,8 @@ def categorias(item):
 
         if cat == 'Violencia de Género': categ = 'VmlvbGVuY2lhIGRlIEfpbmVybw=='
 
+        if _token: categ = categ + '&csrf=' + _token
+
         url = "{}find_page.php?str={}".format(host, categ)
 
         itemlist.append(item.clone( title = cat, url = url, action = 'list_all', text_color = 'deepskyblue' ))
@@ -86,14 +93,18 @@ def anios(item):
     data = do_downloadpage(host)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '>BUSQUEDA POR A(.*?)</div>')
+    _token = scrapertools.find_single_match(str(data), "'csrf_token'" + '.*?"&csrf=(.*?)"')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<span class="text-gray-3500 font-size-16">(.*?)</span>')
+    bloque = scrapertools.find_single_match(data, '>FILTRAR POR A(.*?)</select>')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<option value="(.*?)"')
 
     for match in matches:
-        if match == str(current_year): continue
+        if not match: continue
 
         anyo = base64.b64encode(match.encode('utf8')).decode('utf8')
+
+        if _token: anyo = anyo + '&csrf=' + _token
 
         url = "{}find_page.php?str={}".format(host, anyo)
 
@@ -149,10 +160,10 @@ def list_all(item):
         if item.year: year = year
 
         if not year == '-':
-          year = scrapertools.find_single_match(title, ' (\d{4})')
+          year = scrapertools.find_single_match(title, '(\d{4})')
 
           if year:
-              title = title.replace('(%s)' % year, '').strip()
+              title = title.replace('(' + year + ')', '').strip()
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
                                     contentType = 'movie', contentTitle = title, infoLabels={'year': year} ))
@@ -209,8 +220,12 @@ def list_list(item):
 
         if ' (' in MovieName: MovieName = MovieName.split(" (")[0]
 
+        year = scrapertools.find_single_match(title, '(\d{4})')
+        if year: title = title.replace('(' + year + ')', '').strip()
+        else: year = '-'
+
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title,
-                                    contentType = 'movie', contentTitle = MovieName, infoLabels={'year': '-'} ))
+                                    contentType = 'movie', contentTitle = MovieName, infoLabels={'year': year} ))
 
         if len(itemlist) >= perpage: break
 
@@ -264,7 +279,14 @@ def findvideos(item):
 def search(item, texto):
     logger.info()
     try:
+       data = do_downloadpage(host)
+       data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+       _token = scrapertools.find_single_match(str(data), "'csrf_token'" + '.*?"&csrf=(.*?)"')
+
        texto = base64.b64encode(str(texto).encode('utf8')).decode('utf8')
+       if _token: texto = texto + '&csrf=' + _token
+
        item.url = "{}find_page.php?str={}".format(host, texto)
        return list_all(item)
     except:

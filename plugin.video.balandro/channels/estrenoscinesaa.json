@@ -6,12 +6,12 @@
   "active": true,
 
   "searchable": true,
-  "search_types": ["movie"],
+  "search_types": ["all", "movie", "tvshow"],
 
-  "categories": [ "movie" ],
+  "categories": ["movie", "tvshow"],
   "language": ["cast"],
 
   "clusters": ["suggested", "producers", "lists", "kids"],
 
-  "notes": "Películas en Castellano, por géneros. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Películas y Series en Castellano, por géneros. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

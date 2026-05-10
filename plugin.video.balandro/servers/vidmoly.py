@@ -57,6 +57,10 @@ def get_video_url(page_url, url_referer=''):
 
     ini_page_url = page_url
 
+    # ~ 7/4/26 NO captcha  https://vidmoly.me/\\1.html
+    page_url = page_url.replace('/embed-', '/').replace('/d/', '/').replace('/w/', '/').replace('/v/', '/')
+    if not '.html' in page_url: page_url = page_url + '.html'
+ 
     headers = {}
     if url_referer: headers['Referer'] = url_referer
 
@@ -64,10 +68,17 @@ def get_video_url(page_url, url_referer=''):
 
     if resp.code == 404:
         return 'Archivo inexistente ó eliminado'
+
     elif '/notice.php' in resp.data:
         return 'Archivo inexistente ó eliminado'
 
     data = resp.data
+
+    if 'This video not found' in data:
+        return 'Archivo inexistente ó eliminado'
+
+    elif '>Security Check<' in data:
+        return 'CloudFlare Security Check'
 
     url = scrapertools.find_single_match(data, "sources:.*?file:.*?'(.*?)'.*?,")
     if not url: url = scrapertools.find_single_match(data, 'sources:.*?file:.*?"(.*?)".*?,')
@@ -113,7 +124,10 @@ def get_video_url(page_url, url_referer=''):
                 resuelto = resolveurl.resolve(page_url)
 
                 if resuelto:
-                    video_urls.append(['mp4', resuelto])
+                    if '.m3u8' in resuelto: video_urls.append(['m3u8', resuelto])
+                    elif '.m3u' in resuelto: video_urls.append(['m3u', resuelto])
+                    elif '.mp4' in resuelto: video_urls.append(['mp4', resuelto])
+                    else: video_urls.append(['', resuelto])
                     return video_urls
 
                 color_exec = config.get_setting('notification_exec_color', default='cyan')
@@ -136,6 +150,9 @@ def get_video_url(page_url, url_referer=''):
 
                     elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                         return 'Fichero sin link al vídeo ó restringido'
+
+                    elif 'Cloudflare challenge' in trace:
+                        return 'Cloudflare Challenge Check'
 
                 elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
                     return 'Archivo inexistente'

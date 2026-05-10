@@ -530,9 +530,9 @@ def findvideos(item):
                     if not config.get_setting('developer_mode', default=False): continue
 
                 other = ''
-                if servidor == 'various': other = servertools.corregir_other(url)
+                if servidor == 'various': other = servertools.corregir_other(matchx)
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url=url, language=lang, other=other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url=matchx, language=lang, other=other ))
 
                 continue
 

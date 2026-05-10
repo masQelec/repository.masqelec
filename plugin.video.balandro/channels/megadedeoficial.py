@@ -248,7 +248,11 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
-    matches = scrapertools.find_multiple_matches(data, 'data-season="(.*?)".*?Temp(.*?)</button>')
+    bloque = scrapertools.find_single_match(data, '>Episodios<(.*?)</div>')
+
+    matches = scrapertools.find_multiple_matches(bloque, 'data-season="(.*?)".*?Temp(.*?)</button>')
+
+    tot_tempo = len(matches)
 
     if not matches:
         id_season = scrapertools.find_single_match(data, 'data-season="(.*?)"')
@@ -275,6 +279,9 @@ def temporadas(item):
     for id_season, nro_season in matches:
         nro_season = nro_season.strip()
 
+        if tot_tempo > 9:
+            if len(nro_season) == 1: nro_season = '0' + nro_season
+
         title = 'Temporada ' + nro_season
 
         if len(matches) == 1:
@@ -293,7 +300,7 @@ def temporadas(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    return sorted(itemlist, key=lambda it: it.contentSeason)
+    return sorted(itemlist, key=lambda x: x.title)
 
 
 def episodios(item):
@@ -592,7 +599,7 @@ def findvideos(item):
                         if not config.get_setting('developer_mode', default=False): continue
 
                     other = ''
-                    if servidor == 'various': other = servertools.corregir_other(url)
+                    if servidor == 'various': other = servertools.corregir_other(matchx)
 
                     itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = matchx,
                                           language=lang, other=other ))

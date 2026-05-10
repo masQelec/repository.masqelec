@@ -166,20 +166,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver/?status=&type=Pelicula', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_all', url = host + 'ver/?status=&type=Pelicula&order=latest', search_type = 'movie', text_color='cyan' ))
-
-    itemlist.append(item.clone( title = 'Actualizadas', action = 'list_all', url = host + 'ver/?type=Pelicula&order=update', search_type = 'movie' ))
-
-    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'ver/?status=&type=Pelicula&order=popular', search_type = 'movie' ))
-
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'ver/?type=Pelicula&order=rating', search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por tema', action = 'temas', search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Por estudio', action = 'estudios', search_type = 'movie', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'movie' ))
@@ -197,18 +187,6 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver/?status=&type=Serie', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_all', url = host + '/ver/?status=&type=Serie&order=latest', search_type = 'tvshow', text_color='cyan' ))
-
-    itemlist.append(item.clone( title = 'Actualizadas', action = 'list_all', url = host + 'ver/?type=Serie&order=update', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'ver/?status=Ongoing&type=Serie', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Finalizadas', action = 'list_all', url = host + 'ver/?status=Completed&type=Serie&order=', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'ver/?status=&type=Serie&order=popular', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'ver/?type=Serie&order=rating', search_type = 'tvshow' ))
-
     return itemlist
 
 
@@ -222,18 +200,6 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver/?status=&type=Anime', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + '/ver/?status=&type=Anime&order=latest', search_type = 'tvshow', text_color='cyan' ))
-
-    itemlist.append(item.clone( title = 'Actualizados', action = 'list_all', url = host + 'ver/?type=Anime&order=update', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'ver/?status=Ongoing&type=Anime', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Finalizados', action = 'list_all', url = host + 'ver/?status=Completed&type=Anime&order=', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'ver/?status=&type=Anime&order=popular', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'ver/?type=Anime&order=rating', search_type = 'tvshow' ))
-
     return itemlist
 
 
@@ -242,31 +208,16 @@ def generos(item):
     itemlist = []
 
     data = do_downloadpage(host + 'generos/')
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<h1><span>Generos<(.*?)</ul>')
+    bloque = scrapertools.find_single_match(data, '<span>Generos</span>.*?-->(.*?)</div>')
 
-    matches = re.compile('<a href="(.*?)".*?<span class="name">(.*?)</span>', re.DOTALL).findall(bloque)
+    matches = re.compile('<a href="(.*?)".*?<span class="gnvp-genre-name">(.*?)</span>', re.DOTALL).findall(bloque)
 
     for url, title in matches:
         itemlist.append(item.clone( title=title, url=url, action='list_all', text_color = 'deepskyblue' ))
 
-    return itemlist
-
-
-def alfabetico(item):
-    logger.info()
-    itemlist = []
-
-    for letra in '#0ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-        if letra == '#': letter = '.'
-        elif letra == '0': letter = '0-9'
-        else: letter = letra.upper()
-
-        url = host + 'az-lists/?show=' + letter
-
-        itemlist.append(item.clone ( title = letra, url = url, action = 'list_all', text_color = 'deepskyblue' ))
-
-    return itemlist
+    return sorted(itemlist, key=lambda x: x.title)
 
 
 def temas(item):
@@ -279,18 +230,14 @@ def temas(item):
     data = do_downloadpage(host + 'generos/')
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '>Etiquetas<(.*?)</div></div>')
+    bloque = scrapertools.find_single_match(data, 'Tematicas</span>(.*?)</label>')
 
-    matches = re.compile('<a href="(.*?)".*?aria-label=".*?">(.*?)</a>', re.DOTALL).findall(bloque)
+    matches = re.compile('<a href="(.*?)".*?<span class="gnvp-sg-name">(.*?)</span>', re.DOTALL).findall(bloque)
 
     for url, title in matches:
-        title = title.capitalize()
-
-        title = title.replace('relationship', '').strip()
-
         itemlist.append(item.clone( title=title, url=url, action='list_all', text_color = text_color ))
 
-    return itemlist
+    return sorted(itemlist, key=lambda x: x.title)
 
 
 def paises(item):
@@ -329,6 +276,22 @@ def estudios(item):
     return itemlist
 
 
+def alfabetico(item):
+    logger.info()
+    itemlist = []
+
+    for letra in '#0ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+        if letra == '#': letter = '.'
+        elif letra == '0': letter = '0-9'
+        else: letter = letra.upper()
+
+        url = host + 'az-lists/?show=' + letter
+
+        itemlist.append(item.clone ( title = letra, url = url, action = 'list_all', text_color = 'deepskyblue' ))
+
+    return itemlist
+
+
 def list_all(item):
     logger.info()
     itemlist = []
@@ -340,7 +303,7 @@ def list_all(item):
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for url, title, type, thumb in matches:
-        title = title.replace('&#8217;', "'").replace('&#038;', "&").replace('&#8230;', '')
+        title = title.replace('&#8217;', "'").replace('&#038;', "&").replace('&#8230;', '').replace('&#8211;', '')
 
         tipo = 'movie' if '>Pelicula' in type else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
@@ -384,6 +347,12 @@ def list_all(item):
                     if '/page/' in next_page:
                         itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
 
+        elif 'class="gnvp-pagination">' in data:
+            next_page = scrapertools.find_single_match(data, 'class="gnvp-pagination">.*?class="page-numbers current">.*?href="(.*?)"')
+
+            if next_page:
+                if '?page=' in next_page:
+                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -497,99 +466,98 @@ def findvideos(item):
     if item.contentSeason:
         url = scrapertools.find_single_match(data, '<div class="player-embed".*?<iframe.*?src="(.*?)".*?</iframe>')
 
-        if not '/embed.php?id=' in url: return itemlist
+        if '/embed.php?id=' in url:
+            ses += 1
 
-        ses += 1
+            data2 = do_downloadpage(url)
 
-        data2 = do_downloadpage(url)
+            bloque2 = scrapertools.find_single_match(data2, '<script>.*?var videos.*?=(.*?)</script>')
 
-        bloque2 = scrapertools.find_single_match(data2, '<script>.*?var videos.*?=(.*?)</script>')
+            matches2 = re.compile('", "(.*?)"', re.DOTALL).findall(str(bloque2))
 
-        matches2 = re.compile('", "(.*?)"', re.DOTALL).findall(str(bloque2))
+            for match2 in matches2:
+                data3 = do_downloadpage(match2)
 
-        for match2 in matches2:
-            data3 = do_downloadpage(match2)
+                link = scrapertools.find_single_match(data3, "var url = '(.*?)'")
 
-            link = scrapertools.find_single_match(data3, "var url = '(.*?)'")
+                if link:
+                    servidor = servertools.get_server_from_url(link)
 
-            if link:
-                servidor = servertools.get_server_from_url(link)
+                    if servertools.is_server_available(servidor):
+                        if not servertools.is_server_enabled(servidor): continue
+                    else:
+                        if not config.get_setting('developer_mode', default=False): continue
 
-                if servertools.is_server_available(servidor):
-                    if not servertools.is_server_enabled(servidor): continue
-                else:
-                    if not config.get_setting('developer_mode', default=False): continue
+                    other = servidor
 
-                other = servidor
+                    if servidor == 'various': other = servertools.corregir_other(link)
 
-                if servidor == 'various': other = servertools.corregir_other(link)
+                    if servidor == other: other = ''
 
-                if servidor == other: other = ''
-
-                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = servidor,
-                                      language = lang, other = other ))
+                    itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = servidor,
+                                         language = lang, other = other ))
 
 
-        bloque3 = scrapertools.find_single_match(data2, '<tbody>(.*?)</tbody>')
+            bloque3 = scrapertools.find_single_match(data2, '<tbody>(.*?)</tbody>')
 
-        matches3 = re.compile('<tr>(.*?)</tr>', re.DOTALL).findall(bloque3)
+            matches3 = re.compile('<tr>(.*?)</tr>', re.DOTALL).findall(bloque3)
 
-        for match3 in matches3:
-             url = scrapertools.find_single_match(match3, 'href="(.*?)"')
+            for match3 in matches3:
+                url = scrapertools.find_single_match(match3, 'href="(.*?)"')
 
-             if url:
-                 if '/powvideo.' in url: continue
-                 elif '/streamplay' in url: continue
-                 elif '/streamango.' in url: continue
-                 elif '/streamcloud.' in url: continue
-                 elif '/openload.'in url: continue
-                 elif '/rapidvideo.' in url: continue
-                 elif '/jetload.' in url: continue
-                 elif '/uploaded' in url: continue
-                 elif '/byter' in url: continue
-                 elif '/uploadmp4' in url: continue
-                 elif '/xdrive' in url: continue
+                if url:
+                    if '/powvideo.' in url: continue
+                    elif '/streamplay' in url: continue
+                    elif '/streamango.' in url: continue
+                    elif '/streamcloud.' in url: continue
+                    elif '/openload.'in url: continue
+                    elif '/rapidvideo.' in url: continue
+                    elif '/jetload.' in url: continue
+                    elif '/uploaded' in url: continue
+                    elif '/byter' in url: continue
+                    elif '/uploadmp4' in url: continue
+                    elif '/xdrive' in url: continue
 
-                 elif '/1fichier.' in url: continue
-                 elif '/ul.' in url: continue
-                 elif '/multiup.' in url: continue
-                 elif '/filemirage.' in url: continue
-                 elif '/filepv.' in url: continue
-                 elif '.rapidvideo.' in url: continue
+                    elif '/1fichier.' in url: continue
+                    elif '/ul.' in url: continue
+                    elif '/multiup.' in url: continue
+                    elif '/filemirage.' in url: continue
+                    elif '/filepv.' in url: continue
+                    elif '.rapidvideo.' in url: continue
 
-                 servidor = servertools.get_server_from_url(url)
+                    servidor = servertools.get_server_from_url(url)
 
-                 if servertools.is_server_available(servidor):
-                     if not servertools.is_server_enabled(servidor): continue
-                 else:
-                    if not config.get_setting('developer_mode', default=False): continue
+                    if servertools.is_server_available(servidor):
+                        if not servertools.is_server_enabled(servidor): continue
+                    else:
+                       if not config.get_setting('developer_mode', default=False): continue
 
-                 other = servidor
+                    other = servidor
 
-                 if servidor == 'various': other = servertools.corregir_other(url)
+                    if servidor == 'various': other = servertools.corregir_other(url)
 
-                 if servidor == other: other = ''
+                    if servidor == other: other = ''
 
-                 if 'latino' in match3: lng = 'Lat'
-                 elif 'castellano' in match3: lng = 'Esp'
-                 elif 'subtitulado' in match3: lng = 'Vose'
-                 else: lng = '?'
+                    if 'latino' in match3: lng = 'Lat'
+                    elif 'castellano' in match3: lng = 'Esp'
+                    elif 'subtitulado' in match3: lng = 'Vose'
+                    else: lng = '?'
 
-                 itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor,
-                                       language = lng, other = other ))
+                    itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor,
+                                          language = lng, other = other ))
 
     else:
 
         matches = re.compile('<li data-index="(.*?)".*?<a href="(.*?)"', re.DOTALL).findall(data)
 
         for opcion, url in matches:
-            ses += 1
-
             data1 = do_downloadpage(url)
 
             url = scrapertools.find_single_match(data1, '<div class="player-embed".*?<iframe.*?src="(.*?)".*?</iframe>')
 
             if url:
+                ses += 1
+
                 if '/powvideo.' in url: continue
                 elif '/streamplay' in url: continue
                 elif '/streamango.' in url: continue
@@ -698,6 +666,127 @@ def findvideos(item):
 
                         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor,
                                               language = lng, other = other ))
+
+    if not itemlist:
+        # ~ Castellano
+        bloque_esp = scrapertools.find_single_match(data, '"label":"Castellano"(.*?);')
+
+        matches_esp = re.compile('"src":"(.*?)"', re.DOTALL).findall(bloque_esp)
+
+        for url in matches_esp:
+            ses += 1
+
+            url = url.replace('\\/', '/')
+
+            if '/powvideo.' in url: continue
+            elif '/streamplay' in url: continue
+            elif '/streamango.' in url: continue
+            elif '/streamcloud.' in url: continue
+            elif '/openload.'in url: continue
+            elif '/rapidvideo.' in url: continue
+            elif '/jetload.' in url: continue
+            elif '/uploaded' in url: continue
+            elif '/byter' in url: continue
+            elif '/uploadmp4' in url: continue
+            elif '/xdrive' in url: continue
+
+            elif '/vidsonic.' in url: continue
+
+            elif '/1fichier.' in url: continue
+            elif '/ul.' in url: continue
+            elif '/multiup.' in url: continue
+            elif '/filemirage.' in url: continue
+            elif '/filepv.' in url: continue
+            elif '.rapidvideo.' in url: continue
+
+            servidor = servertools.get_server_from_url(url)
+
+            if servertools.is_server_available(servidor):
+                if not servertools.is_server_enabled(servidor): continue
+            else:
+                if not config.get_setting('developer_mode', default=False): continue
+
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = 'Esp'))
+
+        # ~ Latino
+        bloque_lat = scrapertools.find_single_match(data, '"label":"Latino"(.*?);')
+
+        matches_lat = re.compile('"src":"(.*?)"', re.DOTALL).findall(bloque_lat)
+
+        for url in matches_lat:
+            ses += 1
+
+            url = url.replace('\\/', '/')
+
+            if '/powvideo.' in url: continue
+            elif '/streamplay' in url: continue
+            elif '/streamango.' in url: continue
+            elif '/streamcloud.' in url: continue
+            elif '/openload.'in url: continue
+            elif '/rapidvideo.' in url: continue
+            elif '/jetload.' in url: continue
+            elif '/uploaded' in url: continue
+            elif '/byter' in url: continue
+            elif '/uploadmp4' in url: continue
+            elif '/xdrive' in url: continue
+
+            elif '/vidsonic.' in url: continue
+
+            elif '/1fichier.' in url: continue
+            elif '/ul.' in url: continue
+            elif '/multiup.' in url: continue
+            elif '/filemirage.' in url: continue
+            elif '/filepv.' in url: continue
+            elif '.rapidvideo.' in url: continue
+
+            servidor = servertools.get_server_from_url(url)
+
+            if servertools.is_server_available(servidor):
+                if not servertools.is_server_enabled(servidor): continue
+            else:
+                if not config.get_setting('developer_mode', default=False): continue
+
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = 'Lat'))
+
+        # ~ Subtitulado
+        bloque_sub = scrapertools.find_single_match(data, '"label":"Subtitulado"(.*?);')
+
+        matches_sub = re.compile('"src":"(.*?)"', re.DOTALL).findall(bloque_sub)
+
+        for url in matches_sub:
+            ses += 1
+
+            url = url.replace('\\/', '/')
+
+            if '/powvideo.' in url: continue
+            elif '/streamplay' in url: continue
+            elif '/streamango.' in url: continue
+            elif '/streamcloud.' in url: continue
+            elif '/openload.'in url: continue
+            elif '/rapidvideo.' in url: continue
+            elif '/jetload.' in url: continue
+            elif '/uploaded' in url: continue
+            elif '/byter' in url: continue
+            elif '/uploadmp4' in url: continue
+            elif '/xdrive' in url: continue
+
+            elif '/vidsonic.' in url: continue
+
+            elif '/1fichier.' in url: continue
+            elif '/ul.' in url: continue
+            elif '/multiup.' in url: continue
+            elif '/filemirage.' in url: continue
+            elif '/filepv.' in url: continue
+            elif '.rapidvideo.' in url: continue
+
+            servidor = servertools.get_server_from_url(url)
+
+            if servertools.is_server_available(servidor):
+                if not servertools.is_server_enabled(servidor): continue
+            else:
+                if not config.get_setting('developer_mode', default=False): continue
+
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = 'Vose'))
 
     if not itemlist:
         if not ses == 0:

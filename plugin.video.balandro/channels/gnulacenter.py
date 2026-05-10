@@ -266,9 +266,9 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    bloque = scrapertools.find_single_match(data, "</h1>(.*?)</tbody>")
+    bloque = scrapertools.find_single_match(data, "</dt>(.*?)</section>")
 
-    episodes = scrapertools.find_multiple_matches(bloque, '<td>(.*?)</article>')
+    episodes = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(episodes)

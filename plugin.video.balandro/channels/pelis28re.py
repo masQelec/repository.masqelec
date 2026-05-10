@@ -255,21 +255,25 @@ def list_all(item):
 
         if not url or not title: continue
 
+        title = title.replace('Animeonline', '').replace('Veranimeonline', '').strip()
+
+        title = title.replace('Ver ', '').replace('ver ', '').replace(' Online', '').replace(' online', '').replace(' Serie', '').replace(' serie', '').strip()
+
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="year">(.*?)</span>')
-        if not year: year = scrapertools.find_single_match(match, '</h3></pan>(.*?)</span>')
+        if not year: year = scrapertools.find_single_match(match, '</h3><span>(.*?)</span>')
+        if not year: year = scrapertools.find_single_match(match, '</h3> <span>(.*?)</span>')
 
-        if year: title = title.replace('(', year + ')').strip()
+        if year:
+            if ', ' in year: year = year.split(', ')[1]
+
+        if year: title = title.replace('(' + year + ')', '').replace(' ' + year + ' ', '').replace(' ' + year, '').strip()
         else: year = '-'
 
         if '/peliculas/' in item.url: year = scrapertools.find_single_match(item.url, "/peliculas/(.*?)/")
 
         title = title.replace('&#8217;', "'").replace('&#8211;', '').replace('&#038;', '&').strip()
-
-        title = title.replace('Animeonline', '').replace('Veranimeonline', '').strip()
-
-        title = title.replace('Ver ', '').replace('ver ', '').replace(' Online', '').replace(' online', '').replace(' Serie', '').replace(' serie', '').strip()
 
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo

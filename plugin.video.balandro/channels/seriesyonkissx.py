@@ -612,6 +612,9 @@ def play(item):
 
     url = item.url
 
+    if servidor == 'directo':
+        if '/mega.nz/#confirm' in url: return itemlist
+
     if item.url.endswith('.torrent'):
         if config.get_setting('proxies', item.channel, default=''):
             if PY3:
@@ -638,7 +641,7 @@ def play(item):
             itemlist.append(item.clone( url = item.url, server = 'torrent' ))
             return itemlist
 
-        if item.server == 'directo':
+        if servidor == 'directo':
             host_torrent = host[:-1]
             url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
 

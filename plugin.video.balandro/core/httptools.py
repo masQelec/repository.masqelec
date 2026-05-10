@@ -46,9 +46,9 @@ cj = MozillaCookieJar()
 ficherocookies = os.path.join(config.get_data_path(), "cookies.dat")
 
 
-# ~ 19/2/26
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.26 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.77 Safari/537.36"
+# ~ 25/4/26
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.7727.117 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.56 Safari/537.36"
 
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
@@ -233,8 +233,9 @@ def downloadpage_proxy(canal,
            col = '[B][COLOR %s]' % color_exec
            txt =  col + txt + '[/B][/COLOR]'
 
-        avisar = True
-        if config.get_setting('sin_resp') == 'no': avisar = False
+        # ~ Search
+        avisar = False
+        if config.get_setting('sin_resp') == 'si': avisar = True
 
         if avisar:
            el_canal = ('Sin respuesta en [B][COLOR %s]') % color_alert
@@ -316,6 +317,14 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
     """
 
     response = {}
+
+    if not 'http' in url:
+        if not url.startswith == 'magnet:':
+            if config.get_setting('developer_team'):
+                platformtools.dialog_ok(config.__addon_name + ' -  HttpTools', '[B][COLOR palegreen]Revisar Url Incompleta[/COLOR][/B]', url)
+
+            response["data"] = ""
+            return type('HTTPResponse', (), response)
 
     # ~ Si existe el fichero en la caché y no ha caducado, se devuelve su contenido sin hacer ninguna petición
     if use_cache:
@@ -725,9 +734,16 @@ def get_cookies_from_headers(headers):
 
 
 def get_cookie(url, name, follow_redirects=False):
-    if follow_redirects:
+    try:
         import requests
+        existe_script = True
+    except:
+        existe_script = False
 
+    if not existe_script:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Falta script.module.requests[/COLOR][/B]' % color_alert)
+
+    if follow_redirects:
         try:
             headers = requests.head(url, headers=default_headers).headers
             url = headers['location']

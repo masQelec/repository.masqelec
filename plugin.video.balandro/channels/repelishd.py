@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
 
-host = 'https://repelishd.city/'
+host = 'https://repelishd.run/'
 
 
 def item_configurar_proxies(item):
@@ -44,7 +44,7 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://repelishd.cam/']
+    ant_hosts = ['https://repelishd.cam/', 'https://repelishd.city/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -68,16 +68,16 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
         else:
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
-        if not data:
-            if not '?story=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('RepelisHd', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
+    if not data:
+        if not '?story=' in url:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('RepelisHd', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
-                timeout = config.get_setting('channels_repeat', default=30)
+            timeout = config.get_setting('channels_repeat', default=30)
 
-                if hay_proxies:
-                    data = httptools.downloadpage_proxy('repelishd', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-                else:
-                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+            if hay_proxies:
+                data = httptools.downloadpage_proxy('repelishd', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+            else:
+                data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     return data
 
@@ -118,7 +118,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'cine/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'pelicula/', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'cine/', search_type = 'movie', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
 
@@ -157,7 +159,7 @@ def idiomas(item):
 
     if item.search_type == 'movie':
         text_color = 'deepskyblue'
-        url_idio = host + 'cine/'
+        url_idio = host + 'pelicula/'
     else:
         text_color = 'hotpink'
         url_idio = host + 'series/'
@@ -173,7 +175,7 @@ def calidades(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(host + 'cine/')
+    data = do_downloadpage(host + 'pelicula/')
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, 'Calidad(.*?)<span>Aplicar')
@@ -194,7 +196,7 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(host + 'cine/')
+    data = do_downloadpage(host + 'pelicula/')
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, 'Genres(.*?)<span>Aplicar')
@@ -207,7 +209,7 @@ def generos(item):
 
         title = title.capitalize()
 
-        url = host + 'cine/?genere=' + value
+        url = host + 'pelicula/?genere=' + value
 
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = 'deepskyblue' ))
 
@@ -228,7 +230,7 @@ def anios(item):
     else: limit = 1999
 
     for x in range(current_year, limit, -1):
-        url = host + '/xfsearch/year/' + str(x) + '/'
+        url = host + 'xfsearch/year/' + str(x) + '/'
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = text_color ))
 
@@ -241,12 +243,12 @@ def paises(item):
 
     if item.search_type == 'movie':
         text_color = 'deepskyblue'
-        url_pais = host + 'cine/'
+        url_pais = host + 'pelicula/'
     else:
         text_color = 'hotpink'
         url_pais = host + 'series/'
 
-    data = do_downloadpage(host + 'cine/')
+    data = do_downloadpage(url_pais)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, 'País(.*?)<span>Aplicar')
@@ -514,6 +516,8 @@ def findvideos(item):
         urls = scrapertools.find_multiple_matches(active, 'data-link="(.*?)"')
 
         for url in urls:
+            if not url: continue
+
             ses += 1
 
             if '/verhdlink.' in url: continue
@@ -537,12 +541,21 @@ def findvideos(item):
     return itemlist
 
 
+def _news(item):
+    logger.info()
+
+    item.url = host + 'cine/'
+    item.search_type = 'movie'
+
+    return list_all(item)
+
+
 def search(item, texto):
     logger.info()
     try:
         url = host
 
-        if item.search_type == 'movie': url = host + 'cine/'
+        if item.search_type == 'movie': url = host + 'pelicula/'
         elif item.search_type == 'tvshow': url = host + 'series/'
 
         item.url = url + '?story=' + texto.replace(" ", "+") + '&do=search&subaction=search'

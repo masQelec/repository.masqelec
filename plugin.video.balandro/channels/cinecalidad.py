@@ -539,19 +539,24 @@ def findvideos(item):
         bloque = scrapertools.find_single_match(data, '">Ver(.*?)' + _final)
         if not bloque: bloque = scrapertools.find_single_match(data, '">VER(.*?)' + _final)
 
-        matches = scrapertools.find_multiple_matches(bloque, 'data-src="(.*?)".*?data-option>(.*?)</a>')
-        if not matches:matches = scrapertools.find_multiple_matches(bloque, 'data-src="(.*?)".*?data-option.*?>(.*?)</a>') 
+        # ~ es por las series
+        if 'data-src=""' in bloque:
+            matches = scrapertools.find_multiple_matches(bloque, 'data-lmt="(.*?)".*?data-option>(.*?)</a>')
+            if not matches:matches = scrapertools.find_multiple_matches(bloque, 'data-lmt="(.*?)".*?data-option.*?>(.*?)</a>') 
+        else:
+            matches = scrapertools.find_multiple_matches(bloque, 'data-src="(.*?)".*?data-option>(.*?)</a>')
+            if not matches:matches = scrapertools.find_multiple_matches(bloque, 'data-src="(.*?)".*?data-option.*?>(.*?)</a>') 
 
         for data_url, servidor in matches:
-            ses += 1
-
             other = ''
 
             servidor = servidor.lower().strip()
 
             if servidor == 'trailer' or servidor == 'youtube': continue
 
-            elif servidor == 'veri': continue
+            ses += 1
+
+            if servidor == 'veri': continue
             elif servidor == 'player': continue
             elif servidor == 'vip': continue
 
@@ -563,7 +568,7 @@ def findvideos(item):
             elif 'doostream' in servidor: servidor = 'doodstream'
 
             elif servidor == 'ok': servidor = 'okru'
-	
+
             elif servidor == 'netu' or servidor == 'hqq': servidor = 'waaw'
 
             elif servidor == 'google' or servidor == 'drive' or servidor == 'google drive': servidor = 'gvideo'
@@ -615,7 +620,7 @@ def findvideos(item):
 
             other = ''
 
-            servidor = servidor.lower().strip()
+            servidor = servidor.replace('.com', '').lower().strip()
 
             if servidor == 'subtítulos' or 'subtitulo' in servidor: continue
 
@@ -684,7 +689,7 @@ def findvideos(item):
             for _url, servidor in matches:
                 ses += 1
 
-                servidor = servidor.lower().strip()
+                servidor = servidor.replace('.com', '').lower().strip()
 
                 other = 'd'
 
@@ -692,7 +697,7 @@ def findvideos(item):
 
                 elif servidor == 'veri': continue
 
-                elif servidor == 'bittorrent': servidor = 'torrent'
+                elif servidor == 'utorrent': servidor = 'torrent'
                 elif 'bittorrent' in servidor: servidor = 'torrent'
 
                 elif 'voesx' in servidor: servidor = 'voe'
@@ -725,7 +730,9 @@ def findvideos(item):
                     if not config.get_setting('developer_mode', default=False): continue
 
                 if 'magnet:' in _url: url = _url
-                else: url = item.url + _url
+                else:
+                    url = _url
+                    if not 'http' in _url: url = item.url + _url 
 
                 qlty = '720'
 
@@ -797,7 +804,10 @@ def play(item):
 
             return itemlist
 
-    url = base64.b64decode(item.data_url).decode("utf-8")
+    if item.data_url:
+        url = base64.b64decode(item.data_url).decode("utf-8")
+    else:
+        url = item.url
 
     url = url.replace('&amp;', '&')
 

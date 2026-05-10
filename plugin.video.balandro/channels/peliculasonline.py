@@ -318,6 +318,12 @@ def findvideos(item):
             if '#idioma' in url: url = url.split("#idioma")[0]
             elif '#lang=' in url: url = url.split("#lang=")[0]
 
+        elif '/player.cuevana3.one/' in url:
+            url = url.replace('/player.cuevana3.one/', '/waaw.to/')
+
+            if '#idioma' in url: url = url.split("#idioma")[0]
+            elif '#lang=' in url: url = url.split("#lang=")[0]
+
         servidor = servertools.get_server_from_url(url)
 
         if servertools.is_server_available(servidor):
@@ -352,6 +358,12 @@ def findvideos(item):
 
                     if '/player.cuevana.ac/' in url:
                         url = url.replace('/player.cuevana.ac/', '/waaw.to/')
+
+                        if '#idioma' in url: url = url.split("#idioma")[0]
+                        elif '#lang=' in url: url = url.split("#lang=")[0]
+
+                    elif '/player.cuevana3.one/' in url:
+                        url = url.replace('/player.cuevana3.one/', '/waaw.to/')
 
                         if '#idioma' in url: url = url.split("#idioma")[0]
                         elif '#lang=' in url: url = url.split("#lang=")[0]
@@ -438,6 +450,9 @@ def play(item):
         if new_server.startswith("http"):
             if not config.get_setting('developer_mode', default=False): return itemlist
         servidor = new_server
+
+    if '.fembed.' in url or '/feurl.' in url:
+        return 'Servidor [COLOR red]Fuera de Servicio[/COLOR]'
 
     url = servertools.normalize_url(servidor, url)
 

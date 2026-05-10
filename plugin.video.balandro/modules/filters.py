@@ -1267,12 +1267,15 @@ def show_servers_list(item):
                     if incidencia:
                         info += '[COLOR tan][B]Incidencia [/B][/COLOR]'
 
-        if item.tipo == 'sinsoporte':
+        if item.tipo == 'activos':
+            if "out of service" in notes.lower(): continue
+        elif item.tipo == 'sinsoporte':
             if not "requiere" in notes.lower(): continue
         elif item.tipo == 'outservice':
             if not "out of service" in notes.lower(): continue
         elif item.tipo == 'alternativos':
             if not "alternative" in notes.lower(): continue
+            if "out of service" in notes.lower(): continue
 
             add_on = scrapertools.find_single_match(notes.lower(), 'vía:(.*?)$').strip().lower()
             if ' (' in add_on: add_on = scrapertools.find_single_match(add_on, '(.*?) ').strip().lower()
@@ -1316,6 +1319,16 @@ def show_servers_list(item):
             info += '[COLOR mediumaquamarine]' + notes + '[/COLOR]'
 
         server_name = dict_server['name']
+
+        if dict_server['active'] == False:
+            if notes:
+                if "requiere" in notes.lower(): server_name = '[COLOR red]' + server_name + '[/COLOR]'
+                else: server_name = '[COLOR darkred]' + server_name + '[/COLOR]'
+        else:
+            if notes:
+                if "requiere" in notes.lower(): server_name = '[COLOR red]' + server_name + '[/COLOR]'
+                elif 'Fuera de Servicio' in notes: server_name = '[COLOR darkviolet]' + server_name + '[/COLOR]'
+
         server_thumb = thumb
 
         opciones_servers.append(platformtools.listitem_to_select('[COLOR yellow]' + server_name + '[/COLOR]', info, server_thumb))
@@ -1521,6 +1534,10 @@ def show_channels_list(item):
         info += '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
 
         channel_name = ch['name']
+
+        if 'web anulada' in ch['notes'].lower(): channel_name = '[COLOR darkred]' + channel_name + '[/COLOR]'
+        elif 'web cerrada' in ch['notes'].lower(): channel_name = '[COLOR darkviolet]' + channel_name + '[/COLOR]'
+
         channel_thumb = ch['thumbnail']
 
         opciones_channels.append(platformtools.listitem_to_select('[COLOR yellow]' + channel_name + '[/COLOR]', info, channel_thumb))

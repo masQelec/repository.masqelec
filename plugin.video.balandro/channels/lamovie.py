@@ -58,6 +58,9 @@ def do_downloadapi(type, filter, page, terms, _id, season, order):
         data = resp.data
         return data
     else:
+        if '<title>Just a moment...</title>' in resp.data:
+            if not type == 'search':
+                platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
         return ''
 
 
@@ -201,6 +204,9 @@ def list_filter(item):
        if item.group == 'animes': text_color = 'springgreen'
 
     data = httptools.downloadpage(host).data
+
+    if '<title>Just a moment...</title>' in data:
+        platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
 
     siteconfig = scrapertools.find_single_match(data, "siteConfig\s*=\s*([^<]+)")
 

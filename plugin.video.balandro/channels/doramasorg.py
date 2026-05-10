@@ -350,9 +350,9 @@ def findvideos(item):
     ses = 0
 
     for _post, _lang, srv in matches:
-        ses += 1
-
         if not _post: continue
+
+        ses += 1
 
         post = {'id': _post}
 

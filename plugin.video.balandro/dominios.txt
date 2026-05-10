@@ -1,4 +1,4 @@
-[COLOR coral][B]Balandro [/COLOR][COLOR goldenrod] Situacion Dominios [/COLOR][COLOR aqua] 23 de Febrero de 2026 [/COLOR][COLOR limegreen]  Hora  8:00  [/COLOR][COLOR yellow]Version 4.0.26[/B][/COLOR]
+[COLOR coral][B]Balandro [/COLOR][COLOR goldenrod] Situacion Dominios [/COLOR][COLOR aqua] 28 de Abril de 2026 [/COLOR][COLOR limegreen]  Hora  8:00  [/COLOR][COLOR yellow]Version 4.0.28[/B][/COLOR]
 
  [COLOR yellow][B]CONTACTO:[/B][/COLOR]
    Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Tutoriales, Sugerencias, etc.
@@ -27,7 +27,7 @@
         o menos saturados, o mas duraderos, ademas pueden ser gratuitos o de pago.[/B][/COLOR]
 
  [COLOR red][B]PROXIES[COLOR deepskyblue] GESTION LISTAS PERSONALIZADAS:[/B][/COLOR] 
-   [B][COLOR moccasin] Lista-proxies.zip [COLOR dodgerblue] Descarga desde el Foro [COLOR limegreen][I] Revision 21/2/26 [/I][/B][/COLOR]
+   [B][COLOR moccasin] Lista-proxies.zip [COLOR dodgerblue] Descarga desde el Foro [COLOR limegreen][I] Revision 20/4/26 [/I][/B][/COLOR]
 
  [COLOR sienna][B]SITUACION SERVIDORES:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
 
@@ -36,8 +36,12 @@
  [COLOR darkcyan][B]CANALES TEMPORALMENTE DES-ACTIVADOS:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
 
  [COLOR slateblue][B]CANALES PROBABLEMENTE NO ACCESIBLES:[/B][/COLOR]
-   [B][COLOR moccasin] FlixCorn [COLOR lime] www.flixcorn.com [I][COLOR red] CloudFlare Human Verify [/I][/B][/COLOR]
-   [B][COLOR moccasin] PapayaSeries [COLOR lime] papayaseries.com [I][COLOR red] CloudFlare Human Verify [/I][/B][/COLOR]
+    [B][COLOR moccasin] AnimeOnline [COLOR lime] ww3.animeonline.ninja [I][COLOR red] CloudFlare Protection [/I][/B][/COLOR]
+    [B][COLOR moccasin] AsiaLive [COLOR lime] asialiveaction.com [I][COLOR red] CloudFlare Protection [/I][/B][/COLOR]
+    [B][COLOR moccasin] EzTv [COLOR lime] eztvx.to [I][COLOR red] CloudFlare Protection [/I][/B][/COLOR]
+    [B][COLOR moccasin] OsjoNosu [COLOR lime] osjonosu.xyz [I][COLOR red] Host Error [/I][/B][/COLOR]
+    [B][COLOR moccasin] YoHentai [COLOR lime] yohentai.net [I][COLOR red] Host Not Found [/I][/B][/COLOR]
+    [B][COLOR moccasin] ZonaLeros [COLOR lime] zona-leros.com [I][COLOR red] CloudFlare Protection [/I][/B][/COLOR]
 
  [COLOR cyan][B]ULTIMOS CAMBIOS DE DOMINIOS:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
 

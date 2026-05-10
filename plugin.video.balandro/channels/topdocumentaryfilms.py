@@ -90,8 +90,10 @@ def findvideos(item):
 
         servidor = servertools.get_server_from_url(url)
 
+        url = url.replace('/www.youtube-nocookie.com/', '/www.youtube.com/')
+
         if servidor and servidor != 'directo':
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = 'Vo' ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url, language = 'Vo' ))
 
     if not itemlist:
         if not i == 0:

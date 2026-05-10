@@ -346,6 +346,9 @@ def temporadas(item):
     for tempo in temporadas:
         tempo = tempo.replace('Temporada', '').replace('TEMPORADA', '').strip()
 
+        if tempo == '0':
+            if config.get_setting('channels_especiales', default=True): continue
+
         if tempo == '0': hay_season0 = True
 
         nro_tempo = tempo
