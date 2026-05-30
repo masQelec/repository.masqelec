@@ -3,7 +3,7 @@
   "name": "YtsMx",
   "thumbnail": "ytsmx.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["movie"],
@@ -13,5 +13,5 @@
 
   "clusters": ["onlyone", "torrents", "qualityes", "years", "rankings", "kids", "docs", "vos", "4k", "3d"],
 
-  "notes": "Canal con enlaces Torrent exclusivamente. Películas Subtituladas y en Versión Original, por géneros."
+  "notes": "Web CERRADA. Canal con enlaces Torrent exclusivamente. Películas Subtituladas y en Versión Original."
 }

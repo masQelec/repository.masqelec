@@ -35,10 +35,6 @@ current_month = int(datetime.today().month)
 
 team = False
 if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')): team = True
-elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')): team = True
-elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')): team = True
-elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developerwebs.py')): team = True
-elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developerrelease.py')): team = True
 
 config.set_setting('developer_team', team)
 

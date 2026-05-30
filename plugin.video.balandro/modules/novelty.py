@@ -71,7 +71,7 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    if item.extra == 'doramas' or item.extra == 'animes' or item.extra == 'adults':
+    if item.extra == 'doramas' or item.extra == 'animes' or item.extra == 'new_animes' or item.extra == 'adults':
         filtros = {'status': 0 }
     else:
         filtros = {'searchable': True, 'status': 0 }
@@ -95,19 +95,22 @@ def mainlist(item):
         itemlist.append(item.clone( action='', title='[B][COLOR gold]Canales[/COLOR] Novedades [I][COLOR lightyellow]Infantiles:[/I][/COLOR][/B]', thumbnail=config.get_thumb('booklet'), fanart=fanart, text_color='darksalmon' ))
 
     elif item.extra == 'novelas':
-        itemlist.append(item.clone( action='', title='[B][COLOR gold]Canales[/COLOR] Novedades [I][COLOR lightyellow]Novelas:[/I][/COLOR][/B]', thumbnail=config.get_thumb('booklet'), fanart=fanart, text_color='darksalmon' ))
+        itemlist.append(item.clone( action='', title='[B][COLOR gold]Canales[/COLOR] Novedades [I][COLOR limegreen]Novelas:[/I][/COLOR][/B]', thumbnail=config.get_thumb('booklet'), fanart=fanart, text_color='darksalmon' ))
 
     elif item.extra == 'torrents':
         itemlist.append(item.clone( action='', title='[B][COLOR gold]Canales[/COLOR] Novedades [I][COLOR blue]Torrents:[/I][/COLOR][/B]', thumbnail=config.get_thumb('booklet'), fanart=fanart, text_color='darksalmon' ))
 
     elif item.extra == 'epis_novelas':
-        itemlist.append(item.clone( action='', title='[B][COLOR gold]Canales[/COLOR] Novedades [I][COLOR springgreen]Episodios Novelas:[/I][/B][/COLOR]', thumbnail=config.get_thumb('tvshow'), fanart=fanart, text_color='darksalmon' ))
+        itemlist.append(item.clone( action='', title='[B][COLOR gold]Canales[/COLOR] Novedades [I][COLOR limegreen]Episodios Novelas:[/I][/B][/COLOR]', thumbnail=config.get_thumb('tvshow'), fanart=fanart, text_color='darksalmon' ))
 
     elif item.extra == 'doramas':
         itemlist.append(item.clone( action='', title='[B][COLOR gold]Canales[/COLOR] Novedades [I][COLOR firebrick]Episodios Doramas:[/I][/B][/COLOR]', thumbnail=config.get_thumb('computer'), fanart=fanart, text_color='darksalmon' ))
 
     elif item.extra == 'animes':
         itemlist.append(item.clone( action='', title='[B][COLOR gold]Canales[/COLOR] Novedades [I][COLOR springgreen]Episodios Animes:[/I][/B][/COLOR]', thumbnail=config.get_thumb('tvshow'), fanart=fanart, text_color='darksalmon' ))
+
+    elif item.extra == 'new_animes':
+        itemlist.append(item.clone( action='', title='[B][COLOR gold]Canales[/COLOR] Novedades [I][COLOR springgreen]Animes:[/I][/COLOR][/B]', thumbnail=config.get_thumb('tvshow'), fanart=fanart, text_color='darksalmon' ))
 
     elif item.extra == 'adults':
         itemlist.append(item.clone( action='', title='[B][COLOR gold]Canales[/COLOR] Novedades [I][COLOR orange]Adultos:[/I][/B][/COLOR]', thumbnail=config.get_thumb('adults'), fanart=fanart, text_color='darksalmon' ))
@@ -355,7 +358,6 @@ def mainlist(item):
             if not 'lasts' in ch['clusters']: continue
 
             if ch['id'] == 'cineplus': continue
-            elif ch['id'] == 'gnulacenter': continue
             elif ch['id'] == 'retrotv': continue
             elif ch['id'] == 'seriesretro': continue
             elif ch['id'] == 'star': continue
@@ -405,7 +407,7 @@ def mainlist(item):
                 elif ch['id'] == 'seriesturcas': continue
                 elif ch['id'] == 'srnovelas': continue
 
-            if item.extra == 'epis_novelas':
+            elif item.extra == 'epis_novelas':
                 if ch['id'] == 'seriesturcas': pass
                 else:
                     if not 'lasts' in ch['clusters']: continue
@@ -437,31 +439,50 @@ def mainlist(item):
 
             else: continue
 
-        elif item.extra == 'animes':
+        elif item.extra == 'animes' or item.extra == 'new_animes':
             if not 'exclusivamente al anime' in ch['notes'].lower(): continue
 
             if not 'tvshow' in ch['categories']: continue
 
-            if ch['id'] == 'animeclub': pass
-            elif ch['id'] == 'animeflv': pass
-            elif ch['id'] == 'animejl': pass
-            elif ch['id'] == 'animeonline': pass
-            elif ch['id'] == 'animeyt': pass
-            elif ch['id'] == 'estrenosanime': pass
-            elif ch['id'] == 'jkanime': pass
-            elif ch['id'] == 'henaojara': pass
-            elif ch['id'] == 'henaojaran': pass
-            elif ch['id'] == 'ikucomics': pass
-            elif ch['id'] == 'latanime': pass
-            elif ch['id'] == 'monoschinos': pass
-            elif ch['id'] == 'mundodonghua': pass
-            elif ch['id'] == 'mundodonghuaxyz': pass
-            elif ch['id'] == 'tioanime': pass
-            elif ch['id'] == 'tiodonghua': pass
-            elif ch['id'] == 'veranime': pass
-            elif ch['id'] == 'villaanimex': pass
+            if item.extra == 'animes':
+                if ch['id'] == 'animeclub': pass
+                elif ch['id'] == 'animeflv': pass
+                elif ch['id'] == 'animejara': pass
+                elif ch['id'] == 'animejl': pass
+                elif ch['id'] == 'animeonline': pass
+                elif ch['id'] == 'animeyt': pass
+                elif ch['id'] == 'estrenosanime': pass
+                elif ch['id'] == 'henaojara': pass
+                elif ch['id'] == 'henaojaran': pass
+                elif ch['id'] == 'ikucomics': pass
+                elif ch['id'] == 'jkanime': pass
+                elif ch['id'] == 'latanime': pass
+                elif ch['id'] == 'monoschinos': pass
+                elif ch['id'] == 'mundodonghua': pass
+                elif ch['id'] == 'mundodonghuaxyz': pass
+                elif ch['id'] == 'tioanime': pass
+                elif ch['id'] == 'tiodonghua': pass
+                elif ch['id'] == 'veranime': pass
+                elif ch['id'] == 'villaanimex': pass
 
-            else: continue
+                else: continue
+
+            elif item.extra == 'new_animes':
+                if ch['id'] == 'animeclub': pass
+                elif ch['id'] == 'animeflv': pass
+                elif ch['id'] == 'animejara': pass
+                elif ch['id'] == 'animeyt': pass
+                elif ch['id'] == 'estrenosanime': pass
+                elif ch['id'] == 'henaojara': pass
+                elif ch['id'] == 'henaojaran': pass
+                elif ch['id'] == 'jkanime': pass
+                elif ch['id'] == 'monoschinos': pass
+                elif ch['id'] == 'tioanime': pass
+                elif ch['id'] == 'tiodonghua': pass
+                elif ch['id'] == 'veranime': pass
+                elif ch['id'] == 'villaanimex': pass
+
+                else: continue
 
         elif item.extra == 'adults':
             if not 'para Adultos +18' in ch['notes']: continue
@@ -471,7 +492,6 @@ def mainlist(item):
             elif ch['id'] == 'hentaila': pass
             elif ch['id'] == 'pornhub': pass
             elif ch['id'] == 'sexu': pass
-            elif ch['id'] == 'watchpornfree': pass
             elif ch['id'] == 'youjizz': pass
             elif ch['id'] == 'zbporn': pass
 
@@ -493,23 +513,19 @@ def mainlist(item):
             elif ch['id'] == 'estrenoscinesaa': continue
             elif ch['id'] == 'entrepeliculasyseries': continue
             elif ch['id'] == 'gnula': continue
-            elif ch['id'] == 'gnulacenter': continue
             elif ch['id'] == 'hdcinema': continue
             elif ch['id'] == 'lacartoons': continue
             elif ch['id'] == 'lamovie': continue
             elif ch['id'] == 'megadedeoficial': continue
             elif ch['id'] == 'megaserie': continue
-            elif ch['id'] == 'osjonosu': continue
             elif ch['id'] == 'paraveronline': continue
             elif ch['id'] == 'peliculasonline': continue
             elif ch['id'] == 'peliculaspro': continue
             elif ch['id'] == 'pelis28re': continue
-            elif ch['id'] == 'pelisflix': continue
             elif ch['id'] == 'pelisgratishd': continue
             elif ch['id'] == 'pelismart': continue
             elif ch['id'] == 'pelispediais': continue
             elif ch['id'] == 'pelisplayhd': continue
-            elif ch['id'] == 'pelisplushd': continue
             elif ch['id'] == 'pelisplushdlat': continue
             elif ch['id'] == 'pelisplushdnz': continue
             elif ch['id'] == 'plushd': continue
@@ -530,7 +546,9 @@ def mainlist(item):
             elif item.extra == 'novelas' or item.extra == 'epis_novelas': pass
 
             elif item.extra == 'doramas': pass
-            elif item.extra == 'animes': pass
+
+            elif item.extra == 'animes' or item.extra == 'new_animes': pass
+
             elif item.extra == 'adults': pass
 
             elif 'clons' in ch['clusters']: pass

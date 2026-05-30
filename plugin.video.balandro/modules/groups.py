@@ -562,6 +562,15 @@ def submnu_news(item):
             if config.get_setting('mnu_torrents', default=True):
                 itemlist.append(item.clone( title = ' - [B]Torrents[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('torrents'), extra = 'torrents', search_type = 'movie', text_color='blue' ))
 
+            if config.get_setting('mnu_doramas', default=True):
+                itemlist.append(item.clone( title = ' - [B]Doramas[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('computer'), extra = 'doramas', search_type = 'tvshow', text_color='firebrick' ))
+
+            if config.get_setting('mnu_animes', default=True):
+                itemlist.append(item.clone( title = ' - [B]Animes[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('anime'), extra = 'new_animes', search_type = 'tvshow', text_color='springgreen' ))
+
+            if config.get_setting('mnu_adultos', default=True):
+                itemlist.append(item.clone( title = ' - [B]Adultos[/B]', channel='novelty', action='mainlist', news='lasts', thumbnail=config.get_thumb('adults'), extra = 'adults', search_type = 'all', text_color='orange' ))
+
         if config.get_setting('mnu_series', default=True) or config.get_setting('channels_link_pyse', default=False):
             itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] Novedades Episodios:[/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='darksalmon' ))
 
@@ -628,6 +637,13 @@ def submnu_alls(item):
     if config.get_setting('sub_mnu_favoritos', default=False):
         itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[COLOR plum][B]Favoritos[/B][/COLOR]', context=context_cfg_search, thumbnail=config.get_thumb('star') ))
 
+    itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] Novedades Películas[/B]', channel='novelty', action='mainlist', context=context_usual, thumbnail=config.get_thumb('movie'), extra = 'movies', search_type = 'movie', text_color='deepskyblue' ))
+
+    itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] Novedades Series[/B]', channel='novelty', action='mainlist', context=context_usual, thumbnail=config.get_thumb('tvshow'), extra = 'tvshows', search_type = 'tvshow', text_color='hotpink' ))
+
+    if config.get_setting('mnu_novelas', default=True):
+        itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] [COLOR hotpink]Novedades[/COLOR] Últimas novelas[/B]', channel='novelty', action='mainlist', context=context_usual, thumbnail=config.get_thumb('booklet'), extra = 'novelas', search_type = 'tvshow', text_color='limegreen' ))
+
     itemlist.append(item.clone( channel='submnuctext', action='submnu_channels', title='[COLOR yellow][B]Buscar[/B][/COLOR]', context=context_buscar, extra = 'mixed', thumbnail=config.get_thumb('search') ))
 
     itemlist.append(item.clone( title = '[B][I]Canales:[/I][/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='gold' ))
@@ -682,6 +698,8 @@ def submnu_pelis(item):
     if config.get_setting('sub_mnu_favoritos', default=False):
         itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[COLOR plum][B]Favoritos[/B][/COLOR]', context=context_cfg_search, thumbnail=config.get_thumb('star') ))
 
+    itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] Novedades Películas[/B]', channel='novelty', action='mainlist', context=context_usual, thumbnail=config.get_thumb('movie'), extra = 'movies', search_type = 'movie', text_color='deepskyblue' ))
+
     itemlist.append(item.clone( channel='submnuctext', action='submnu_channels', title='[COLOR yellow][B]Buscar[/B][/COLOR]', context=context_buscar, extra = 'movies', thumbnail=config.get_thumb('search') ))
 
     itemlist.append(item.clone( title = '[B][I]Canales:[/I][/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='deepskyblue' ))
@@ -733,6 +751,11 @@ def submnu_series(item):
     if config.get_setting('sub_mnu_favoritos', default=False):
         itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[COLOR plum][B]Favoritos[/B][/COLOR]', context=context_cfg_search, thumbnail=config.get_thumb('star') ))
 
+    itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] Novedades Series[/B]', channel='novelty', action='mainlist', context=context_usual, thumbnail=config.get_thumb('tvshow'), extra = 'tvshows', search_type = 'tvshow', text_color='hotpink' ))
+
+    if config.get_setting('mnu_novelas', default=True):
+        itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] [COLOR hotpink]Novedades[/COLOR] Últimas novelas[/B]', channel='novelty', action='mainlist', context=context_usual, thumbnail=config.get_thumb('booklet'), extra = 'novelas', search_type = 'tvshow', text_color='limegreen' ))
+
     itemlist.append(item.clone( channel='submnuctext', action='submnu_channels', title='[COLOR yellow][B]Buscar[/B][/COLOR]', context=context_buscar, extra = 'tvshows', thumbnail=config.get_thumb('search') ))
 
     itemlist.append(item.clone( title = '[B][I]Canales:[/I][/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='hotpink' ))
@@ -781,6 +804,8 @@ def submnu_docs(item):
     if config.get_setting('sub_mnu_favoritos', default=False):
         itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[COLOR plum][B]Favoritos[/B][/COLOR]', context=context_cfg_search, thumbnail=config.get_thumb('star') ))
 
+    itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] Novedades Documentales[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('documentary'), extra = 'documentaries', search_type = 'documentary', text_color='cyan' ))
+
     itemlist.append(item.clone( channel='submnuctext', action='submnu_channels', title='[COLOR yellow][B]Buscar[/B][/COLOR]', context=context_buscar, extra = 'documentaries', thumbnail=config.get_thumb('search') ))
 
     itemlist.append(item.clone( title = '[B][I]Canales:[/I][/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='cyan' ))
@@ -800,6 +825,8 @@ def submnu_doramas(item):
 
     if config.get_setting('sub_mnu_favoritos', default=False):
         itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[COLOR plum][B]Favoritos[/B][/COLOR]', context=context_cfg_search, thumbnail=config.get_thumb('star') ))
+
+    itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] Novedades Episodios Doramas[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('computer'), extra = 'doramas', search_type = 'tvshow', text_color='firebrick' ))
 
     itemlist.append(item.clone( channel='submnuctext', action='submnu_channels', title='[COLOR yellow][B]Buscar[/B][/COLOR]', context=context_buscar, extra = 'dorama', thumbnail=config.get_thumb('search') ))
 
@@ -832,6 +859,10 @@ def submnu_animes(item):
     if config.get_setting('sub_mnu_favoritos', default=False):
         itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[COLOR plum][B]Favoritos[/B][/COLOR]', context=context_cfg_search, thumbnail=config.get_thumb('star') ))
 
+    itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] Novedades Episodios Animes[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('anime'), extra = 'animes', search_type = 'tvshow', text_color='springgreen' ))
+
+    itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] Novedades Últimos Animes[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('anime'), extra = 'new_animes', search_type = 'tvshow', text_color='moccasin' ))
+
     itemlist.append(item.clone( channel='submnuctext', action='submnu_channels', title='[COLOR yellow][B]Buscar[/B][/COLOR]', context=context_buscar, extra = 'anime', thumbnail=config.get_thumb('search') ))
 
     itemlist.append(item.clone( title = '[B][I]Canales:[/I][/B]', action = '', context=context_parental, thumbnail=config.get_thumb('stack'), text_color='springgreen' ))
@@ -860,6 +891,8 @@ def submnu_adults(item):
 
     if config.get_setting('sub_mnu_favoritos', default=False):
         itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[COLOR plum][B]Favoritos[/B][/COLOR]', context=context_cfg_search, thumbnail=config.get_thumb('star') ))
+
+    itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] Novedades Adultos[/B]', channel='novelty', action='mainlist', context=context_usual, news='lasts', thumbnail=config.get_thumb('adults'), extra = 'adults', search_type = 'tvshow', text_color='orange' ))
 
     itemlist.append(Item( channel='search', action='search', title='[B]Buscar [COLOR orange]vídeo[/COLOR][/B] ...', extra = '+18', search_video = 'adult', thumbnail=config.get_thumb('search'), text_color='yellow' ))
 

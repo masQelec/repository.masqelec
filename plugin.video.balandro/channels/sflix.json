@@ -3,7 +3,7 @@
   "name": "SFlix",
   "thumbnail": "sflix.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["tvshow"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["current", "lasts", "producers", "lists", "kids", "docs", "vos"],
+  "clusters": ["lasts", "producers", "lists", "kids", "docs", "vos"],
 
-  "notes": "Series por Géneros."
+  "notes": "Web ANULADA. Series por Géneros."
 }

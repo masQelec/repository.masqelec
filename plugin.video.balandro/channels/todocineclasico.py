@@ -10,6 +10,17 @@ from core import httptools, scrapertools, tmdb, servertools
 host = 'https://leyendasdelcine.com/'
 
 
+def do_downloadpage(url, post=None, headers=None):
+    data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    if '<title>Just a moment...</title>' in data:
+        if not '/search_elastic?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
+    return data
+
+
 def mainlist(item):
     return mainlist_pelis(item)
 
@@ -55,7 +66,7 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(host + 'movies').data
+    data = do_downloadpage(host + 'movies')
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '>Géneros<(.*?)</select>')
@@ -74,7 +85,7 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     if '/collections/' in item.url or '/search_elastic' in item.url:
@@ -116,7 +127,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     if '?lang_id=8' in data: lang = 'Esp'
@@ -128,7 +139,7 @@ def findvideos(item):
 
     lnk = item.url.replace('/details/', '/watch/')
 
-    data = httptools.downloadpage(lnk).data
+    data = do_downloadpage(lnk)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)".*?</iframe>')

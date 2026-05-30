@@ -10,7 +10,7 @@ from core import httptools, scrapertools, servertools
 host = 'https://watchpornfree.info/'
 
 
-perpage = 30
+perpage = 50
 
 
 def do_downloadpage(url, post=None, headers=None):
@@ -53,8 +53,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'xxxscenes/' ))
 
-    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + 'category/featured/', text_color = 'cyan' ))
-
     itemlist.append(item.clone( title = 'Parodias', action = 'list_all', url = host + 'category/parodies/', text_color = 'pink' ))
 
     itemlist.append(item.clone( title = 'Películas', action = 'pelis', text_color = 'deepskyblue' ))
@@ -71,7 +69,7 @@ def pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Películas catálogo', action = 'list_all', url = host ))
+    itemlist.append(item.clone( title = 'Películas catálogo', action = 'list_all', url = host + 'category/porn-movies' ))
     itemlist.append(item.clone( title = 'Películas más vistas', action = 'list_all', url = host + '?v_sortby=views' ))
     itemlist.append(item.clone( title = 'Películas más valoradas', action = 'list_all', url = host + '?r_sortby=highest_rated' ))
 
@@ -192,6 +190,9 @@ def findvideos(item):
         elif '/fikper.' in url: continue
         elif '/turbobit.' in url: continue
 
+        elif '/frdl.' in url: continue
+        elif '/hitfile.' in url: continue
+
         servidor = servertools.get_server_from_url(url)
 
         other = ''
@@ -267,14 +268,6 @@ def play(item):
     itemlist.append(item.clone(server = servidor, url = url))
 
     return itemlist
-
-
-def _lasts(item):
-    logger.info()
-
-    item.url = host + 'category/featured/'
-
-    return list_all(item)
 
 
 def search(item, texto):

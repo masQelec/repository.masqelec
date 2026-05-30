@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://animeytx.net/'
+host = 'https://wwv.animeytx.net/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://animeyt.moe/', 'https://animeenlatino.moe/', 'https://aniyt.net/',
-             'https://wvw.aniyt.net/', 'https://animeytx.com/']
+             'https://wvw.aniyt.net/', 'https://animeytx.com/', 'https://animeytx.net/']
 
 
 domain = config.get_setting('dominio', 'animeyt', default='')
@@ -666,6 +666,15 @@ def _epis(item):
     item.search_type = 'tvshow'
 
     return list_all(item)
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host
+    item.search_type = 'tvshow'
+
+    return last_animes(item)
 
 
 def search(item, texto):

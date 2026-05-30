@@ -403,9 +403,12 @@ def findvideos(item):
 
     if not embeds: embeds = scrapertools.find_single_match(data, 'data-src="(.*?)"')
 
-    if not 'http' in embeds: embeds = ''
-
     if not embeds: return itemlist
+
+    if embeds.startswith('//'): embeds = 'https:' + embeds
+    elif embeds.startswith("/"): embeds = host[:-1] + embeds
+
+    if not 'http' in embeds: return itemlist
 
     embeds = embeds.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
 
@@ -423,13 +426,9 @@ def findvideos(item):
 
         servidor = servertools.get_server_from_url(url)
 
-        other = ''
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang ))
 
-        if servidor == 'various': other = servertools.corregir_other(url)
-
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other ))
-
-    elif '//embed69.' in embeds:
+    elif '/embed69.' in embeds or '/vidurl/' in embeds:
         ses += 1
 
         datae = data
@@ -487,13 +486,20 @@ def findvideos(item):
                     if not config.get_setting('developer_mode', default=False): continue
 
                 other = ''
+                cpow = ''
 
                 if servidor == 'various': other = servertools.corregir_other(srv)
 
                 if '.eyJs' in link: age = ''
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes, age=age,
-                                      language=lang, other=other ))
+                elif 'POW_CHALLENGE' in data:
+                   cpow = scrapertools.find_single_match(data, "POW_CHALLENGE\s*=\s*'([^']+)';" +
+                                                               "\s*\w*\s*POW_DIFFICULTY\s*=\s*(\d+);" +
+                                                               "\s*\w*\s*POW_SALT\s*=\s*'([^']+)';")
+                   if cpow: age = ''
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '',
+                                      crypto=link, bytes=e_bytes, age=age, cpow=cpow, language=lang, other=other ))
 
             continue
 
@@ -629,14 +635,24 @@ def play(item):
         url = ''
 
         if not bytes:
-            url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
-            url += '='
+            if 'eyJs' in item.crypto:
+                url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
+                url += '='
 
-            try:
-                url = base64.b64decode(url).decode()
-                url = scrapertools.find_single_match(url, '"link":"(.*?)"')
-            except:
-                url = ''
+                try:
+                    url = base64.b64decode(url).decode()
+                    url = scrapertools.find_single_match(url, '"link":"(.*?)"')
+                except:
+                    url = ''
+
+            elif item.cpow:
+                res_pow = {"challenge": item.cpow[0], "difficulty": int(item.cpow[1]), "salt": item.cpow[2]}
+
+                resolve_pow = decrypters.decode_pow(res_pow)
+                aes_clave = resolve_pow.get("aes_key", "")
+
+                if aes_clave:
+                    url = decrypters.decode_decipher(crypto, aes_clave)
 
         if not url:
             if bytes:
@@ -660,7 +676,7 @@ def play(item):
                 return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
 
     if url:
-        if '/xupalace.' in url or '/uploadfox.' in url:
+        if '/hydrax.' in url or '/xupalace.' in url or '/uploadfox.' in url or '/embed69.' in url or '/pelisplay.' in url:
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)

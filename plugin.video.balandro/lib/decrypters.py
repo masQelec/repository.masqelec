@@ -135,21 +135,67 @@ def decode_streamcrypt(url):
     return url
 
 
+def decode_pow(params):
+    import hashlib, random, time
+
+    try:
+        challenge = params.get("challenge", "")
+        difficulty = params.get("difficulty", 3)
+        salt = params.get("salt", "")
+
+        format_candidate = params.get("challenge_separator", "%s%d")
+        format_aes_key = params.get("challenge_separator_aes_key", "%s%d%s")
+
+        timer = params.get("timer", False)
+
+        prefix = "0" * difficulty
+        nonce = 0
+        aes_key = ""
+        start = time.time()
+
+        while True:
+            candidate = format_candidate % (challenge, nonce)
+            hash_hex = hashlib.sha256(candidate.encode("utf-8")).hexdigest()
+
+            if hash_hex.startswith(prefix):
+                if salt:
+                    key_material = (format_aes_key % (challenge, nonce, salt)).encode()
+                    aes_key = hashlib.sha256(key_material).digest()
+
+                elapsed = int((time.time() - start) * 1000)
+
+                if timer and elapsed < 350:
+                    fake_delay = random.randint(400, 900)
+                    time.sleep((fake_delay - elapsed) / 1000.0)
+                    elapsed = fake_delay
+
+                return {"nonce": nonce, "elapsed": elapsed, "hash_hex": hash_hex, "aes_key": aes_key}
+
+            nonce += 1
+
+    except Exception:
+        import traceback
+        logger.error(traceback.format_exc())
+        return {}
+
+
 def decode_decipher(_cryto, e_bytes):
     try:
         from Cryptodome.Cipher import AES
     except Exception:
         from Crypto.Cipher import AES
     except:
-        return ''
+        AES = object()
 
     try:
         encrypt = base64.b64decode(_cryto)
-        _len = e_bytes.encode("utf-8")
+        _len = e_bytes.encode("utf-8") if not isinstance(e_bytes, bytes) else e_bytes
+
         if len(_len) not in (16, 24, 32): _len = (_len + b"\x00" * 32)[:32]
         return pkcs7(AES.new(_len, AES.MODE_CBC, encrypt[:16]).decrypt(encrypt[16:]), AES.block_size).decode('utf-8')
     except Exception:
         return ''
+
 
 def pkcs7(data, block_size=16):
     pad_len = data[-1]

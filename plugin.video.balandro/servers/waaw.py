@@ -15,7 +15,7 @@ else:
 
 import os, xbmc, time
 
-from core import filetools, httptools, scrapertools
+from core import filetools, scrapertools
 from platformcode import config, logger, platformtools
 
 

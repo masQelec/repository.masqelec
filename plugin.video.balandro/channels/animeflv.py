@@ -274,6 +274,9 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
+    hay_proximo = False
+    if 'var anime_info = ' in data: hay_proximo = True
+
     info = scrapertools.find_single_match(data, "anime_info = \[(.*?)\];")
 
     if not info: return itemlist
@@ -376,9 +379,29 @@ def episodios(item):
                                     contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
+            if hay_proximo:
+                blk_cap = scrapertools.find_single_match(str(data), 'var anime_info = (.*?);')
+
+                next_cap = scrapertools.find_single_match(blk_cap, '.*?",".*?",".*?","(.*?)"')
+
+                if next_cap:
+                    next_cap = 'Próx. Epis.: ' + next_cap
+                    itemlist.append(item.clone( action='', title = next_cap, thumbnail = item.thumbnail, text_color='cyan' ))
             break
 
     tmdb.set_infoLabels(itemlist)
+
+    if not itemlist:
+        if hay_proximo:
+            blk_cap = scrapertools.find_single_match(str(data), 'var anime_info = (.*?);')
+
+            next_cap = scrapertools.find_single_match(blk_cap, '.*?",".*?",".*?","(.*?)"')
+
+            if next_cap:
+                platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]Proximamente[/B][/COLOR]')
+
+                next_cap = 'Próx. Epis.: ' + next_cap
+                itemlist.append(item.clone( action='', title = next_cap, thumbnail = item.thumbnail, text_color='cyan', infoLabels={'year': ''} ))
 
     if itemlist:
         if len(matches) > ((item.page + 1) * item.perpage):
@@ -467,6 +490,16 @@ def _epis(item):
     item.search_type = 'tvshow'
 
     return last_epis(item)
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host
+    item.froup = 'news'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
 
 
 def search(item, texto):

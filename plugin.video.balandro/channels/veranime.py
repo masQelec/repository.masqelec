@@ -474,6 +474,16 @@ def _epis(item):
     return list_all(item)
 
 
+def _news(item):
+    logger.info()
+
+    item.url = host
+    item.group = 'news'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
+
+
 def search(item, texto):
     logger.info()
     try:

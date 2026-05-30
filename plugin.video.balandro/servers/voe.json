@@ -277,15 +277,31 @@
         "url": "https://voe.sx/e/\\1"
       },
       {
-        "pattern": "https:///lancewhosedifficult.com(?:e/|)([A-z0-9]+)",
+        "pattern": "https://lancewhosedifficult.com/(?:e/|)([A-z0-9]+)",
         "url": "https://voe.sx/e/\\1"
       },
       {
-        "pattern": "https:///dianaavoidthey.com(?:e/|)([A-z0-9]+)",
+        "pattern": "https://dianaavoidthey.com/(?:e/|)([A-z0-9]+)",
         "url": "https://voe.sx/e/\\1"
       },
       {
-        "pattern": "https:///timmaybealready.com(?:e/|)([A-z0-9]+)",
+        "pattern": "https://jefferycontrolmodel.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://marissasharecareer.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://charlestoughrace.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://ianrequireadult.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://timmaybealready.com/(?:e/|)([A-z0-9]+)",
         "url": "https://voe.sx/e/\\1"
       }
     ]

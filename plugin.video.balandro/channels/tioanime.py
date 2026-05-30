@@ -248,6 +248,10 @@ def episodios(item):
                 else: item.perpage = 50
 
     for epi in epis[item.page * item.perpage:]:
+        next_cap = ''
+        if 'Proximo episodio:' in data:
+            next_cap = scrapertools.find_single_match(str(data), 'Proximo episodio:.*?<span>(.*?)</span>')
+
         url =  host + '/ver/' + '%s-%s' % (info[1], epi)
 
         if item.contentSerieName:
@@ -268,6 +272,11 @@ def episodios(item):
                                     contentType = 'episode', contentSeason = season, contentEpisodeNumber = epi ))
 
         if len(itemlist) >= item.perpage:
+            if next_cap:
+                next_cap = 'Próx. Epis. ' + next_cap
+                itemlist.append(item.clone( action='', title = next_cap, thumbnail = item.thumbnail, text_color='cyan'))
+            break
+
             break
 
     if itemlist:
@@ -408,6 +417,16 @@ def _epis(item):
 
     item.url = host
     item.group = 'last'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host
+    item.group = 'news'
     item.search_type = 'tvshow'
 
     return list_all(item)

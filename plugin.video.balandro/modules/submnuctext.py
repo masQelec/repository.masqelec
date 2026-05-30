@@ -309,7 +309,7 @@ def submnu_news(item):
         if config.get_setting('mnu_adultos', default=True):
             itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] Novedades Adultos:[/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='darksalmon' ))
 
-            itemlist.append(item.clone( title = ' - [B]Adultos[/B]', channel='novelty', action='mainlist', context=context_usual, news='lasts', thumbnail=config.get_thumb('tvshow'), extra = 'adults', search_type = 'tvshow', text_color='orange' ))
+            itemlist.append(item.clone( title = ' - [B]Adultos[/B]', channel='novelty', action='mainlist', context=context_usual, news='lasts', thumbnail=config.get_thumb('adults'), extra = 'adults', search_type = 'tvshow', text_color='orange' ))
 
         return itemlist
 
@@ -355,6 +355,9 @@ def submnu_news(item):
                         if config.get_setting('mnu_torrents', default=True):
                             itemlist.append(item.clone( title = ' - [B]Torrents[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('torrents'), extra = 'torrents', search_type = 'movie', text_color='blue' ))
 
+                        if config.get_setting('mnu_animes', default=True):
+                            itemlist.append(item.clone( title = ' - [B]Animes[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('anime'), extra = 'new_animes', search_type = 'tvshow', text_color='springgreen' ))
+
         if presentar_todo:
             if config.get_setting('mnu_series', default=True) or config.get_setting('channels_link_pyse', default=False):
                 if not item.extra == 'torrents' and not item.extra == 'movies':
@@ -375,6 +378,15 @@ def submnu_news(item):
                         if not item.extra == 'tales' and not item.extra == 'dorama' and not item.extra == 'tvshows':
                             if config.get_setting('mnu_animes', default=True):
                                 itemlist.append(item.clone( title = ' - [B]Animes[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('anime'), extra = 'animes', search_type = 'tvshow', text_color='springgreen' ))
+
+                        if item.extra == 'tales':
+                            if config.get_setting('mnu_novelas', default=True):
+                                itemlist.append(item.clone( title = ' - [B]Novelas[/B]', channel='novelty', action='mainlist', context=context_usual, news='epis', thumbnail=config.get_thumb('booklet'), extra = 'epis_novelas', search_type = 'tvshow', text_color='limegreen' ))
+
+                                itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] [COLOR darksalmon]Novedades[/COLOR] Últimas novelas[/B]', channel='novelty', action='mainlist', context=context_usual, thumbnail=config.get_thumb('booklet'), extra = 'novelas', search_type = 'tvshow', text_color='limegreen' ))
+
+                        if item.extra == 'anime':
+                            itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] [COLOR darksalmon]Novedades[/COLOR] Últimos animes[/B]', channel='novelty', action='mainlist', context=context_usual, news='news', thumbnail=config.get_thumb('anime'), extra = 'new_animes', search_type = 'tvshow', text_color='moccasin' ))
 
             if item.extra == 'all' or item.extra == 'mixed' or item.extra == 'infantil' or item.extra == 'groups':
                 itemlist.append(item.clone( title = '[B][COLOR darksalmon]Novedades[/COLOR] en Canales:[/B]', action = '', context=context_usual, thumbnail=config.get_thumb('stack'), text_color='gold' ))
@@ -1259,8 +1271,6 @@ def _dominio_memorizado(item):
 
     elif item.from_channel == 'pelispanda': domains.manto_domain_pelispanda(item)
 
-    elif item.from_channel == 'pelisplushd': domains.manto_domain_pelisplushd(item)
-
     elif item.from_channel == 'pelisplushdlat': domains.manto_domain_pelisplushdlat(item)
 
     elif item.from_channel == 'pelisplushdnz': domains.manto_domain_pelisplushdnz(item)
@@ -1270,8 +1280,6 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'serieskao': domains.manto_domain_serieskao(item)
 
     elif item.from_channel == 'seriespapayato': domains.manto_domain_seriespapayato(item)
-
-    elif item.from_channel == 'sflix': domains.manto_domain_sflix(item)
 
     elif item.from_channel == 'srnovelas': domains.manto_domain_srnovelas(item)
 
@@ -1436,13 +1444,6 @@ def _proxies(item):
 
         if config.get_setting('channel_cuevana3pro_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'cuevana3run':
-        from channels import cuevana3run
-        item.channel = 'cuevana3run'
-        cuevana3run.configurar_proxies(item)
-
-        if config.get_setting('channel_cuevana3run_proxies') is None: refrescar = False
-
     elif item.from_channel == 'cuevanavip':
         from channels import cuevanavip
         item.channel = 'cuevanavip'
@@ -1554,13 +1555,6 @@ def _proxies(item):
         gnula.configurar_proxies(item)
 
         if config.get_setting('channel_gnula_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'gnulacenter':
-        from channels import gnulacenter
-        item.channel = 'gnulacenter'
-        gnulacenter.configurar_proxies(item)
-
-        if config.get_setting('channel_gnulacenter_proxies') is None: refrescar = False
 
     elif item.from_channel == 'gnulatv':
         from channels import gnulatv
@@ -1674,13 +1668,6 @@ def _proxies(item):
 
         if config.get_setting('channel_naranjatorrent_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'osjonosu':
-        from channels import osjonosu
-        item.channel = 'osjonosu'
-        osjonosu.configurar_proxies(item)
-
-        if config.get_setting('channel_osjonosu_proxies') is None: refrescar = False
-
     elif item.from_channel == 'pasateatorrent':
         from channels import pasateatorrent
         item.channel = 'pasateatorrent'
@@ -1709,13 +1696,6 @@ def _proxies(item):
 
         if config.get_setting('channel_pelis28re_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'pelisflix':
-        from channels import pelisflix
-        item.channel = 'pelisflix'
-        pelisflix.configurar_proxies(item)
-
-        if config.get_setting('channel_pelisflix_proxies') is None: refrescar = False
-
     elif item.from_channel == 'pelisforte':
         from channels import pelisforte
         item.channel = 'pelisforte'
@@ -1743,13 +1723,6 @@ def _proxies(item):
         pelispediais.configurar_proxies(item)
 
         if config.get_setting('channel_pelispediais_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'pelisplushd':
-        from channels import pelisplushd
-        item.channel = 'pelisplushd'
-        pelisplushd.configurar_proxies(item)
-
-        if config.get_setting('channel_pelisplushd_proxies') is None: refrescar = False
 
     elif item.from_channel == 'pelisplushdlat':
         from channels import pelisplushdlat
@@ -1877,6 +1850,13 @@ def _proxies(item):
 
         if config.get_setting('channel_tomadivx_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'tubepelis':
+        from channels import tubepelis
+        item.channel = 'tubepelis'
+        tubepelis.configurar_proxies(item)
+
+        if config.get_setting('channel_tubepelis_proxies') is None: refrescar = False
+
     elif item.from_channel == 'ultrapelis':
         from channels import ultrapelis
         item.channel = 'ultrapelis'
@@ -1890,13 +1870,6 @@ def _proxies(item):
         verdetorrent.configurar_proxies(item)
 
         if config.get_setting('channel_verdetorrent_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'verflix':
-        from channels import verflix
-        item.channel = 'verflix'
-        verflix.configurar_proxies(item)
-
-        if config.get_setting('channel_verflix_proxies') is None: refrescar = False
 
     elif item.from_channel == 'veronline':
         from channels import veronline

@@ -312,6 +312,8 @@ def get_video_url(page_url, url_referer=''):
         # ~ 28/8/2025  FILELIONS pq falla ResolveUrl
         page_url = page_url.replace('/filelions.to/', '/taylorplayer.com/')
 
+        page_url = page_url.replace("|Referer=", '$$')
+
     # ~ STREAMWISH
     elif txt_server == 'Streamwish':
         if config.get_setting('servers_time', default=True):

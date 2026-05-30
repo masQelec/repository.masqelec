@@ -196,12 +196,15 @@ def findvideos(item):
         url = servertools.normalize_url(servidor, url)
 
         other = ''
-
         if servidor == 'various': other = servertools.corregir_other(url)
+
+        force_input = ''
+
+        if other == 'Lulustream': force_input = True
 
         if not servidor == 'directo':
             itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor,
-                                  language = lang, other = other ))
+                                  language = lang, other = other, force_input = force_input ))
 
     if not itemlist:
         if not ses == 0:

@@ -173,7 +173,7 @@ def news_epis(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '>Últimos episodios<(.*?)>Ver más episodios<')
+    bloque = scrapertools.find_single_match(data, '>Últimos episodios<(.*?)>Últimos')
 
     matches = re.compile('<div class="sideranking-item"(.*?)</div> </div> </div>').findall(bloque)
 
@@ -452,6 +452,7 @@ def findvideos(item):
             elif '/hgbazooka.' in url: continue
             elif '.tickcounter.' in url: continue
             elif '/zuvioeb.' in url: continue
+            elif '/abyssplayer.' in url: continue
 
             url = url.replace('/Mivalyo.com/', '/mivalyo.com/')
 
@@ -488,6 +489,8 @@ def findvideos(item):
         ses += 1
 
         if '/short.' in url: continue
+
+        elif '/abyssplayer.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
 

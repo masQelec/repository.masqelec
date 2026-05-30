@@ -166,6 +166,7 @@ def get_video_url(page_url, url_referer=''):
     elif 'vimeos' in page_url: txt_server = 'Vimeos'
     elif 'bigshare' in page_url: txt_server = 'Bigshare'
     elif 'vkvideo' in page_url: txt_server = 'Vk'
+    elif 'vidsonic' in page_url: txt_server = 'Vidsonic'
 
     elif txt_server == 'Unknow': return 'Desconocido'
 

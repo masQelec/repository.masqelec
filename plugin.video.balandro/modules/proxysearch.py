@@ -755,6 +755,19 @@ def proxysearch_channel(item, channel_id, channel_name, iniciales_channels_proxi
              procesados += 1
              return
 
+          if channel_id == 'dontorrents':
+              try:
+                 data_tor_proxy = httptools.downloadpage('https://donproxies.com/').data
+              except:
+                 data_tor_proxy = ''
+
+              if data_tor_proxy:
+                  tor_proxy = scrapertools.find_single_match(data_tor_proxy, 'Pulse el boton inferior para que se le genere un proxy.*?<a href="(.*?)".*?>Ingresar al Proxy Generado<')
+                  if tor_proxy:
+                      if not tor_proxy.endswith('/'): tor_proxy = tor_proxy + '/'
+
+                  if not host == tor_proxy: host = tor_proxy
+
           if not host:
               if channel_id == 'hdfull':
                   try:

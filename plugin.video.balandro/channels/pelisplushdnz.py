@@ -533,6 +533,11 @@ def findvideos(item):
         if srv == 'embed69':
             ses += 1
 
+            if url.startswith('//'): url = 'https:' + url
+            elif url.startswith("/"): url = host[:-1] + url
+
+            if not 'http' in url: continue
+
             datae = do_downloadpage(url)
 
             dataLink = scrapertools.find_single_match(datae, 'const dataLink =(.*?);')
@@ -587,15 +592,29 @@ def findvideos(item):
                         if not config.get_setting('developer_mode', default=False): continue
 
                     other = ''
+                    cpow = ''
 
                     if servidor == 'various': other = servertools.corregir_other(srv)
 
                     if '.eyJs' in link: age = ''
 
-                    itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes, age=age,
-                                          language=lang, other=other ))
+                    elif 'POW_CHALLENGE' in datae:
+                       cpow = scrapertools.find_single_match(datae, "POW_CHALLENGE\s*=\s*'([^']+)';" +
+                                                                    "\s*\w*\s*POW_DIFFICULTY\s*=\s*(\d+);" +
+                                                                    "\s*\w*\s*POW_SALT\s*=\s*'([^']+)';")
+                       if cpow: age = ''
+
+                    itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '',
+                                      crypto=link, bytes=e_bytes, age=age, cpow=cpow, language=lang, other=other ))
+
+                continue
 
         elif srv == 'moe':
+            if url.startswith('//'): url = 'https:' + url
+            elif url.startswith("/"): url = host[:-1] + url
+
+            if not 'http' in url: continue
+
             data2 = do_downloadpage(url)
 
             matches2 = scrapertools.find_multiple_matches(data2, '<li onclick="' + "go_to_player.*?'(.*?)'.*?" + 'data-lang="(.*?)".*?<span>(.*?)</span>')
@@ -636,6 +655,11 @@ def findvideos(item):
 
                     url_pattern = '(?:[\w\d]+://)?[\d\w]+\.[\d\w]+/moe\?data=(.+)$'
                     src_pattern = "this\[_0x5507eb\(0x1bd\)\]='(.+?)'"
+
+                    if vid_url.startswith('//'): vid_url = 'https:' + vid_url
+                    elif vid_url.startswith("/"): vid_url = host[:-1] + vid_url
+
+                    if not 'http' in vid_url: continue
 
                     data3 = do_downloadpage(vid_url)
 
@@ -829,14 +853,24 @@ def play(item):
         url = ''
 
         if not bytes:
-            url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
-            url += '='
+            if 'eyJs' in item.crypto:
+                url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
+                url += '='
 
-            try:
-                url = base64.b64decode(url).decode()
-                url = scrapertools.find_single_match(url, '"link":"(.*?)"')
-            except:
-                url = ''
+                try:
+                    url = base64.b64decode(url).decode()
+                    url = scrapertools.find_single_match(url, '"link":"(.*?)"')
+                except:
+                    url = ''
+
+            elif item.cpow:
+                res_pow = {"challenge": item.cpow[0], "difficulty": int(item.cpow[1]), "salt": item.cpow[2]}
+
+                resolve_pow = decrypters.decode_pow(res_pow)
+                aes_clave = resolve_pow.get("aes_key", "")
+
+                if aes_clave:
+                    url = decrypters.decode_decipher(crypto, aes_clave)
 
         if not url:
             if bytes:
@@ -864,7 +898,7 @@ def play(item):
 
         servidor = servertools.get_server_from_url(url)
 
-        if '/plustream.' in url or '/xupalace.' in url:
+        if '/hydrax.' in url or '/xupalace.' in url or '/uploadfox.' in url or '/embed69.' in url or '/pelisplay.' in url:
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         if servidor == 'zplayer': url = url + '|Referer=' + host

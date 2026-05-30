@@ -18,7 +18,7 @@ def do_downloadpage(url, post=None, headers=None):
 
     if not data:
         if url.startswith(host):
-            if not '?s=' in url:
+            if not '/search?q=' in url:
                 if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('XmoviesForYou', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
@@ -47,6 +47,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
+    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'most-viewed'))
+
     return itemlist
 
 
@@ -57,21 +59,34 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
-    matches = scrapertools.find_multiple_matches(data, '<article.*?<a href="(.*?)".*?src="(.*?)".*?alt="(.*?)"')
+    if '</h1>' in data:
+        bloque = scrapertools.find_single_match(data, '</h1>(.*?)$')
+    else:
+        bloque = data
+
+    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?src="(.*?)".*?alt="(.*?)"')
 
     for url, thumb, title in matches:
         if not title: continue
 
         url = host[:-1] + url
 
-        itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
+        itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb,
+                                    contentType = 'movie', contentTitle = title, contentExtra='adults') )
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<div class="flex justify-center mt-12 gap-2">.*?<a href="(.*?)".*?</section>')
+        bloque = scrapertools.find_single_match(data, '<div class="flex justify-center mt-12 gap-2">(.*?)</section>')
+        if not bloque: bloque = scrapertools.find_single_match(data, '<div class="flex justify-center mt-12 gap-2">(.*?)</main>')
+
+        if not '>Prev</a>' in bloque:
+            next_page = scrapertools.find_single_match(bloque, '<a href="(.*?)"')
+        else:
+            next_page = scrapertools.find_single_match(bloque, '>Prev</a>.*?<a href="(.*?)"')
 
         if next_page:
             next_page = host[:-1] + next_page
 
+            #if '/page/' in next_page:
             itemlist.append(item.clone (action='list_all', title='Siguientes ...', url=next_page, text_color = 'coral') )
 
     return itemlist
@@ -129,7 +144,7 @@ def search(item, texto):
     try:
         config.set_setting('search_last_video', texto)
 
-        item.url =  host + '?s=%s' % (texto.replace(" ", "+"))
+        item.url =  host + 'search?q=%s' % (texto.replace(" ", "+"))
         return list_all(item)
     except:
         import sys

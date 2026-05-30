@@ -510,7 +510,6 @@ def manto_params(item):
         config.set_setting('channel_pelisforte_dominio', '')
         config.set_setting('channel_pelismart_dominio', '')
         config.set_setting('channel_pelispanda_dominio', '')
-        config.set_setting('channel_pelisplushd_dominio', '')
         config.set_setting('channel_pelisplushdlat_dominio', '')
         config.set_setting('channel_pelisplushdnz_dominio', '')
 
@@ -518,7 +517,6 @@ def manto_params(item):
 
         config.set_setting('channel_serieskao_dominio', '')
         config.set_setting('channel_seriespapayato_dominio', '')
-        config.set_setting('channel_sflix_dominio', '')
         config.set_setting('channel_srnovelas_dominio', '')
         config.set_setting('channel_subtorrents_dominio', '')
 
@@ -595,7 +593,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '148.0.7778.56')  # ~ 25/4/26
+        config.set_setting('chrome_last_version', '149.0.7827.22')  # ~ 22/5/26
 
         config.set_setting('debug', '0')
 
@@ -1809,10 +1807,6 @@ def opciones_pelispanda(item):
     item.from_channel = 'pelispanda'
     opciones_domains_common(item)
 
-def opciones_pelisplushd(item):
-    item.from_channel = 'pelisplushd'
-    opciones_domains_common(item)
-
 def opciones_pelisplushdlat(item):
     item.from_channel = 'pelisplushdlat'
     opciones_domains_common(item)
@@ -1831,10 +1825,6 @@ def opciones_serieskao(item):
 
 def opciones_seriespapayato(item):
     item.from_channel = 'seriespapayato'
-    opciones_domains_common(item)
-
-def opciones_sflix(item):
-    item.from_channel = 'sflix'
     opciones_domains_common(item)
 
 def opciones_srnovelas(item):
@@ -1955,8 +1945,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'pelispanda': domains.manto_domain_pelispanda(item)
 
-            elif item.from_channel == 'pelisplushd': domains.manto_domain_pelisplushd(item)
-
             elif item.from_channel == 'pelisplushdlat': domains.manto_domain_pelisplushdlat(item)
 
             elif item.from_channel == 'pelisplushdnz': domains.manto_domain_pelisplushdnz(item)
@@ -1966,8 +1954,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'serieskao': domains.manto_domain_serieskao(item)
 
             elif item.from_channel == 'seriespapayato': domains.manto_domain_seriespapayato(item)
-
-            elif item.from_channel == 'sflix': domains.manto_domain_sflix(item)
 
             elif item.from_channel == 'srnovelas': domains.manto_domain_srnovelas(item)
 
@@ -2031,8 +2017,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'pelispanda': domains.manto_domain_pelispanda(item)
 
-            elif item.from_channel == 'pelisplushd': domains.test_domain_pelisplushd(item)
-
             elif item.from_channel == 'pelisplushdlat': domains.test_domain_pelisplushdlat(item)
 
             elif item.from_channel == 'pelisplushdnz': domains.test_domain_pelisplushdnz(item)
@@ -2042,8 +2026,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'serieskao': domains.test_domain_serieskao(item)
 
             elif item.from_channel == 'seriespapayato': domains.test_domain_seriespapayato(item)
-
-            elif item.from_channel == 'sflix': domains.test_domain_sflix(item)
 
             elif item.from_channel == 'srnovelas': domains.test_domain_srnovelas(item)
 
@@ -2078,8 +2060,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'pelisforte': helper.show_help_pelisforte(item)
 
             elif item.from_channel == 'seriespapayato': helper.show_help_seriespapayato(item)
-
-            elif item.from_channel == 'sflix': helper.show_help_sflix(item)
 
             elif item.from_channel == 'srnovelas': helper.show_help_srnovelas(item)
 

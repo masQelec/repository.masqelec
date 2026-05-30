@@ -180,6 +180,9 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
+    hay_proximo = False
+    if '>Próximo capitulo a estrenarse el' in data: hay_proximo = True
+
     if str(item.languages) == 'Esp' or str(item.languages) == 'Lat':
         if '<span class="statuse"> Subtitulado</span>' in data: item.languages = 'Vose'
 
@@ -234,6 +237,13 @@ def episodios(item):
                     item.perpage = sum_parts
                 else: item.perpage = 50
 
+    if hay_proximo:
+        next_cap = scrapertools.find_single_match(data, '>Próximo capitulo a estrenarse el(.*?)<span').strip()
+
+        if next_cap:
+            next_cap = 'Próx. Epis.: ' + next_cap
+            itemlist.append(item.clone( action='', title = next_cap, thumbnail = item.thumbnail, text_color='cyan' ))
+
     for match in matches[item.page * item.perpage:]:
         url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
@@ -283,6 +293,10 @@ def findvideos(item):
     matches = scrapertools.find_multiple_matches(data, '<div id="tab.*?src="(.*?)"')
 
     for url in matches:
+        if not url: continue
+
+        elif url == '#': continue
+
         ses += 1
 
         if 'player1isempty' in url: continue
@@ -290,7 +304,6 @@ def findvideos(item):
         elif '/fembuki.' in url:continue
         elif '/esprinahy.' in url: continue
         elif '/argtesa.' in url: continue
-        elif '/aporodiko.' in url: continue
 
         url = url.replace('/netusia.xyz/', '/waaw.to/')
 
@@ -299,6 +312,8 @@ def findvideos(item):
         other = ''
 
         if servidor == 'various': other = servertools.corregir_other(url)
+
+        elif '/aporodiko.' in url: other = 'Turboviplay'
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor,
                               language = item.languages, other = other ))
@@ -318,11 +333,7 @@ def play(item):
     url = item.url
 
     if '/aporodiko.com/' in url:
-        data = do_downloadpage(url)
-
-        url = scrapertools.find_single_match(data, 'data-hash="(.*?)"')
-
-    if '.turboviplay.' in url: url = ''
+        url = url.replace('/aporodiko.com/', '/turboviplay.com/')
 
     if url:
         servidor = servertools.get_server_from_url(url)

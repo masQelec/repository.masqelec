@@ -310,6 +310,8 @@ def get_video_url(page_url):
             if not 'K,' in url and not "get_media" in url:
                 qlty = scrapertools.find_single_match(url, '/(\d+P)_')
 
+                url = url + '|Referer=' + host + '&Origin=' + host
+
                 video_urls.append([qlty, url])
 
     return video_urls

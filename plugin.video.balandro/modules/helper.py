@@ -49,8 +49,8 @@ descartar_xxx = config.get_setting('descartar_xxx', default=False)
 descartar_anime = config.get_setting('descartar_anime', default=False)
 
 _foro = "[COLOR plum][B][I] www.mimediacenter.info/foro/ [/I][/B][/COLOR]"
-_source = "[COLOR coral][B][I] repobal.github.io/base/ [/I][/B][/COLOR]"
-_scripts = "[COLOR mediumaquamarine][B][I] repobal.github.io/base/scripts/ [/I][/B][/COLOR]"
+_source = "[COLOR coral][B][I] https://repobal.github.io/base/ [/I][/B][/COLOR]"
+_scripts = "[COLOR mediumaquamarine][B][I] https://repobal.github.io/base/scripts/ [/I][/B][/COLOR]"
 _telegram = "[COLOR lightblue][B][I] t.me/balandro_asesor [/I][/B][/COLOR]"
 
 _team = "[COLOR hotpink][B][I] t.me/Balandro_team [/I][/B][/COLOR]"
@@ -579,7 +579,9 @@ def mainlist(item):
 
     itemlist.append(item.clone( action='show_msgfixed', title= ' - [B]Mensajes Fijados [COLOR paleturquoise][I]Telegram Balandro Asesor[/I][/B]', text_color='chartreuse', thumbnail=config.get_thumb('telegram') ))
 
-    itemlist.append(item.clone( action='submnu_errores', title=' - [B]Mensajes de [COLOR darkred][I]Errores[/I][/B][/COLOR] en los Canales', context=context_ayuda, text_color='palegreen', thumbnail=config.get_thumb('addon') ))
+    itemlist.append(item.clone( action='submnu_errores', title=' - [B]Mensajes de [COLOR darkred]Errores[/COLOR] en los Canales[/B]', context=context_ayuda, text_color='palegreen', thumbnail=config.get_thumb('addon') ))
+
+    itemlist.append(item.clone( action='show_ratings', title=' - [COLOR khaki][B]Ratings[/B][/COLOR] (valoración Películas ó Series)', context=context_ayuda, text_color='khaki', thumbnail=config.get_thumb('addon') ))
 
     itemlist.append(item.clone( action='submnu_actualizar', title=' - [B]Actualizar [COLOR darkcyan][I]Fixes[/I][/B]', context=context_ayuda, text_color='cyan', thumbnail=config.get_thumb('addon') ))
 
@@ -1502,6 +1504,8 @@ def show_infos_play(item):
         if con_problemas:
             itemlist.append(item.clone( channel='submnuteam', action='resumen_con_problemas', title='    - Canales[COLOR tomato][B] Con Problemas[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
+    itemlist.append(item.clone( action='submnu_avisinfo_servers', title= '    - [COLOR aquamarine][B]Avisos[/COLOR] [COLOR green]Información[/B][/COLOR] servidores', thumbnail=config.get_thumb('bolt') ))
+
     itemlist.append(item.clone( action='show_server_report', title= ' - Reportar [COLOR gold][B]Reproducción de lista abortada[/B][/COLOR]', thumbnail=config.get_thumb('megaphone') ))
 
     itemlist.append(item.clone( action='show_not_play', title= ' - ¿ Qué [COLOR goldenrod][B]NO[/B][/COLOR] está contemplado en Balandro ?', thumbnail=config.get_thumb('roadblock') ))
@@ -1515,8 +1519,6 @@ def show_infos_play(item):
     itemlist.append(item.clone( action='show_server_report', title= ' - Como [COLOR deepskyblue][B]Reportar[/B][/COLOR] posible Fallo en la Reproducción de Servidores', thumbnail=config.get_thumb('telegram') ))
 
     itemlist.append(item.clone( channel='submnuteam', action='show_help_players', title= ' - Add-Ons [COLOR fuchsia][B]Players[/B][/COLOR] y Repositorios Externos [COLOR limegreen][B]Instalados[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
-
-    itemlist.append(item.clone( action='submnu_avisinfo_servers', title= '    - [COLOR aquamarine][B]Avisos[/COLOR] [COLOR green]Información[/B][/COLOR] servidores', thumbnail=config.get_thumb('bolt') ))
 
     itemlist.append(item.clone( action='show_servers_list', title= '    - Qué servidores se detectan pero [COLOR fuchsia][B]No están Soportados[/B][/COLOR]', tipo = 'sinsoporte', thumbnail=config.get_thumb('roadblock') ))
 
@@ -1573,7 +1575,11 @@ def submnu_avisinfo_servers(item):
 
     itemlist.append(item.clone( action='show_help_uptobox', title= ' - [COLOR green][B]Información[/B][/COLOR] servidor [COLOR darkorange][B]Uptobox[/B][/COLOR]', thumbnail=config.get_thumb('uptobox') ))
 
+    itemlist.append(item.clone( action='show_help_vidmoly', title= ' - [COLOR green][B]Información[/B][/COLOR] servidor [COLOR darkorange][B]Vidmoly[/B][/COLOR]', thumbnail=config.get_thumb('vidmoly') ))
+
     itemlist.append(item.clone( action='show_help_voe', title= ' - [COLOR green][B]Información[/B][/COLOR] servidor [COLOR darkorange][B]Voe[/B][/COLOR]', thumbnail=config.get_thumb('voe') ))
+
+    itemlist.append(item.clone( action='show_help_waaw', title= ' - [COLOR green][B]Información[/B][/COLOR] servidor [COLOR darkorange][B]Waaw[/B][/COLOR]', thumbnail=config.get_thumb('waaw') ))
 
     itemlist.append(item.clone( action='show_help_vias_resolve', title= ' - [COLOR green][B]Información[/B][/COLOR] servidor [COLOR darkorange][B]ResolveUrl[/B][/COLOR]', thumbnail=config.get_thumb('resolveurl') ))
 
@@ -2393,7 +2399,7 @@ def submnu_desarrollo(item):
 
     itemlist.append(item.clone( action='', title='[COLOR firebrick][B][I]FUENTES:[/I][/B][/COLOR]', folder=False, thumbnail=config.get_thumb('team') ))
 
-    itemlist.append(item.clone( action='', title=' - Fuentes [COLOR darkorange][B]github.com/repobal/[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
+    itemlist.append(item.clone( action='', title=' - Fuentes [COLOR darkorange][B]https://github.com/repobal/[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
 
     itemlist.append(item.clone( action='', title='[COLOR firebrick][B][I]TELEGRAM:[/I][/B][/COLOR]', folder=False, thumbnail=config.get_thumb('team') ))
 
@@ -2667,7 +2673,7 @@ def show_help_miscelanea(item):
 
     txt += '[COLOR yellow][B]BALANDRO:[/B][/COLOR][CR]'
 
-    txt += '  Fuente [COLOR yellow]Balandro[/COLOR]:  [COLOR plum][B]repobal.github.io/base/[/B][/COLOR][CR]'
+    txt += '  Fuente [COLOR yellow]Balandro[/COLOR]:  [COLOR plum][B]https://repobal.github.io/base/[/B][/COLOR][CR]'
     txt += '  para obtener [COLOR yellowgreen]Repositorio, Add-On, Scripts, etc.[/COLOR][CR][CR]'
 
     txt += '  Foro:  [COLOR coral][B]www.mimediacenter.info/foro/[/B][/COLOR][CR]'
@@ -2678,7 +2684,7 @@ def show_help_miscelanea(item):
 
     txt += '[COLOR chocolate][B]DESARROLLO BALANDRO:[/B][/COLOR][CR]'
 
-    txt += '  [COLOR firebrick]Fuentes Desarrollo[/COLOR] [COLOR yellow]Balandro[/COLOR]:  [COLOR darkorange][B]github.com/repobal/[/B][/COLOR][CR]'
+    txt += '  [COLOR firebrick]Fuentes Desarrollo[/COLOR] [COLOR yellow]Balandro[/COLOR]:  [COLOR darkorange][B]https://github.com/repobal/[/B][/COLOR][CR]'
     txt += '  para [COLOR orange]Mantenimiento del Add-On, Scripts, etc.[/COLOR][CR][CR]'
 
     txt += '  [COLOR chartreuse]Telegram[/COLOR]:  [COLOR lightblue][B]t.me/Balandro_team[/B][/COLOR][CR]'
@@ -2828,10 +2834,6 @@ def show_help_cuevana3pro(item):
     item.notice = 'cuevana3pro'
     show_help_canales(item)
 
-def show_help_cuevana3run(item):
-    item.notice = 'cuevana3run'
-    show_help_canales(item)
-
 def show_help_detodo(item):
     item.notice = 'detodo'
     show_help_canales(item)
@@ -2886,10 +2888,6 @@ def show_help_mundodonghua(item):
 
 def show_help_mundodonghuaxyz(item):
     item.notice = 'mundodonghuaxyz'
-    show_help_canales(item)
-
-def show_help_osjonosu(item):
-    item.notice = 'osjonosu'
     show_help_canales(item)
 
 def show_help_peliculaspro(item):
@@ -2952,6 +2950,17 @@ def submnu_errores(item):
     itemlist.append(item.clone( action='show_help_error_imprevisto', title= ' - ¿ Qué hacer si se Avisa de [COLOR red][B]Error Imprevisto[/B][/COLOR] en un Canal ?' ))
 
     return itemlist
+
+
+def show_ratings(item):
+    logger.info()
+
+    txt = 'En los Listados de Películas ó Series:[CR]'
+    txt += '  pulsación sostenida sobre el[CR]'
+    txt += '  Nombre de la [COLOR darkgoldenrod][B]Película ó Serie[/B][/COLOR][CR]'
+    txt += '  y ahí la Opción [COLOR yellow][B]Información[/B][/COLOR]'
+
+    platformtools.dialog_textviewer('Ratings (valoración Películas ó Series)', txt)
 
 
 def show_help_error_canal(item):
@@ -3087,12 +3096,6 @@ def show_help_canales(item):
         txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
         txt += '[COLOR yellow][B][CR]Además efectuan control de acceso que puede [COLOR indianred]Bloquear[/COLOR] la Web incluso con el uso [COLOR red]Proxies[/COLOR].[/COLOR][/B][CR]'
 
-    elif item.notice == 'cuevana3run':
-        if config.get_setting('channel_cuevana3run_proxies', default=''):
-	        txt += '[CR][B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
-
-        txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]hCAPTCHA / reCAPTCHA[/COLOR] visible / oculto.[/COLOR][/B][CR]'
-
     elif item.notice == 'detodo':
         if config.get_setting('channel_detodo_proxies', default=''):
 	        txt += '[CR][B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
@@ -3155,12 +3158,6 @@ def show_help_canales(item):
 
     elif item.notice == 'mundodonghua' or item.notice == 'mundodonghuaxyz':
         if config.get_setting('channel_mundodonghua_proxies', default=''):
-	        txt += '[CR][B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
-
-        txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
-
-    elif item.notice == 'osjonosu':
-        if config.get_setting('channel_osjonosu_proxies', default=''):
 	        txt += '[CR][B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
 
         txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
@@ -3427,6 +3424,31 @@ def show_help_uptobox(item):
     platformtools.dialog_textviewer('Información servidor Uptobox', txt)
 
 
+def show_help_vidmoly(item):
+    logger.info()
+
+    if not servertools.is_server_available('vidmoly'):
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El servidor está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    txt = '*) [COLOR palegreen][B]Vidmoly[/COLOR][/B][CR]'
+
+    txt += '    [COLOR goldenrod][B]En Horas Punta[/COLOR][/B],[CR]'
+    txt += '    al Reproducir Vídeos con este servidor,[CR]'
+    txt += '    Activan [COLOR red][B]CloudFlare[/COLOR][/B] [COLOR yellow][B]CaptCha[/COLOR][/B] Oculto.[CR]'
+    txt += '    y nos devuelve [COLOR gold][B]Cloudflare Challenge Check[/COLOR][/B].[CR][CR]'
+
+    txt += '    Es un Tema Ajeno a Balandro y nos es Imposible solucionarlo,[CR]'
+    txt += '    porque requeriría una espera de varios minutos para efectuar el [COLOR fuchsia][B]Play[/COLOR][/B].[CR]'
+
+    txt += '    Simplemente [COLOR cyan][B]Prescindimos de ello.[/COLOR][/B][CR][CR]'
+
+    txt += '    [COLOR yellowgreen][B]Toca esperar a que pasen esas[/COLOR][/B] [COLOR goldenrod][B]Horas Punta[/COLOR][/B],[CR]'
+    txt += '     ó bien Solicitar al Web Master de ese Servidor, que Retire ese Control.'
+
+    platformtools.dialog_textviewer('Información servidor Vidmoly', txt)
+
+
 def show_help_voe(item):
     logger.info()
 
@@ -3434,17 +3456,48 @@ def show_help_voe(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El servidor está Inactivo[/B][/COLOR]' % color_avis)
         return
 
-    txt = ''
+    txt = '*) [COLOR palegreen][B]Voe[/COLOR][/B][CR]'
 
-    txt += '*) En ciertas ocasiones al Reproducir Vídeos con este servidor,[CR]'
+    txt += '    En ciertas ocasiones al Reproducir Vídeos con este servidor,[CR]'
     txt += '    [COLOR yellow][B]Crashea el Add-On[/COLOR][/B][CR]'
 
-    txt += '    Puede solucionarlo efectuando una [COLOR gold][B]Pausa[/COLOR][/B],[CR]'
+    txt += '    Puede solucionarlo efectuando una [COLOR goldenrod][B]Pausa[/COLOR][/B],[CR]'
     txt += '    durante un Minuto y continuar con el [COLOR fuchsia][B]Play[/COLOR][/B].[CR][CR]'
 
     txt += '    ó bien efectuando de Nuevo el [COLOR fuchsia][B]Play[/COLOR][/B]'
 
     platformtools.dialog_textviewer('Información servidor Voe', txt)
+
+
+def show_help_waaw(item):
+    logger.info()
+
+    if not servertools.is_server_available('waaw'):
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El servidor está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    txt = '*) [COLOR palegreen][B]Waaw[/COLOR][/B]'
+
+    txt += '[CR]     1) Si la Pantalla Central está completamente en [COLOR seagreen][B]Negro[/COLOR][/B][CR]'
+    txt += '         y no apareciera el [COLOR goldenrod][B]Símbolo Play[/COLOR][/B][CR]'
+    txt += '         para [COLOR springgreen][B]Ubicar y Entregar[/COLOR][/B] los Vídeos con este servidor,[CR]'
+    txt += '         si al Acceder nos devuelve [COLOR gold][B]Captcha erróneo[/COLOR][/B] [COLOR cyan][B]Inténtelo de nuevo[/COLOR][/B].[CR][CR]'
+
+    txt += '         Es muy probable que el [COLOR red][B]Archivo No Exista[/COLOR][/B][CR]'
+
+    txt += '[CR]     2) En el caso contrario:[CR]'
+    txt += '         Antes de reportarlo como un posible error,[CR]'
+    txt += '         rogamos accedaís a traves de un navegador web,[CR]'
+    txt += '         a ese canal en concreto y procedaís a comprobar[CR]'
+    txt += '         si esa película/serie/episodio[CR]'
+    txt += '         [COLOR goldenrod][B]Reproduce a traves del servidor[/COLOR][/B].[CR]'
+
+    txt += '[CR]         [COLOR darkcyan]Si el resultado de esta operativa ha resultado satisfactoria,[CR]'
+    txt += '         indicarnos toda esa información para proceder a su verficación/subsanación.[/COLOR][CR]'
+
+    txt += '[CR]         Grupo Telegram: [COLOR lightblue][B][I]t.me/balandro_asesor[/I][/B][/COLOR]'
+
+    platformtools.dialog_textviewer('Información servidor Waaw', txt)
 
 
 def show_help_youtube(item):
@@ -5611,26 +5664,28 @@ def show_msgfixed(item):
 
     opciones_nro = [
             ('00 - [COLOR yellow][B]Todos los Mensajes[/B][/COLOR]'),
-            ('01 - [COLOR yellow][B]Comunicado Balandro Team[/B][/COLOR]'),
-            ('02 - [COLOR yellow][B]Comunicado Oficial Balandro[/B][/COLOR]'),
-            ('03 - [COLOR yellow][B]Opciones Telegram Balandro Asesor[/B][/COLOR]'),
-            ('04 - [COLOR yellow][B]Instalación Balandro[/B][/COLOR]'),
-            ('05 - [COLOR yellow][B]Descarga e Instalación del Addon de Vídeo Balandro[/B][/COLOR]'),
-            ('06 - [COLOR yellow][B]Balandro Reproducciones[/B][/COLOR]'),
-            ('07 - [COLOR yellow][B]Grupo Privado/Público Telegram Balandro Asesor[/B][/COLOR]'),
-            ('08 - [COLOR yellow][B]Quitar los Proxies de un Canal[/B][/COLOR]'),
-            ('09 - [COLOR yellow][B]Gestión de Proxies[/B][/COLOR]'),
-            ('10 - [COLOR yellow][B]Si Apareciera la Ventana de Error Inesperado[/B][/COLOR]'),
-            ('11 - [COLOR yellow][B]Instalación de Addons Externos[/B][/COLOR]'),
-            ('12 - [COLOR yellow][B]Idiomas (Audios)[/B][/COLOR]'),
-            ('13 - [COLOR yellow][B]Última Versión de Balandro[/B][/COLOR]'),
-            ('14 - [COLOR yellow][B]Acceso a los Mensajes Fijados desde el Foro[/B][/COLOR]'),
-            ('15 - [COLOR yellow][B]Historial de Telegram[/B][/COLOR]'),
-            ('16 - [COLOR yellow][B]Inputstream Adaptive y Ffmpegdirect[/B][/COLOR]'),
-            ('17 - [COLOR yellow][B]ResolveUrl Dependencias[/B][/COLOR]'),
-            ('18 - [COLOR yellow][B]Fuentes Especiales[/B][/COLOR]'),
-            ('19 - [COLOR yellow][B]Contacto[/B][/COLOR]'),
-            ('20 - [COLOR yellow][B]Créditos[/B][/COLOR]')
+            ('01 - [COLOR yellow][B]Normativa General[/B][/COLOR]'),
+            ('02 - [COLOR yellow][B]Comunicado Balandro Team[/B][/COLOR]'),
+            ('03 - [COLOR yellow][B]Comunicado Oficial Balandro[/B][/COLOR]'),
+            ('04 - [COLOR yellow][B]Opciones Telegram Balandro Asesor[/B][/COLOR]'),
+            ('05 - [COLOR yellow][B]Instalación Balandro[/B][/COLOR]'),
+            ('06 - [COLOR yellow][B]Descarga e Instalación del Addon de Vídeo Balandro[/B][/COLOR]'),
+            ('07 - [COLOR yellow][B]Balandro Reproducciones[/B][/COLOR]'),
+            ('08 - [COLOR yellow][B]Grupo Privado/Público Telegram Balandro Asesor[/B][/COLOR]'),
+            ('09 - [COLOR yellow][B]Quitar los Proxies de un Canal[/B][/COLOR]'),
+            ('10 - [COLOR yellow][B]Gestión de Proxies[/B][/COLOR]'),
+            ('11 - [COLOR yellow][B]Si Apareciera la Ventana de Error Inesperado[/B][/COLOR]'),
+            ('12 - [COLOR yellow][B]Instalación de Addons Externos[/B][/COLOR]'),
+            ('13 - [COLOR yellow][B]Idiomas (Audios)[/B][/COLOR]'),
+            ('14 - [COLOR yellow][B]Última Versión de Balandro[/B][/COLOR]'),
+            ('15 - [COLOR yellow][B]Acceso a los Mensajes Fijados desde el Foro[/B][/COLOR]'),
+            ('16 - [COLOR yellow][B]Historial de Telegram[/B][/COLOR]'),
+            ('17 - [COLOR yellow][B]Información Servidores[/B][/COLOR]'),
+            ('18 - [COLOR yellow][B]Inputstream Adaptive y Ffmpegdirect[/B][/COLOR]'),
+            ('19 - [COLOR yellow][B]ResolveUrl Dependencias[/B][/COLOR]'),
+            ('20 - [COLOR yellow][B]Fuentes Especiales[/B][/COLOR]'),
+            ('21 - [COLOR yellow][B]Contacto[/B][/COLOR]'),
+            ('22 - [COLOR yellow][B]Créditos[/B][/COLOR]')
             ]
 
     txt = ''
@@ -6316,9 +6371,9 @@ def show_help_torrents(item):
         txt += '        [COLOR goldenrod][B]Repository Elementumorg[/B][/COLOR]'
 
     txt += '[CR][CR]     Puede obtener estos [COLOR limegreen][B]Repositorios[/B][/COLOR] desde [COLOR chartreuse][B]Nuestra Fuente[/B][/COLOR], carpeta [COLOR gold][B]Scripts[/B][/COLOR].[CR]'
-    txt += '        Fuente  [COLOR darkorange][B]repobal.github.io/base/[/B][/COLOR][CR]'
+    txt += '        Fuente  [COLOR darkorange][B]https://repobal.github.io/base/[/B][/COLOR][CR]'
 
-    txt += '        Scripts  [COLOR mediumaquamarine][B]repobal.github.io/base/scripts/[/B][/COLOR][CR]'
+    txt += '        Scripts  [COLOR mediumaquamarine][B]https://repobal.github.io/base/scripts/[/B][/COLOR][CR]'
 
     if not PY3:
         txt += '[CR]         - [COLOR lightblue][B]Carpeta Kodi18:[/COLOR][COLOR gold] Otros repositorios y plugins [/COLOR][COLOR lightblue] hasta 18.x[/B][/COLOR][CR]'
@@ -6853,9 +6908,9 @@ def show_help_ins_youtube(item):
     logger.info()
 
     txt = 'Puede obtenerlo desde [COLOR chartreuse][B]Nuestra Fuente[/B][/COLOR], carpeta [COLOR gold][B]Scripts[/B][/COLOR].[CR]'
-    txt += '    Fuente  [COLOR darkorange][B]repobal.github.io/base/[/B][/COLOR][CR]'
+    txt += '    Fuente  [COLOR darkorange][B]https://repobal.github.io/base/[/B][/COLOR][CR]'
 
-    txt += '    Scripts  [COLOR mediumaquamarine][B]repobal.github.io/base/scripts/[/B][/COLOR][CR]'
+    txt += '    Scripts  [COLOR mediumaquamarine][B]https://repobal.github.io/base/scripts/[/B][/COLOR][CR]'
 
     if not PY3:
         txt += '[CR]     - [COLOR lightblue][B]Carpeta Kodi18:[/COLOR][COLOR gold] Otros repositorios y plugins [/COLOR][COLOR lightblue] hasta 18.x[/B][/COLOR][CR]'
@@ -6874,9 +6929,9 @@ def show_help_ins_resolveurl(item):
     logger.info()
 
     txt = 'Puede obtenerlo desde [COLOR chartreuse][B]Nuestra Fuente[/B][/COLOR], carpeta [COLOR gold][B]Scripts[/B][/COLOR].[CR]'
-    txt += '    Fuente  [COLOR darkorange][B]repobal.github.io/base/[/B][/COLOR][CR]'
+    txt += '    Fuente  [COLOR darkorange][B]https://repobal.github.io/base/[/B][/COLOR][CR]'
 
-    txt += '    Scripts  [COLOR mediumaquamarine][B]repobal.github.io/base/scripts/[/B][/COLOR][CR]'
+    txt += '    Scripts  [COLOR mediumaquamarine][B]https://repobal.github.io/base/scripts/[/B][/COLOR][CR]'
 
     if not PY3:
         txt += '[CR]     - [COLOR lightblue][B]Carpeta Kodi18:[/COLOR][COLOR gold] Otros repositorios y plugins [/COLOR][COLOR lightblue] hasta 18.x[/B][/COLOR][CR]'
@@ -7082,9 +7137,9 @@ def show_help_vias(item):
         txt += '    - [COLOR yellow][B]Repository Resolveurl[/B][/COLOR][CR]'
 
     txt += '[CR]*) Algunos puede obtenerlos desde [COLOR chartreuse][B]Nuestra Fuente[/B][/COLOR], carpeta [COLOR gold][B]Scripts[/B][/COLOR].[CR]'
-    txt += '    Fuente  [COLOR darkorange][B]repobal.github.io/base/[/B][/COLOR][CR]'
+    txt += '    Fuente  [COLOR darkorange][B]https://repobal.github.io/base/[/B][/COLOR][CR]'
 
-    txt += '    Scripts  [COLOR mediumaquamarine][B]repobal.github.io/base/scripts/[/B][/COLOR][CR]'
+    txt += '    Scripts  [COLOR mediumaquamarine][B]https://repobal.github.io/base/scripts/[/B][/COLOR][CR]'
 
     if not PY3:
         txt += '[CR]     - [COLOR lightblue][B]Carpeta Kodi18:[/COLOR][COLOR gold] Otros repositorios y plugins [/COLOR][COLOR lightblue] hasta 18.x[/B][/COLOR][CR]'
@@ -7602,13 +7657,6 @@ def show_test(item):
            if tex_dom: tex_dom = tex_dom + '   PelisPanda: ' + pelispanda_dominio + '[CR]'
            else: tex_dom = '[CR]   PelisPanda: ' + pelispanda_dominio + '[CR]'
 
-    datos = channeltools.get_channel_parameters('pelisplushd')
-    if datos['active']:
-        pelisplushd_dominio = config.get_setting('channel_pelisplushd_dominio', default='')
-        if pelisplushd_dominio:
-           if tex_dom: tex_dom = tex_dom + '   PelisPlusHd: ' + pelisplushd_dominio + '[CR]'
-           else: tex_dom = '[CR]   PelisPlusHd: ' + pelisplushd_dominio + '[CR]'
-
     datos = channeltools.get_channel_parameters('pelisplushdlat')
     if datos['active']:
         pelisplushdlat_dominio = config.get_setting('channel_pelisplushdlat_dominio', default='')
@@ -7643,13 +7691,6 @@ def show_test(item):
         if seriespapayato_dominio:
            if tex_dom: tex_dom = tex_dom + '   SeriesPapayaTo: ' + seriespapayato_dominio + '[CR]'
            else: tex_dom = '[CR]   SeriesPapayaTo: ' + seriespapayato_dominio + '[CR]'
-
-    datos = channeltools.get_channel_parameters('sflix')
-    if datos['active']:
-        sflix_dominio = config.get_setting('channel_sflix_dominio', default='')
-        if sflix_dominio:
-           if tex_dom: tex_dom = tex_dom + '   SFlix: ' + sflix_dominio + '[CR]'
-           else: tex_dom = '[CR]   SFlix: ' + sflix_dominio + '[CR]'
 
     datos = channeltools.get_channel_parameters('srnovelas')
     if datos['active']:

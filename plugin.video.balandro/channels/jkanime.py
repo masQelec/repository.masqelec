@@ -519,6 +519,10 @@ def episodios(item):
         itemlist.append(item.clone( action='findvideos', title = title, url = item.url ))
         return itemlist
 
+    next_cap = ''
+    if 'Próximo episodio:' in data:
+        next_cap = scrapertools.find_single_match(str(data), 'Próximo episodio:.*?</b>(.*?)<').strip()
+
     pag_nro = 1
 
     i = 0
@@ -593,6 +597,10 @@ def episodios(item):
            if not str(i) == str(total): continue
 
            bucle_pags = False
+
+    if next_cap:
+        next_cap = 'Próx. Epis. ' + next_cap
+        itemlist.append(item.clone( action='', title = next_cap, thumbnail = item.thumbnail, text_color='cyan'))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -806,6 +814,15 @@ def _epis(item):
     item.search_type = 'tvshow'
 
     return last_epis(item)
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host
+    item.search_type = 'tvshow'
+
+    return list_last(item)
 
 
 def search(item, texto):

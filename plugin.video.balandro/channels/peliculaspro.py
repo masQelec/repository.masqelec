@@ -7,11 +7,11 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://peliculaspro.org/'
+host = 'https://pelispro.net/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://peliculaspro.net/']
+ant_hosts = ['https://peliculaspro.net/', 'https://peliculaspro.org/']
 
 
 domain = config.get_setting('dominio', 'peliculaspro', default='')
@@ -413,6 +413,7 @@ def findvideos(item):
             elif srv == 'vanfem': continue
             elif srv == 'freepelis': continue
             elif srv == 'streamcrypt': continue
+            elif srv == 'filekeeper': continue
 
             elif srv == 'streamz': servidor = srv
             elif srv == 'doods': servidor = 'doodstream'
@@ -448,6 +449,8 @@ def findvideos(item):
         srv = srv.lower().strip()
 
         if srv == '1fichier': continue
+        elif srv == 'filekeeper': continue
+
         elif srv == 'ver en': continue
         elif srv == 'drop': continue
         elif srv == 'bit': continue
@@ -542,11 +545,10 @@ def play(item):
 
             if not url: url = scrapertools.find_single_match(data, '<a class="fake-player-container" href="(.*?)"')
 
-    if '/peliculaspro.' in url: url = ''
-
-    elif url == '/blank.html': url = ''
-
     if url:
+        if '/peliculaspro.' in url or '/blank.html' in url or '/vimeus.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
         if url.startswith('https://pelisfree.site/'):
             url = url.replace('/pelisfree.site/', '/waaw.to/')
 

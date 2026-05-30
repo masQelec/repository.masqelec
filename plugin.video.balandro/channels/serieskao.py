@@ -224,22 +224,24 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<div class="posters-grid">(.*?)<span>Copyright')
+    bloque = scrapertools.find_single_match(data, '</h1>(.*?)<strong>SeriesKao</strong>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '(.*?)</div></div></a>')
+    matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
     for match in matches:
         url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
-        title = scrapertools.find_single_match(match, '<h3 class="poster-card__title">(.*?)</h3>')
+        title = scrapertools.find_single_match(match, '<h2 class="card__title">(.*?)</h2>')
 
         if not url or not title: continue
+
+        if url.startswith("/"): url = host[:-1] + url
 
         title = title.replace('&#038;', '').replace('&#039;', '').replace('()', '')
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
-        year = scrapertools.find_single_match(title, ' \((\d+)\)')
+        year = scrapertools.find_single_match(match, '<span class="card__badge card__badge--year">(.*?)</span>')
 
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
@@ -281,12 +283,10 @@ def temporadas(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    temporadas = scrapertools.find_multiple_matches(data, 'data-tab="season-(.*?)</a>')
+    temporadas = scrapertools.find_multiple_matches(data, '<option value="season-(.*?)"')
 
     for tempo in temporadas:
-        season = scrapertools.find_single_match(tempo, '\d+')
-
-        title = 'Temporada ' + season
+        title = 'Temporada ' + tempo
 
         if len(temporadas) == 1:
             if config.get_setting('channels_seasons', default=True):
@@ -294,11 +294,11 @@ def temporadas(item):
 
                 item.page = 0
                 item.contentType = 'season'
-                item.contentSeason = int(season)
+                item.contentSeason = tempo
                 itemlist = episodios(item)
                 return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = int(season), text_color = 'tan' ))
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -315,9 +315,9 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<div id="season-' + str(item.contentSeason) + '"(.*?)</div></div>')
+    bloque = scrapertools.find_single_match(data, 'id="season-' + str(item.contentSeason) + '"(.*?)</div>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?class="episode-item">(.*?)</a>')
+    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?<span class="episode-item(.*?)</a>')
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
@@ -365,11 +365,13 @@ def episodios(item):
                 else: item.perpage = 50
 
     for url, datos in matches[item.page * item.perpage:]:
-        epis = scrapertools.find_single_match(datos, '<span class="episode-number">E(.*?)</span>')
+        if url.startswith("/"): url = host[:-1] + url
+
+        epis = scrapertools.find_single_match(datos, '__number">(.*?)</span>')
 
         if not epis: epis = 1
 
-        epi_name = scrapertools.find_single_match(datos, '<span class="episode-title">(.*?)</span>')
+        epi_name = scrapertools.find_single_match(datos, '<span class="episode-item__title">(.*?)</span>')
 
         titulo = "%sx%s %s" % (str(item.contentSeason), str(epis), epi_name)
 
@@ -404,16 +406,32 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    link = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
+    link = scrapertools.find_single_match(data, '<iframe id="player-iframe".*?src="(.*?)"')
     if 'videoSources' in str(link): link = scrapertools.find_single_match(data, "var videoSources =.*?'([^']+)")
 
     if not link: return itemlist
+
+    if link.startswith('//'): link = 'https:' + link
+    elif link.startswith("/"): link = host[:-1] + link
+
+    if not 'http' in link: return itemlist
 
     data = do_downloadpage(link)
 
     ses = 0
 
-    if '//embed69.' in link:
+    if '/waaw.' in link:
+        ses += 1
+
+        lang = '?'
+
+        url = link
+
+        servidor = servertools.get_server_from_url(url)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang ))
+
+    elif '/embed69.' in link or '/vidurl/' in link:
         ses += 1
 
         datae = data
@@ -472,13 +490,20 @@ def findvideos(item):
                     if not config.get_setting('developer_mode', default=False): continue
 
                 other = ''
+                cpow = ''
 
                 if servidor == 'various': other = servertools.corregir_other(srv)
 
                 if '.eyJs' in link: age = ''
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes, age=age,
-                                      language=lang, other=other ))
+                elif 'POW_CHALLENGE' in data:
+                   cpow = scrapertools.find_single_match(data, "POW_CHALLENGE\s*=\s*'([^']+)';" +
+                                                               "\s*\w*\s*POW_DIFFICULTY\s*=\s*(\d+);" +
+                                                               "\s*\w*\s*POW_SALT\s*=\s*'([^']+)';")
+                   if cpow: age = ''
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '',
+                                      crypto=link, bytes=e_bytes, age=age, cpow=cpow, language=lang, other=other ))
 
             continue
 
@@ -644,14 +669,24 @@ def play(item):
         url = ''
 
         if not bytes:
-            url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
-            url += '='
+            if 'eyJs' in item.crypto:
+                url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
+                url += '='
 
-            try:
-                url = base64.b64decode(url).decode()
-                url = scrapertools.find_single_match(url, '"link":"(.*?)"')
-            except:
-                url = ''
+                try:
+                    url = base64.b64decode(url).decode()
+                    url = scrapertools.find_single_match(url, '"link":"(.*?)"')
+                except:
+                    url = ''
+
+            elif item.cpow:
+                res_pow = {"challenge": item.cpow[0], "difficulty": int(item.cpow[1]), "salt": item.cpow[2]}
+
+                resolve_pow = decrypters.decode_pow(res_pow)
+                aes_clave = resolve_pow.get("aes_key", "")
+
+                if aes_clave:
+                    url = decrypters.decode_decipher(crypto, aes_clave)
 
         if not url:
             if bytes:
@@ -684,7 +719,7 @@ def play(item):
         return itemlist
 
     if url:
-        if '/xupalace.' in url or '/uploadfox.' in url:
+        if '/hydrax.' in url or '/xupalace.' in url or '/uploadfox.' in url or '/embed69.' in url or '/pelisplay.' in url:
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)

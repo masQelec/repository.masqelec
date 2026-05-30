@@ -122,6 +122,8 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host, group = 'free', search_type = 'tvshow', text_color = 'cyan' ))
 
+    itemlist.append(item.clone( title = 'Últimos animes', action = 'list_last', url = host + 'genero/mundo-donghua/', search_type = 'tvshow', text_color = 'moccasin' ))
+
     itemlist.append(item.clone( title = 'Episodios', action = 'list_all', url = host + 'episodios/', group = 'last', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Animes', action = 'list_all', url = host + 'genero/animacion/', group = 'donghua', search_type = 'tvshow', text_color = 'springgreen' ))
@@ -274,6 +276,74 @@ def list_all(item):
             if next_page:
                 if '/page/' in next_page:
                     itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color = 'coral' ))
+
+    return itemlist
+
+
+def list_last(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>Top Episodios Semanal<')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+
+        if not url or not title: continue
+
+        if '- Portada Oficial' in title: title = title.split("- Portada Oficial")[0]
+
+        title = title.replace('&#8217;s', "'s").replace('&#8211;', '').replace('&#8217;', '').replace('&#8220;', '').replace('&#8221;', '').replace('&#038;', '').strip()
+
+        year = scrapertools.find_single_match(match, '</h3><span>(.*?)</span>')
+        if ',' in year: year = year.split(",")[1].strip()
+
+        if not year: year = '-'
+
+        thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
+
+        SerieName = corregir_SerieName(title)
+
+        season = 1
+
+        if '>T2' in match: season = 2
+        elif '>T3' in match: season = 3
+        elif '>T4' in match: season = 4
+        elif '>T5' in match: season = 5
+        elif '>T6' in match: season = 6
+        elif '>T7' in match: season = 7
+        elif '>T8' in match: season = 8
+        elif '>T9' in match: season = 9
+
+        elif 'Temporada 2' in match: season = 2
+        elif 'Temporada 3' in match: season = 3
+        elif 'Temporada 4' in match: season = 4
+        elif 'Temporada 5' in match: season = 5
+        elif 'Temporada 6' in match: season = 6
+        elif 'Temporada 7' in match: season = 7
+        elif 'Temporada 8' in match: season = 8
+        elif 'Temporada 9' in match: season = 9
+
+        title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
+
+        itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
+                                    contentType='tvshow', contentSerieName=SerieName, contentSeason = season, infoLabels={'year': year} ))
+
+    if itemlist:
+        if '<div class="pagination">' in data:
+            next_page = scrapertools.find_single_match(data,'<div class="pagination">.*?<span class="current">.*?ref="(.*?)"')
+
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_last', url = next_page, text_color = 'coral' ))
+
+    tmdb.set_infoLabels(itemlist)
 
     return itemlist
 
@@ -577,6 +647,7 @@ def findvideos(item):
         elif '.animefenix.' in url: continue
         elif '/odysee.' in url: continue
         elif '/csst.online' in url: continue
+        elif '.mediadelivery.' in url: continue
 
         if 'http:' in url: url = url.replace('http:', 'https:')
 
@@ -766,6 +837,8 @@ def corregir_SerieName(SerieName):
     if 'Capítulo' in SerieName: SerieName = SerieName.split("Capítulo")[0]
     if 'Capitulo' in SerieName: SerieName = SerieName.split("Capitulo")[0]
 
+    if '- Portada Oficial' in SerieName: SerieName = SerieName.split("- Portada Oficial")[0]
+
     if ' S1 ' in SerieName: SerieName = SerieName.split(" S1 ")[0]
     elif ' S2 ' in SerieName: SerieName = SerieName.split(" S2 ")[0]
     elif ' S3 ' in SerieName: SerieName = SerieName.split(" S3 ")[0]
@@ -787,13 +860,13 @@ def corregir_SerieName(SerieName):
     elif ' T9 ' in SerieName: SerieName = SerieName.split(" T9 ")[0]
 
     if '2nd' in SerieName: SerieName = SerieName.split("2nd")[0]
-    if '3rd' in SerieName: SerieName = SerieName.split("3rd")[0]
-    if '4th' in SerieName: SerieName = SerieName.split("4th")[0]
-    if '5th' in SerieName: SerieName = SerieName.split("5th")[0]
-    if '6th' in SerieName: SerieName = SerieName.split("6th")[0]
-    if '7th' in SerieName: SerieName = SerieName.split("7th")[0]
-    if '8th' in SerieName: SerieName = SerieName.split("8th")[0]
-    if '9th' in SerieName: SerieName = SerieName.split("9th")[0]
+    elif '3rd' in SerieName: SerieName = SerieName.split("3rd")[0]
+    elif '4th' in SerieName: SerieName = SerieName.split("4th")[0]
+    elif '5th' in SerieName: SerieName = SerieName.split("5th")[0]
+    elif '6th' in SerieName: SerieName = SerieName.split("6th")[0]
+    elif '7th' in SerieName: SerieName = SerieName.split("7th")[0]
+    elif '8th' in SerieName: SerieName = SerieName.split("8th")[0]
+    elif '9th' in SerieName: SerieName = SerieName.split("9th")[0]
 
     SerieName = SerieName.strip()
 
@@ -808,6 +881,15 @@ def _epis(item):
     item.search_type = 'tvshow'
 
     return list_all(item)
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'genero/mundo-donghua/'
+    item.search_type = 'tvshow'
+
+    return list_last(item)
 
 
 def search(item, texto):

@@ -34,7 +34,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host))
 
-    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + '/0/', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + 'cat/4k-porn/', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'most-viewed/' ))
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'top-rated/' ))
@@ -131,7 +131,6 @@ def list_all(item):
 
         if not url or not title: continue
 
-
         title = title.replace('&amp;', '&').replace('&#039;t', "'t").replace('&#039;', '')
 
         url = host[:-1] + url
@@ -145,7 +144,8 @@ def list_all(item):
 
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
 
-        itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
+        itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb,
+                                    contentType = 'movie', contentTitle = title, contentExtra='adults') )
 
     if itemlist:
         bloque = scrapertools.find_single_match(data, '<div class="numlist2(.*?)</div>')
@@ -182,6 +182,10 @@ def findvideos(item):
 
         qlty = qlty.replace('<u>', '').strip()
 
+        if '@' in qlty: qlty = qlty.split("@")[0]
+
+        if '(2K)' in qlty or '(4K)' in qlty: continue
+
         url = scrapertools.find_single_match(link, 'href="(.*?)"')
 
         if url:
@@ -195,7 +199,7 @@ def findvideos(item):
 def _lasts(item):
     logger.info()
 
-    item.url = host + '/0/'
+    item.url = host + 'cat/4k-porn/'
 
     return list_all(item)
 

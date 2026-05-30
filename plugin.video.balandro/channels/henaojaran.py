@@ -468,6 +468,9 @@ def findvideos(item):
             elif srv == 'streamruby':
                 servidor = 'various'
                 other = srv
+            elif srv == 'byse':
+                servidor = 'various'
+                other = srv
 
             srv = srv.capitalize()
 
@@ -537,23 +540,27 @@ def findvideos(item):
         elif '/dood' in url: servidor = 'doodstream'
         elif '/veev.' in url: servidor = 'zures'
         elif '/streamruby.' in url: servidor = 'various'
+        elif '/byse' in url: servidor = 'various'
 
         else:
              if servertools.is_server_available(url):
                  if not servertools.is_server_enabled(url): continue
              else:
-                 if not config.get_setting('developer_mode', default=False): continue
+                 if not config.get_setting('developer_team', default=False): continue
                  servidor = 'directo'
 
         other = ''
         if servidor == 'various': other = servertools.corregir_other(url)
+        elif servidor == 'zures': other = servertools.corregir_zures(url)
+
         elif not servidor == 'directo': other = ''
 
         force_input = ''
 
         if other == 'Lulustream': force_input = True
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, url=url, language=lang, other=other, force_input=force_input ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, url=url,
+                              language=lang, other=other.capitalize(), force_input=force_input ))
 
     if not itemlist:
         if not ses == 0:
@@ -726,6 +733,15 @@ def _epis(item):
     item.search_type = 'tvshow'
 
     return last_epis(item)
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host
+    item.search_type = 'tvshow'
+
+    return list_last(item)
 
 
 def search(item, texto):

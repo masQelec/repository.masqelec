@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.balandro" name="Balandro" version="4.0.28" provider-name="Team Balandro">
+<addon id="plugin.video.balandro" name="[B]Balandro[/B]" version="4.0.29" provider-name="Team Balandro">
   <requires>
      <import addon="script.module.requests" optional="true"/>
   </requires>
@@ -19,7 +19,7 @@
       <screenshot>resources/screenshots/4.jpg</screenshot>
     </assets>
     <news>
-    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.28[/COLOR][COLOR chartreuse]  Abril de 2026[/B][/COLOR]
+    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.29[/COLOR][COLOR chartreuse]  Mayo de 2026[/B][/COLOR]
 
     [COLOR goldenrod][B]Media Centers:[/B][/COLOR]
         [COLOR tan][B]Kodi Versiones Oficiales Soportadas:[/B][/COLOR]

@@ -214,36 +214,68 @@ def list_all(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    datac = ''
 
     patron = '<td class="vertThseccion">.*?<img src="(.*?)".*?<a href="(.*?)".*?title="(.*?)".*?<td>.*?<td>(.*?)</td>'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 
-    for lang, url, title, qlty in matches:
-        if not url or not title: continue
+    if not matches: 
+        if '<!-- Carousel Container -->' in data:
+            datac = scrapertools.find_single_match(data, '<!-- Carousel Container -->(.*?)$')
+        else:
+            datac = data
 
-        title = title.split("(")[0]
-        if "3D" in title: title = title.split("3D")[0]
+        patron = '<div class="w3l-movie-text">.*?<a href="(.*?)".*?title="(.*?)".*?' + "<img src='(.*?)'.*?</a></div>"
+ 
+        matches = re.compile(patron, re.DOTALL).findall(datac)
 
-        if lang.endswith("1.png"): lang = "Esp"
-        elif lang.endswith("2.png"): lang = "Vo"
-        elif lang.endswith("4.png"): lang = "Fr"   
-        elif lang.endswith("8.png"): lang = "It"
-        elif lang.endswith("512.png"): lang = "Lat"
-        else: lang = "Vose"
+    if datac:
+        for url, title, lang in matches:
+            if not url or not title: continue
 
-        title = title.replace('&#038;', '&')
+            title = title.split("(")[0]
+            if "3D" in title: title = title.split("3D")[0]
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, qualities=qlty, languages=lang,
-                                    contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+            if lang.endswith("1.png"): lang = "Esp"
+            elif lang.endswith("2.png"): lang = "Vo"
+            elif lang.endswith("4.png"): lang = "Fr"   
+            elif lang.endswith("8.png"): lang = "It"
+            elif lang.endswith("512.png"): lang = "Lat"
+            else: lang = "Vose"
+
+            title = title.replace('&#038;', '&').replace('&#8217;s', "'s")
+
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, languages=lang,
+                                        contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+    else:
+        for lang, url, title, qlty in matches:
+            if not url or not title: continue
+
+            title = title.split("(")[0]
+            if "3D" in title: title = title.split("3D")[0]
+
+            if lang.endswith("1.png"): lang = "Esp"
+            elif lang.endswith("2.png"): lang = "Vo"
+            elif lang.endswith("4.png"): lang = "Fr"   
+            elif lang.endswith("8.png"): lang = "It"
+            elif lang.endswith("512.png"): lang = "Lat"
+            else: lang = "Vose"
+
+            title = title.replace('&#038;', '&').replace('&#8217;s', "'s")
+
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, qualities=qlty, languages=lang,
+                                        contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_url = scrapertools.find_single_match(data, "<span class='current'>\d+<\/span><a href='([^']+)'")
+        next_page = scrapertools.find_single_match(data, "<span class='current'>.*?<a href='(.*?)'")
 
-        if '/page/' in next_url:
-            itemlist.append(item.clone( title='Siguientes ...', url=next_url, action='list_all', text_color='coral' ))
+        if '/page/' in next_page:
+            itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_all', text_color='coral' ))
 
     return itemlist
 
@@ -265,7 +297,7 @@ def list_series(item):
 
         title = title.split("(")[0]
 
-        title = title.replace('&#038;', '&')
+        title = title.replace('&#038;', '&').replace('&#8217;s', "'s")
 
         if not host in url: url = host + url
 
@@ -275,10 +307,10 @@ def list_series(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_url = scrapertools.find_single_match(data, "<span class='current'>.*?<a href='([^']+)'")
+        next_page = scrapertools.find_single_match(data, "<span class='current'>.*?<a href='(.*?)'")
 
-        if '/page/' in next_url:
-            itemlist.append(item.clone( title='Siguientes ...', url=next_url, action='list_series', text_color='coral' ))
+        if '/page/' in next_page:
+            itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_series', text_color='coral' ))
 
     return itemlist
 

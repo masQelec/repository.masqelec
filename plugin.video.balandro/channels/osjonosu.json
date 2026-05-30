@@ -3,7 +3,7 @@
   "name": "OsjoNosu",
   "thumbnail": "osjonosu.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["movie", "tvshow"],
   "language": ["cast"],
 
-  "clusters": ["onlyone", "notice", "news", "lasts", "years", "infantil", "lists", "kids", "docs"],
+  "clusters": ["onlyone", "years", "infantil", "lists", "kids", "docs"],
 
-  "notes": "Películas por géneros. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Web CERRADA. Películas por géneros. Series por Géneros."
 }

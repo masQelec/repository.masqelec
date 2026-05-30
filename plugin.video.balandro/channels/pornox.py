@@ -33,14 +33,14 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host  + 'en/kereses/search?sort_by=post_date&from_videos=1' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host  + 'en/search?sort_by=post_date&from_videos=1' ))
 
-    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host  + 'en/kereses/search?sort_by=most_commented&from_videos=1' ))
-    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host  + 'en/kereses/search?sort_by=rating_month&from_videos=1' ))
-    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host  + 'en/kereses/search?sort_by=video_viewed_month&from_videos=1' ))
-    itemlist.append(item.clone( title = 'Más candentes', action = 'list_all', url = host  + 'en/kereses/search?sort_by=most_favourited&from_videos=1' ))
+    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host  + 'en/search?sort_by=most_commented&from_videos=1' ))
+    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host  + 'en/search?sort_by=rating_month&from_videos=1' ))
+    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host  + 'en/search?sort_by=video_viewed_month&from_videos=1' ))
+    itemlist.append(item.clone( title = 'Más candentes', action = 'list_all', url = host  + 'en/search?sort_by=most_favourited&from_videos=1' ))
 
-    itemlist.append(item.clone( title = 'Long play', action = 'list_all', url = host  + 'en/kereses/search?sort_by=duration&from_videos=1' ))
+    itemlist.append(item.clone( title = 'Long play', action = 'list_all', url = host  + 'en/search?sort_by=duration&from_videos=1' ))
 
     itemlist.append(item.clone( title = 'Por canal', action = 'listas', url = host + 'en/szexcsatorna/1/' ))
 
@@ -60,7 +60,7 @@ def list_all(item):
 
     bloque = scrapertools.find_single_match(data, '<div class="list-videos">(.*?)</script>')
 
-    if '/en/kereses/?q=' in item.url: bloque = scrapertools.find_single_match(data, '<div class="list-videos">(.*?)<div id="list_albums_albums_list_search_result">')
+    if '/en/?q=' in item.url: bloque = scrapertools.find_single_match(data, '<div class="list-videos">(.*?)<div id="list_albums_albums_list_search_result">')
 
     patron = '<div class="item">.*?<a href="(.*?)".*?title="(.*?)".*?src="(.*?)"(.*?)</div></a></div>'
 
@@ -85,6 +85,9 @@ def list_all(item):
     if itemlist:
         bloque = scrapertools.find_single_match(data, '<div class="load-more"(.*?)</div>')
 
+        if not bloque:
+            bloque = scrapertools.find_single_match(data, '<li class="page">(.*?)</div>')
+
         next_page = scrapertools.find_single_match(bloque, '<a href="(.*?)"')
 
         ant_page = ''
@@ -105,7 +108,7 @@ def list_all(item):
                   ant_page = scrapertools.find_single_match(item.url, '/en/szexcsatorna/(.*?)/')
             elif '/en/pornosztarok/' in item.url:
                  ant_page = scrapertools.find_single_match(item.url, '/en/pornosztarok/(.*?)/')
-				
+
             if ant_page:
                 try:
                    sig_page = int(ant_page)
@@ -173,6 +176,9 @@ def listas(item):
 
     for url, title, thumb in matches:
         title = title.capitalize()
+
+        if '/en/szex-kategoriak/' in item.url:
+            title = title.replace('porn', '').strip()
 
         thumb = thumb.replace(' ', '%20').strip()
 
@@ -269,6 +275,11 @@ def findvideos(item):
         itemlist.append(Item( channel = item.channel, action='play', title='', server = 'ktp', url = item.url, language = 'Vo') )
 
     else:
+        url = scrapertools.find_single_match(data, 'data-preview="(.*?)"')
+
+        if url:
+            itemlist.append(Item( channel = item.channel, action='play', title='', server = 'directo', url = url, language = 'Vo', other = 'tráiler') )
+
         url = scrapertools.find_single_match(data, '<source src="(.*?)"')
 
         if url:
@@ -282,7 +293,7 @@ def search(item, texto):
     try:
         config.set_setting('search_last_video', texto)
 
-        item.url = "%sen/kereses/?q=%s&sort_by=post_date&from_videos=1" % (host, texto.replace(" ", "+"))
+        item.url = "%sen/?q=%s&sort_by=post_date&from_videos=1" % (host, texto.replace(" ", "+"))
         return list_all(item)
     except:
         import sys

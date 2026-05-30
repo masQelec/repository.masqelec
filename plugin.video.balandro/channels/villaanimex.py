@@ -517,6 +517,15 @@ def _epis(item):
     return last_epis(item)
 
 
+def _news(item):
+    logger.info()
+
+    item.url = host
+    item.search_type = 'tvshow'
+
+    return list_last(item)
+
+
 def search(item, texto):
     logger.info()
     try:

@@ -41,7 +41,7 @@ search_no_accesibles = config.get_setting('search_no_accesibles', default=False)
 _foro = "[COLOR plum][B][I] www.mimediacenter.info/foro/ [/I][/B][/COLOR]"
 _telegram = "[COLOR lightblue][B][I] t.me/balandro_asesor [/I][/B][/COLOR]"
 
-_scripts = "[COLOR mediumaquamarine][B][I] repobal.github.io/base/scripts/ [/I][/B][/COLOR]"
+_scripts = "[COLOR mediumaquamarine][B][I] https://repobal.github.io/base/scripts/ [/I][/B][/COLOR]"
 
 _team = "[COLOR hotpink][B][I] t.me/balandro_team [/I][/B][/COLOR]"
 
@@ -1029,9 +1029,9 @@ def submnu_logs(item):
         itemlist.append(item.clone( action='', title='[B]LOGS:[/B]', thumbnail=config.get_thumb('tools'), text_color='limegreen' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'servers_todo.log')):
-            itemlist.append(item.clone( action='', title='[B][I]SERVIDORES:[/I][/B]', thumbnail=config.get_thumb('bolt'), text_color='limegreen' ))
+            itemlist.append(item.clone( action='', title='[B][I]SERVIDORES:[/I][/B]', text_color='limegreen' ))
 
-            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver', todo = 'servers_todo.log', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
+            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver', todo = 'servers_todo.log', thumbnail=config.get_thumb('bolt'), text_color='yellow' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'qualities_todo.log')):
             itemlist.append(item.clone( action='', title='[B][I]CALIDADES:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='limegreen' ))
@@ -1043,21 +1043,17 @@ def submnu_logs(item):
 
             itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver', todo = 'proxies.log', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
 
-        if os.path.exists(os.path.join(config.get_data_path(), 'canales.log')) or os.path.exists(os.path.join(config.get_data_path(), 'servidores.log')):
-            itemlist.append(item.clone( action='', title='[B][I]INSATISFACTORIOS:[/I][/B]', text_color='limegreen' ))
+        if config.get_setting('developer_team'):
+            if os.path.exists(os.path.join(config.get_data_path(), 'canales.log')) or os.path.exists(os.path.join(config.get_data_path(), 'servidores.log')):
+                itemlist.append(item.clone( action='', title='[B][I]INSATISFACTORIOS:[/I][/B]', text_color='limegreen' ))
 
-            if os.path.exists(os.path.join(config.get_data_path(), 'canales.log')):
-                itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver canales', todo = 'canales.log', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
+                if os.path.exists(os.path.join(config.get_data_path(), 'canales.log')):
+                    itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver canales', todo = 'canales.log', thumbnail=config.get_thumb('stack'), text_color='gold' ))
 
-            if os.path.exists(os.path.join(config.get_data_path(), 'servidores.log')):
-                itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver servidores', todo = 'servidores.log', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
+                if os.path.exists(os.path.join(config.get_data_path(), 'servidores.log')):
+                    itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver servidores', todo = 'servidores.log', thumbnail=config.get_thumb('bolt'), text_color='fuchsia' ))
 
         itemlist.append(item.clone( channel='actions', action='manto_temporales', title='Eliminar Todos los LOGS', _logs = True, thumbnail=config.get_thumb('keyboard'), text_color='red' ))
-
-        if config.get_setting('developer_team'):
-            itemlist.append(item.clone( action='', title='[B][I]WEBS/HOST:[/I][/B]', text_color='limegreen' ))
-
-            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver canales', todo = 'webs.log', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
 
     if item.helper: platformtools.itemlist_refresh()
 
@@ -1147,18 +1143,49 @@ def submnu_gestionar(item):
         if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')):
             itemlist.append(item.clone( channel='developergenres', action='mainlist', title=' - [COLOR thistle][B]Géneros[/B][/COLOR]', thumbnail=config.get_thumb('genres') ))
 
-        if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')):
-            itemlist.append(item.clone( channel='developertest', action='mainlist', title=' - [COLOR gold][B]Canales y Servidores[/B][/COLOR]', thumbnail=config.get_thumb('tools') ))
+        tests = False
+        if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')): tests = True
+        elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')):  tests = True
 
-        if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')):
-            if os.path.exists(os.path.join(config.get_data_path(), 'developer.sqlite')):
-                itemlist.append(item.clone( channel='developertools', action='mainlist', title=' - [COLOR olive][B]Queries[/B][/COLOR] Canales y Servidores', thumbnail=config.get_thumb('tools') ))
+        if tests:
+            itemlist.append(item.clone( action='', title='[B][I]TESTS CANALES Y SERVIDORES:[/I][/B]', thumbnail=config.get_thumb('support'), text_color='teal' ))
 
-        if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developerwebs.py')):
-            itemlist.append(item.clone( channel='developerwebs', action='mainlist', title=' - [COLOR cyan][B]Webs/Hosts[/B][/COLOR] de los Canales', thumbnail=config.get_thumb('tools') ))
+            if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')):
+                itemlist.append(item.clone( channel='developertest', action='mainlist', title=' - [COLOR gold][B]Canales y Servidores[/B][/COLOR]', thumbnail=config.get_thumb('tools') ))
+
+            if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')):
+                if os.path.exists(os.path.join(config.get_data_path(), 'developer.sqlite')):
+                    itemlist.append(item.clone( channel='developertools', action='mainlist', title=' - Generación [COLOR darkgoldenrod][B]Queries[/B][/COLOR]', thumbnail=config.get_thumb('tools') ))
+
+        checks = False
+        if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developerthumbs.py')): checks = True
+        elif os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developerwebs.py')): checks = True
+
+        if checks:
+            itemlist.append(item.clone( action='', title='[B][I]CHECKS CANALES:[/I][/B]', thumbnail=config.get_thumb('stack'), text_color='teal' ))
+
+            if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developerthumbs.py')):
+                itemlist.append(item.clone( channel='developerthumbs', action='mainlist', title=' - [COLOR palegreen][B]Thumbs[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
+            if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developerwebs.py')):
+                itemlist.append(item.clone( channel='developerwebs', action='mainlist', title=' - Generación [COLOR cyan][B]Webs/Hosts[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
+        itemlist.append(item.clone( action='', title='[B][I]WEBS/HOSTS:[/I][/B]', text_color='teal' ))
+
+        itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - [COLOR yellow]Ver dominios[/COLOR]', todo = 'webs.log', thumbnail=config.get_thumb('computer') ))
+
+        itemlist.append(item.clone( action='', title='[B][I]INSATISFACTORIOS:[/I][/B]', text_color='teal' ))
+
+        if os.path.exists(os.path.join(config.get_data_path(), 'canales.log')):
+            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - [COLOR gold]Ver canales[/COLOR]', todo = 'canales.log', thumbnail=config.get_thumb('stack') ))
+
+        if os.path.exists(os.path.join(config.get_data_path(), 'servidores.log')):
+            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - [COLOR fuchsia]Ver servidores[/COLOR]', todo = 'servidores.log', thumbnail=config.get_thumb('bolt') ))
 
         if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developerrelease.py')):
-            itemlist.append(item.clone( channel='developerrelease', action='mainlist', title=' - [COLOR yellow][B]Release[/B][/COLOR] de la Versión', thumbnail=config.get_thumb('tools') ))
+            itemlist.append(item.clone( action='', title='[B][I]VERSIÓN:[/I][/B]', thumbnail=config.get_thumb('addon'), text_color='teal' ))
+
+            itemlist.append(item.clone( channel='developerrelease', action='mainlist', title=' - Generación [COLOR yellow][B]Release[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
     return itemlist
 
@@ -1379,7 +1406,7 @@ def submnu_developers(item):
 
     itemlist.append(item.clone( action='', title='[COLOR firebrick][B][I]FUENTES:[/I][/B][/COLOR]', folder=False ))
 
-    itemlist.append(item.clone( action='', title=' - Fuentes [COLOR darkorange][B]github.com/repobal[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
+    itemlist.append(item.clone( action='', title=' - Fuentes [COLOR darkorange][B]https://github.com/repobal[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
 
     if config.get_setting('developer_team'):
         itemlist.append(item.clone( action='', title='[COLOR firebrick][B][I]GESTIONAR:[/I][/B][/COLOR]', folder=False ))
@@ -1961,44 +1988,7 @@ def test_all_webs(item):
                         else:
                             rememorize = True
 
-                if 'Falso Positivo.' in str(txt):
-                    if txt_status:
-                        if con_incidencias:
-                            host_incid = ch['name']
-
-                            if host_incid in str(con_incidencias):
-                                incidencia = ''
-
-                                incids = scrapertools.find_multiple_matches(str(con_incidencias), '[COLOR moccasin](.*?)[/B][/COLOR]')
-
-                                for incid in incids:
-                                    if not ' ' + host_incid + ' ' in str(incid): continue
-
-                                    incidencia = incid
-                                    break
-
-                                if incidencia:
-                                    tests_all_webs.append(ch['name'] + '  Con Incidencia')
-                                    continue
-
-                        if no_accesibles:
-                            host_incid = ch['name']
-
-                            if host_incid in str(no_accesibles):
-                                incidencia = ''
-
-                                incids = scrapertools.find_multiple_matches(str(no_accesibles), '[COLOR moccasin](.*?)[/B][/COLOR]')
-
-                                for incid in incids:
-                                    if not ' ' + host_incid + ' ' in str(incid): continue
-
-                                    incidencia = incid
-                                    break
-
-                                if incidencia:
-                                    tests_all_webs.append(ch['name'] + '  No Accesible')
-                                    continue
-
+                else:
                     if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '¿ Desea comprobar el Canal de nuevo, [COLOR red][B]por Falso Positivo. [/B][/COLOR]?'):
 
                         try: txt = tester.test_channel(ch['name'])
@@ -2012,6 +2002,43 @@ def test_all_webs(item):
                                 platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]No se ha solucionado el Falso Positivo.[/B][/COLOR]')
                                 tests_all_webs.append(ch['name'] + '  Sin Solucion Falso Positivo')
                                 continue
+
+            if txt_status:
+                if con_incidencias:
+                    host_incid = ch['name']
+
+                    if host_incid in str(con_incidencias):
+                        incidencia = ''
+
+                        incids = scrapertools.find_multiple_matches(str(con_incidencias), '[COLOR moccasin](.*?)[/B][/COLOR]')
+
+                        for incid in incids:
+                            if not ' ' + host_incid + ' ' in str(incid): continue
+
+                            incidencia = incid
+                            break
+
+                        if incidencia:
+                            tests_all_webs.append(ch['name'] + '  Con Incidencia')
+                            continue
+
+                if no_accesibles:
+                    host_incid = ch['name']
+
+                    if host_incid in str(no_accesibles):
+                        incidencia = ''
+
+                        incids = scrapertools.find_multiple_matches(str(no_accesibles), '[COLOR moccasin](.*?)[/B][/COLOR]')
+
+                        for incid in incids:
+                            if not ' ' + host_incid + ' ' in str(incid): continue
+
+                            incidencia = incid
+                            break
+
+                        if incidencia:
+                            tests_all_webs.append(ch['name'] + '  No Accesible')
+                            continue
 
             if ' al parecer No se necesitan' in str(txt):
                 if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]¿ Desea Quitar los Proxies del Canal ?[/B][/COLOR], porqué parece que NO se necesitan.'):
@@ -3424,7 +3451,7 @@ def resumen_canales(item):
 
     if not temas_adults == 0: txt += '          [COLOR orange][B]Con Temática Adultos[/B][/COLOR] ' + str(temas_adults) + '[CR]'
 
-    if config.get_setting('mnu_pelis', default=True): txt += '[CR]  ' + str(bus_pelis) + ' [COLOR deepskyblue][B]Películas[/B][/COLOR][CR]'
+    if config.get_setting('mnu_pelis', default=True): txt += '[CR]    ' + str(bus_pelis) + ' [COLOR deepskyblue][B]Películas[/B][/COLOR][CR]'
 
     if config.get_setting('mnu_series', default=True): txt += '    ' + str(bus_series) + ' [COLOR hotpink][B]Series[/B][/COLOR][CR]'
 

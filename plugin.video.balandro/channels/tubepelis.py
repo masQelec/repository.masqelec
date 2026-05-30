@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import re
+import re, base64
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -85,8 +85,6 @@ def acciones(item):
                                 from_channel='tubepelis', folder=False, text_color='chartreuse' ))
 
     itemlist.append(item_configurar_proxies(item))
-
-    itemlist.append(Item( channel='helper', action='show_help_tubepelis', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('tubepelis') ))
 
     platformtools.itemlist_refresh()
 
@@ -200,6 +198,14 @@ def findvideos(item):
 
         if '.mystream.' in url: continue
 
+        if '/reproductor.php?v=' in url:
+           _url = scrapertools.find_single_match(url, '/reproductor.php(.*?)$')
+
+           _url = _url.replace('?v=', '').replace('%3D', '=')
+
+           if _url:
+               url = base64.b64decode(_url).decode("utf-8")
+
         servidor = servertools.get_server_from_url(url)
 
         if servertools.is_server_available(servidor):
@@ -217,9 +223,11 @@ def findvideos(item):
            if not servidor == 'various': other = ''
 
         if servidor == 'directo':
-            if not config.get_setting('developer_mode', default=False): continue
-            other = url.split("/")[2]
-            other = other.replace('https:', '').replace('www.', '').strip()
+            try:
+                other = url.split("/")[2]
+                other = other.replace('https:', '').replace('www.', '').replace('.com', '').strip()
+            except:
+                other = url
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Lat', other = other ))
 

@@ -2,6 +2,11 @@
 <settings>
 
     <category label="Info">
+        <setting label="Balandro Fuente:" type="lsep"/>
+
+        <setting id="_fuen" type="text" label="[COLOR white][B]Fuente: [I]https://repobal.github.io/base/[/I][/B][/COLOR]" enable="false"/>
+        <setting id="_fuen0" type="text" label="[COLOR white][B]Acceso: Repositorio, Add-On y Scripts[/B][/COLOR]" enable="false"/>
+
         <setting label="Información Preliminar:" type="lsep"/>
 
         <setting id="info_grl" type="bool" label="Opciones" default="false"/>
@@ -17,18 +22,17 @@
         <setting label="Balandro General:" type="lsep"/>
 
         <setting id="info_bro" type="bool" label="Opciones" default="false"/>
-        <setting id="_fuen" type="text" label="[COLOR white][B]Fuente [I]repobal.github.io/base/[/I]  Repo, Add-On, Scripts[/B][/COLOR]" enable="false" visible="eq(-1,true)"/>
 
-        <setting id="show_contacto" type="action" label="[COLOR limegreen][B]Contacto[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_contacto)"/>
-        <setting id="show_help_use" type="action" label="[COLOR darkorange][B]Uso[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_use)"/>
-        <setting id="show_help_faq" type="action" label="[COLOR tomato][B]FAQS[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_faq)"/>
-        <setting id="show_msgfixed" type="action" label="[COLOR chartreuse][B]Telegram Mensajes Fijados[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_msgfixed)"/>
-        <setting id="show_not_contemplated" type="action" label="[COLOR red][B]No Contemplado[/B][/COLOR]" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_not_contemplated)"/>
-        <setting id="show_latest_domains" type="action" label="[COLOR cyan][B]Últimos Cambios Dominios[/B][/COLOR]" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=show_latest_domains)"/>
-        <setting id="show_help_domains" type="action" label="[COLOR bisque][B]Gestión Dominios[/B][/COLOR]" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_domains)"/>
-        <setting id="show_help_bloqueos" type="action" label="[COLOR yellowgreen][B]Bloqueos Operadoras[/B][/COLOR]" visible="eq(-9,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_bloqueos)"/>
-        <setting id="show_help_proxies" type="action" label="[COLOR crimson][B]Uso de Proxies[/B][/COLOR]" visible="eq(-10,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_proxies)"/>
-        <setting id="show_legalidad" type="action" label="[COLOR goldenrod][B]Legalidad[/B][/COLOR]" visible="eq(-11,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_legalidad)"/>
+        <setting id="show_contacto" type="action" label="[COLOR limegreen][B]Contacto[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_contacto)"/>
+        <setting id="show_help_use" type="action" label="[COLOR darkorange][B]Uso[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_use)"/>
+        <setting id="show_help_faq" type="action" label="[COLOR tomato][B]FAQS[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_faq)"/>
+        <setting id="show_msgfixed" type="action" label="[COLOR chartreuse][B]Telegram Mensajes Fijados[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_msgfixed)"/>
+        <setting id="show_not_contemplated" type="action" label="[COLOR red][B]No Contemplado[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_not_contemplated)"/>
+        <setting id="show_latest_domains" type="action" label="[COLOR cyan][B]Últimos Cambios Dominios[/B][/COLOR]" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=show_latest_domains)"/>
+        <setting id="show_help_domains" type="action" label="[COLOR bisque][B]Gestión Dominios[/B][/COLOR]" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_domains)"/>
+        <setting id="show_help_bloqueos" type="action" label="[COLOR yellowgreen][B]Bloqueos Operadoras[/B][/COLOR]" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_bloqueos)"/>
+        <setting id="show_help_proxies" type="action" label="[COLOR crimson][B]Uso de Proxies[/B][/COLOR]" visible="eq(-9,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_proxies)"/>
+        <setting id="show_legalidad" type="action" label="[COLOR goldenrod][B]Legalidad[/B][/COLOR]" visible="eq(-10,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_legalidad)"/>
 
         <setting label="Balandro Sistema:" type="lsep"/>
 
@@ -327,7 +331,6 @@
         <setting id="opc_pelisforte" type="action" label="[COLOR gold]PelisForte[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_pelisforte)"/>
         <setting id="opc_pelismart" type="action" label="[COLOR gold]PelisMart[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_pelismart)"/>
         <setting id="opc_pelipanda" type="action" label="[COLOR gold]PelisPanda[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_pelispanda)"/>
-        <setting id="opc_pelisplushd" type="action" label="[COLOR gold]PelisPlusHd[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_pelisplushd)"/>
         <setting id="opc_pelisplushdlat" type="action" label="[COLOR gold]PelisPlusHdLat[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_pelisplushdlat)"/>
         <setting id="opc_pelisplushdnz" type="action" label="[COLOR gold]PelisPlusHdNz[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_pelisplushdnz)"/>
 
@@ -335,7 +338,6 @@
 
         <setting id="opc_serieskao" type="action" label="[COLOR gold]SeriesKao[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_serieskao)"/>
         <setting id="opc_seriespapayato" type="action" label="[COLOR gold]SeriesPapayaTo[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_seriespapayato)"/>
-        <setting id="opc_sflix" type="action" label="[COLOR gold]SFlix[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_sflix)"/>
         <setting id="opc_srnovelas" type="action" label="[COLOR gold]SrNovelas[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_srnovelas)"/>
         <setting id="opc_subtorrents" type="action" label="[COLOR gold]SubTorrents[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_subtorrents)"/>
 
@@ -395,9 +397,11 @@
         <setting id="show_help_gamovideo" type="action" label="Aviso [COLOR darkorange][B]Gamovideo[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_gamovideo)"/>
         <setting id="show_help_mega" type="action" label="Aviso [COLOR darkorange][B]Mega[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_mega)"/>
         <setting id="show_help_uptobox" type="action" label="Aviso [COLOR darkorange][B]Uptobox[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_uptobox)"/>
-        <setting id="show_help_voe" type="action" label="Aviso [COLOR darkorange][B]Voe[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_voe)"/>
-        <setting id="show_help_vias2" type="action" label="Aviso [COLOR darkorange][B]ResolveUrl[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_vias_resolve)"/>
-        <setting id="show_help_vias" type="action" label="Aviso [COLOR darkorange][B]Youtube[/B][/COLOR]" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_vias_youtube)"/>
+        <setting id="show_help_vidmoly" type="action" label="Aviso [COLOR darkorange][B]Vidmoly[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_vidmoly)"/>
+        <setting id="show_help_voe" type="action" label="Aviso [COLOR darkorange][B]Voe[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_voe)"/>
+        <setting id="show_help_waaw" type="action" label="Aviso [COLOR darkorange][B]Waaw[/B][/COLOR]" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_waaw)"/>
+        <setting id="show_help_vias2" type="action" label="Aviso [COLOR darkorange][B]ResolveUrl[/B][/COLOR]" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_vias_resolve)"/>
+        <setting id="show_help_vias" type="action" label="Aviso [COLOR darkorange][B]Youtube[/B][/COLOR]" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_vias_youtube)"/>
 
         <setting label="Servidores con Vías Alternativas y Adicionales:" type="lsep"/>
 
@@ -513,10 +517,13 @@
 
         <setting id="prvxb_opc" type="bool" label="Opciones" default="false"/>
         <setting id="proxies_list" type="bool" label="Habilitar la selección de su [COLOR yellow][B]Lista Personalizada[/B][/COLOR] (Lista-proxies.txt)" default="false" visible="eq(-1,true)"/>
-        <setting id="path_yourlist" type="text" label="[COLOR white][B]Ubicación por defecto [I].../addon_data.../plugin.video.balandro[/I][/B][/COLOR]" enable="false" visible="eq(-2,true)"/>
-        <setting id="proxies_yourlist" type="action" label="Información [COLOR goldenrod][B]Uso del fichero[/B][/COLOR] Personalizado" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_yourlist)"/>
-        <setting id="proxies_yourlist" type="action" label="[COLOR chocolate][B]Visualizar[/B][/COLOR] su fichero Personalizado" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_yourlist)"/>
-        <setting id="manto_yourlist" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] su fichero Personalizado" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_yourlist)"/>
+
+        <setting id="path_yourlist" type="text" label="[COLOR white][B]Ubicación por Defecto:[/B][/COLOR]" enable="false" visible="eq(-2,true)"/>
+        <setting id="path_yourlist1" type="text" label="Ruta: [COLOR white][B][I].../addon_data.../plugin.video.balandro[/I][/B][/COLOR]" enable="false" visible="eq(-3,true)"/>
+
+        <setting id="proxies_yourlist" type="action" label="Información [COLOR goldenrod][B]Uso del fichero[/B][/COLOR] Personalizado" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_yourlist)"/>
+        <setting id="proxies_yourlist" type="action" label="[COLOR chocolate][B]Visualizar[/B][/COLOR] su fichero Personalizado" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_yourlist)"/>
+        <setting id="manto_yourlist" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] su fichero Personalizado" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_yourlist)"/>
     </category>
 
     <category label="Torrents">
@@ -1042,8 +1049,9 @@
 
         <setting id="show_contacto1" type="action" label="[COLOR limegreen][B]Contacto[/B][/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_contacto)"/>
 
-        <setting label="Acceso Fuente:" type="lsep"/>
-        <setting id="_fuen1" type="text" label="[COLOR white][B]Fuente [I]repobal.github.io/base/[/I]  Repo, Add-On, Scripts[/B][/COLOR]" enable="false" visible="true"/>
+        <setting label="Balandro Fuente:" type="lsep"/>
+        <setting id="_fuen1" type="text" label="[COLOR white][B]Fuente: [I]https://repobal.github.io/base/[/I][/B][/COLOR]" enable="false"/>
+        <setting id="_fuen2" type="text" label="[COLOR white][B]Acceso: Repositorio, Add-On y Scripts[/B][/COLOR]" enable="false"/>
     </category>
 
     <category label="Team">
@@ -1063,8 +1071,10 @@
         <setting id="show_dev_notes" type="action" label="Notas para [COLOR goldenrod][B]Developers[/B][/COLOR] (Desarrolladores)" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_dev_notes)"/>
         <setting id="copy_dev" type="action" label="[COLOR yellowgreen]Obtener Copia del Fihero de [COLOR gold][B]Notas[/B][/COLOR] para desarrolladores[/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=copy_dev)"/>
 
-        <setting label="Fuente Desarrollo:" type="lsep"/>
-        <setting id="_dfon" type="text" label="[COLOR white][B]Código Fuente Desarrollo [I]github.com/repobal/[/I][/B][/COLOR]" enable="false" visible="true"/>
+        <setting label="Balandro Fuente Desarrollo:" type="lsep"/>
+        <setting id="_dfon" type="text" label="[COLOR white][B]Fuente: [I]https://github.com/repobal/[/I][/B][/COLOR]" enable="false"/>
+        <setting id="_dfon0" type="text" label="[COLOR white][B]Acceso: Código Fuente Desarrollo[/B][/COLOR]" enable="false"/>
+
     </category>
 
 </settings>

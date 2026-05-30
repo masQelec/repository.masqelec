@@ -21,6 +21,13 @@ from core import filetools, httptools, scrapertools
 from lib import jsunpack
 
 
+cf_challenges = ['https://challenges.cloudflare.com', 'https://www.google.com/recaptcha/api2/anchor?']
+
+domains_alt = ['\/\/transit-', '\/\/box-[^\/]+\/hls\d+\/']
+
+url_alt = 'biz/embed-'
+
+
 espera = config.get_setting('servers_waiting', default=6)
 
 color_exec = config.get_setting('notification_exec_color', default='cyan')
@@ -59,26 +66,44 @@ def get_video_url(page_url, url_referer=''):
 
     # ~ 7/4/26 NO captcha  https://vidmoly.me/\\1.html
     page_url = page_url.replace('/embed-', '/').replace('/d/', '/').replace('/w/', '/').replace('/v/', '/')
+
     if not '.html' in page_url: page_url = page_url + '.html'
- 
+
     headers = {}
     if url_referer: headers['Referer'] = url_referer
 
+    cookie = "cf_turnstile_demo_pass_" + page_url.replace('https://vidmoly.me/', '').replace('.html', '') + "=1"
+
+    headers['cookie'] = cookie
+
     resp = httptools.downloadpage(page_url, headers=headers)
+
+    data = resp.data
+
+    if '>Security Check<' in data:
+        for challenge in cf_challenges:
+            if challenge in data:
+                break
+
+        _url = ''
+
+        for domain in domains_alt:
+            if scrapertools.find_single_match(_url, domain):
+                page_url = page_url.replace("me/", url_alt)
+
+                resp = httptools.downloadpage(page_url, timeout=30)
+
+                data = resp.data
+                break
 
     if resp.code == 404:
         return 'Archivo inexistente ó eliminado'
 
-    elif '/notice.php' in resp.data:
+    elif '/notice.php' in data:
         return 'Archivo inexistente ó eliminado'
-
-    data = resp.data
 
     if 'This video not found' in data:
         return 'Archivo inexistente ó eliminado'
-
-    elif '>Security Check<' in data:
-        return 'CloudFlare Security Check'
 
     url = scrapertools.find_single_match(data, "sources:.*?file:.*?'(.*?)'.*?,")
     if not url: url = scrapertools.find_single_match(data, 'sources:.*?file:.*?"(.*?)".*?,')
@@ -88,21 +113,22 @@ def get_video_url(page_url, url_referer=''):
         video_urls.append(['m3u8', url])
         return video_urls
 
-    packed = scrapertools.find_single_match(data, "<script type=[\"']text/javascript[\"']>(eval.*?)</script>")
+    if not '>Security Check<' in data:
+        packed = scrapertools.find_single_match(data, "<script type=[\"']text/javascript[\"']>(eval.*?)</script>")
 
-    if packed: data = jsunpack.unpack(packed)
+        if packed: data = jsunpack.unpack(packed)
 
-    bloque = scrapertools.find_single_match(data, 'sources:\s*\[(.*?)\]')
+        bloque = scrapertools.find_single_match(data, 'sources:\s*\[(.*?)\]')
 
-    matches = scrapertools.find_multiple_matches(bloque, '\{(.*?)\}')
+        matches = scrapertools.find_multiple_matches(bloque, '\{(.*?)\}')
 
-    for vid in matches:
-        url = scrapertools.find_single_match(vid, 'file:"([^"]+)')
-        lbl = scrapertools.find_single_match(vid, 'label:"([^"]+)')
-        if not lbl: lbl = url[-4:]
+        for vid in matches:
+            url = scrapertools.find_single_match(vid, 'file:"([^"]+)')
+            lbl = scrapertools.find_single_match(vid, 'label:"([^"]+)')
+            if not lbl: lbl = url[-4:]
 
-        if url:
-            video_urls.append([lbl, url + '|Referer=https://vidmoly.me/'])
+            if url:
+                video_urls.append([lbl, url + '|Referer=https://vidmoly.me/'])
 
     if not video_urls:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):

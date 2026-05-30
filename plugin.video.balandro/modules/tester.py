@@ -796,10 +796,23 @@ def test_channel(channel_name):
                   if existe:
                       dataw = filetools.read(webs_log)
 
-                      host = scrapertools.find_single_match(dataw, channel_name + '  "(.*?)"')
+                      host = scrapertools.find_single_match(dataw, '"' + channel_name + '"' + '  "(.*?)"')
 
                       if host:
                           platformtools.dialog_notification(config.__addon_name + ' [COLOR palegreen][B]' + channel_name + '[/COLOR][/B]', '[COLOR cyan][B]' + host + '[/COLOR][/B]')
+
+          if channel_id == 'dontorrents':
+              try:
+                 data_tor_proxy = httptools.downloadpage('https://donproxies.com/').data
+              except:
+                 data_tor_proxy = ''
+
+              if data_tor_proxy:
+                  tor_proxy = scrapertools.find_single_match(data_tor_proxy, 'Pulse el boton inferior para que se le genere un proxy.*?<a href="(.*?)".*?>Ingresar al Proxy Generado<')
+                  if tor_proxy:
+                      if not tor_proxy.endswith('/'): tor_proxy = tor_proxy + '/'
+
+                  if not host == tor_proxy: host = tor_proxy
 
           if not host:
               try:
@@ -1378,6 +1391,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
     if response.sucess == False:
         if 'getaddrinfo failed' in str(response.code): txt += '[CR]domain: [COLOR darkgoldenrod][B]No se puede acceder a este sitio web.[/B][/COLOR][CR]'
         elif 'No address associated with hostname' in str(response.code): txt += '[CR]domain: [COLOR darkgoldenrod][B]Inaccesible no se puede acceder a este sitio.[/B][/COLOR][CR]'
+
         elif '| 502: Bad gateway</title>' in str(response.data): txt += '[CR][COLOR darkgoldenrod][B]Host error Bad Gateway[/B][/COLOR][CR]'
 
         elif '<urlopen error timed out>' in str(response.code) or '<urlopen error' in str(response.code):
@@ -1407,7 +1421,9 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             elif '<title>Access Denied</title>' in response.data: txt += '[CR]acces: [COLOR orangered][B]Denegado[/B][/COLOR]'
             elif 'se encuentra en mantenimiento' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
 
-            elif '<h1>Index of /</h1>' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Puede estar en mantenimiento[/B][/COLOR]'
+            elif '<h1>Index of /</h1>' in response.data or 'Index of /</h1>' in response.data :
+                  txt += '[CR]obras: [COLOR springgreen][B]Puede estar en mantenimiento[/B][/COLOR]'
+
             else:
                if len(response.data) > 0:
                    txt += '[CR]resp: [COLOR orangered][B]Unknow[/B][/COLOR][CR]'
@@ -1427,7 +1443,11 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
         if len(response.data) >= 1000:
             if 'Estamos en mantenimiento, por favor inténtelo más tarde' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
-            elif '<h1>Index of /</h1>' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Puede estar en mantenimiento[/B][/COLOR]'
+
+            elif '>Página en mantenimiento<' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
+
+            elif '<h1>Index of /</h1>' in response.data or 'Index of /</h1>' in response.data :
+                 txt += '[CR]obras: [COLOR springgreen][B]Puede estar en mantenimiento[/B][/COLOR]'
 
             elif 'This site is currently under construction' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Está en mantenimiento[/B][/COLOR]'
 
@@ -1554,9 +1574,10 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                 elif '/cgi-sys/defaultwebpage.cgi' in response.data: txt += txt_sorry
                 elif '/www.alliance4creativity.com/' in new_web: txt += '[CR]legal: [COLOR springgreen][B]Copyright infringement[/B][/COLOR]'
-                elif '<h1>Index of /</h1>' in response.data: txt += '[CR]obras: [COLOR springgreen][B]Puede estar en mantenimiento[/B][/COLOR]'
+                elif '<h1>Index of /</h1>' in response.data or 'Index of /</h1>' in response.data:
+                    txt += '[CR]obras: [COLOR springgreen][B]Puede estar en mantenimiento[/B][/COLOR]'
 
-                elif '"/lander"' in str(response.data):
+                elif '"/lander"' in str(response.data) or '-lander/' in str(response.data):
                     txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
 
                     if 'Diagnosis:' in txt:

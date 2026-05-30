@@ -13,7 +13,7 @@
         "url": "https://\\1/api/v1/video?id=\\2"
       },
       {
-        "pattern": "https://([a-z]+.(?:easyvidplayer|embedseek|seekplayer|player4me|ezplayer|rpmplay|4meplayer|upns|strp2p|rpmstream|p2pstream).(?:online|\\w{2,4}))/#([A-z0-9]+)",
+        "pattern": "https://([a-z]+.(?:easyvidplayer|embedseek|seekplayer|player4me|ezplayer|rpmplay|4meplayer|upns|strp2p|rpmstream|p2pstream|p2pplay).(?:online|\\w{2,4}))/#([A-z0-9]+)",
         "url": "https://\\1/api/v1/video?id=\\2"
       },
       {

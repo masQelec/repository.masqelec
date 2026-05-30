@@ -11,7 +11,7 @@ from lib.pyberishaes import GibberishAES
 from lib import decrypters
 
 
-host = 'https://pelisgratishd.in/'
+host = 'https://pelisgratishd.zip/'
 
 
 def item_configurar_proxies(item):
@@ -47,6 +47,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://pelisgratishd.in/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     hay_proxies = False
     if config.get_setting('channel_pelisgratishd_proxies', default=''): hay_proxies = True
 
@@ -420,9 +426,12 @@ def findvideos(item):
 
     if not embed: embed = scrapertools.find_single_match(data, 'data-src="(.*?)"')
 
-    if not 'http' in embed: embed = ''
-
     if not embed: return itemlist
+
+    if embed.startswith('//'): embed = 'https:' + embed
+    elif embed.startswith("/"): embed = host[:-1] + embed
+
+    if not 'http' in embed: return itemlist
 
     new_url = embed
 
@@ -431,7 +440,18 @@ def findvideos(item):
 
     ses = 0
 
-    if '//embed69.' in new_url:
+    if '/waaw.' in new_url:
+        ses += 1
+
+        lang = '?'
+
+        url = new_url
+
+        servidor = servertools.get_server_from_url(url)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang ))
+
+    elif '/embed69.' in new_url or '/vidurl/' in new_url:
         ses += 1
 
         datae = data
@@ -489,13 +509,20 @@ def findvideos(item):
                     if not config.get_setting('developer_mode', default=False): continue
 
                 other = ''
+                cpow = ''
 
                 if servidor == 'various': other = servertools.corregir_other(srv)
 
                 if '.eyJs' in link: age = ''
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes, age=age,
-                                      language=lang, other=other ))
+                elif 'POW_CHALLENGE' in data:
+                   cpow = scrapertools.find_single_match(data, "POW_CHALLENGE\s*=\s*'([^']+)';" +
+                                                               "\s*\w*\s*POW_DIFFICULTY\s*=\s*(\d+);" +
+                                                               "\s*\w*\s*POW_SALT\s*=\s*'([^']+)';")
+                   if cpow: age = ''
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '',
+                                      crypto=link, bytes=e_bytes, age=age, cpow=cpow, language=lang, other=other ))
 
             continue
 
@@ -608,14 +635,24 @@ def play(item):
         url = ''
 
         if not bytes:
-            url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
-            url += '='
+            if 'eyJs' in item.crypto:
+                url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
+                url += '='
 
-            try:
-                url = base64.b64decode(url).decode()
-                url = scrapertools.find_single_match(url, '"link":"(.*?)"')
-            except:
-                url = ''
+                try:
+                    url = base64.b64decode(url).decode()
+                    url = scrapertools.find_single_match(url, '"link":"(.*?)"')
+                except:
+                    url = ''
+
+            elif item.cpow:
+                res_pow = {"challenge": item.cpow[0], "difficulty": int(item.cpow[1]), "salt": item.cpow[2]}
+
+                resolve_pow = decrypters.decode_pow(res_pow)
+                aes_clave = resolve_pow.get("aes_key", "")
+
+                if aes_clave:
+                    url = decrypters.decode_decipher(crypto, aes_clave)
 
         if not url:
             if bytes:
@@ -639,7 +676,7 @@ def play(item):
                 return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
 
     if url:
-        if '/xupalace.' in url or '/uploadfox.' in url:
+        if '/hydrax.' in url or '/xupalace.' in url or '/uploadfox.' in url or '/embed69.' in url or '/pelisplay.' in url:
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)

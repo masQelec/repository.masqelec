@@ -46,9 +46,9 @@ cj = MozillaCookieJar()
 ficherocookies = os.path.join(config.get_data_path(), "cookies.dat")
 
 
-# ~ 25/4/26
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.7727.117 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.56 Safari/537.36"
+# ~ 22/5/26
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.179 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.22 Safari/537.36"
 
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
@@ -321,7 +321,7 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
     if not 'http' in url:
         if not url.startswith == 'magnet:':
             if config.get_setting('developer_team'):
-                platformtools.dialog_ok(config.__addon_name + ' -  HttpTools', '[B][COLOR palegreen]Revisar Url Incompleta[/COLOR][/B]', url)
+                platformtools.dialog_ok(config.__addon_name + ' - HttpTools', '[B][COLOR palegreen]Revisar Url Incompleta[/COLOR][/B]', url)
 
             response["data"] = ""
             return type('HTTPResponse', (), response)

@@ -3,7 +3,7 @@
   "name": "Zures",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Allviid,  Amdahost,  Asianload,  Asianplay,  Bigshare,  Bigwarp,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohd,  Oneupload,  Pandafiles,  Rovideo,  Savefiles,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamix, Streamoupload,  Streamup,  SwiftLoad,  Turbovid,  Tusfiles,  Udrop,  Updown,  Uploadbaz,  Uploadflix,  Uploadhub,  Uploady,  Upvid,  Veev,  Veoh,  Vidara,  Vidbasic,  Vidbob,  Videa,  Vidlook,  Vidmx,  Vidnest, Vido,  Vidpro,  Vidstore,  Vidtube,  Vimeos,  Vipss,  Vkprime,  Wecima,  Worlduploads,  Ztreamhub)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Allviid,  Amdahost,  Asianload,  Asianplay,  Bigshare,  Bigwarp,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohd,  Oneupload,  Pandafiles,  Rovideo,  Savefiles,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamix, Streamoupload,  Streamup,  SwiftLoad,  Turbovid,  Tusfiles,  Udrop,  Updown,  Uploadbaz,  Uploadflix,  Uploadhub,  Uploady,  Upvid,  Veev,  Veoh,  Vidara,  Vidbasic,  Vidbob,  Videa,  Vidlook,  Vidmx,  Vidnest, Vido,  Vidpro,  Vidsonic,  Vidstore,  Vidtube,  Vimeos,  Vipss,  Vkprime,  Wecima,  Worlduploads,  Ztreamhub)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -101,7 +101,7 @@
         "url": "https://sendit.cloud/\\1"
       },
       {
-        "pattern": "https://streamable.com/(?:s/|e/|)([0-9a-zA-Z]+)",
+        "pattern": "https://streamable.com/(?:s/|e/)([0-9a-zA-Z]+)",
         "url": "https://streamable.com/e/\\1"
       },
       {
@@ -145,11 +145,11 @@
         "url": "https://uploady.io/\\1"
       },
       {
-        "pattern": "https://veev.to/(?:d/|e/)([0-9a-zA-Z]+)",
+        "pattern": "https://veev.to/(?:d/|e)([0-9a-zA-Z]+)",
         "url": "https://veev.to/e/\\1"
       },
       {
-        "pattern": "https://doods.to/(?:d/|e/)([0-9a-zA-Z]+)",
+        "pattern": "https://doods.to/(?:d/|e)([0-9a-zA-Z]+)",
         "url": "https://veev.to/e/\\1"
       },
       {
@@ -213,7 +213,7 @@
         "url": "https://videakid.hu/\\1"
       },
       {
-        "pattern": "https://swiftload.io/(?:d/|e/|v/)([0-9a-zA-Z]+)",
+        "pattern": "https://swiftload.io/(?:d/|e/|v)([0-9a-zA-Z]+)",
         "url": "https://swiftload.io/v/\\1"
       },
       {
@@ -261,19 +261,19 @@
         "url": "https://asianload.cfd/watch?v=\\2"
       },
       {
-        "pattern": "https://savefiles.com/(?:embed-|e/|)([0-9a-zA-Z]+)",
+        "pattern": "https://savefiles.com/(?:embed-|e/)([0-9a-zA-Z]+)",
         "url": "https://savefiles.com/e/\\1"
       },
       {
-        "pattern": "https://savefiles.top/(?:embed-|e/|)([0-9a-zA-Z]+)",
+        "pattern": "https://savefiles.top/(?:embed-|e/)([0-9a-zA-Z]+)",
         "url": "https://savefiles.com/e/\\1"
       },
       {
-        "pattern": "https://streamhls.to/(?:embed-|e/|)([0-9a-zA-Z]+)",
+        "pattern": "https://streamhls.to/(?:embed-|e)([0-9a-zA-Z]+)",
         "url": "https://savefiles.com/e/\\1"
       },
       {
-        "pattern": "https://vidbasic.top/(?:embed/|)([0-9a-zA-Z]+)",
+        "pattern": "https://vidbasic.top/(?:embed/)([0-9a-zA-Z]+)",
         "url": "https://vidbasic.top/embed/\\1"
       },
       {
@@ -293,7 +293,7 @@
         "url": "https://vidnest.io/embed-\\1.html"
       },
       {
-        "pattern": "https://vidnest.io/(?:e/|d/)([0-9a-zA-Z]+)",
+        "pattern": "https://vidnest.io/(?:e/|d)([0-9a-zA-Z]+)",
         "url": "https://vidnest.io/embed-\\1.html"
       },
       {
@@ -301,11 +301,11 @@
         "url": "https://vidnest.io/embed-\\1.html"
       },
       {
-        "pattern": "https://vidnest.live/(?:e/|d/)([0-9a-zA-Z]+)",
+        "pattern": "https://vidnest.live/(?:e/|d)([0-9a-zA-Z]+)",
         "url": "https://vidnest.io/embed-\\1.html"
       },
       {
-        "pattern": "https://bigshare.io/(?:watch/|)([0-9a-zA-Z]+).html",
+        "pattern": "https://bigshare.io/(?:watch/)([0-9a-zA-Z]+).html",
         "url": "https://bigshare.io/watch/\\1"
       },
       {
@@ -317,12 +317,16 @@
         "url": "https:/streamix.so/v/\\1"
       },
       {
-        "pattern": "https://vidara.so/(?:e/|/v)([0-9a-zA-Z]+)",
+        "pattern": "https://vidara.so/(?:e/|v/)([0-9a-zA-Z]+)",
         "url": "https:/vidara.so/v/\\1"
       },
       {
-        "pattern": "https://vidara.to/(?:e/|/v)([0-9a-zA-Z]+)",
+        "pattern": "https://vidara.to/(?:e/|v/)([0-9a-zA-Z]+)",
         "url": "https:/vidara.to/v/\\1"
+      },
+      {
+        "pattern": "https://vidsonic.net/(?:d/|e/)([0-9a-zA-Z]+)",
+        "url": "https://vidsonic.net/e/\\1"
       }
     ]
   }

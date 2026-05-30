@@ -6,7 +6,7 @@ PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
 
-import re, os
+import re, os, base64
 
 from platformcode import logger, config, platformtools
 from core.item import Item
@@ -15,7 +15,7 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www3.divxtotal.lol/'
+host = 'https://divxtotal.foo/'
 
 
 # ~ por si viene de enlaces guardados
@@ -24,7 +24,7 @@ ant_hosts = ['https://www.divxtotal.re/', 'https://www.divxtotal.ac/', 'https://
              'https://www.divxtotal.pl/', 'https://www.divxtotal.wf/', 'https://www.divxtotal.win/',
              'https://www1.divxtotal.zip/', 'https://www2.divxtotal.zip/', 'https://www2.divxtotal.mov/',
              'https://www3.divxtotal.mov/', 'https://www4.divxtotal.mov/', 'https://www5.divxtotal.mov/',
-             'https://divxtotal.io/', 'https://www1.divxtotal.lol/', ]
+             'https://divxtotal.io/', 'https://www1.divxtotal.lol/', 'https://www3.divxtotal.lol/']
 
 
 domain = config.get_setting('dominio', 'divxtotal', default='')
@@ -432,34 +432,60 @@ def play(item):
     itemlist = []
 
     if item.other == 'Directo':
-        item.url = host + 'download_tt.php?u=' + item.url
+        new_url = host + 'download_tt.php?u=' + item.url
 
-        if item.url.endswith('.torrent'):
+        if new_url.endswith('.torrent'):
             if config.get_setting('proxies', item.channel, default=''):
                 if PY3:
                     from core import requeststools
-                    data = requeststools.read(item.url, 'divxtotal')
+                    data = requeststools.read(new_url, 'divxtotal')
                 else:
-                    data = do_downloadpage(item.url)
+                    data = do_downloadpage(new_url)
+
+                if str(data) == "b''":
+                    return 'Archivo [COLOR red]Inexistente[/COLOR]'
 
                 if data:
-                    try:
-                       if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
-                           return 'Archivo [COLOR red]No encontrado[/COLOR]'
-                       elif '<p>Por causas ajenas a ' in str(data):
-                           if not config.get_setting('proxies', item.channel, default=''):
-                               return 'Archivo [COLOR red]bloqueado[/COLOR] [COLOR yellow]Configure proxies a usar ...[/COLOR]'
+                    if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
+                        return 'Archivo [COLOR red]No encontrado[/COLOR]'
+                    elif '<p>Por causas ajenas a ' in str(data):
+                        if not config.get_setting('proxies', item.channel, default=''):
+                            return 'Archivo [COLOR red]bloqueado[/COLOR] [COLOR yellow]Configure proxies a usar ...[/COLOR]'
 
-                           return 'Archivo [COLOR red]bloqueado[/COLOR]'
-                    except:
-                       pass
+                        return 'Archivo [COLOR red]bloqueado[/COLOR]'
 
                     file_local = os.path.join(config.get_data_path(), "temp.torrent")
                     with open(file_local, 'wb') as f: f.write(data); f.close()
 
                     itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+
         else:
-            itemlist.append(item.clone( url = item.url, server = 'torrent' ))
+            new_url = base64.b64decode(item.url).decode("utf-8")
+
+            if PY3:
+                from core import requeststools
+                data = requeststools.read(new_url, 'divxtotal')
+            else:
+                data = do_downloadpage(new_url)
+
+            if str(data) == "b''":
+                return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
+            if data:
+                if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
+                    return 'Archivo [COLOR red]No encontrado[/COLOR]'
+                elif '<p>Por causas ajenas a ' in str(data):
+                    if not config.get_setting('proxies', item.channel, default=''):
+                       return 'Archivo [COLOR red]bloqueado[/COLOR] [COLOR yellow]Configure proxies a usar ...[/COLOR]'
+
+                    return 'Archivo [COLOR red]bloqueado[/COLOR]'
+                else:
+                    return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
+                file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                with open(file_local, 'wb') as f: f.write(data); f.close()
+
+                itemlist.append(item.clone( url = file_local, server = 'torrent' ))
 
         return itemlist
 
@@ -470,24 +496,23 @@ def play(item):
         if url_base64.endswith('.torrent'): item.url = url_base64
 
     if item.url.endswith('.torrent'):
-        if config.get_setting('proxies', item.channel, default=''):
-            if PY3:
-                from core import requeststools
-                data = requeststools.read(item.url, 'divxtotal')
-            else:
-                data = do_downloadpage(item.url)
+        if PY3:
+            from core import requeststools
+            data = requeststools.read(item.url, 'divxtotal')
+        else:
+            data = do_downloadpage(item.url)
 
-            if data:
-                try:
-                   if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
-                       return 'Archivo [COLOR red]No encontrado[/COLOR]'
-                   elif '<p>Por causas ajenas a ' in str(data):
-                       if not config.get_setting('proxies', item.channel, default=''):
-                           return 'Archivo [COLOR red]bloqueado[/COLOR] [COLOR yellow]Configure proxies a usar ...[/COLOR]'
+        if str(data) == "b''":
+            return 'Archivo [COLOR red]Inexistente[/COLOR]'
 
-                       return 'Archivo [COLOR red]bloqueado[/COLOR]'
-                except:
-                   pass
+        if data:
+            if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
+                return 'Archivo [COLOR red]No encontrado[/COLOR]'
+            elif '<p>Por causas ajenas a ' in str(data):
+                if not config.get_setting('proxies', item.channel, default=''):
+                    return 'Archivo [COLOR red]bloqueado[/COLOR] [COLOR yellow]Configure proxies a usar ...[/COLOR]'
+
+                return 'Archivo [COLOR red]bloqueado[/COLOR]'
 
             file_local = os.path.join(config.get_data_path(), "temp.torrent")
             with open(file_local, 'wb') as f: f.write(data); f.close()

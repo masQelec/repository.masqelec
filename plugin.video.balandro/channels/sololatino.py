@@ -291,7 +291,7 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = scrapertools.find_multiple_matches(data, '<div class="card">(.*?)</div></a></div>')
+    matches = scrapertools.find_multiple_matches(data, '<div class="card">(.*?)</div></div></a>')
 
     for match in matches:
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
@@ -302,7 +302,7 @@ def list_all(item):
 
         if 'guia-solo-latino' in url: continue
 
-        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;', "'").strip()
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;', "'").replace('&#039;', "'").strip()
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
@@ -459,201 +459,118 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
+    _player_id = scrapertools.find_single_match(data, 'data-player-id="(.*?)"')
+
+    if not _player_id: _player_id = scrapertools.find_single_match(data, 'data-server-url="(.*?)"')
+
+    if not _player_id: return itemlist
+
+    _player_model = scrapertools.find_single_match(data, 'data-player-model="(.*?)"')
+
+    if not _player_model: _player_model = scrapertools.find_single_match(data, 'data-server-type="(.*?)"')
+
+    if not _player_model: return itemlist
+
+    if not 'iframe' in _player_model:
+        api_url = host + 'api/player-url/' + _player_model + '/' + _player_id
+
+        data = do_downloadpage(api_url)
+
+        new_url = scrapertools.find_single_match(data, '"url":"(.*?)"')
+    else:
+        new_url = _player_id
+
+    new_url = new_url.replace('\\/', '/')
+
+    if not new_url: return itemlist
+
+    new_url = new_url.replace('/player.pelisserieshoy.com/', '/embed69.org/')
+
+    if not '/embed69.' in new_url and not '/vidurl' in new_url: return itemlist
+ 
+    data = do_downloadpage(new_url)
+
     ses = 0
 
-    # ~ P1ayer
-    matches = scrapertools.find_multiple_matches(data, 'data-server-url="(.*?)"')
+    # ~ P1ayers
+    dataLink = scrapertools.find_single_match(data, 'const dataLink =(.*?);')
+    if not dataLink: dataLink = scrapertools.find_single_match(data, 'dataLink(.*?);')
 
-    if not matches:
-        if '//embed69.' in data:
-            matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)".*?</iframe>')
+    e_bytes = scrapertools.find_single_match(data, "const bytes =.*?'(.*?)'")
+    if not e_bytes: e_bytes = scrapertools.find_single_match(data, "const safeServer =.*?'(.*?)'")
 
-    for stream in matches:
-        if not stream: continue
+    e_links = dataLink.replace(']},', '"type":"file"').replace(']}]', '"type":"file"')
 
-        if not 'http' in stream: continue
-        elif stream.endswith('.js'): continue
+    age = ''
+    if not dataLink or not e_bytes: age = 'crypto'
 
-        ses += 1
+    langs = scrapertools.find_multiple_matches(str(e_links), '"video_language":(.*?)"type":"file"')
 
-        if '.pelisserieshoy.' in stream: continue
+    for lang in langs:
+         ses += 1
 
-        data_s = do_downloadpage(stream)
+         lang = lang + '"type":"video"'
 
-        if '//embed69.' in stream:
-            ses += 1
+         links = scrapertools.find_multiple_matches(str(lang), '"servername":"(.*?)","link":"(.*?)".*?"type":"video"')
 
-            datae = data_s
+         if 'SUB' in lang: lang = 'Vose'
+         elif 'LAT' in lang: lang = 'Lat'
+         elif 'ESP' in lang: lang = 'Esp'
+         elif 'JAP' in lang: lang = 'Jap'
+         else: lang = '?'
 
-            dataLink = scrapertools.find_single_match(datae, 'const dataLink =(.*?);')
-            if not dataLink: dataLink = scrapertools.find_single_match(datae, 'dataLink(.*?);')
+         for srv, link in links:
+             ses += 1
 
-            e_bytes = scrapertools.find_single_match(datae, "const bytes =.*?'(.*?)'")
-            if not e_bytes: e_bytes = scrapertools.find_single_match(datae, "const safeServer =.*?'(.*?)'")
+             srv = srv.lower().strip()
 
-            e_links = dataLink.replace(']},', '"type":"file"').replace(']}]', '"type":"file"')
+             if not srv: continue
+             elif host in link: continue
 
-            age = ''
-            if not dataLink or not e_bytes: age = 'crypto'
+             elif '1fichier.' in srv: continue
+             elif 'plustream' in srv: continue
+             elif 'embedsito' in srv: continue
+             elif 'disable2' in srv: continue
+             elif 'disable' in srv: continue
+             elif 'xupalace' in srv: continue
+             elif 'uploadfox' in srv: continue
 
-            langs = scrapertools.find_multiple_matches(str(e_links), '"video_language":(.*?)"type":"file"')
+             elif srv == 'download': continue
+             elif srv == 'up2box': continue
 
-            for lang in langs:
-                ses += 1
+             servidor = servertools.corregir_servidor(srv)
 
-                lang = lang + '"type":"video"'
+             if servertools.is_server_available(servidor):
+                 if not servertools.is_server_enabled(servidor): continue
+             else:
+                 if not config.get_setting('developer_mode', default=False): continue
 
-                links = scrapertools.find_multiple_matches(str(lang), '"servername":"(.*?)","link":"(.*?)".*?"type":"video"')
+             other = ''
+             cpow = ''
 
-                if 'SUB' in lang: lang = 'Vose'
-                elif 'LAT' in lang: lang = 'Lat'
-                elif 'ESP' in lang: lang = 'Esp'
-                elif 'JAP' in lang: lang = 'Jap'
-                else: lang = '?'
+             if servidor == 'various': other = servertools.corregir_other(srv)
 
-                for srv, link in links:
-                    ses += 1
+             if '.eyJs' in link: age = ''
 
-                    srv = srv.lower().strip()
+             elif 'POW_CHALLENGE' in data:
+                cpow = scrapertools.find_single_match(data, "POW_CHALLENGE\s*=\s*'([^']+)';" +
+                                                           "\s*\w*\s*POW_DIFFICULTY\s*=\s*(\d+);" +
+                                                           "\s*\w*\s*POW_SALT\s*=\s*'([^']+)';")
+                if cpow: age = ''
 
-                    if not srv: continue
-                    elif host in link: continue
+             itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '',
+                                   crypto=link, bytes=e_bytes, age=age, cpow=cpow, language=lang, other=other ))
 
-                    elif '1fichier.' in srv: continue
-                    elif 'plustream' in srv: continue
-                    elif 'embedsito' in srv: continue
-                    elif 'disable2' in srv: continue
-                    elif 'disable' in srv: continue
-                    elif 'xupalace' in srv: continue
-                    elif 'uploadfox' in srv: continue
-
-                    elif srv == 'download': continue
-                    elif srv == 'up2box': continue
-
-                    servidor = servertools.corregir_servidor(srv)
-
-                    if servertools.is_server_available(servidor):
-                        if not servertools.is_server_enabled(servidor): continue
-                    else:
-                        if not config.get_setting('developer_mode', default=False): continue
-
-                    other = ''
-
-                    if servidor == 'various': other = servertools.corregir_other(srv)
-
-                    if '.eyJs' in link: age = ''
-
-                    itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes, age=age,
-                                          language=lang, other=other ))
-
-                continue
-
-        if '//xupalace.' in stream:
-            ses += 1
-
-            lang = '?'
-
-            if 'php?id=' in stream:
-                datax = do_downloadpage(stream)
-
-                url = scrapertools.find_single_match(datax, '<iframe src="(.*?)"')
-
-                if url:
-                    servidor = servertools.get_server_from_url(url)
-
-                    if servertools.is_server_available(servidor):
-                        if not servertools.is_server_enabled(servidor): continue
-                    else:
-                        if not config.get_setting('developer_mode', default=False): continue
-
-                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang ))
-
-                continue
-
-            elif '/video/' in stream:
-                datax = do_downloadpage(stream)
-
-                matchesx = scrapertools.find_multiple_matches(datax, "go_to_playerVast.*?'(.*?)'(.*?)</span>")
-
-                for matchx, restox in matchesx:
-                    if '/embedsito.' in matchx: continue
-                    elif '/player-cdn.' in matchx: continue
-                    elif '/1fichier.' in matchx: continue
-                    elif '/hydrax.' in matchx: continue
-                    elif '/xupalace.' in matchx: continue
-                    elif '/uploadfox.' in matchx: continue
-
-                    if 'data-lang="0"' in restox: lang = 'Lat'
-                    elif 'data-lang="1"' in restox: lang = 'Esp'
-                    elif 'data-lang="2"' in restox: lang = 'Vose'
-                    elif 'data-lang="3"' in restox: lang = 'Jap'
-                    else: lang = '?'
-
-                    servidor = servertools.get_server_from_url(matchx)
-
-                    if servertools.is_server_available(servidor):
-                        if not servertools.is_server_enabled(servidor): continue 
-                    else:
-                        if not config.get_setting('developer_mode', default=False): continue
-
-                    other = ''
-                    if servidor == 'various': other = servertools.corregir_other(matchx)
-
-                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = matchx,
-                                          language=lang, other=other ))
-
-                continue
-
-        # ~ Otros
-        links = scrapertools.find_multiple_matches(data_s, '<li onclick="go_to_playerVast(.*?)>')
-
-        for link in links:
-            url = scrapertools.find_single_match(str(link), "'(.*?)'")
-            if not url: url = scrapertools.find_single_match(str(link), '"(.*?)"')
-
-            if not url: continue
-
-            ses += 1
-
-            if '/plustream.' in url: continue
-            elif '/embedsito.' in url: continue
-            elif '/xupalace.' in url: continue
-
-            if 'data-lang="0"' in link: lang = 'Lat'
-            elif 'data-lang="1"' in link: lang = 'Esp'
-            elif 'data-lang="2"' in link: lang = 'Vose'
-            elif 'data-lang="3"' in link: lang = 'Jap'
-            else: lang = '?'
-
-            servidor = servertools.get_server_from_url(url)
-
-            if servertools.is_server_available(servidor):
-                if not servertools.is_server_enabled(servidor): continue
-            else:
-                if not config.get_setting('developer_mode', default=False): continue
-
-            other = servidor
-
-            if servidor == 'various': other = servertools.corregir_other(url)
-
-            if servidor == other: other = ''
-
-            if servidor == 'directo':
-                if not config.get_setting('developer_mode', default=False): continue
-                other = url.split("/")[2]
-                other = other.replace('https:', '').strip()
-
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                  language = lang, other = other.capitalize() ))
+         continue
 
     # ~ Player 2
     match = scrapertools.find_single_match(data, '"dooplay_player_option ".*?<iframe.*?src="(.*?)".*?</iframe>')
 
     if match:
-        if not '//embed69.' in match:
-            datax = do_downloadpage(match)
+        if not '/embed69.' in match and not '/vidurl/' in match:
+            data = do_downloadpage(match)
 
-            matchesx = scrapertools.find_multiple_matches(datax, "go_to_playerVast.*?'(.*?)'(.*?)</span>")
+            matchesx = scrapertools.find_multiple_matches(data, "go_to_playerVast.*?'(.*?)'(.*?)</span>")
 
             for matchx, restox in matchesx:
                 ses += 1
@@ -705,14 +622,24 @@ def play(item):
         url = ''
 
         if not bytes:
-            url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
-            url += '='
+            if 'eyJs' in item.crypto:
+                url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
+                url += '='
 
-            try:
-                url = base64.b64decode(url).decode()
-                url = scrapertools.find_single_match(url, '"link":"(.*?)"')
-            except:
-                url = ''
+                try:
+                    url = base64.b64decode(url).decode()
+                    url = scrapertools.find_single_match(url, '"link":"(.*?)"')
+                except:
+                    url = ''
+
+            elif item.cpow:
+                res_pow = {"challenge": item.cpow[0], "difficulty": int(item.cpow[1]), "salt": item.cpow[2]}
+
+                resolve_pow = decrypters.decode_pow(res_pow)
+                aes_clave = resolve_pow.get("aes_key", "")
+
+                if aes_clave:
+                    url = decrypters.decode_decipher(crypto, aes_clave)
 
         if not url:
             if bytes:
@@ -736,7 +663,7 @@ def play(item):
                 return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
 
     if url:
-        if '/xupalace.' in url or '/uploadfox.' in url:
+        if '/hydrax.' in url or '/xupalace.' in url or '/uploadfox.' in url or '/embed69.' in url or '/pelisplay.' in url:
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)

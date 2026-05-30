@@ -117,6 +117,9 @@ def get_video_url(page_url, url_referer=''):
                     elif 'Cloudflare challenge' in trace:
                         return 'Cloudflare Challenge Check'
 
+                    elif 'BYPARR not available' in trace:
+                        return 'No está Habilitado el Acceso a ByParr'
+
                 elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
                     return 'Archivo inexistente'
 
@@ -133,37 +136,54 @@ def get_video_url(page_url, url_referer=''):
     if js_code:
         js_code = re.sub("\s+\+\s+Date.now\(\)", '', js_code)
 
+        existe = False
+        hay_error = False
+
         try:
-            import js2py
-            existe = True
+            try:
+                import js2py
+                existe = True
+            except:
+                import traceback
+                logger.error(traceback.format_exc())
+
+                trace = traceback.format_exc()
+                if 'Your python version made changes to the bytecode' in trace:
+                    trace = 'RuntimeError: Your python version made changes to the bytecode'
+
+                if config.get_setting('developer_team'):
+                    platformtools.dialog_ok(config.__addon_name, '[COLOR red][B]Error en[/B][/COLOR] [COLOR gold][B]Script Module Js2py[/B][/COLOR]', trace)
+
+                hay_error = True
         except:
-            existe = False
+            pass
 
-        if not existe:
-            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Falta script.module.js2py[/COLOR][/B]' % color_alert)
+        if not hay_error:
+            if not existe:
+                platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Falta script.module.js2py[/COLOR][/B]' % color_alert)
 
-        if existe:
-            js = js2py.eval_js(js_code)
+            if existe:
+                js = js2py.eval_js(js_code)
 
-            makeplay = js() + str(int(time.time()*1000))
+                makeplay = js() + str(int(time.time()*1000))
 
-            if makeplay:
-                if config.get_setting('servers_time', default=True):
-                    platformtools.dialog_notification('Cargando [COLOR cyan][B]Dood[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
-                    time.sleep(int(espera))
+                if makeplay:
+                    if config.get_setting('servers_time', default=True):
+                        platformtools.dialog_notification('Cargando [COLOR cyan][B]Dood[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
+                        time.sleep(int(espera))
 
-                url = scrapertools.find_single_match(data, "\$.get\('(/pass[^']+)'")
+                    url = scrapertools.find_single_match(data, "\$.get\('(/pass[^']+)'")
 
-                if url:
-                    data2 = httptools.downloadpage(player + '/' + url, headers={'Referer': page_url}).data
+                    if url:
+                        data2 = httptools.downloadpage(player + '/' + url, headers={'Referer': page_url}).data
 
-                    new_url = re.sub(r'\s+', '', data2)
+                        new_url = re.sub(r'\s+', '', data2)
 
-                    if new_url:
-                        url = new_url + makeplay + '|Referer=' + page_url.replace(host, player)
+                        if new_url:
+                            url = new_url + makeplay + '|Referer=' + page_url.replace(host, player)
 
-                        video_urls.append(['mp4', url])
-                        return video_urls
+                            video_urls.append(['mp4', url])
+                            return video_urls
 
     if not video_urls:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
@@ -211,6 +231,9 @@ def get_video_url(page_url, url_referer=''):
 
                    elif 'Cloudflare challenge' in trace:
                        return 'Cloudflare Challenge Check'
+
+                   elif 'BYPARR not available' in trace:
+                       return 'No está Habilitado el Acceso a ByParr'
 
                elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
                    return 'Archivo inexistente'

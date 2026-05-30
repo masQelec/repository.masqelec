@@ -1,27 +1,37 @@
 [COLOR chartreuse][B]Indice Mensajes Fijados:[/B][/COLOR]
 
-  [COLOR chartreuse][B]01[/B][/COLOR]  [COLOR yellow]Comunicado Balandro Team[/COLOR]
-  [COLOR chartreuse][B]02[/B][/COLOR]  [COLOR yellow]Comunicado Oficial Balandro[/COLOR]
-  [COLOR chartreuse][B]03[/B][/COLOR]  [COLOR yellow]Opciones Telegram Balandro Asesor[/COLOR]
-  [COLOR chartreuse][B]04[/B][/COLOR]  [COLOR yellow]Instalación Balandro[/COLOR]
-  [COLOR chartreuse][B]05[/B][/COLOR]  [COLOR yellow]Descarga e Instalación del Addon de Vídeo Balandro[/COLOR]
-  [COLOR chartreuse][B]06[/B][/COLOR]  [COLOR yellow]Balandro Reproducciones[/COLOR]
-  [COLOR chartreuse][B]07[/B][/COLOR]  [COLOR yellow]Grupo Privado/Público Telegram Balandro Asesor[/COLOR]
-  [COLOR chartreuse][B]08[/B][/COLOR]  [COLOR yellow]Quitar los Proxies de un Canal[/COLOR]
-  [COLOR chartreuse][B]09[/B][/COLOR]  [COLOR yellow]Gestión de Proxies[/COLOR]
-  [COLOR chartreuse][B]10[/B][/COLOR]  [COLOR yellow]Si Apareciera la Ventana de Error Inesperado[/COLOR]
-  [COLOR chartreuse][B]11[/B][/COLOR]  [COLOR yellow]Instalación de Addons Externos[/COLOR]
-  [COLOR chartreuse][B]12[/B][/COLOR]  [COLOR yellow]Idiomas (Audios)[/COLOR]
-  [COLOR chartreuse][B]13[/B][/COLOR]  [COLOR yellow]Última Versión de Balandro[/COLOR]
-  [COLOR chartreuse][B]14[/B][/COLOR]  [COLOR yellow]Acceso a los Mensajes Fijados desde el Foro[/COLOR]
-  [COLOR chartreuse][B]15[/B][/COLOR]  [COLOR yellow]Historial de Telegram[/COLOR]
-  [COLOR chartreuse][B]16[/B][/COLOR]  [COLOR yellow]Inputstream Adaptive y Ffmpegdirect[/COLOR]
-  [COLOR chartreuse][B]17[/B][/COLOR]  [COLOR yellow]ResolveUrl Dependencias[/COLOR]
-  [COLOR chartreuse][B]18[/B][/COLOR]  [COLOR yellow]Fuentes Especiales[/COLOR]
-  [COLOR chartreuse][B]19[/B][/COLOR]  [COLOR yellow]Contacto[/COLOR]
-  [COLOR chartreuse][B]20[/B][/COLOR]  [COLOR yellow]Créditos[/COLOR]
+  [COLOR chartreuse][B]01[/B][/COLOR]  [COLOR yellow]Normativa General[/COLOR]
+  [COLOR chartreuse][B]02[/B][/COLOR]  [COLOR yellow]Comunicado Balandro Team[/COLOR]
+  [COLOR chartreuse][B]03[/B][/COLOR]  [COLOR yellow]Comunicado Oficial Balandro[/COLOR]
+  [COLOR chartreuse][B]04[/B][/COLOR]  [COLOR yellow]Opciones Telegram Balandro Asesor[/COLOR]
+  [COLOR chartreuse][B]05[/B][/COLOR]  [COLOR yellow]Instalación Balandro[/COLOR]
+  [COLOR chartreuse][B]06[/B][/COLOR]  [COLOR yellow]Descarga e Instalación del Addon de Vídeo Balandro[/COLOR]
+  [COLOR chartreuse][B]07[/B][/COLOR]  [COLOR yellow]Balandro Reproducciones[/COLOR]
+  [COLOR chartreuse][B]08[/B][/COLOR]  [COLOR yellow]Grupo Privado/Público Telegram Balandro Asesor[/COLOR]
+  [COLOR chartreuse][B]09[/B][/COLOR]  [COLOR yellow]Quitar los Proxies de un Canal[/COLOR]
+  [COLOR chartreuse][B]10[/B][/COLOR]  [COLOR yellow]Gestión de Proxies[/COLOR]
+  [COLOR chartreuse][B]11[/B][/COLOR]  [COLOR yellow]Si Apareciera la Ventana de Error Inesperado[/COLOR]
+  [COLOR chartreuse][B]12[/B][/COLOR]  [COLOR yellow]Instalación de Addons Externos[/COLOR]
+  [COLOR chartreuse][B]13[/B][/COLOR]  [COLOR yellow]Idiomas (Audios)[/COLOR]
+  [COLOR chartreuse][B]14[/B][/COLOR]  [COLOR yellow]Última Versión de Balandro[/COLOR]
+  [COLOR chartreuse][B]15[/B][/COLOR]  [COLOR yellow]Acceso a los Mensajes Fijados desde el Foro[/COLOR]
+  [COLOR chartreuse][B]16[/B][/COLOR]  [COLOR yellow]Historial de Telegram[/COLOR]
+  [COLOR chartreuse][B]17[/B][/COLOR]  [COLOR yellow]Información Servidores[/COLOR]
+  [COLOR chartreuse][B]18[/B][/COLOR]  [COLOR yellow]Inputstream Adaptive y Ffmpegdirect[/COLOR]
+  [COLOR chartreuse][B]19[/B][/COLOR]  [COLOR yellow]ResolveUrl Dependencias[/COLOR]
+  [COLOR chartreuse][B]20[/B][/COLOR]  [COLOR yellow]Fuentes Especiales[/COLOR]
+  [COLOR chartreuse][B]21[/B][/COLOR]  [COLOR yellow]Contacto[/COLOR]
+  [COLOR chartreuse][B]22[/B][/COLOR]  [COLOR yellow]Créditos[/COLOR]
 
-[COLOR chartreuse][B]Mensaje Fijado 01[/COLOR]  [COLOR yellow]Comunicado Balandro Team[/B][/COLOR]
+[COLOR chartreuse][B]Mensaje Fijado 01[/COLOR]  [COLOR yellow]Normativa General[/B][/COLOR]
+
+  Abstenerse de publicar Fotos/Vídeos excepto Emoticones 
+  En el caso de necesitar alguna Foto ó algún Vídeo,
+  respecto a la ejecución de Balandro, se os dará Aurorización explicita para ello.
+  No hacer referencia a:  Canales,  Plataformas,  Sitios Web,  Add-Ons,  etc.
+  El incumplimiento de esta Normativa Acarreará la posible [COLOR gold]Expulsión del Grupo[/COLOR].
+
+[COLOR chartreuse][B]Mensaje Fijado 02[/COLOR]  [COLOR yellow]Comunicado Balandro Team[/B][/COLOR]
 
 Son ya más de 7 años desde la salida de este addon.
 Desde [COLOR gold]Enero/2021[/COLOR] hemos solicitado incorporaciones, al equipo de desarrollo del addon
@@ -61,7 +71,7 @@ Además:
   y eso a veces no es de vuestro agrado, pues lo sentimos, pero esto es lo que hay,
   y si se volviese a suceder, procederemos incluso al [COLOR red]Cierre[/COLOR] de [COLOR gold]Balandro Asesor[/COLOR].
 
-[COLOR chartreuse][B]Mensaje Fijado 02[/COLOR]  [COLOR yellow]Comunicado Oficial Balandro[/B][/COLOR]
+[COLOR chartreuse][B]Mensaje Fijado 03[/COLOR]  [COLOR yellow]Comunicado Oficial Balandro[/B][/COLOR]
 
 Licencia [COLOR cyan]GNU GPL v3[/COLOR]  [COLOR dodgerblue]https://www.gnu.org/licenses/gpl-faq.html[/COLOR]
   
@@ -117,11 +127,11 @@ El software de libre disposición implica que los usuarios tienen las cuatro lib
        [COLOR cyan]ladran, pues cabalgamos[/COLOR]
        en nuestro caso navegamos con viento a favor y a toda vela.
 
-[COLOR chartreuse][B]Mensaje Fijado 03[/COLOR]  [COLOR yellow]Opciones Telegram Balandro Asesor[/B][/COLOR]
+[COLOR chartreuse][B]Mensaje Fijado 04[/COLOR]  [COLOR yellow]Opciones Telegram Balandro Asesor[/B][/COLOR]
 
 @balandro | Linktree  [COLOR dodgerblue]linktr.ee/balandro[/COLOR]
 
-[COLOR chartreuse][B]Mensaje Fijado 04[/COLOR]  [COLOR yellow]Instalación Balandro[/B][/COLOR]
+[COLOR chartreuse][B]Mensaje Fijado 05[/COLOR]  [COLOR yellow]Instalación Balandro[/B][/COLOR]
 
 Compatible con:
   Solo versiones OFICIALES de KODI
@@ -143,7 +153,7 @@ Si ya teneís este repositorio instalado, vuestro Media Center Kodi,
 os avisará, de una [COLOR gold]Actualización Disponible[/COLOR].
 
 Si no teneís instalado este último Repositorio:
-  1) Disponible por fuente  [COLOR dodgerblue]repobal.github.io/base/[/COLOR]
+  1) Disponible por fuente  [COLOR dodgerblue]https://repobal.github.io/base/[/COLOR]
 
   2) Disponible desde nuestro Foro
   [COLOR dodgerblue]www.mimediacenter.info/foro/[/COLOR]  Balandro
@@ -163,7 +173,7 @@ Procedimiento Instalación:
   porque a veces Kodi, es muy Caprichoso.
 
 Recomendación para disponer de más Servidores (vías alternativas):
-  Instalar desde la Fuente de Balandro  [COLOR dodgerblue]repobal.github.io/base/[/COLOR]
+  Instalar desde la Fuente de Balandro  [COLOR dodgerblue]https://repobal.github.io/base/[/COLOR]
 
   dentro de la Carpeta [COLOR gold]Scripts[/COLOR] según la versión de su Kodi
     Sub-Carpeta [COLOR gold]kodi18[/COLOR] Hasta Kodi 18.x
@@ -171,7 +181,7 @@ Recomendación para disponer de más Servidores (vías alternativas):
 
     [COLOR gold]Repo Elementum,  Repo ResolveUrl,  Plugin Video Youtube [/COLOR]
 
-[COLOR chartreuse][B]Mensaje Fijado 05[/COLOR]  [COLOR yellow]Descarga e Instalación del Addon de Vídeo Balandro[/B][/COLOR] 
+[COLOR chartreuse][B]Mensaje Fijado 06[/COLOR]  [COLOR yellow]Descarga e Instalación del Addon de Vídeo Balandro[/B][/COLOR] 
 
 Solo si el Repositorio de Balandro está [COLOR gold]Temporalmente Caído[/COLOR]
 
@@ -190,7 +200,7 @@ Descarga [COLOR gold]Solo[/COLOR] disponible desde nuestro Foro:
   abandonar vuestro Media Center Kodi e ingresar de nuevo en el,
   porque a veces Kodi, es muy Caprichoso.
 
-[COLOR chartreuse][B]Mensaje Fijado 06[/COLOR]  [COLOR yellow]Balandro Reproducciones[/B][/COLOR]
+[COLOR chartreuse][B]Mensaje Fijado 07[/COLOR]  [COLOR yellow]Balandro Reproducciones[/B][/COLOR]
 
 Comprobación antes de reportar un posible fallo en la Reproducción de [COLOR gold]Servidores[/COLOR]:
   Antes de reportarlo como un posible error, rogamos accedaís a traves de un navegador web,
@@ -206,7 +216,7 @@ Comprobación antes de reportar un posible fallo en la Reproducción de [COLOR g
   porque si la carga solo recayera sobre nosotros,
   sería imposible abordarlo por saturación/falta de tiempo.
 
-[COLOR chartreuse][B]Mensaje Fijado 07[/COLOR]  [COLOR yellow]Grupo Privado/Público Telegram Balandro Asesor[/B][/COLOR] 
+[COLOR chartreuse][B]Mensaje Fijado 08[/COLOR]  [COLOR yellow]Grupo Privado/Público Telegram Balandro Asesor[/B][/COLOR] 
 
 Grupo Telegram: [COLOR lightblue][B][I]t.me/balandro_asesor[/I][/B][/COLOR]
 
@@ -222,7 +232,7 @@ Atención:
 Opción Disponible:
   Los Miembros del Grupo, tienen la autorización para [COLOR gold]Añadir Nuevos Miembros[/COLOR].
 
-[COLOR chartreuse][B]Mensaje Fijado 08[/COLOR]  [COLOR yellow]Quitar los Proxies de un Canal[/B][/COLOR]
+[COLOR chartreuse][B]Mensaje Fijado 09[/COLOR]  [COLOR yellow]Quitar los Proxies de un Canal[/B][/COLOR]
 
 Métodos para Quitar los proxies en un canal concreto.
 
@@ -237,7 +247,7 @@ Método 2:
 Método 3:
   En la [COLOR gold]Consola[/COLOR] del Proceso de Obtención de Proxies, [COLOR gold]Cancelar[/COLOR], y ejecutar Quitar los proxies.
 
-[COLOR chartreuse][B]Mensaje Fijado 09[/COLOR]  [COLOR yellow]Gestión de Proxies[/B][/COLOR]
+[COLOR chartreuse][B]Mensaje Fijado 10[/COLOR]  [COLOR yellow]Gestión de Proxies[/B][/COLOR]
 
 Se recomienda su gestión, solo para [COLOR gold]Usuarios Avanzados[/COLOR].
 
@@ -282,7 +292,7 @@ Información:
   Esta lista tiene mayor estabilidad y una caducidad más longeva, es cuestión de ir probando,
   cuando no se consigan obtener proxies por el método Automático ó Habitual.
 
-[COLOR chartreuse][B]Mensaje Fijado 10[/COLOR]  [COLOR yellow]Si Apareciera la Ventana de Error Inesperado[/B][/COLOR] 
+[COLOR chartreuse][B]Mensaje Fijado 11[/COLOR]  [COLOR yellow]Si Apareciera la Ventana de Error Inesperado[/B][/COLOR] 
 
 Compruebe:
   Que tenga suficiente espacio Libre Disponible en su Equipo,
@@ -300,13 +310,13 @@ Si fuera este su caso deberá seguir estos pasos:
 Atención:
   Tenga presente que al efectuar estos pasos, [COLOR gold]PERDERÁ[/COLOR] toda su configuración personalizada.
 
-[COLOR chartreuse][B]Mensaje Fijado 11[/COLOR]  [COLOR yellow]Instalación de Addons Externos[/B][/COLOR]
+[COLOR chartreuse][B]Mensaje Fijado 12[/COLOR]  [COLOR yellow]Instalación de Addons Externos[/B][/COLOR]
 
 Solo con versiones OFICIALES de KODI
   22.x Piers,  21.x Omega,  20.x Nexus,  19.x Matrix,  18.x Leia,  17.x Krypton
 
 Recomendación para disponer de más Servidores (vías alternativas):
-  Instalar desde la Fuente de Balandro  [COLOR dodgerblue]repobal.github.io/base/[/COLOR]
+  Instalar desde la Fuente de Balandro  [COLOR dodgerblue]https://repobal.github.io/base/[/COLOR]
 
   dentro de la Carpeta [COLOR gold]Scripts[/COLOR] según la versión de su Kodi:
     Sub-Carpeta [COLOR gold]kodi18[/COLOR] Hasta Kodi 18.x
@@ -314,7 +324,7 @@ Recomendación para disponer de más Servidores (vías alternativas):
 
     [COLOR gold]Repo Elementum,  Repo ResolveUrl,  Plugin Video Youtube [/COLOR]
 
-[COLOR chartreuse][B]Mensaje Fijado 12[/COLOR]  [COLOR yellow]Idiomas (Audios)[/B][/COLOR]
+[COLOR chartreuse][B]Mensaje Fijado 13[/COLOR]  [COLOR yellow]Idiomas (Audios)[/B][/COLOR]
 
 Casi todos tienen idioma [COLOR gold]Castellano[/COLOR].
 Aunque no lo determina el canal habitualmente,
@@ -324,7 +334,7 @@ Los estrenos en castellano, tardan mucho más tiempo en ponerlos los uploaders e
 
 Revise sus [COLOR gold]Ajustes, categoría Play[/COLOR].
 
-[COLOR chartreuse][B]Mensaje Fijado 13[/COLOR]  [COLOR yellow]Última Versión de Balandro[/B][/COLOR] 
+[COLOR chartreuse][B]Mensaje Fijado 14[/COLOR]  [COLOR yellow]Última Versión de Balandro[/B][/COLOR] 
 
 Les recordamos que NO almacenamos [COLOR gold]NINGÚN[/COLOR] tipo de Contenido,
 tan SOLO presentamos lo que las Webs (Canales) Suministran.
@@ -337,36 +347,87 @@ tan SOLO presentamos lo que las Webs (Canales) Suministran.
   [COLOR dodgerblue]www.mimediacenter.info/foro/[/COLOR]  Balandro
   [COLOR gold]Aviso Mantenimiento del Addon (a mínimos)[/COLOR]
 
-[COLOR chartreuse][B]Mensaje Fijado 14[/COLOR]  [COLOR yellow]Acceso a los Mensajes Fijados desde el Foro[/B][/COLOR] 
+[COLOR chartreuse][B]Mensaje Fijado 15[/COLOR]  [COLOR yellow]Acceso a los Mensajes Fijados desde el Foro[/B][/COLOR] 
 
 [COLOR dodgerblue]www.mimediacenter.info/foro/[/COLOR]  Balandro
 [COLOR gold]Telegram Balandro Asesor Mensajes Fijados[/COLOR]
 
-[COLOR chartreuse][B]Mensaje Fijado 15[/COLOR]  [COLOR yellow]Historial de Telegram[/B][/COLOR]
+[COLOR chartreuse][B]Mensaje Fijado 16[/COLOR]  [COLOR yellow]Historial de Telegram[/B][/COLOR]
 
 Nota Informativa cada cierto tiempo, procedemos a eliminar Todo el Historial de Chats.
 
-Normativa General:
-  Abstenerse de publicar Fotos/Vídeos excepto Emoticones 
-  En el caso de necesitar alguna Foto ó algún Vídeo,
-  respecto a la ejecución de Balandro, se os dará Aurorización explicita para ello.
-  No hacer referencia a:  Canales,  Plataformas,  Sitios Web,  Add-Ons,  etc.
-  El incumplimiento de esta Normativa Acarreará la posible [COLOR gold]Expulsión del Grupo[/COLOR].
+[COLOR chartreuse][B]Mensaje Fijado 17[/COLOR]  [COLOR yellow]Información Servidores[/B][/COLOR]
 
-[COLOR chartreuse][B]Mensaje Fijado 16[/COLOR]  [COLOR yellow]Inputstream Adaptive y Ffmpegdirect[/B][/COLOR]
+  [COLOR palegreen][B]Gamovideo[/COLOR][/B]:  [COLOR red][B]Fuera de Servicio[/COLOR][/B]
+
+  [COLOR palegreen][B]Mega[/COLOR][/B]:
+    Si su Media Center es una versión anterior a [COLOR goldenrod][B]Kodi 19.x[/COLOR][/B]
+    y opera bajo el sistema operativo [COLOR gold][B]Windows[/COLOR][/B],
+    en determinadas ocasiones, puede fallar la Reproducción.
+
+    Para cualquier plataforma de ejecución [COLOR gold][B](Windows, Android, Rasperri, etc.)[/COLOR][/B]
+    deben existir Obligatoriamente los modulos necesarios de [COLOR yellow][B]Cryptografía[/COLOR][/B]
+    ya integrados en su Equipo, si no existieran, puede fallar la Reproducción.
+
+  [COLOR palegreen][B]Uptobox[/COLOR][/B]:  [COLOR red][B]Fuera de Servicio[/COLOR][/B]
+
+  [COLOR palegreen][B]Vidmoly[/COLOR][/B]:
+    *) [COLOR goldenrod][B]En Horas Punta[/COLOR][/B],
+        al Reproducir Vídeos con este servidor,
+        Activan [COLOR red][B]CloudFlare[/COLOR][/B] [COLOR yellow][B]CaptCha[/COLOR][/B] Oculto.
+        y nos devuelve [COLOR gold][B]Cloudflare Challenge Check[/COLOR][/B].
+
+        Es un Tema Ajeno a Balandro y nos es Imposible solucionarlo,
+        porque requeriría una espera de varios minutos para efectuar el [COLOR fuchsia][B]Play[/COLOR][/B].
+
+        Simplemente [COLOR cyan][B]Prescindimos de ello.[/COLOR][/B]
+
+        [COLOR yellowgreen][B]Toca esperar a que pasen esas[/COLOR][/B] [COLOR goldenrod][B]Horas Punta[/COLOR][/B],
+         ó bien Solicitar al Web Master de ese Servidor, que Retire ese Control.
+
+  [COLOR palegreen][B]Voe[/COLOR][/B]:
+    *) En ciertas ocasiones al Reproducir Vídeos con este servidor,
+        [COLOR yellow][B]Crashea el Add-On[/COLOR][/B]
+
+        Puede solucionarlo efectuando una [COLOR goldenrod][B]Pausa[/COLOR][/B],
+        durante un Minuto y continuar con el [COLOR fuchsia][B]Play[/COLOR][/B].
+
+        ó bien efectuando de Nuevo el [COLOR fuchsia][B]Play[/COLOR][/B]
+
+  [COLOR palegreen][B]Waaw[/COLOR][/B]:
+    1) Si la Pantalla Central está completamente en [COLOR seagreen][B]Negro[/COLOR][/B]
+         y no apareciera el [COLOR goldenrod][B]Símbolo Play[/COLOR][/B]
+         para [COLOR springgreen][B]Ubicar y Entregar[/COLOR][/B] los Vídeos con este servidor,
+         si al Acceder nos devuelve [COLOR gold][B]Captcha erróneo[/COLOR][/B] [COLOR cyan][B]Inténtelo de nuevo[/COLOR][/B].
+
+         Es muy probable que el [COLOR red][B]Archivo No Exista[/COLOR][/B]
+
+    2) En el caso contrario:
+         Antes de reportarlo como un posible error,
+         rogamos accedaís a traves de un navegador web,
+         a ese canal en concreto y procedaís a comprobar
+         si esa película/serie/episodio
+         [COLOR goldenrod][B]Reproduce a traves del servidor[/COLOR][/B].
+
+         [COLOR darkcyan]Si el resultado de esta operativa ha resultado satisfactoria,
+         indicarnos toda esa información para proceder a su verficación/subsanación.[/COLOR]
+
+         Grupo Telegram: [COLOR lightblue][B][I]t.me/balandro_asesor[/I][/B][/COLOR]
+
+[COLOR chartreuse][B]Mensaje Fijado 18[/COLOR]  [COLOR yellow]Inputstream Adaptive y Ffmpegdirect[/B][/COLOR]
 
   Puede obtenerlos a través del Repositorio de su Media Center Kodi: [COLOR cyan]Git-Hub Add-On Repository[/COLOR] 
   ó bien accediendo a los [COLOR palegreen]Ajustes de su Media Center, Add-Ons, Buscar[/COLOR]  Tecleando el texto: [COLOR yellow]input[/COLOR]
 
-[COLOR chartreuse][B]Mensaje Fijado 17[/COLOR]  [COLOR yellow]ResolveUrl Dependencias[/B][/COLOR]
+[COLOR chartreuse][B]Mensaje Fijado 19[/COLOR]  [COLOR yellow]ResolveUrl Dependencias[/B][/COLOR]
 
   [COLOR goldenrod]Si tiene instalado el Repositorio de ResolveUrl[/COLOR] [COLOR red]y NO le aparece como Instalado el Script ResolveUrl.[/COLOR]
   Compruebe las [COLOR chartreuse]Dependencias[/COLOR] de [COLOR fuchsia]ResolveUrl[/COLOR] en:
   Los [COLOR palegreen]Ajustes de su Media Center, Sistema, Add-Ons[/COLOR], [COLOR yellow]Gestionar Dependencias, ResolveURL, DEPENDENCIAS[/COLOR]
 
-[COLOR chartreuse][B]Mensaje Fijado 18[/COLOR]  [COLOR yellow]Fuentes Especiales[/B][/COLOR]
+[COLOR chartreuse][B]Mensaje Fijado 20[/COLOR]  [COLOR yellow]Fuentes Especiales[/B][/COLOR]
 
-[COLOR greenyellow][B]Fuente Comunes:[/B][/COLOR] [COLOR dodgerblue][B][I]repobal.github.io/base/scripts/comunes/[/I][/B][/COLOR]
+[COLOR greenyellow][B]Fuente Comunes:[/B][/COLOR] [COLOR dodgerblue][B][I]https://repobal.github.io/base/scripts/comunes/[/I][/B][/COLOR]
 
   [COLOR lightyellow][B]Resources, Scripts y Skins[/B][/COLOR]
     Resources Language, Requests y Skin Confluence
@@ -381,7 +442,7 @@ Normativa General:
     [COLOR yellowgreen]Skins Opcionales para Kodi:[/COLOR]
       [COLOR aquamarine]skin.confluence[/COLOR]
 
-[COLOR greenyellow][B]Fuente Scripts:[/B][/COLOR] [COLOR dodgerblue][B][I]repobal.github.io/base/scripts/[/I][/B][/COLOR]
+[COLOR greenyellow][B]Fuente Scripts:[/B][/COLOR] [COLOR dodgerblue][B][I]https://repobal.github.io/base/scripts/[/I][/B][/COLOR]
 
   [COLOR lightyellow][B]Repositorios, Add-Ons y Scripts[/B][/COLOR]
     dentro de la Carpeta [COLOR gold]Scripts[/COLOR] según la versión de su Kodi
@@ -390,13 +451,13 @@ Normativa General:
 
       [COLOR gold]Repo Elementum,  Repo ResolveUrl,  Plugin Video Youtube [/COLOR]
 
-[COLOR greenyellow][B]Fuente Team:[/B][/COLOR]  [COLOR orange][B][I]github.com/repobal/[/I][/B][/COLOR]
+[COLOR greenyellow][B]Fuente Team:[/B][/COLOR]  [COLOR orange][B][I]https://github.com/repobal/[/I][/B][/COLOR]
 
   [COLOR lightyellow][B]Team Balandro[/B][/COLOR]
     Grupo Desarrollo: [COLOR hotpink][B][I]t.me/Balandro_team[/I][/B][/COLOR]
     Incorporaciones a Team Solo con Enlace de Invitación
 
-[COLOR chartreuse][B]Mensaje Fijado 19[/COLOR]  [COLOR yellow]Contacto[/B][/COLOR]
+[COLOR chartreuse][B]Mensaje Fijado 21[/COLOR]  [COLOR yellow]Contacto[/B][/COLOR]
 
 Instalaciones, Tutoriales, Sugerencias
   Foro: [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]
@@ -409,16 +470,16 @@ Team Balandro
   Grupo Desarrollo: [COLOR hotpink][B][I]t.me/Balandro_team[/I][/B][/COLOR]
   Incorporaciones a Team Solo con Enlace de Invitación
 
-[COLOR chartreuse][B]Mensaje Fijado 20[/COLOR]  [COLOR yellow]Créditos[/B][/COLOR]
+[COLOR chartreuse][B]Mensaje Fijado 22[/COLOR]  [COLOR yellow]Créditos[/B][/COLOR]
 
   [COLOR goldenrod][B]Media Centers:[/B][/COLOR]
       [COLOR tan][B]Kodi Versiones Oficiales Soportadas:[/B][/COLOR]
       [COLOR plum][B]22.x Piers,  21.x Omega,  20.x Nexus,[/B][/COLOR]
       [COLOR plum][B]19.x Matrix,  18.x Leia  y  17.x Krypton[/B][/COLOR]
 
-  [COLOR springgreen][B]Fuente[/COLOR]  [COLOR cyan]repobal.github.io/base/[/B][/COLOR]
+  [COLOR springgreen][B]Fuente[/COLOR]  [COLOR cyan]https://repobal.github.io/base/[/B][/COLOR]
 
-  [COLOR firebrick][B]Team[/COLOR]  [COLOR orange]github.com/repobal/[/B][/COLOR]
+  [COLOR firebrick][B]Team[/COLOR]  [COLOR orange]https://github.com/repobal/[/B][/COLOR]
 
   [COLOR limegreen][B]Contacto:[/B][/COLOR]
       Foro  www.mimediacenter.info/foro/

@@ -11,7 +11,7 @@
   "categories": ["movie"],
   "language": ["cast", "vo"],
 
-  "clusters": ["classic"],
+  "clusters": ["suggested", "classic"],
 
   "notes": "Películas clásicas por géneros."
 }

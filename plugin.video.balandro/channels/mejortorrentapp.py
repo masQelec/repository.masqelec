@@ -13,7 +13,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www42.mejortorrent.eu'
+host = 'https://www43.mejortorrent.eu'
 
 
 # ~ por si viene de enlaces guardados
@@ -31,7 +31,7 @@ ant_hosts = ['https://mejortorrent.app', 'https://mejortorrent.wtf', 'https://ww
              'https://www32.mejortorrent.eu', 'https://www33.mejortorrent.eu','https://www34.mejortorrent.eu',
              'https://www35.mejortorrent.eu', 'https://www36.mejortorrent.eu', 'https://www37.mejortorrent.eu',
              'https://www38.mejortorrent.eu', 'https://www39.mejortorrent.eu', 'https://www40.mejortorrent.eu',
-             'https://www41.mejortorrent.eu']
+             'https://www41.mejortorrent.eu', 'https://www42.mejortorrent.eu']
 
 
 domain = config.get_setting('dominio', 'mejortorrentapp', default='')
@@ -106,6 +106,11 @@ def do_downloadpage(url, post=None, headers=None):
                     data = httptools.downloadpage_proxy('mejortorrentapp', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+    if not '/busqueda?q=' in url:
+        if '<title>Just a moment...</title>' in data:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+            return ''
 
     return data
 
@@ -408,6 +413,8 @@ def list_list(item):
         title = scrapertools.find_single_match(match, '<a href=.*?">.*?>(.*?)<strong>')
 
         if not url or not title: continue
+
+        title = title.replace('&#039;', "'")
 
         qlty = scrapertools.find_single_match(match, '<strong>(.*?)</strong>')
 

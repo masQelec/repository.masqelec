@@ -141,6 +141,18 @@
         "url": "https://dropload.io/\\2"
       },
       {
+        "pattern": "(https://dropload.pro/)(?:embed-|e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://dropload.io/\\2"
+      },
+      {
+        "pattern": "(https://dropload.co/)(?:embed-|e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://dropload.io/\\2"
+      },
+      {
+        "pattern": "(https://dr0pstream.com/)(?:embed-|e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://dropload.io/\\2"
+      },
+      {
         "pattern": "(https://streamwish.)(?:com|to|top|site|fun)/(?:e/|f/|d/)([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\2"
       },
@@ -402,14 +414,6 @@
       },
       {
         "pattern": "https://dhcplay.com/([0-9a-zA-Z]+)",
-        "url": "https://streamwish.to/\\1"
-      },
-      {
-        "pattern": "https://hlsflex.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
-        "url": "https://streamwish.to/\\1"
-      },
-      {
-        "pattern": "https://hlsflex.com/([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },
       {
