@@ -219,8 +219,6 @@ def list_all(item):
         if 'ingles.png' in match.lower(): langs.append('Vose')
         if 'japon.png' in match.lower(): langs.append('Jap')
 
-        if not langs: langs.append('Vo')
-
         title = title.replace('&#038;', '&')
 
         tipo = 'movie' if '/movies/' in url else 'tvshow'
@@ -387,7 +385,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'mexico': 'Lat', 'latino': 'Lat', 'latíno': 'Lat', 'espana': 'Esp', 'castellano': 'Esp', 'ingles': 'Vose',  'inglés': 'Vose', 'subtitulado': 'Vose', 'japonés sub': 'Jap', 'japones sub': 'Jap'}
+    IDIOMAS = {'mexico': 'Lat', 'latino': 'Lat', 'latíno': 'Lat', 'lat': 'Lat', 'espana': 'Esp', 'castellano': 'Esp', 'cas': 'Esp', 'ingles': 'Vose',  'inglés': 'Vose', 'subtitulado': 'Vose', 'japonés sub': 'Jap', 'japones sub': 'Jap'}
 
     data = do_downloadpage(item.url)
 
@@ -466,11 +464,7 @@ def play(item):
 
         if 'voe.sx' in url: servidor = 'voe'
 
-        else:
-           if 'http' in servidor:
-               if 'tubeload' in url or 'mvidoo' in url or 'rutube' in url or 'filemoon' in url or 'moonplayer' in url or 'streamhub' in url or 'uploadever' in url or 'videowood' in url or 'yandex' in url or 'yadi.' in url or 'fastupload' in url or 'dropload' in url or 'streamwish' in url or 'krakenfiles' in url or 'hexupload' in url or 'hexload' in url or 'desiupload' in url or 'filelions' in url or 'youdbox' in url or 'yodbox' in url or 'wish' in url or 'azipcdn' in url or 'awish' in url or 'dwish' in url or 'mwish' in url or 'swish' in url or 'lulustream' in url or 'luluvdo' in url or 'lion' in url or 'alions' in url or 'dlions' in url or 'mlions' in url or 'turboviplay' in url or 'emturbovid' in url or 'tuborstb' in url or 'streamvid' in url or 'upload.do' in url or 'uploaddo' in url or 'file-upload' in url or 'wishfast' in url or 'doodporn' in url or 'vidello' in url or 'vidroba' in url or 'vidspeed' in url or 'sfastwish' in url or 'fviplions' in url or 'moonmov' in url or 'flaswish' in url or 'vkspeed' in url or 'vkspeed7' in url or 'obeywish' in url or 'twitch' in url or 'vidhide' in url or 'hxfile' in url or 'drop' in url or 'embedv' in url or 'vgplayer' in url or 'userload' in url or 'uploadraja' in url or 'cdnwish' in url or 'goodstream' in url or 'asnwish' in url  or 'flastwish' in url or 'jodwish' in url or 'fmoonembed' in url or 'embedmoon' in url or 'moonjscdn' in url or 'rumble' in url or 'bembed' in url or 'javlion' in url or 'streamruby' in url or 'sruby' in url or 'rubystream' in url or 'stmruby' in url or 'rubystm' in url or 'rubyvid' in url or 'swhoi'in url or 'listeamed' in url or 'go-streamer.net' in url or 'fsdcmo' in url or 'fdewsdc' in url or 'peytonepre' in url or 'ryderjet' in url or 'smoothpre' in url or 'movearnpre' in url or 'seraphinap' in url or 'seraphinapl' in url or 'qiwi' in url or 'swdyu' in url or 'streamhihi' in url or 'luluvdoo' in url or 'lulu' in url or 'ponmi' in url or 'wishonly' in url or 'streamsilk' in url or 'playerwish' in url or 'hlswish' in url or 'iplayerhls' in url or 'hlsflast' in url or 'ghbrisk' in url or 'cybervynx' in url or 'streamhg ' in url or 'stbhg' in url or 'dhcplay' in url or 'wish' in url or 'stblion' in url or 'terabox' in url or 'dhtpre' in url or 'dramacool' in url or 'l1afav' in url or 'hlsflex' in url or 'swiftplayers' in url or 'gradehgplus' in url or 'hailindihg' in url or 'guxhag' in url or 'habetar' in url or 'yuguaab' in url or 'mivalyo' in url or 'taylorplayer' in url or 'videoland' in url or 'bingezove' in url or 'dinisglows' in url or 'dingtezuni' in url or 'xenolyzb' in url or 'hgplaycdn' in url or 'davioad' in url or 'haxloppd' in url or 'dumbalag' in url or 'kravaxxa' in url or 'hgbazooka' in url or 'cavanhabg' in url: servidor = 'various'
-
-               elif 'allviid' in url or 'cloudfile' in url or 'cloudmail' in url or 'dailyuploads' in url or 'darkibox' in url or 'dembed' in url or 'downace' in url or 'fastdrive' in url or 'fastplay' in url or 'filegram' in url or 'gostream' in url or 'letsupload' in url or 'liivideo' in url or 'myupload' in url or 'neohd' in url or 'oneupload' in url or 'pandafiles' in url or 'rovideo' in url or 'send' in url or 'streamable' in url or 'streamdav' in url or 'streamgzzz' in url or 'streamoupload' in url or 'turbovid' in url or 'tusfiles' in url or 'uploadba' in url or 'uploadflix' in url or 'uploadhub' in url or 'uploady' in url or 'veev' in url or 'doods' in url or 'veoh' in url or 'vidbob' in url or 'vidlook' in url or 'vidmx' in url or 'vido.' in url or 'vidpro' in url or 'vidstore' in url or 'vipss' in url or 'vkprime' in url or 'worlduploads' in url or 'ztreamhub' in url or 'amdahost' in url or 'updown' in url or 'videa' in url or 'asianplay' in url or 'swiftload' in url or 'udrop' in url or 'vidtube' in url or 'bigwarp' in url or 'bgwp' in url or 'wecima': servidor = 'zures'
+        else: servidor = servertools.corregir_servidor(url)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()

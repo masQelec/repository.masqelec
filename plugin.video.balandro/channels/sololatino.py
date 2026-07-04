@@ -139,7 +139,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'series?sort=popular', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'series?genero=&sort=popular', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'series?sort=rating', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
@@ -302,7 +302,7 @@ def list_all(item):
 
         if 'guia-solo-latino' in url: continue
 
-        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;', "'").replace('&#039;', "'").strip()
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;', "'").replace('&#039;', "'").replace('&amp;', '&').strip()
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
@@ -378,6 +378,8 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
+    _tmdb_id = scrapertools.find_single_match(data, '/title/tt(.*?)"')
+
     bloque = scrapertools.find_single_match(data, '<div data-season-panel="' + str(item.contentSeason) + '"(.*?)</a></div></div>')
 
     matches = re.compile('<a href="(.*?)".*?<img src="(.*?)".*?<p class="ep-num">E(.*?)</p>.*?<p class="text-sm font-semibold text-white leading-tight">(.*?)</p>', re.DOTALL).findall(bloque)
@@ -430,6 +432,17 @@ def episodios(item):
     for url, thumb, epis, title in matches[item.page * item.perpage:]:
         if not epis: epis = 1
 
+        _tmdb_id = _tmdb_id.replace('/', '')
+
+        if '-' in _tmdb_id: _tmdb_id = _tmdb_id.split("-")[0]
+
+        nro_epi = str(epis)
+        if len(nro_epi) == 1: nro_epi = '0' + nro_epi
+
+        _tmdb_id = _tmdb_id + '-' + str(item.contentSeason) + 'x' + str(nro_epi)
+
+        title = title.replace('&#039;s', "'s").replace('&quot;', '').replace('&amp;', '&').strip()
+
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
 
         titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
@@ -438,7 +451,7 @@ def episodios(item):
 
         if 'Epis.' in titulo: titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail=thumb,
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail=thumb, _tmdb_id=_tmdb_id,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
@@ -458,36 +471,47 @@ def findvideos(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     _player_id = scrapertools.find_single_match(data, 'data-player-id="(.*?)"')
 
     if not _player_id: _player_id = scrapertools.find_single_match(data, 'data-server-url="(.*?)"')
+ 
+    if not _player_id: _player_id = scrapertools.find_single_match(data, 'data-player-token="(.*?)"')
 
     if not _player_id: return itemlist
 
-    _player_model = scrapertools.find_single_match(data, 'data-player-model="(.*?)"')
+    if item._tmdb_id:
+        _tmdb_id = item._tmdb_id
+    else:
+        _tmdb_id = scrapertools.find_single_match(data, '/title/tt(.*?)"')
 
-    if not _player_model: _player_model = scrapertools.find_single_match(data, 'data-server-type="(.*?)"')
+    if not _tmdb_id: return itemlist
+ 
+    if not 'iframe' in _player_id:
+        headers = {'Referer': item.url}
 
-    if not _player_model: return itemlist
+        post = {'t': _player_id}
 
-    if not 'iframe' in _player_model:
-        api_url = host + 'api/player-url/' + _player_model + '/' + _player_id
+        api_url = host + 'api/player-url'
 
-        data = do_downloadpage(api_url)
+        data = do_downloadpage(api_url, post=post, headers=headers)
 
         new_url = scrapertools.find_single_match(data, '"url":"(.*?)"')
+
+        if not new_url:
+            new_url = 'https://embed69.org/f/tt' + _tmdb_id
     else:
         new_url = _player_id
 
     new_url = new_url.replace('\\/', '/')
 
-    if not new_url: return itemlist
+    if not 'http' in new_url: return itemlist
 
     new_url = new_url.replace('/player.pelisserieshoy.com/', '/embed69.org/')
 
     if not '/embed69.' in new_url and not '/vidurl' in new_url: return itemlist
- 
+
     data = do_downloadpage(new_url)
 
     ses = 0
@@ -566,6 +590,10 @@ def findvideos(item):
     # ~ Player 2
     match = scrapertools.find_single_match(data, '"dooplay_player_option ".*?<iframe.*?src="(.*?)".*?</iframe>')
 
+    if not match:
+        if not itemlist:
+            match = new_url.replace('/embed69.org/f/', '/xupalace.org/video/')
+
     if match:
         if not '/embed69.' in match and not '/vidurl/' in match:
             data = do_downloadpage(match)
@@ -596,10 +624,10 @@ def findvideos(item):
                     if not config.get_setting('developer_mode', default=False): continue
 
                 other = ''
-                if servidor == 'various': other = servertools.corregir_other(url)
+                if servidor == 'various': other = servertools.corregir_other(matchx)
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = matchx,
-                                      language=lang, other=other, age='P2' ))
+                                      language=lang, other=other, age='xp' ))
 
     if not itemlist:
         if not ses == 0:
@@ -622,7 +650,7 @@ def play(item):
         url = ''
 
         if not bytes:
-            if 'eyJs' in item.crypto:
+            if '.eyJs' in item.crypto:
                 url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
                 url += '='
 

@@ -124,7 +124,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
@@ -139,7 +139,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series_p/', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -184,12 +184,14 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = scrapertools.find_multiple_matches(data, '<div class="imagen-post">(.*?)<div class="bloque-date">')
+    matches = scrapertools.find_multiple_matches(data, '<div class="relative my-5 md:my-4">(.*?)</div></div></div>')
 
     for match in matches:
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
-        title = scrapertools.find_single_match(match, '<div class="bloque-inferior">(.*?)</div>').strip()
+        title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+
+        if not title: title = scrapertools.find_single_match(match, 'text-center px-2">(.*?)</p>').strip()
 
         if not url or not title: continue
 
@@ -228,7 +230,7 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<nav class="navigation pagination".*?class="page-numbers current">.*?href="(.*?)"')
+        next_page = scrapertools.find_single_match(data, '<nav role=navigation aria-label=paginator.*?<span aria-current=page>.*?' + "href='(.*?)'")
 
         if next_page:
             if '/page/' in next_page:
@@ -239,7 +241,9 @@ def list_all(item):
 
 def episodios(item):
     logger.info()
-    itemlist=[]
+    itemlist = []
+
+    tab_episodes = []
 
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
@@ -247,9 +251,9 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<tbody>(.*?)</tbody>')
+    bloque = scrapertools.find_single_match(data, '<tbody(.*?)</tbody>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<tr class="lol">.*?</td>.*?<td>(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
+    matches = scrapertools.find_multiple_matches(bloque, '<tr wire:key=episode-0>.*?<td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-300">(.*?)</td>.*?<td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-300 text-center">(.*?)</td>.*?href="(.*?)"')
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
@@ -297,7 +301,9 @@ def episodios(item):
                 else: item.perpage = 50
 
     for temp_epis, qlty, url in matches[item.page * item.perpage:]:
-        temp_epis = temp_epis.replace('&#215;', 'x')
+        qlty = qlty.strip()
+
+        temp_epis = temp_epis.replace('&#215;', 'x').strip()
 
         if 'completa' in temp_epis.lower():
             season = 99
@@ -328,6 +334,10 @@ def episodios(item):
 
         if url.startswith("/"): url = host[:-1] + url
 
+        if (str(season) + 'x' + str(episode)) in tab_episodes: continue
+
+        tab_episodes.append(str(season) + 'x' + str(episode))
+
         itemlist.append(item.clone( action = 'findvideos', title = titulo, url = url, quality = qlty,
                                     contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
 
@@ -356,9 +366,12 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = re.compile('<tbody>.*?</td>.*?<td>(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"', re.DOTALL).findall(data)
+    matches = re.compile('<tbody.*?</td>.*?</td>.*?<td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-300">(.*?)</td>.*?<td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-300 text-center">(.*?)</td>.*?href="(.*?)"', re.DOTALL).findall(data)
 
     for qlty, peso, url in matches:
+        qlty = qlty.strip()
+        peso = peso.strip()
+
         if not url.startswith('http'): url = host[:-1] + url
 
         other = peso.replace('&#8230;', '').strip()

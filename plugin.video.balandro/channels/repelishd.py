@@ -298,7 +298,7 @@ def list_all(item):
         year = scrapertools.find_single_match(article, '</h3> <span>(.*?)</span>')
         if not year: year = '-'
 
-        tipo = 'tvshow' if 'style="background-color:' in article or item.search_type == 'tvshow' else 'movie'
+        tipo = 'tvshow' if 'style="background-color:' in article or '/serie/' in item.url or item.search_type == 'tvshow' else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'tvshow':
@@ -336,10 +336,13 @@ def temporadas(item):
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     if not 'id="season-' in data:
-        platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]No es Una Serie[/B][/COLOR]')
-        return
+        if not '>Temporada<' in data:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]No es Una Serie[/B][/COLOR]')
+            return
 
     matches = re.compile('id="season-(.*?)"', re.DOTALL).findall(data)
+
+    if not matches: matches = re.compile('"#season-(.*?)"', re.DOTALL).findall(data)
 
     for season in matches:
         title = 'Temporada ' + season
@@ -379,6 +382,11 @@ def episodios(item):
     bloque = scrapertools.find_single_match(data, 'id="season-' + str(season) + '"(.*?)</ul></div>')
 
     matches = re.compile("<li>(.*?)</li>").findall(bloque)
+
+    if not matches:
+        bloque = scrapertools.find_single_match(data, '"#season-(.*?)' + "'data-link'")
+
+        matches = re.compile("'num'.*?'(.*?)'").findall(bloque)
 
     if item.page == 0:
         sum_parts = len(matches)
@@ -420,6 +428,28 @@ def episodios(item):
                     item.perpage = sum_parts
 
     for datos in matches[item.page * item.perpage:]:
+        if datos == '1x1':
+            titulo = '1x1' + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
+            url = ''
+
+            if '/vimeus.' in data:
+                _key = scrapertools.find_single_match(data, "&view_key=(.*?)'")
+
+                if _key:
+                    datos = ''
+
+                    _tmdb = scrapertools.find_single_match(data, "var tmdbRaw = '(.*?)'")
+                    _tit = scrapertools.find_single_match(data, "var titolo= '(.*?)'")
+
+                    if _tmdb and _tit:
+                        url = 'https://vimeus.com/e/serie?tmdb=' + _tmdb + '&view_key=' +_key + '&se=1&ep=1&title=' + _tit + '&theme=minimal'
+
+            itemlist.append(item.clone( action = 'findvideos', url = url, datos = datos, title = titulo,
+                                        contentType = 'episode', contentSeason = 1, contentEpisodeNumber = 1 ))
+
+            continue
+
         url = scrapertools.find_single_match(datos, 'data-link="(.*?)"')
         title = scrapertools.find_single_match(datos, 'data-title="(.*?)"')
 
@@ -492,46 +522,73 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    if 'id="season-' in data:
+    if 'id="season-' in data or '>Temporada<' in data:
         platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B]Es Una Serie[/B][/COLOR]')
         return
 
     enlace = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
 
-    if not enlace: return itemlist
+    if enlace:
+       datae = do_downloadpage(enlace)
+       datae = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', datae)
 
-    datae = do_downloadpage(enlace)
-    datae = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', datae)
+       actives = scrapertools.find_multiple_matches(datae, '<ul class="_player-mirrors (.*?)</ul>')
 
-    actives = scrapertools.find_multiple_matches(datae, '<ul class="_player-mirrors (.*?)</ul>')
+       for active in actives:
+           ses += 1
 
-    for active in actives:
-        ses += 1
+           if 'castellano' in active or 'español' in active: lang = 'Esp'
+           elif 'latino' in active: lang = 'Lat'
+           elif 'subtitulado' in active: lang = 'Vose'
+           else: lang = '?'
 
-        if 'castellano' in active or 'español' in active: lang = 'Esp'
-        elif 'latino' in active: lang = 'Lat'
-        elif 'subtitulado' in active: lang = 'Vose'
-        else: lang = '?'
+           urls = scrapertools.find_multiple_matches(active, 'data-link="(.*?)"')
 
-        urls = scrapertools.find_multiple_matches(active, 'data-link="(.*?)"')
+           for url in urls:
+               if not url: continue
 
-        for url in urls:
-            if not url: continue
+               ses += 1
 
-            ses += 1
+               if '/verhdlink.' in url: continue
 
-            if '/verhdlink.' in url: continue
+               if not 'http' in url: url = 'https:' + url
 
-            if not 'http' in url: url = 'https:' + url
+               servidor = servertools.get_server_from_url(url)
 
-            servidor = servertools.get_server_from_url(url)
+               url = servertools.normalize_url(servidor, url)
 
-            url = servertools.normalize_url(servidor, url)
+               other = ''
+               if servidor == 'various': other = servertools.corregir_other(url)
+               elif servidor == 'zures': other = servertools.corregir_zures(url)
 
-            other = ''
-            if servidor == 'various': other = servertools.corregir_other(url)
+               itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language=lang, other=other ))
 
-            itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language=lang, other=other ))
+    if not itemlist:
+        if '/vimeus.' in item.url:
+            new_url = item.url
+
+            datav = do_downloadpage(new_url)
+
+            embed = scrapertools.find_single_match(datav, '"embeds":(.*?)</script>')
+
+            links = scrapertools.find_multiple_matches(embed, '"url":"(.*?)"')
+
+            for link in links:
+                ses += 1
+
+                url = link
+
+                servidor = servertools.get_server_from_url(url)
+
+                if servidor == 'directo': continue
+
+                other = ''
+
+                if servidor == 'various': other = servertools.corregir_other(url)
+                elif servidor == 'zures': other = servertools.corregir_zures(url)
+
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url,
+                                      language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:

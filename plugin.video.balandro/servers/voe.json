@@ -303,6 +303,10 @@
       {
         "pattern": "https://timmaybealready.com/(?:e/|)([A-z0-9]+)",
         "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://jessicayeahcatch.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
       }
     ]
   }

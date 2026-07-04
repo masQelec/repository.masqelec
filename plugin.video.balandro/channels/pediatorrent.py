@@ -74,7 +74,11 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     if not '?query=' in url and not 'buscar?q=' in url:
-        if '<title>Just a moment...</title>' in data:
+        if '<meta name="robots"' in data:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]Boot[COLOR orangered] Protection [COLOR plum]Private[/B][/COLOR]')
+            return ''
+
+        elif '<title>Just a moment...</title>' in data:
             platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
             return ''
 

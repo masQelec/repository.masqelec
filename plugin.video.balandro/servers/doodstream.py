@@ -69,68 +69,6 @@ def get_video_url(page_url, url_referer=''):
     if 'Video not found' in data:
         return "Archivo inexistente ó eliminado"
 
-    if 'Just a moment...' in data:
-        path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'doodstream.py'))
-
-        existe = filetools.exists(path)
-        if not existe:
-            return 'El Plugin No existe en Resolveurl'
-
-        if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-            if config.get_setting('servers_time', default=True):
-                platformtools.dialog_notification('Cargando [COLOR cyan][B]Doodstream[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
-                time.sleep(int(espera))
-
-            try:
-                import_libs('script.module.resolveurl')
-
-                import resolveurl
-                page_url = ini_page_url
-                resuelto = resolveurl.resolve(page_url)
-
-                if resuelto:
-                    video_urls.append(['mp4', resuelto])
-                    return video_urls
-
-                color_exec = config.get_setting('notification_exec_color', default='cyan')
-                el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
-                el_srv += ('ResolveUrl[/B][/COLOR]')
-                platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
-
-                page_url = ini_page_url
-
-                return 'ResolveUrl No se pudo Reproducir el Vídeo'
-
-            except:
-                import traceback
-                logger.error(traceback.format_exc())
-                logger.info("check-00-traceback: %s" % traceback)
-
-                if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
-                    trace = traceback.format_exc()
-                    if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
-                        return 'Archivo inexistente ó eliminado'
-
-                    elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
-                        return 'Fichero sin link al vídeo ó restringido'
-
-                    elif 'Cloudflare challenge' in trace:
-                        return 'Cloudflare Challenge Check'
-
-                    elif 'BYPARR not available' in trace:
-                        return 'No está Habilitado el Acceso a ByParr'
-
-                elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
-                    return 'Archivo inexistente'
-
-                elif '<urlopen error' in traceback.format_exc():
-                    return 'No se puede establecer la conexión'
-
-                return 'Sin Respuesta ResolveUrl'
-
-        else:
-           return 'Falta ResolveUrl'
-
     js_code = scrapertools.find_single_match(data, ("(function\s?makePlay.*?})"))
 
     if js_code:
@@ -200,6 +138,9 @@ def get_video_url(page_url, url_referer=''):
             try:
                 import_libs('script.module.resolveurl')
 
+                if xbmc.getCondVisibility('System.HasAddon("script.module.cloudrequest")'):
+                    import_libs('script.module.cloudrequest')
+
                 import resolveurl
                 page_url = ini_page_url
                 resuelto = resolveurl.resolve(page_url)
@@ -235,8 +176,14 @@ def get_video_url(page_url, url_referer=''):
                    elif 'BYPARR not available' in trace:
                        return 'No está Habilitado el Acceso a ByParr'
 
+               elif "No module named 'cloudscraper'" in traceback.format_exc():
+                   return 'Falta script.module.cloudrequest'
+
                elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
                    return 'Archivo inexistente'
+
+               elif 'HTTP Error 403: Forbidden' in traceback.format_exc() or '403 Forbidden' in traceback.format_exc():
+                   return 'Archivo bloqueado'
 
                elif '<urlopen error' in traceback.format_exc():
                    return 'No se puede establecer la conexión'

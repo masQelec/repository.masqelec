@@ -193,6 +193,9 @@ def get_video_url(page_url, url_referer=''):
     try:
         import_libs('script.module.resolveurl')
 
+        if xbmc.getCondVisibility('System.HasAddon("script.module.cloudrequest")'):
+            import_libs('script.module.cloudrequest')
+
         import resolveurl
         page_url = ini_page_url
         resuelto = resolveurl.resolve(page_url)
@@ -228,6 +231,14 @@ def get_video_url(page_url, url_referer=''):
                 video_urls = [[url[-4:], url]]
                 return video_urls
 
+        elif txt_server == 'Savefiles':
+           # ~ 30/5/2026  SAVEFILES pq falla ResolveUrl  import cloudscraper
+           video = savefiles(page_url)
+
+           if video:
+               video_urls.append(['m3u8', video])
+               return video_urls
+
         if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
             trace = traceback.format_exc()
             if 'File Removed' in trace or 'File Not Found' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace or 'Video removed' in trace or 'Stream not found' in trace:
@@ -236,8 +247,14 @@ def get_video_url(page_url, url_referer=''):
             elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Unable to locate stream' in trace or 'Video Link Not Found' in trace or 'Not Found' in trace:
                 return 'Fichero sin link al vídeo ó restringido'
 
+            elif 'Unable to solve captcha' in trace:
+                return 'Unable Solve Captcha'
+
             elif 'Cloudflare challenge' in trace:
                 return 'Cloudflare Challenge Check'
+
+        elif "No module named 'cloudscraper'" in traceback.format_exc():
+             return 'Falta script.module.cloudrequest'
 
         elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
             return 'Archivo inexistente'
@@ -249,3 +266,17 @@ def get_video_url(page_url, url_referer=''):
             return 'No se puede establecer la conexión'
 
         return 'Sin Respuesta ' + txt_server
+
+
+def savefiles(page_url):
+    id = page_url.replace('https://savefiles.com/', '').replace('embed-', '').replace('e/', '')
+
+    post = {'op': 'embed', 'file_code': id, 'auto': '0', 'referer': ''}
+
+    headers = {'Referer': page_url}
+
+    resp = httptools.downloadpage('https://savefiles.com/dl', post=post, headers=headers)
+
+    video = scrapertools.find_single_match(resp.data, 'file:"(.*?)"')
+
+    return video

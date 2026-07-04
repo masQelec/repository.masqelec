@@ -46,9 +46,9 @@ cj = MozillaCookieJar()
 ficherocookies = os.path.join(config.get_data_path(), "cookies.dat")
 
 
-# ~ 22/5/26
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.179 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.22 Safari/537.36"
+# ~ 25/6/26
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.7871.24 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.7871.47 Safari/537.36"
 
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)

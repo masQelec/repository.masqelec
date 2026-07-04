@@ -68,6 +68,8 @@ def list_all(item):
     for url, thumb, title, qlty, duration in matches:
         if not thumb.startswith("https"): thumb = "https:" + thumb
 
+        duration = duration.strip()
+
         titulo = "[COLOR tan]%s[/COLOR] [COLOR darksalmon]%s[/COLOR] %s" % (duration, qlty, title)
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, contentType = 'movie', contentTitle = title, contentExtra='adults' ))
@@ -185,7 +187,6 @@ def findvideos(item):
             item.contentTitle = ' '.join(lista)
         else:
             plot = pornstar
-
 
     itemlist.append(Item( channel = item.channel, action='play', title='', server = 'ktp', url = item.url, plot = plot, language = 'Vo') )
 

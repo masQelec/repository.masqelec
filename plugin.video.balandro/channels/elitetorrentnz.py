@@ -146,7 +146,7 @@ def generos(item):
 
     data = do_downloadpage(host)
 
-    bloque = scrapertools.find_single_match(data, '<ul id="cab-categorias">(.*?)</ul>')
+    bloque = scrapertools.find_single_match(data, '<ul id=cab-categorias>(.*?)</ul>')
 
     matches = scrapertools.find_multiple_matches(bloque, 'href="(.*?)".*?title=.*?">(.*?)</a>')
 
@@ -182,7 +182,7 @@ def list_all(item):
     if '/?s=' in item.url:
         if '<h1>No se han encontrado resultados para' in data: return itemlist
 
-    matches = scrapertools.find_multiple_matches(data, '<div class="imagen"(.*?)<div class="meta">')
+    matches = scrapertools.find_multiple_matches(data, '<div class=imagen(.*?)</li>')
 
     i = 0
 
@@ -313,7 +313,7 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '<div class="enlace_descarga"(.*?)</center>')
+    bloque = scrapertools.find_single_match(data, '<div class=ficha_descarga_opciones>(.*?)</center>')
 
     links = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)"')
 

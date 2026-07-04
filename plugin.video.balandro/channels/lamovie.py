@@ -21,10 +21,18 @@ from core import httptools, scrapertools, servertools, tmdb
 from core.jsontools import json
 
 
-host = 'https://la.movie/'
+host = 'https://lamovie.org/'
 
 
 def do_downloadapi(type, filter, page, terms, _id, season, order):
+    global host
+
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://la.movie/']
+
+    for ant in ant_hosts:
+        host = host.replace(ant, host)
+
     try:
         url_filter = _urllib.urlencode({'filter':"{{{0}}}".format(filter)})
     except:
@@ -151,8 +159,8 @@ def mainlist_animes(item):
     return itemlist
 
 
-# ~ Si venimos de Grupos 
 def generos(item):
+    # ~ Solo venimos desde las opciones de Grupos Menu Principal del Addon
     logger.info()
 
     item.grp = 'genres'
@@ -162,7 +170,6 @@ def generos(item):
     else:
         item.group = 'tvshow'
 
-    # ~ Necesario Solo para la Opcion Generos del Menu Principal del Addon
     item.url = host
 
     return list_filter(item)
@@ -198,6 +205,11 @@ def list_filter(item):
 
     grp = item.grp
 
+    # ~ Ademas si venimos de la Opcion Generos del Menu Principal del Addon
+    only_one_genre = False
+    if item.filter:
+        if grp == 'genres':only_one_genre = True
+
     if item.search_type == 'movie': text_color = 'deepskyblue'
     else:
        text_color = 'hotpink'
@@ -231,6 +243,14 @@ def list_filter(item):
                   title = title.replace('\\u00e9', 'é')
                   title = title.replace('\\u00ed', 'í')
                   title = title.replace('\\u00fa', 'ú')
+
+                  if only_one_genre:
+                      if not sfilter == item.filter : continue
+
+                      item.filter = sfilter
+                      item.grp = grp
+                      itemlist = list_all(item)
+                      return itemlist
 
                itemlist.append(item.clone ( title = title, action = "list_all", filter = sfilter, grp = grp, text_color = text_color ))
         except:

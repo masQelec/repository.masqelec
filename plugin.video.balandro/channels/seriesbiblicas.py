@@ -58,7 +58,7 @@ def mainlist_series(item):
 
     # ~ itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_ser', url = host + 'series' , search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_ser', url = host + 'series/' , search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimas', action = 'list_ser', url = host, search_type = 'tvshow', group = 'lasts', text_color = 'moccasin' ))
 
@@ -111,9 +111,9 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '>PELÍCULAS DISPONIBLES<(.*?)>SIGUENOS<')
+    bloque = scrapertools.find_single_match(data, 'PELÍCULAS DISPONIBLES<(.*?)>SIGUENOS<')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<div class="wpb_column vc_column_container td-pb-span3">(.*?)</div></div>')
+    matches = scrapertools.find_multiple_matches(bloque, '<div class="wpb_column vc_column_container td-pb-.*?">(.*?)</div></div>')
 
     num_matches = len(matches)
 
@@ -298,14 +298,14 @@ def episodios(item):
     elif ' TEMPORADA<' in data:
         text_season = ''
 
-        if item.i == 1: text_season = '>PRIMERA'
+        if item.i == 1: text_season = '>PRIME'
         elif item.i == 2: text_season = '>SEGUNDA'
         elif item.i == 3: text_season = '>TERCERA'
         elif item.i == 4: text_season = '>CUARTA'
         elif item.i == 5: text_season = '>QUINTA'
         elif item.i == 6: text_season = '>SEXTA'
 
-        bloque = scrapertools.find_single_match(data, text_season + ' TEMPORADA<.*?</p>(.*?)</center>')
+        bloque = scrapertools.find_single_match(data, text_season + '.*?TEMPORADA<.*?</p>(.*?)</center>')
         if not bloque:
             if '>CAPITULOS<' in data:
                 bloque = scrapertools.find_single_match(data, '>CAPITULOS</span></center>(.*?)</div></div></div></center>')
@@ -316,9 +316,16 @@ def episodios(item):
     elif '>CAPÍTULOS<' in data:
         bloque = scrapertools.find_single_match(data, '>CAPÍTULOS</span>(.*?)</div></div></div></div></div></div></div>')
 
+    elif '>EPISODES<' in data:
+        bloque = scrapertools.find_single_match(data, '>EPISODES</span>(.*?)</div></div></div></div></div></div></div>')
+
     else:
         bloque = scrapertools.find_single_match(data, '>CAPITULOS</span></center>(.*?)</center>')
         if not bloque: bloque = scrapertools.find_single_match(data, '>CAPITULOS</span>(.*?)</div></div></div></center>')
+
+        if not bloque:
+            bloque = scrapertools.find_single_match(data, '>EPISODIOS</span></center>(.*?)</center>')
+            if not bloque: bloque = scrapertools.find_single_match(data, '>EPISODIOS</span>(.*?)</div></div></div></center>')
 
     matches = re.compile('<div class="su-spoiler-title">.*?</span>(.*?)</div>.*?<a href="(.*?)".*?</i>(.*?)</div></div>', re.DOTALL).findall(bloque)
     if not matches: matches = re.compile("class='sa_hover_(.*?)'" + '.*?data-mfp-src="(.*?)".*?<noscript>(.*?)</noscript>', re.DOTALL).findall(bloque)
@@ -389,17 +396,15 @@ def episodios(item):
         titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
         titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
-        epis = i
-
         if 'Epis.' in titulo:
             titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
 
             epis = scrapertools.find_single_match(titulo, 'Epis.(.*?)HD').strip()
-            epis = epis.replace('[/COLOR]', '').strip()
+            epis = epis.replace('[/COLOR]', '').replace('- ', '').strip()
 
             if epis: titulo = titulo.replace(str(item.contentSeason) + 'x' + str(i), str(item.contentSeason) + 'x' + str(epis))
             else: epis = i
-	
+
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, link = link, resto = resto,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 

@@ -356,8 +356,8 @@ def findvideos(item):
         if 'youtube.com' in url: continue
 
         elif '/mirrorace.' in url: continue
-
         elif '.fivemanage.' in url: continue
+        elif '/powvideo.' in url: continue
 
         if url:
             servidor = servertools.get_server_from_url(url)
@@ -388,7 +388,9 @@ def findvideos(item):
 
         elif 'up-4ever' in srv: continue
         elif 'mirrorace' in srv: continue
+        elif 'fivemanage' in srv: continue
         elif '1fichier' in srv: continue
+        elif 'powvideo' in srv: continue
 
         other = ''
         age = ''
@@ -471,10 +473,6 @@ def play(item):
 
             elif '.up-4ever'in item.url:
                 return 'Servidor [COLOR red]No Soportado[/COLOR]'
-
-            if '.fivemanage.' in item.url:
-                if item.url.startswith("//"): item.url = 'https:' + item.url
-                servidor = 'directo'
 
     if url:
         if '.fivemanage.' in url: url = ''

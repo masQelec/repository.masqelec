@@ -261,15 +261,15 @@
         "url": "https://asianload.cfd/watch?v=\\2"
       },
       {
-        "pattern": "https://savefiles.com/(?:embed-|e/)([0-9a-zA-Z]+)",
+        "pattern": "https://savefiles.com/(?:embed-|e/|v)([0-9a-zA-Z]+)",
         "url": "https://savefiles.com/e/\\1"
       },
       {
-        "pattern": "https://savefiles.top/(?:embed-|e/)([0-9a-zA-Z]+)",
+        "pattern": "https://savefiles.top/(?:embed-|e/|v)([0-9a-zA-Z]+)",
         "url": "https://savefiles.com/e/\\1"
       },
       {
-        "pattern": "https://streamhls.to/(?:embed-|e)([0-9a-zA-Z]+)",
+        "pattern": "https://streamhls.to/(?:embed-|e/|v)([0-9a-zA-Z]+)",
         "url": "https://savefiles.com/e/\\1"
       },
       {

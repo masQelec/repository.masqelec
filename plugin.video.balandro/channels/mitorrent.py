@@ -127,7 +127,7 @@ def idiomas(item):
 
         url = url_idio + value
 
-        itemlist.append(item.clone( action='list_all', title=title, url=url, text_color='moccasin' ))
+        itemlist.append(item.clone( action='list_all', title=title, url=url, text_color='deepskyblue' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -149,7 +149,7 @@ def calidades(item):
 
         url = url_qlty + value
 
-        itemlist.append(item.clone( action='list_all', title=title, url=url, text_color='tan' ))
+        itemlist.append(item.clone( action='list_all', title=title, url=url, text_color='moccasin' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 

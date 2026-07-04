@@ -2127,7 +2127,6 @@ def test_domain_subtorrents(item):
     except:
         platformtools.dialog_notification(config.__addon_name + ' - SubTorrents', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
-
 def manto_domain_todotorrents(item):
     logger.info()
 

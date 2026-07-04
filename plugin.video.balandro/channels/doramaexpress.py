@@ -328,6 +328,15 @@ def temporadas(item):
 
     temporadas = re.compile('data-season="(.*?)"', re.DOTALL).findall(data)
 
+    if not temporadas:
+        platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]Temporadas[/COLOR]')
+
+        item.page = 0
+        item.contentType = 'season'
+        item.contentSeason = 1
+        itemlist = episodios(item)
+        return itemlist
+
     for tempo in temporadas:
         if not tempo: continue
 

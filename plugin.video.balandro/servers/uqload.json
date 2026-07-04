@@ -9,83 +9,163 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "uqload.com/(?:embed-|)([A-z0-9]+)",
+        "pattern": "uqload.com/(?:embed-|e/)([A-z0-9]+)",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.com/(?:embed-|)([A-z0-9]+).html",
+        "pattern": "uqload.com/(?:embed-|e/)([A-z0-9]+).html",
         "url": "https://uqload.com/embed-\\"
       },
       {
-        "pattern": "uqload.org/(?:embed-|)([A-z0-9]+)",
+        "pattern": "uqload.com/([A-z0-9]+)",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.org/(?:embed-|)([A-z0-9]+).html",
+        "pattern": "uqload.com/([A-z0-9]+).html",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.co/(?:embed-|)([A-z0-9]+)",
+        "pattern": "uqload.org/(?:embed-|e/)([A-z0-9]+)",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.co/(?:embed-|)([A-z0-9]+).html",
+        "pattern": "uqload.org/(?:embed-|e/)([A-z0-9]+).html",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.io/(?:embed-|)([A-z0-9]+)",
+        "pattern": "uqload.org/([A-z0-9]+)",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.io/(?:embed-|)([A-z0-9]+).html",
+        "pattern": "uqload.org/([A-z0-9]+).html",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.to/(?:embed-|)([A-z0-9]+)",
+        "pattern": "uqload.co/(?:embed-|e/)([A-z0-9]+)",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.to/(?:embed-|)([A-z0-9]+).html",
+        "pattern": "uqload.co/(?:embed-|e/)([A-z0-9]+).html",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.ws/(?:embed-|)([A-z0-9]+)",
+        "pattern": "uqload.co/([A-z0-9]+)",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.ws/(?:embed-|)([A-z0-9]+).html",
+        "pattern": "uqload.co/([A-z0-9]+).html",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.net/(?:embed-|)([A-z0-9]+)",
+        "pattern": "uqload.io/(?:embed-|e/)([A-z0-9]+)",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.net/(?:embed-|)([A-z0-9]+).html",
+        "pattern": "uqload.io/(?:embed-|e/)([A-z0-9]+).html",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.cx/(?:embed-|)([A-z0-9]+)",
+        "pattern": "uqload.io/([A-z0-9]+)",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.cx/(?:embed-|)([A-z0-9]+).html",
+        "pattern": "uqload.io/([A-z0-9]+).html",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.bz/(?:embed-|)([A-z0-9]+)",
+        "pattern": "uqload.to/(?:embed-|e/)([A-z0-9]+)",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.bz/(?:embed-|)([A-z0-9]+).html",
+        "pattern": "uqload.to/(?:embed-|e/)([A-z0-9]+).html",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.is/(?:embed-|)([A-z0-9]+)",
+        "pattern": "uqload.to/([A-z0-9]+)",
         "url": "https://uqload.com/embed-\\1.html"
       },
       {
-        "pattern": "uqload.is/(?:embed-|)([A-z0-9]+).html",
+        "pattern": "uqload.to/([A-z0-9]+).html",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.ws/(?:embed-|e/)([A-z0-9]+)",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.ws/(?:embed-|e/)([A-z0-9]+).html",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.ws/([A-z0-9]+)",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.ws/([A-z0-9]+).html",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.net/(?:embed-|e/)([A-z0-9]+)",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.net/(?:embed-|e/)([A-z0-9]+).html",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.net/([A-z0-9]+)",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.net/([A-z0-9]+).html",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.cx/(?:embed-|e/)([A-z0-9]+)",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.cx/(?:embed-|e/)([A-z0-9]+).html",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.cx/([A-z0-9]+)",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.cx/([A-z0-9]+).html",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.bz/(?:embed-|e/)([A-z0-9]+)",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.bz/(?:embed-|e/)([A-z0-9]+).html",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.bz/([A-z0-9]+)",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.bz/([A-z0-9]+).html",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.is/(?:embed-|e/)([A-z0-9]+)",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.is/(?:embed-|e/)([A-z0-9]+).html",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.is/([A-z0-9]+)",
+        "url": "https://uqload.com/embed-\\1.html"
+      },
+      {
+        "pattern": "uqload.is/([A-z0-9]+).html",
         "url": "https://uqload.com/embed-\\1.html"
       }
     ]

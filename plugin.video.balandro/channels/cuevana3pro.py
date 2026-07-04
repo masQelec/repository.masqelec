@@ -414,12 +414,14 @@ def temporadas(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = re.compile('</i>.*?Temporada (.*?)<', re.DOTALL).findall(data)
+    matches = re.compile('</i>.*?Temporada (.*?)<span.*?<i id="(.*?)"', re.DOTALL).findall(data)
 
-    for tempo in matches:
+    for tempo, id in matches:
         tempo = tempo.strip()
 
         title = 'Temporada ' + tempo
+
+        id = id.replace('icon-', '').strip()
 
         if len(matches) == 1:
             if config.get_setting('channels_seasons', default=True):
@@ -428,10 +430,11 @@ def temporadas(item):
                 item.page = 0
                 item.contentType = 'season'
                 item.contentSeason = tempo
+                item.id = id
                 itemlist = episodios(item)
                 return itemlist
 
-        itemlist.append(item.clone( action='episodios', title=title, page = 0, contentType='season', contentSeason=tempo, text_color = 'tan' ))
+        itemlist.append(item.clone( action='episodios', title=title, page = 0, id = id, contentType='season', contentSeason=tempo, text_color = 'tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -448,7 +451,7 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '</i>.*?Temporada ' + str(item.contentSeason) + '(.*?)</i></div></a></div></div>')
+    bloque = scrapertools.find_single_match(data, '<div id="' + str(item.id) + '"(.*?)</div> </div>')
 
     matches = re.compile('<a href="(.*?)".*?<div class="flex items-center">.*?">(.*?)</span>.*?<span class="text.*?">(.*?)</span>', re.DOTALL).findall(bloque)
 
@@ -501,7 +504,9 @@ def episodios(item):
         epis = scrapertools.find_single_match(epis, 'E(.*?)$').strip()
         if not epis: epis = 1
 
-        url = host + url
+        if url.startswith("/"): url = host + url
+
+        if not epis: epis = 1
 
         titulo = str(item.contentSeason) + 'x' + epis + ' ' + title.replace(str(item.contentSeason) + 'x' + epis, '').strip()
 
@@ -815,7 +820,8 @@ def findvideos(item):
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other ))
 
     # ~ iframes src
-    matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, '<iframe src="(.*?)"')
+    if not matches: matches = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
 
     for match in matches:
         lang = '?'
@@ -1103,7 +1109,7 @@ def play(item):
         url = ''
 
         if not bytes:
-            if 'eyJs' in item.crypto:
+            if '.eyJs' in item.crypto:
                 url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
                 url += '='
 

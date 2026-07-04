@@ -19,7 +19,9 @@ def get_video_url(page_url, url_referer=''):
         return  "Archivo inexistente ó eliminado"
     elif '_msg">File was locked by administrator</div>' in data:
         return  "El archivo está bloqueado"
-    elif 'DDoS protection by DDos-Guard' in data:
+    elif '>503 Service Unavailable<' in data:
+        return  "Servicio No Disponible"
+    elif 'DDoS protection by DDos-Guard' in data or '>DDoS-Guard<' in data:
         return  "DDos-Guard protection"
 
     if 'sources:' not in data:

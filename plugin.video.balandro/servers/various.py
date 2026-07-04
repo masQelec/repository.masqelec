@@ -119,7 +119,7 @@ def get_video_url(page_url, url_referer=''):
 
                   page_url = page_url.replace('.html', '')
 
-    elif 'filemoon' in page_url or 'fmoonembed' in page_url or 'embedmoon' in page_url or 'moonjscdn' in page_url or 'l1afav' in page_url or 'byseqekaho' in page_url or 'bysedikamoum' in page_url or 'bysevepoin' in page_url or 'byseraguci' in page_url or 'bysewihe' in page_url or 'bysejikuar' in page_url or 'byse' in page_url:
+    elif 'filemoon' in page_url or 'fmoonembed' in page_url or 'embedmoon' in page_url or 'moonjscdn' in page_url or 'l1afav' in page_url or 'byseqekaho' in page_url or 'bysedikamoum' in page_url or 'bysevepoin' in page_url or 'byseraguci' in page_url or 'bysewihe' in page_url or 'bysejikuar' in page_url or 'embedplaybyse' in page_url or 'byse' in page_url:
           # ~ 19/1/26  Anulado en ResolveUrl
           # ~ txt_server = 'Filemoon'
 
@@ -134,6 +134,8 @@ def get_video_url(page_url, url_referer=''):
           page_url = page_url.replace('/bysewihe.com/', '/filemoon.sx/').replace('/bysejikuar.com/', '/filemoon.sx/').replace('/byse.sx/', '/filemoon.sx/')
 
           page_url = page_url.replace('/bysesukior.com/', '/filemoon.sx/').replace('/byselapuix.com/', '/filemoon.sx/').replace('/bysezoxexe.com/', '/filemoon.sx/')
+
+          page_url = page_url.replace('/embedplaybyse.top/', '/filemoon.sx/')
 
     elif 'streamhub' in page_url:
           txt_server = 'Streamhub'
@@ -202,7 +204,7 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('/desiupload.to/', '/desiupload.co/').replace('/desiupload.in/', '/desiupload.co/')
 
-    elif 'filelions' in page_url or 'azipcdn' in page_url or 'alions' in page_url or 'dlions' in page_url or 'mlions' in page_url or 'fviplions' in page_url or 'javlion' in page_url or 'fdewsdc' in page_url or 'peytonepre' in page_url or 'ryderjet' in page_url or 'smoothpre' in page_url or 'movearnpre' in page_url or 'seraphinap' in page_url or 'seraphinapl' in page_url or 'mivalyo' in page_url or 'taylorplayer' in page_url or 'videoland' in page_url or 'bingezove' in page_url or 'dinisglows' in page_url or 'dingtezuni' in page_url or 'dintezuvio' in page_url or 'callistanise' in page_url or 'minochinos' in page_url or 'earnvids' in page_url:
+    elif 'filelions' in page_url or 'azipcdn' in page_url or 'alions' in page_url or 'dlions' in page_url or 'mlions' in page_url or 'fviplions' in page_url or 'javlion' in page_url or 'fdewsdc' in page_url or 'peytonepre' in page_url or 'ryderjet' in page_url or 'smoothpre' in page_url or 'movearnpre' in page_url or 'seraphinap' in page_url or 'seraphinapl' in page_url or 'mivalyo' in page_url or 'taylorplayer' in page_url or 'videoland' in page_url or 'bingezove' in page_url or 'dinisglows' in page_url or 'dingtezuni' in page_url or 'dintezuvio' in page_url or 'callistanise' in page_url or 'earnvids' in page_url:
           txt_server = 'Filelions'
 
           page_url = page_url.replace('/filelions.com/', '/filelions.to/').replace('/filelions.live/', '/filelions.to/').replace('/filelions.xyz/', '/filelions.to/').replace('/filelions.online/', '/filelions.to/').replace('/filelions.site/', '/filelions.to/').replace('/filelions.co/', '/filelions.to/').replace('/filelions.top/', '/filelions.to/')
@@ -221,7 +223,12 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('/dinisglows.com/', '/filelions.to/').replace('/dingtezuni.com/', '/filelions.to/').replace('/dintezuvio.com/', '/filelions.to/')
 
-          page_url = page_url.replace('/callistanise.com/', '/filelions.to/').replace('/minochinos.com/', '/filelions.to/').replace('/earnvids.xyz/', '/filelions.to/')
+          page_url = page_url.replace('/callistanise.com/', '/filelions.to/').replace('/earnvids.xyz/', '/filelions.to/')
+
+    elif  'minochinos' in page_url:
+          txt_server = 'Filelions'
+
+          page_url = page_url.replace('/minochinos.com/f/', '/minochinos.com/embed/')
 
     elif 'youdbox' in page_url or 'yodbox' in page_url or 'youdboox' in page_url: 
           txt_server = 'Youdbox'
@@ -286,7 +293,7 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('/player.twitch.tv/', '/www.twitch.tv/')
 
-    elif 'vidhide' in page_url or 'stblion' in page_url or 'dhtpre' in page_url or 'dramacool' in page_url:
+    elif 'vidhide' in page_url or 'stblion' in page_url or 'dhtpre' in page_url or 'dramacool' in page_url or 'morencius' in page_url:
           # ~ 8/11/25  Anulado en ResolveUrl
           # ~ txt_server = 'Vidhidepro'
 
@@ -302,6 +309,7 @@ def get_video_url(page_url, url_referer=''):
           page_url = page_url.replace('/stblion.xyz/', '/vidhidepro.com/')
           page_url = page_url.replace('/dhtpre.com/', '/vidhidepro.com/')
           page_url = page_url.replace('/dramacool.men/', '/vidhidepro.com/')
+          page_url = page_url.replace('/morencius.com/', '/vidhidepro.com/')
 
           page_url = page_url.replace('/vidhidepro.com/', '/filelions.to/')
 
@@ -340,6 +348,9 @@ def get_video_url(page_url, url_referer=''):
 
     try:
         import_libs('script.module.resolveurl')
+
+        if xbmc.getCondVisibility('System.HasAddon("script.module.cloudrequest")'):
+            import_libs('script.module.cloudrequest')
 
         import resolveurl
 
@@ -389,8 +400,14 @@ def get_video_url(page_url, url_referer=''):
             elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Unable to locate stream' in trace or 'Video Link Not Found' in trace or 'Not Found' in trace:
                 return 'Fichero sin link al vídeo ó restringido'
 
+            elif 'Unable to solve captcha' in trace:
+                return 'Unable Solve Captcha'
+
             elif 'Cloudflare challenge' in trace:
                 return 'Cloudflare Challenge Check'
+
+        elif "No module named 'cloudscraper'" in traceback.format_exc():
+             return 'Falta script.module.cloudrequest'
 
         elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
             return 'Archivo inexistente'

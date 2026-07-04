@@ -1640,13 +1640,6 @@ def _proxies(item):
 
         if config.get_setting('channel_mejortorrentin_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'moviesdvdr':
-        from channels import moviesdvdr
-        item.channel = 'moviesdvdr'
-        moviesdvdr.configurar_proxies(item)
-
-        if config.get_setting('channel_moviesdvdr_proxies') is None: refrescar = False
-
     elif item.from_channel == 'mundodonghua':
         from channels import mundodonghua
         item.channel = 'mundodonghua'

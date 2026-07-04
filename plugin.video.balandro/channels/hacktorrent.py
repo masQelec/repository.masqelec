@@ -9,7 +9,7 @@ from core import httptools, scrapertools, servertools, tmdb
 from lib import decrypters
 
 
-host = 'https://hacktorrent.to/'
+host = 'https://hacktorrent.cc/'
 
 
 per_page = '20'
@@ -21,7 +21,7 @@ rut_animes = host + 'wp-json/wpreact/v1/animes?posts_per_page=' + per_page
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://hacktorrent.men/']
+    ant_hosts = ['https://hacktorrent.men/', 'https://hacktorrent.to/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -339,9 +339,10 @@ def episodios(item):
 
         sort = 'A' + epis
 
-        if len(epis) < 10: sort = sort + '0' + epis
-        elif len(epis) < 100: sort = sort + '00' + epis
-        else: sort = sort + '000' + epis
+        if tot_epis > 10:
+            if len(epis) <= 1: sort = 'A0' + epis
+
+            if len(epis) <= 1: epis = '0' + epis
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
 
@@ -349,7 +350,7 @@ def episodios(item):
 
         if not '/acortalink.' in link:
             titulo = '[COLOR blue][B][I]Streaming[/I][/B][/COLOR]  ' + titulo
-            sort = sort + 'S'
+            sort = 'B' + epis
 
         itemlist.append(item.clone( action='findvideos', url=link, title=titulo, language=lang, quality=qlty, size=size, sort = sort,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
@@ -362,7 +363,7 @@ def episodios(item):
     if itemlist:
         if len(matches) > ((item.page + 1) * item.perpage):
             itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", page = item.page + 1, perpage = item.perpage,
-                            sort = 'B1000000', text_color='coral' ))
+                            sort = 'C1000000', text_color='coral' ))
 
     return sorted(itemlist, key=lambda it: it.sort)
 

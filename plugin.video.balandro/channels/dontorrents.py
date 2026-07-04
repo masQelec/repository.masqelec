@@ -18,10 +18,10 @@ from lib import decrypters
 host = 'https://4144-don.mirror.pm/'
 
 
-# ~ 23/5/26 last domain  'https://dontorrent.science/'
+# ~ 3/6/26 last domain  'https://dontorrent.review/'
 
 # ~ Web Search
-web_search_dontorrent = 'https://dontorrent.science/'
+web_search_dontorrent = 'https://dontorrent.review/'
 
 
 # ~ Alternative Webs Clons
@@ -126,7 +126,8 @@ ant_hosts =  [
              # ~ 2026
              'https://dontorrent.prof/', 'https://dontorrent.info/', 'https://dontorrent.promo/',
              'https://dontorrent.photos/', 'https://dontorrent.cfd/', 'https://dontorrent.pink/',
-             'https://dontorrent.reisen/', 'https://dontorrent.racing/', 'https://dontorrent.rocks/']
+             'https://dontorrent.reisen/', 'https://dontorrent.racing/', 'https://dontorrent.rocks/',
+             'https://dontorrent.science/', 'https://dontorrent.support/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')
@@ -583,11 +584,11 @@ def list_last(item):
 
     data = do_downloadpage(item.url)
 
+    if not data: return itemlist
+
     if item.search_type == "movie": search_type = "PELÍCULAS"
     elif item.search_type == "tvshow": search_type = "SERIES"
     elif item.search_type == "documentary": search_type = "DOCUMENTALES"
-
-    if not data: return itemlist
 
     try:
         match = re.compile("""(?s)<div class="h5 text-dark">%s:<\/div>(.*?)<br><br>""" % (search_type)).findall(data)[0]
@@ -598,9 +599,6 @@ def list_last(item):
             match = ''
 
     matches = re.compile(r"""<span class="text-muted">\d+-\d+-\d+<\/span> <a href='([^']+)' class="text-primary">([^<]+)""").findall(match)
-
-    # ~ Alternative Webs Clons
-    if not web_clon: matches = ''
 
     if not matches:
         if item.search_type == "movie": search_type = "PELICULAS"

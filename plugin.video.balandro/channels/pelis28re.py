@@ -550,6 +550,7 @@ def findvideos(item):
                         if not config.get_setting('developer_mode', default=False): continue
 
                     other = ''
+                    cpow = ''
 
                     if servidor == 'various': other = servertools.corregir_other(srv)
                     elif servidor == 'zures': other = servertools.corregir_zures(srv)
@@ -561,8 +562,14 @@ def findvideos(item):
 
                     if '.eyJs' in link: age = ''
 
-                    itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes, age=age,
-                                          language=lang, other=other.capitalize() ))
+                    elif 'POW_CHALLENGE' in datae:
+                       cpow = scrapertools.find_single_match(datae, "POW_CHALLENGE\s*=\s*'([^']+)';" +
+                                                                    "\s*\w*\s*POW_DIFFICULTY\s*=\s*(\d+);" +
+                                                                    "\s*\w*\s*POW_SALT\s*=\s*'([^']+)';")
+                       if cpow: age = ''
+
+                    itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '',
+                                          crypto=link, bytes=e_bytes, age=age, cpow=cpow, language=lang, other=other ))
 
                 continue
 
@@ -877,14 +884,24 @@ def play(item):
         url = ''
 
         if not bytes:
-            url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
-            url += '='
+            if '.eyJs' in item.crypto:
+                url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
+                url += '='
 
-            try:
-                url = base64.b64decode(url).decode()
-                url = scrapertools.find_single_match(url, '"link":"(.*?)"')
-            except:
-                url = ''
+                try:
+                    url = base64.b64decode(url).decode()
+                    url = scrapertools.find_single_match(url, '"link":"(.*?)"')
+                except:
+                    url = ''
+
+            elif item.cpow:
+                res_pow = {"challenge": item.cpow[0], "difficulty": int(item.cpow[1]), "salt": item.cpow[2]}
+
+                resolve_pow = decrypters.decode_pow(res_pow)
+                aes_clave = resolve_pow.get("aes_key", "")
+
+                if aes_clave:
+                    url = decrypters.decode_decipher(crypto, aes_clave)
 
         if not url:
             if bytes:

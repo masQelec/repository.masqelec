@@ -343,6 +343,9 @@ def extract_videos(video_id, ini_page_url):
                     try:
                         import_libs('script.module.resolveurl')
 
+                        if xbmc.getCondVisibility('System.HasAddon("script.module.cloudrequest")'):
+                            import_libs('script.module.cloudrequest')
+
                         import resolveurl
                         page_url = ini_page_url
                         resuelto = resolveurl.resolve(page_url)
@@ -377,6 +380,9 @@ def extract_videos(video_id, ini_page_url):
 
                             elif 'Cloudflare challenge' in trace:
                                 return 'Cloudflare Challenge Check'
+
+                        elif "No module named 'cloudscraper'" in traceback.format_exc():
+                            return 'Falta script.module.cloudrequest'
 
                         elif 'HTTP Error 404: Not Found' in trace or '404 Not Found' in trace:
                             return 'Archivo inexistente'
@@ -531,6 +537,9 @@ def extract_videos(video_id, ini_page_url):
                 try:
                     import_libs('script.module.resolveurl')
 
+                    if xbmc.getCondVisibility('System.HasAddon("script.module.cloudrequest")'):
+                        import_libs('script.module.cloudrequest')
+
                     import resolveurl
                     page_url = ini_page_url
                     resuelto = resolveurl.resolve(page_url)
@@ -567,6 +576,9 @@ def extract_videos(video_id, ini_page_url):
 
                         elif 'Cloudflare challenge' in trace:
                             return 'Cloudflare Challenge Check'
+
+                    elif "No module named 'cloudscraper'" in traceback.format_exc():
+                        return 'Falta script.module.cloudrequest'
 
                     elif 'HTTP Error 404: Not Found' in trace or '404 Not Found' in trace:
                         return 'Archivo inexistente'

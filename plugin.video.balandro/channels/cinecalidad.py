@@ -839,16 +839,16 @@ def play(item):
 
             url = url.replace('&amp;', '&')
 
-            if servidor == 'mega':
-               if url.startswith('#'): url = 'https://mega.nz/' + url
-               elif not url.startswith('http'): url = 'https://mega.nz/file/' + url
-
             if not url:
                 if '/acortalink.' in data:
                     return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
 
                 elif 'There has been a critical error on this website' in data:
                      return '[COLOR red]Website [COLOR orangered]Critical Error[/COLOR]'
+
+            if servidor == 'mega':
+               if url.startswith('#'): url = 'https://mega.nz/' + url
+               elif not url.startswith('http'): url = 'https://mega.nz/file/' + url
 
         if url:
             servidor = servertools.get_server_from_url(url)
@@ -877,7 +877,10 @@ def play(item):
                        servidor = new_server
 
         if '/acortalink.' in url:
-           return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
+            return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
+
+        elif '/1fichier.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         if url.endswith('.torrent'):
             if config.get_setting('proxies', item.channel, default=''):

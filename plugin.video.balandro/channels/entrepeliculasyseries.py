@@ -693,7 +693,7 @@ def play(item):
         url = ''
 
         if not bytes:
-            if 'eyJs' in item.crypto:
+            if '.eyJs' in item.crypto:
                 url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
                 url += '='
 

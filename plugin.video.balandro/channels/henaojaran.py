@@ -459,33 +459,29 @@ def findvideos(item):
 
             if srv == 'rpmshare': continue
 
-            if srv == 'savefiles':
-                servidor = 'zures'
-                other = srv
-            elif srv == 'veev':
-                servidor = 'zures'
-                other = srv
-            elif srv == 'streamruby':
-                servidor = 'various'
-                other = srv
-            elif srv == 'byse':
-                servidor = 'various'
-                other = srv
-
             srv = srv.capitalize()
 
             force_input = ''
 
             if srv == 'Lulustream': force_input = True
 
+            cpow = ''
+
             age = 'crypto'
+
             if '.eyJs' in encrypt: age = ''
+
+            elif 'POW_CHALLENGE' in data1:
+                cpow = scrapertools.find_single_match(data1, "POW_CHALLENGE\s*=\s*'([^']+)';" +
+                                                             "\s*\w*\s*POW_DIFFICULTY\s*=\s*(\d+);" +
+                                                             "\s*\w*\s*POW_SALT\s*=\s*'([^']+)';")
+                if cpow: age = ''
 
             if not config.get_setting('developer_mode', default=False):
                 if age == 'crypto': continue
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server='directo', title = '', crypto=encrypt, bytes=d_bytes,
-                                  language=lang, other=srv, age=age, force_input = force_input ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server='directo', title = '',
+                                  crypto=encrypt, bytes=d_bytes, language=lang, other=srv, age=age, cpow=cpow, force_input = force_input ))
 
     # ~ download
     bloque = scrapertools.find_single_match(data, 'data-dwn=(.*?)>Descargar<')
@@ -585,19 +581,29 @@ def play(item):
         url = ''
 
         if not bytes:
-            url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
-            url += '='
+            if '.eyJs' in item.crypto:
+                url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
+                url += '='
 
-            try:
-                url = base64.b64decode(url).decode()
-                url = scrapertools.find_single_match(url, '"link":"(.*?)"')
-            except:
-                url = ''
+                try:
+                    url = base64.b64decode(url).decode()
+                    url = scrapertools.find_single_match(url, '"link":"(.*?)"')
+                except:
+                    url = ''
+
+            elif item.cpow:
+                res_pow = {"challenge": item.cpow[0], "difficulty": int(item.cpow[1]), "salt": item.cpow[2]}
+
+                resolve_pow = decrypters.decode_pow(res_pow)
+                aes_clave = resolve_pow.get("aes_key", "")
+
+                if aes_clave:
+                    url = decrypters.decode_decipher(crypto, aes_clave)
 
         if not url:
             if bytes:
                 try:
-                   url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
+                    url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
                 except:
                     url = ''
 

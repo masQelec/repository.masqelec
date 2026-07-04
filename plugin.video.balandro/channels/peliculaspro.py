@@ -419,15 +419,57 @@ def findvideos(item):
             elif srv == 'doods': servidor = 'doodstream'
             elif srv == 'streamtape' or srv == 'stapadblockuser': servidor = 'streamtape'
             elif srv == 'netu' or srv == 'hqq': servidor = 'waaw'
-            elif srv == 'd0o0d' or srv == 'do0od' or srv == 'd0000d' or srv == 'd000d' or srv == 'dood': servidor = 'doodstream'
+            elif srv == 'd0o0d' or srv == 'do0od' or srv == 'd0000d' or srv == 'd000d' or srv == 'dood' or srv == 'playmogo' : servidor = 'doodstream'
             elif srv == 'vidoza': servidor = 'vidoza'
             elif srv == 'pelisfree': servidor = 'waaw'
+            elif srv == 'voe': servidor = 'voe'
+
+            elif srv =='vimeus':
+                new_url = url
+
+                new_url = new_url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
+                new_url = new_url.replace('amp;#038;', '&').replace('#038;', '&').replace('amp;', '&')
+
+                datan = do_downloadpage(new_url)
+
+                urlv = scrapertools.find_single_match(datan, '<iframe.*?src="(.*?)"')
+
+                urlv = urlv.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
+                urlv = urlv.replace('amp;#038;', '&').replace('#038;', '&').replace('amp;', '&')
+
+                if urlv:
+                    datav = do_downloadpage(urlv, headers = {'Referer': host})
+
+                    embed = scrapertools.find_single_match(datav, '"embeds":(.*?)</script>')
+
+                    links = scrapertools.find_multiple_matches(embed, '"url":"(.*?)"')
+
+                    for link in links:
+                        ses += 1
+
+                        url = link
+
+                        servidor = servertools.get_server_from_url(url)
+
+                        if servidor == 'directo': continue
+
+                        other = ''
+
+                        if servidor == 'various': other = servertools.corregir_other(url)
+                        elif servidor == 'zures': other = servertools.corregir_zures(url)
+
+                        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url,
+                                              language = idioma, other = other ))
+
+                    continue
 
             else:
                 if servidor == srv: srv = ''
 
                 elif servidor == 'directo': other = servertools.corregir_other(srv)
+
                 elif servidor == 'various': other = servertools.corregir_other(srv)
+                elif servidor == 'zures': other = servertools.corregir_zures(srv)
 
                 else: other = srv
 

@@ -524,6 +524,7 @@ def findvideos(item):
                     elif '/filemirage.' in url: continue
                     elif '/filepv.' in url: continue
                     elif '.rapidvideo.' in url: continue
+                    elif '/www.they.tube' in url: continue
 
                     servidor = servertools.get_server_from_url(url)
 
@@ -576,6 +577,7 @@ def findvideos(item):
                 elif '/filemirage.' in url: continue
                 elif '/filepv.' in url: continue
                 elif '.rapidvideo.' in url: continue
+                elif '/www.they.tube' in url: continue
 
                 if not '/embed.php?id=' in url:
                     servidor = servertools.get_server_from_url(url)
@@ -645,6 +647,7 @@ def findvideos(item):
                         elif '/filemirage.' in url: continue
                         elif '/filepv.' in url: continue
                         elif '.rapidvideo.' in url: continue
+                        elif '/www.they.tube' in url: continue
 
                         servidor = servertools.get_server_from_url(url)
 
@@ -698,6 +701,7 @@ def findvideos(item):
             elif '/filemirage.' in url: continue
             elif '/filepv.' in url: continue
             elif '.rapidvideo.' in url: continue
+            elif '/www.they.tube' in url: continue
 
             servidor = servertools.get_server_from_url(url)
 
@@ -738,6 +742,7 @@ def findvideos(item):
             elif '/filemirage.' in url: continue
             elif '/filepv.' in url: continue
             elif '.rapidvideo.' in url: continue
+            elif '/www.they.tube' in url: continue
 
             servidor = servertools.get_server_from_url(url)
 
@@ -778,6 +783,7 @@ def findvideos(item):
             elif '/filemirage.' in url: continue
             elif '/filepv.' in url: continue
             elif '.rapidvideo.' in url: continue
+            elif '/www.they.tube' in url: continue
 
             servidor = servertools.get_server_from_url(url)
 

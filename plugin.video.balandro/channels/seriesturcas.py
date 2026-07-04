@@ -145,7 +145,6 @@ def list_all(item):
                 buscar_next = False
 
         if buscar_next:
-
             if "<ul class='pagination'>" in data:
                 next_page = scrapertools.find_single_match(data, "<ul class='pagination'>.*?<li class='active'>.*?</a>.*?href='(.*?)'")
 
@@ -244,6 +243,8 @@ def episodios(item):
             next_cap = 'Próx. Epis.: ' + next_cap
             itemlist.append(item.clone( action='', title = next_cap, thumbnail = item.thumbnail, text_color='cyan' ))
 
+            item.perpage = (item.perpage + 1)
+
     for match in matches[item.page * item.perpage:]:
         url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
@@ -290,7 +291,14 @@ def findvideos(item):
 
     ses = 0
 
-    matches = scrapertools.find_multiple_matches(data, '<div id="tab.*?src="(.*?)"')
+    bloque = scrapertools.find_single_match(data, '<div id="player">(.*?)</script></div>')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<div id="tab.*?src="(.*?)"')
+
+    if not matches:
+        bloque = scrapertools.find_single_match(data, 'Descargar<(.*?)</ul>')
+
+        matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)"')
 
     for url in matches:
         if not url: continue
@@ -302,7 +310,6 @@ def findvideos(item):
         if 'player1isempty' in url: continue
 
         elif '/fembuki.' in url:continue
-        elif '/esprinahy.' in url: continue
         elif '/argtesa.' in url: continue
 
         url = url.replace('/netusia.xyz/', '/waaw.to/')

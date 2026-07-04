@@ -1,0 +1,17 @@
+{
+  "id": "esprinahy",
+  "name": "Esprinahy",
+
+  "active": true,
+
+  "find_videos": {
+    "ignore_urls": [],
+    "patterns": [
+      {
+        "pattern": "https://esprinahy.com/(?:embed-|d/|w/|v/|dl/)([A-z0-9]+)",
+        "url": "https://esprinahy.com/d/\\1"
+      }
+    ]
+  }
+
+}

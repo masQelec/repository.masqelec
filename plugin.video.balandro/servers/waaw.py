@@ -79,11 +79,16 @@ def get_video_url(page_url, url_referer=''):
     try:
         import_libs('script.module.resolveurl')
 
+        if xbmc.getCondVisibility('System.HasAddon("script.module.cloudrequest")'):
+            import_libs('script.module.cloudrequest')
+
         import resolveurl
         page_url = ini_page_url
 
         page_url = page_url.replace('watch_video.php?v=', 'f/')
- 
+
+        if "|Referer=" in page_url: page_url = page_url.replace("|Referer=", '$$')
+
         resuelto = resolveurl.resolve(page_url)
 
         if resuelto:
@@ -111,6 +116,9 @@ def get_video_url(page_url, url_referer=''):
             elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                 return 'Fichero sin link al vídeo ó restringido'
 
+            elif 'Unable to solve captcha' in trace:
+                return 'Unable Solve Captcha'
+
             elif 'Cloudflare challenge' in trace:
                 return 'Cloudflare Challenge Check'
 
@@ -122,6 +130,9 @@ def get_video_url(page_url, url_referer=''):
 
         elif "AttributeError: 'int'" in traceback.format_exc():
             return 'AttributeError [COLOR red][B]get_int[/COLOR]'
+
+        elif "No module named 'cloudscraper'" in traceback.format_exc():
+             return 'Falta script.module.cloudrequest'
 
         elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
             return 'Archivo inexistente'

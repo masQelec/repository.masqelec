@@ -3216,14 +3216,14 @@ def show_help_canales(item):
 
         txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
 
-    elif item.notice == 'subtorrents':
-        if config.get_setting('channel_subtorrents_proxies', default=''):
+    elif item.notice == 'zonaleros':
+        if config.get_setting('channel_zonaleros_proxies', default=''):
 	        txt += '[CR][B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
 
         txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
 
-    elif item.notice == 'zonaleros':
-        if config.get_setting('channel_zonaleros_proxies', default=''):
+    elif item.notice == 'subtorrents':
+        if config.get_setting('channel_subtorrents_proxies', default=''):
 	        txt += '[CR][B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
 
         txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'

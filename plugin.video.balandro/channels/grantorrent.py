@@ -14,7 +14,7 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://grantorrent.zip/'
+host = 'https://grantorrent.foo/'
 
 
 _player = host
@@ -30,7 +30,7 @@ ant_hosts = ['http://grantorrent.net/', 'https://grantorrent1.com/', 'https://gr
              'https://grantorrent.bz/', 'https://grantorrent.zip/', 'https://www1.grantorrent.pm/',
              'https://www1.grantorrent.wf/', 'https://www2.grantorrent.wf/', 'https://www3.grantorrent.wf/',
              'https://www4.grantorrent.wf/', 'https://grantorrent.mov/', 'https://www1.grantorrent.lol/',
-             'https://www2.grantorrent.lol/', 'https://www3.grantorrent.lol/']
+             'https://www2.grantorrent.lol/', 'https://www3.grantorrent.lol/', 'https://grantorrent.zip/']
 
 
 domain = config.get_setting('dominio', 'grantorrent', default='')
@@ -243,9 +243,9 @@ def calidades(item):
 
     data = do_downloadpage(host + 'peliculas/')
 
-    bloque = scrapertools.find_single_match(data, '<div id="bloque_cat">(.*?)</div>')
+    bloque = scrapertools.find_single_match(data, '<div id=bloque_cat>(.*?)</div>')
 
-    matches = re.compile('href="(.*?)".*?<button.*?">(.*?)</button>', re.DOTALL).findall(bloque)
+    matches = re.compile('href="(.*?)".*?<button.*?>(.*?)</button>', re.DOTALL).findall(bloque)
 
     for url, title in matches:
         title = title.strip()
@@ -319,7 +319,7 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, "<span aria-current='page'>.*?<a href='(.*?)'")
+        next_page = scrapertools.find_single_match(data, "<span aria-current=page>.*?<a href='(.*?)'")
 
         if next_page:
             if '/page/' in next_page:
@@ -334,6 +334,8 @@ def episodios(item):
     logger.info()
     itemlist = []
 
+    tab_episodes = []
+
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
@@ -341,7 +343,7 @@ def episodios(item):
 
     bloque = scrapertools.find_single_match(data, '<tbody(.*?)</tbody>')
 
-    matches = re.compile('"episode-.*?<td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-300">(.*?)</td>.*?<a href="(.*?)"', re.DOTALL).findall(bloque)
+    matches = re.compile('episode-.*?<td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-300">(.*?)</td>.*?<a href="(.*?)"', re.DOTALL).findall(bloque)
 
     num_matches = len(matches)
 
@@ -409,6 +411,10 @@ def episodios(item):
         if 'Temporada' in epis: epis = 1
 
         titulo = str(season) + 'x' + str(epis) + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'") + ' ' + completa
+
+        if (str(season) + 'x' + str(epis)) in tab_episodes: continue
+
+        tab_episodes.append(str(season) + 'x' + str(epis))
 
         itemlist.append(item.clone( action = 'findvideos', url=url, title=titulo,  contentType='episode', contentSeason=season, contentEpisodeNumber=epis ))
 
@@ -488,6 +494,8 @@ def play(item):
     if not item.url.endswith('.torrent'):
         host_torrent = host[:-1]
         url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
+
+        url_base64 = url_base64.replace('.torrent&st=gtn', '.torrent').replace('.torrent&doresume=false', '.torrent').strip()
 
         if url_base64.endswith('.torrent'):
            if not '//dl.' in url_base64: url_base64 = url_base64.replace(host, _player)

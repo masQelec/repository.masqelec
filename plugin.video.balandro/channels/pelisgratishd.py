@@ -298,7 +298,7 @@ def temporadas(item):
 
     data = do_downloadpage(item.url)
 
-    matches = scrapertools.find_multiple_matches(data, 'data-season="(.*?)".*?>Temporada(.*?)</span>')
+    matches = scrapertools.find_multiple_matches(data, 'data-season="(.*?)".*?>.*?Temporada(.*?)</span>')
 
     tot_seasons = len(matches)
 
@@ -342,7 +342,7 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, 'id="season-' + str(item.id_season) + '"(.*?)</button>')
+    bloque = scrapertools.find_single_match(data, 'id="season-' + str(item.id_season) + '"(.*?)</div></div>')
 
     matches = scrapertools.find_multiple_matches(bloque, 'href="(.*?)"')
 
@@ -635,7 +635,7 @@ def play(item):
         url = ''
 
         if not bytes:
-            if 'eyJs' in item.crypto:
+            if '.eyJs' in item.crypto:
                 url = scrapertools.find_single_match(item.crypto, '\.(eyJs.*?)\.')
                 url += '='
 

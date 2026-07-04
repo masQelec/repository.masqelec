@@ -3425,7 +3425,7 @@ def resumen_canales(item):
         if config.get_setting('mnu_animes', default=True):
             if not config.get_setting('descartar_anime', default=False): txt += '    ' + str(animes) + '  [COLOR springgreen][B]Animes[/B][/COLOR][CR]'
 
-        if not trailers == 0: txt += '       ' + str(trailers) + ' [COLOR darkgoldenrod][B]Traílers[/B][/COLOR][CR]'
+        if not trailers == 0: txt += '      ' + str(trailers) + '  [COLOR darkgoldenrod][B]Traílers[/B][/COLOR][CR]'
 
         if config.get_setting('mnu_adultos', default=True):
             if not adults == 0: txt += '    ' + str(adults) + '  [COLOR orange][B]Adultos[/B][/COLOR][CR]'

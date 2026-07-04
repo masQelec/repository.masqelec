@@ -17,6 +17,7 @@ import os, xbmc, time
 
 from platformcode import config, logger, platformtools
 from core import filetools, httptools, scrapertools
+from lib import jsunpack
 
 
 espera = config.get_setting('servers_waiting', default=6)
@@ -63,6 +64,9 @@ def get_video_url(page_url, url_referer=''):
         page_url = page_url.replace('/uqload.to/', '/uqload.com/embed-')
         page_url = page_url.replace('/uqload.ws/', '/uqload.com/embed-')
         page_url = page_url.replace('/uqload.net/', '/uqload.com/embed-')
+        page_url = page_url.replace('/uqload.cx/', '/uqload.com/embed-')
+        page_url = page_url.replace('/uqload.bz/', '/uqload.com/embed-')
+        page_url = page_url.replace('/uqload.is/', '/uqload.com/embed-')
 
     if not page_url.endswith('.html'): page_url += '.html'
 
@@ -72,11 +76,32 @@ def get_video_url(page_url, url_referer=''):
 
     if 'File was deleted' in data:
         return 'Archivo inexistente ó eliminado'
+    elif 'File is no longer available as it expired or has been deleted' in data:
+        return 'Archivo inexistente ó eliminado'
+    elif 'The file expired' in data or 'The file was deleted' in data:
+        return 'Archivo inexistente ó eliminado'
 
     bloque = scrapertools.find_single_match(data, 'sources\s*:\s*\[(.*?)\]')
+
+    if not bloque:
+        unpacked = ''
+
+        try:
+            packed = scrapertools.find_single_match(data, "text/javascript'>(eval.*?)\s*</script>")
+
+            if packed: unpacked = jsunpack.unpack(packed)
+        except:
+            pass
+
+        if unpacked:
+            bloque = scrapertools.find_single_match(unpacked, 'sources\s*:\s*\[(.*?)\]')
+
     matches = scrapertools.find_multiple_matches(bloque, '(http.*?)"')
 
     for url in matches:
+        if '.m3u8' in url: type = 'm3u8'
+        elif '.m3u' in url: type = 'm3u8'
+        else: type = 'mp4'
         video_urls.append(['mp4', url + '|Referer=https://uqload.com/'])
 
     if not video_urls:
@@ -94,12 +119,18 @@ def get_video_url(page_url, url_referer=''):
             try:
                 import_libs('script.module.resolveurl')
 
+                if xbmc.getCondVisibility('System.HasAddon("script.module.cloudrequest")'):
+                    import_libs('script.module.cloudrequest')
+
                 import resolveurl
                 page_url = ini_page_url
                 resuelto = resolveurl.resolve(page_url)
 
                 if resuelto:
-                    video_urls.append(['mp4', resuelto])
+                    if '.m3u8' in resuelto: video_urls.append(['m3u8', resuelto])
+                    elif '.m3u' in resuelto: video_urls.append(['m3u', resuelto])
+                    elif '.mp4' in resuelto: video_urls.append(['mp4', resuelto])
+                    else: video_urls.append(['', resuelto])
                     return video_urls
 
                 color_exec = config.get_setting('notification_exec_color', default='cyan')
@@ -128,6 +159,9 @@ def get_video_url(page_url, url_referer=''):
 
                 elif ' Bad Request' in traceback.format_exc():
                    if '/recaptcha/' in traceback.format_exc(): return 'Fichero de Vídeo con CaptCha'
+
+                elif "No module named 'cloudscraper'" in traceback.format_exc():
+                    return 'Falta script.module.cloudrequest'
 
                 elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
                     return 'Archivo inexistente'

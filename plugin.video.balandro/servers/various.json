@@ -89,6 +89,10 @@
         "url": "https://filemoon.sx/e/\\1"
       },
       {
+        "pattern": "https://embedplaybyse.top/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
         "pattern": "https://byse.sx/(?:e/|d/|download/)([0-9a-zA-Z]+)",
         "url": "https://filemoon.sx/e/\\1"
       },
@@ -618,7 +622,7 @@
       },
       {
         "pattern": "https://minochinos.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
-        "url": "https://filelions.to/f/\\1"
+        "url": "https://minochinos.com/f/\\1"
       },
       {
         "pattern": "https://earnvids.xyz/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
@@ -842,6 +846,10 @@
       },
       {
         "pattern": "https://dramacool.men/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://vidhidepro.com/s/\\1"
+      },
+      {
+        "pattern": "https://morencius.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
         "url": "https://vidhidepro.com/s/\\1"
       },
       {

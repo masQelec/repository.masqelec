@@ -1,4 +1,4 @@
-[COLOR coral][B]Balandro [/COLOR][COLOR goldenrod] Situacion Dominios [/COLOR][COLOR aqua] 28 de Mayo de 2026 [/COLOR][COLOR limegreen]  Hora  8:00  [/COLOR][COLOR yellow]Version 4.0.29[/B][/COLOR]
+[COLOR coral][B]Balandro [/COLOR][COLOR goldenrod] Situacion Dominios [/COLOR][COLOR aqua] 29 de Junio de 2026 [/COLOR][COLOR limegreen]  Hora  8:00  [/COLOR][COLOR yellow]Version 4.0.30[/B][/COLOR]
 
  [COLOR yellow][B]CONTACTO:[/B][/COLOR]
    Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Tutoriales, Sugerencias, etc.
@@ -39,6 +39,11 @@
     [B][COLOR moccasin] AnimeOnline [COLOR lime] ww3.animeonline.ninja [I][COLOR red] CloudFlare Protection [/I][/B][/COLOR]
     [B][COLOR moccasin] AsiaLive [COLOR lime] asialiveaction.com [I][COLOR red] CloudFlare Protection [/I][/B][/COLOR]
     [B][COLOR moccasin] EzTv [COLOR lime] eztvx.to [I][COLOR red] CloudFlare Protection [/I][/B][/COLOR]
+    [B][COLOR moccasin] LilaTorrent [COLOR lime] lilatorrent.com [I][COLOR red] CloudFlare Private Protection [/I][/B][/COLOR]
+    [B][COLOR moccasin] NaranjaTorrent [COLOR lime] naranjatorrent.com [I][COLOR red] CloudFlare Private Protection [/I][/B][/COLOR]
+    [B][COLOR moccasin] PediaTorrent [COLOR lime] pediatorrent.com [I][COLOR red] CloudFlare Private Protection [/I][/B][/COLOR]
+    [B][COLOR moccasin] RojoTorrent [COLOR lime] rojotorrent.com [I][COLOR red] CloudFlare Private Protection [/I][/B][/COLOR]
+    [B][COLOR moccasin] VerdeTorrent [COLOR lime] verdetorrent.com [I][COLOR red] CloudFlare Private Protection [/I][/B][/COLOR]
     [B][COLOR moccasin] Yts [COLOR lime] yts.bz [I][COLOR red] CloudFlare Protection [/I][/B][/COLOR]
     [B][COLOR moccasin] ZonaLeros [COLOR lime] zona-leros.com [I][COLOR red] CloudFlare Protection [/I][/B][/COLOR]
 

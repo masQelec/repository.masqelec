@@ -43,6 +43,7 @@ def mainlist_pelis(item):
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
     itemlist.append(item.clone ( title = 'Listas:', search_type = 'movie', text_color = 'moccasin' ))
+
     itemlist.append(item.clone ( title = ' - Orden alfabético', action = 'list_all', url = host + 'movies?filter=alpha', search_type = 'movie' ))
     itemlist.append(item.clone ( title = ' - Orden aleatorio', action = 'list_all', url = host + 'movies?filter=rand', search_type = 'movie' ))
 
@@ -56,6 +57,7 @@ def idiomas(item):
     itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'movies?lang_id=8', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Francés', action = 'list_all', url = host + 'movies?lang_id=4', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Inglés', action = 'list_all', url = host + 'movies?lang_id=2', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'movies?lang_id=12', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Mudo', action = 'list_all', url = host + 'movies?lang_id=10', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'movies?lang_id=9', text_color = 'deepskyblue' ))
 
@@ -114,11 +116,13 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_url = scrapertools.find_single_match(data, '<div class="nav-links">.*?<li class=" active">.*?<li class="">.*?href="(.*?)".*?</nav>')
+        next_page = scrapertools.find_single_match(data, '<div class="nav-links">.*?<li class=" active">.*?<li class="">.*?href="(.*?)".*?</nav>')
 
-        if next_url:
-            if '?page=' in next_url:
-                itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'list_all', text_color = 'coral' ))
+        if next_page:
+            next_page = next_page.replace('&amp;', '&')
+
+            if '?page=' in next_page or '&page=' in next_page:
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral' ))
 
     return itemlist
 

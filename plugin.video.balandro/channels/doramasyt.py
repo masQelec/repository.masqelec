@@ -352,7 +352,7 @@ def last_epis(item):
 
         if not epis: epis = 1
 
-        titulo = title.replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = title.replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
         itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail = thumb, url = url,
                                     contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))

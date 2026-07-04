@@ -9,19 +9,23 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "http(?:s|)://mixdrop.(?:co|to|sx|bz|ch|gl|club|vc|ag|is|si|nu|ms|ps|sb|my|sn|net|top|click)/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
+        "pattern": "http(?:s|)://mixdrop.(?:co|to|sx|bz|ch|gl|club|vc|ag|is|si|nu|ms|ps|sb|my|sn|net|top|click|com)/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
         "url": "https://mixdrop.ag/e/\\1"
       },
       {
-        "pattern": "http(?:s|)://mixdroop.(?:co|to|sx|bz|ch|gl|club|vc|ag|is|si|nu|ms|ps|sb|my|sn|net|top|click)/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
+        "pattern": "http(?:s|)://mixdroop.(?:co|to|sx|bz|ch|gl|club|vc|ag|is|si|nu|ms|ps|sb|my|sn|net|top|click|com)/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
         "url": "https://mixdrop.ag/e/\\1"
       },
       {
-        "pattern": "http(?:s|)://mixdrp.(?:co|to|sx|bz|ch|gl|club|vc|ag|is|si|nu|ms|ps|sb|my|sn|net|top|click)/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
+        "pattern": "http(?:s|)://mixdrp.(?:co|to|sx|bz|ch|gl|club|vc|ag|is|si|nu|ms|ps|sb|my|sn|net|top|click|com)/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
         "url": "https://mixdrop.ag/e/\\1"
       },
       {
-        "pattern": "http(?:s|)://mxdrop.(?:co|to|sx|bz|ch|gl|club|vc|ag|is|si|nu|ms|ps|sb|my|sn|net|top|click)/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
+        "pattern": "http(?:s|)://mxdrop.(?:co|to|sx|bz|ch|gl|club|vc|ag|is|si|nu|ms|ps|sb|my|sn|net|top|click|com)/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
+        "url": "https://mixdrop.ag/e/\\1"
+      },
+      {
+        "pattern": "http(?:s|)://m1xdrop.(?:co|to|sx|bz|ch|gl|club|vc|ag|is|si|nu|ms|ps|sb|my|sn|net|top|click|com)/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
         "url": "https://mixdrop.ag/e/\\1"
       },
       {
@@ -30,10 +34,6 @@
       },
       {
         "pattern": "https://mixdrop23.net/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
-        "url": "https://mixdrop.ag/e/\\1"
-      },
-      {
-        "pattern": "https://m1xdrop.com/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
         "url": "https://mixdrop.ag/e/\\1"
       },
       {
@@ -62,6 +62,10 @@
       },
       {
         "pattern": "https://mdzsmutpcvykb.net/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
+        "url": "https://mixdrop.ag/e/\\1"
+      },
+      {
+        "pattern": "https://miixdrop.net/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
         "url": "https://mixdrop.ag/e/\\1"
       }
     ]
