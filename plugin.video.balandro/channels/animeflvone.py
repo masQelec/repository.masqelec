@@ -11,26 +11,13 @@ from lib.pyberishaes import GibberishAES
 from lib import decrypters
 
 
-host = 'https://ww1.henaojara.net/'
+host = 'https://vww.animeflv.one/'
 
 
 def do_downloadpage(url, post=None, headers=None):
-    # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://wvw.henaojara.net/', 'https://vwv.henaojara.net/']
-
-    for ant in ant_hosts:
-        url = url.replace(ant, host)
-
     if not headers: headers = {'Referer': host}
 
     data = httptools.downloadpage(url, post=post, headers=headers).data
-
-    if '<title>Error 404</title>' in data:
-        if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('HenaOjaraN', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
-
-        timeout = config.get_setting('channels_repeat', default=30)
-
-        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     return data
 
@@ -119,17 +106,17 @@ def list_all(item):
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
-    matches = scrapertools.find_multiple_matches(data, '<article(.*?)</article>')
-
     for match in matches:
+        match = match.replace('""', '"').strip()
+
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
-        title = scrapertools.find_single_match(match, '<h3.*?title=".*?">(.*?)</a>')
-        if not title: title = scrapertools.find_single_match(match, ' alt="(.*?)"')
+        title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+        if not title: title = scrapertools.find_single_match(match, 'title=".*?"')
 
         if not url or not title: continue
 
-        title = title.replace('#8217;', "'")
+        title = title.replace('#8217;', "'").replace('Ver ', '')
 
         season = 1
 
@@ -206,19 +193,21 @@ def list_last(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '>Nuevos Animes Agregados<(.*?)>Animes En emisión<')
+    bloque = scrapertools.find_single_match(data, 'Últimos animes agregados<(.*?)</section>')
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
 
     for match in matches:
+        match = match.replace('""', '"').strip()
+
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
-        title = scrapertools.find_single_match(match, '<h3.*?title=".*?">(.*?)</a>')
-        if not title: title = scrapertools.find_single_match(match, ' alt="(.*?)"')
+        title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+        if not title: title = scrapertools.find_single_match(match, 'title=".*?"')
 
         if not url or not title: continue
 
-        title = title.replace('#8217;', "'")
+        title = title.replace('#8217;', "'").replace('Ver ', '')
 
         year = scrapertools.find_single_match(match, '<span class="Year">.*?-(.*?)</span>').strip()
         if not year: year = scrapertools.find_single_match(title, '(\d{4})')
@@ -293,24 +282,39 @@ def last_epis(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '>Episodios nuevos(.*?)>Somos')
+    bloque = scrapertools.find_single_match(data, 'Últimos episodios agregados<(.*?)Últimos animes agregados<')
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
 
     for match in matches:
+        match = match.replace('""', '"').strip()
+
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
+        if '/noticias/' in url: continue
+
         title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+        if not title: title = scrapertools.find_single_match(match, 'title=".*?"')
 
         if not url or not title: continue
 
-        title = title.replace('#8217;', "'")
+        title = title.replace('#8217;', "'").replace('Ver ', '')
 
         SerieName = corregir_SerieName(title)
 
-        temp = scrapertools.find_single_match(match, '<span class="ClB">(.*?)x')
-        if not temp: temp = 1
+        season = 1
 
-        epis = scrapertools.find_single_match(match, '<b class="e">Episodio (.*?)</b>').strip()
+        if 'Temporada' in title or 'Season' in title:
+            if '2nd' in title: season = 2
+            elif '3rd' in title: season = 3
+            elif '4th' in title: season = 4
+            elif '5th' in title: season = 5
+            elif '6th' in title: season = 6
+            elif '7th' in title: season = 7
+            elif '8th' in title: season = 8
+            elif '9th' in title: season = 9
+
+        epis = scrapertools.find_single_match(match, '<u>Episodio (.*?)</u>').strip()
         if not epis: epis = 1
 
         title = 'Episodio ' + str(epis) + ' ' + title
@@ -326,11 +330,12 @@ def last_epis(item):
         thumb = 'https:' + thumb
 
         year = scrapertools.find_single_match(match, '<span class="Year">.*?,(.*?)</span>').strip()
-
         if not year: year = '-'
 
+        SerieName = SerieName.replace(str(epis), '').strip()
+
         itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb, infoLabels={'year': year},
-                                    contentSerieName = SerieName, contentType = 'episode', contentSeason=temp, contentEpisodeNumber=epis))
+                                    contentSerieName = SerieName, contentType = 'episode', contentSeason=season, contentEpisodeNumber=epis))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -354,7 +359,7 @@ def episodios(item):
 
     if not matches:
         if 'Proximamente<' in data:
-             platformtools.dialog_notification('HenaOjaraN', '[COLOR cyan][B]Proximamente[/B][/COLOR]')
+             platformtools.dialog_notification('AnimeFlvOne', '[COLOR cyan][B]Proximamente[/B][/COLOR]')
              return
 
     if item.page == 0 and item.perpage == 50:
@@ -368,37 +373,37 @@ def episodios(item):
         if config.get_setting('channels_charges', default=True):
             item.perpage = sum_parts
             if sum_parts >= 100:
-                platformtools.dialog_notification('HenaOjaraN', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                platformtools.dialog_notification('AnimeFlvOne', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
-                platformtools.dialog_notification('HenaOjaraN', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                platformtools.dialog_notification('AnimeFlvOne', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
         else:
             item.perpage = sum_parts
 
             if sum_parts >= 1000:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('HenaOjaraN', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    platformtools.dialog_notification('AnimeFlvOne', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
                     item.perpage = 500
 
             elif sum_parts >= 500:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('HenaOjaraN', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    platformtools.dialog_notification('AnimeFlvOne', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
                     item.perpage = 250
 
             elif sum_parts >= 250:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]125[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('HenaOjaraN', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
+                    platformtools.dialog_notification('AnimeFlvOne', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
                     item.perpage = 125
 
             elif sum_parts >= 125:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]75[/B][/COLOR] elementos ?'):
-                    platformtools.dialog_notification('HenaOjaraN', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
+                    platformtools.dialog_notification('AnimeFlvOne', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
                     item.perpage = 75
 
             elif sum_parts > 50:
                 if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
-                    platformtools.dialog_notification('HenaOjaraN', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    platformtools.dialog_notification('AnimeFlvOne', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
                     item.perpage = sum_parts
                 else: item.perpage = 50
 
@@ -463,7 +468,7 @@ def findvideos(item):
     if d_encrypt:
         post = {'acc': 'opt', 'i': d_encrypt}
 
-        data1 = do_downloadpage(host + 'hj', post=post, headers={'Referer': item.url, 'X-Requested-With': 'XMLHttpRequest'})
+        data1 = do_downloadpage(host + 'flv', post=post, headers={'Referer': item.url, 'X-Requested-With': 'XMLHttpRequest'})
 
         matches = re.compile('<li(.*?)</li>', re.DOTALL).findall(data1)
 

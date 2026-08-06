@@ -13,5 +13,5 @@
 
   "clusters": ["current", "torrents", "qualityes", "languages", "years", "kids", "docs", "4k"],
 
-  "notes": "Canal con enlaces Torrent exclusivamente. Películas y series, por géneros, calidad, idioma y año."
+  "notes": "Canal con enlaces Torrent exclusivamente. Películas por géneros. Series por Géneros."
 }

@@ -177,11 +177,6 @@ def generos(item):
     for genre in genres:
         url = host + 'generos/' + genre + '/'
 
-        if item.search_type == 'movie': url = url + 'peliculas/'
-        else:
-            if item.group == 'animes': url = url + 'animes/'
-            else: url = url + 'series/'
-
         itemlist.append(item.clone( action = 'list_all', title = genre.capitalize(), url = url, text_color = text_color ))
 
     return itemlist
@@ -197,20 +192,13 @@ def anios(item):
        else: text_color = 'hotpink'
 
     if item.search_type == 'movie': tope_year = 1932
-    else:
-        if item.group == 'animes': tope_year = 1998
-        else: tope_year = 1984
+    else: tope_year = 1998
 
     from datetime import datetime
     current_year = int(datetime.today().year)
 
     for x in range(current_year, tope_year, -1):
         url = host + 'year/' + str(x) + '/'
-
-        if item.search_type == 'movie': url = url + 'peliculas/'
-        else:
-            if item.group == 'animes': url = url + 'animes/'
-            else: url = url + 'series/'
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = text_color ))
 

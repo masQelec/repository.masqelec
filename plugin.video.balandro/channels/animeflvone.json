@@ -1,0 +1,17 @@
+{
+  "id": "animeflvone",
+  "name": "AnimeFlvOne",
+  "thumbnail": "animeflvone.jpg",
+
+  "active": true,
+
+  "searchable": false,
+  "search_types": ["tvshow"],
+
+  "categories": ["tvshow"],
+  "language": ["cast", "lat", "vose", "vo"],
+
+  "clusters": ["crypto", "anime"],
+
+  "notes": "Web dedicada exclusivamente al anime."
+}

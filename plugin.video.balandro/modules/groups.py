@@ -1042,7 +1042,10 @@ def ch_groups(item):
 
         if 'trailers' in ch['clusters']: continue
 
-        if item.group == 'classic':
+        if item.group == 'years':
+            if not 'years' in ch['clusters']: continue
+
+        elif item.group == 'classic':
             if item.extra == 'movies':
                 if not 'movie' in ch['categories']: continue
 

@@ -182,11 +182,18 @@ def list_all(item):
     if itemlist:
         next_page = scrapertools.find_single_match(data,'<ul class="paginacion">.*?class="current">.*?data-page="(.*?)"')
 
+        ##########temlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'catalogo?paged=1&tipo=pelicula'
+        ####https://animejara.com/catalogo?paged=2
+
         if next_page:
             _url = item.url
 
+            _urlt = scrapertools.find_single_match(item.url, '&tipo=(.*?)$')
+
             if '?paged=': _url = _url.split("?paged=")[0]
             elif '&paged=': _url = _url.split("&paged=")[0]
+
+            if _urlt: _url = host + 'catalogo?' + _urlt
 
             if not '?' in _url:
                 url = _url + '?paged=' + next_page
@@ -194,50 +201,6 @@ def list_all(item):
                 url = _url + '&paged=' + next_page
 
             itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = url, text_color = 'coral' ))
-
-    return itemlist
-
-
-def list_last(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(item.url)
-    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-
-    bloque = scrapertools.find_single_match(data, 'Últimas Temporadas<(.*?)Últimos Episodios<')
-
-    matches = re.compile('<a href="(.*?)".*?<img data-src="(.*?)".*?alt="(.*?)"', re.DOTALL).findall(bloque)
-
-    for url, thumb, title in matches:
-        title = title.replace('#8217;', "'").replace('#8211;', '')
-
-        _year = scrapertools.find_single_match(title, '(\d{4})')
-        if _year: title = title.replace('(' + _year + ')', '').strip()
-
-        SerieName = corregir_SerieName(title)
-
-        PeliName = SerieName
-
-        tipo = 'movie' if '/movie/' in url else 'tvshow'
-
-        if tipo == 'tvshow':
-            if '#season-' in url: url = url.split("#season-")[0]
-
-            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
-                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
-
-        if tipo == 'movie':
-            PeliName = title.strip()
-
-            if 'Movie' in PeliName: PeliName = PeliName.split("Movie")[0]
-
-            title = '[COLOR deepskyblue]Film [/COLOR]' + title
-
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
-                                        contentType='movie', contentTitle=PeliName, infoLabels={'year': '-'} ))
-
-    tmdb.set_infoLabels(itemlist)
 
     return itemlist
 
@@ -274,6 +237,60 @@ def last_epis(item):
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail=thumb, infoLabels={'year': '-'},
                                     contentSerieName = SerieName, contentType = 'episode', contentSeason=temp, contentEpisodeNumber=epis))
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
+def list_last(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    bloque = scrapertools.find_single_match(data, 'Últimas Temporadas<(.*?)</section>')
+
+    matches = re.compile('<a href="(.*?)".*?<img data-src="(.*?)".*?alt="(.*?)"', re.DOTALL).findall(bloque)
+
+    for url, thumb, title in matches:
+        title = title.replace('#8217;', "'").replace('#8211;', '')
+
+        _year = scrapertools.find_single_match(title, '(\d{4})')
+        if _year: title = title.replace('(' + _year + ')', '').strip()
+
+        SerieName = corregir_SerieName(title)
+
+        PeliName = SerieName
+
+        tipo = 'movie' if '/movie/' in url else 'tvshow'
+
+        if tipo == 'tvshow':
+            titulo = title
+
+            if '#season-' in url:
+                nro_season = scrapertools.find_single_match(url, '#season-(.*?)$').strip()
+
+                url = url.split("#season-")[0]
+
+                if not nro_season == '1':
+                    titulo = title + ' Season ' + nro_season
+
+                    titulo = titulo.replace(' Season ', '[COLOR tan] Temp. [/COLOR]')
+
+            itemlist.append(item.clone( action='temporadas', url=url, title=titulo, thumbnail=thumb,
+                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
+
+        if tipo == 'movie':
+            PeliName = title.strip()
+
+            if 'Movie' in PeliName: PeliName = PeliName.split("Movie")[0]
+
+            title = '[COLOR deepskyblue]Film [/COLOR]' + title
+
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                                        contentType='movie', contentTitle=PeliName, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -424,7 +441,7 @@ def findvideos(item):
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
     lang = scrapertools.find_single_match(data, '<h1 class="Title">(.*?)<span>')
-
+ 
     if 'castellano' in lang.lower(): lang = 'Esp'
     elif 'latino' in lang.lower(): lang = 'Lat'
     elif 'subtitulado' in lang.lower(): lang = 'Vose'
@@ -446,6 +463,12 @@ def findvideos(item):
             data2 = do_downloadpage(url2)
 
             data2 = data2.replace('&quot;', '"')
+
+            if ' Castellano -' in data2: lang = 'Esp'
+            elif ' Latino -' in data2: lang = 'Lat'
+            elif ' Subtitulado -' in data2: lang = 'Vose'
+            elif ' Sub -' in data2: lang = 'Vose'
+            else: lang = 'VO'
 
             matches2 = scrapertools.find_multiple_matches(data2, 'playVideo.*?"(.*?)".*?alt="(.*?)"')
 

@@ -425,10 +425,10 @@ def findvideos(item):
 
         url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '".*?src="(.*?)".*?</div>')
 
-        if url.endswith('.png'): url = ''
+        if url.endswith('.png') or url.endswith('.webp'): url = ''
 
         if not url or url == 'https://':
-            datar = data.replace('src=&quot;', 'src="').replace('&quot;', '"')
+            datar = (str(data).replace('src=&quot;', 'src="').replace('&quot;', '"'))
 
             url = scrapertools.find_single_match(datar, ' id="Opt' + str(opt) + '".*?src="(.*?)"')
 

@@ -263,7 +263,7 @@ def last_epis(item):
     matches = scrapertools.find_multiple_matches(bloque, patron)
 
     for url, thumb, title, epis in matches:
-        title = title.replace('ver ', '')
+        title = title.replace('ver ', '').replace('&quot;', '').strip()
 
         thumb = host + thumb
 
@@ -445,12 +445,18 @@ def findvideos(item):
     if not matches:
         bloque = scrapertools.find_single_match(str(data), 'var video =(.*?)</script>')
 
+        if not bloque: bloque = scrapertools.find_single_match(str(data), 'episodes =(.*?),];')
+
         matches = scrapertools.find_multiple_matches(bloque, 'video.*?<a href="([^"]+)"')
+
+        if not matches: matches = scrapertools.find_multiple_matches(bloque, '"episodio-(.*?)"')
 
     for url in matches:
         ses += 1
 
         if url:
+            if not 'http' in url: url = item.url + '/episodio-' + url
+
             if url.startswith('//'): url = 'https:' + url
 
             if url.startswith('https://animejl.top/v/'): url = url.replace('https://animejl.top/v/', 'https://vanfem.com/v/')

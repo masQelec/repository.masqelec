@@ -1381,13 +1381,6 @@ def _proxies(item):
 
         if config.get_setting('channel_animeonline_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'cine24h':
-        from channels import cine24h
-        item.channel = 'cine24h'
-        cine24h.configurar_proxies(item)
-
-        if config.get_setting('channel_cine24h_proxies') is None: refrescar = False
-
     elif item.from_channel == 'cinecalidad':
         from channels import cinecalidad
         item.channel = 'cinecalidad'
@@ -1451,13 +1444,6 @@ def _proxies(item):
 
         if config.get_setting('channel_cuevanavip_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'detodo':
-        from channels import detodo
-        item.channel = 'detodo'
-        detodo.configurar_proxies(item)
-
-        if config.get_setting('channel_detodo_proxies') is None: refrescar = False
-
     elif item.from_channel == 'divxatope':
         from channels import divxatope
         item.channel = 'divxatope'
@@ -1499,13 +1485,6 @@ def _proxies(item):
         doramasyt.configurar_proxies(item)
 
         if config.get_setting('channel_doramasyt_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'dpeliculas':
-        from channels import dpeliculas
-        item.channel = 'dpeliculas'
-        dpeliculas.configurar_proxies(item)
-
-        if config.get_setting('channel_dpeliculas_proxies') is None: refrescar = False
 
     elif item.from_channel == 'elifilms':
         from channels import elifilms

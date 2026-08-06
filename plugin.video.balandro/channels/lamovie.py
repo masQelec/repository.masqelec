@@ -52,9 +52,10 @@ def do_downloadapi(type, filter, page, terms, _id, season, order):
     else:
         type = '{0}s'.format(type)
 
-        url = '{0}wp-api/v1/listing/{1}?{2}&order=desc&postType={1}&postsPerPage=20&page={3}&orderBy='.format(host, type, url_filter, page)
+        orderby = ''
+        if not order: orderby = 'latest'
 
-        if not order: order = 'latest'
+        url = '{0}wp-api/v1/listing/{1}?{2}&order=desc&postType={1}&postsPerPage=20&page={3}&orderBy='.format(host, type, url_filter, page, orderby)
 
         url += order
 

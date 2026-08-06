@@ -508,7 +508,8 @@ def findvideos(item):
         else:
             if not config.get_setting('developer_mode', default=False): continue
 
-        lang = '?'
+        if 'Sub Español' in data: lang = 'Vose'
+        else: lang = '?'
 
         other = ''
 

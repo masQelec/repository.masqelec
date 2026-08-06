@@ -71,6 +71,7 @@ def get_video_url(page_url, url_referer=''):
 
           ini_page_url = page_url
 
+    elif 'bowfile' in page_url: txt_server = 'Bowfile'
     elif 'cloudfile' in page_url: txt_server = 'Cloudfile'
     elif 'cloudmail' in page_url: txt_server = 'Cloudmail'
     elif 'dailyuploads' in page_url: txt_server = 'Dailyuploads'
@@ -115,9 +116,9 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('/e/', '/v/')
 
-          ini_page_url = page_url
-
           page_url = page_url + '$$' + page_url
+
+          ini_page_url = page_url
 
     elif 'streamoupload' in page_url: txt_server = 'Streamoupload'
 
@@ -198,7 +199,16 @@ def get_video_url(page_url, url_referer=''):
 
         import resolveurl
         page_url = ini_page_url
+
         resuelto = resolveurl.resolve(page_url)
+
+        if not resuelto:
+            # ~ 4/7/2026  STREAMIX pq falla ResolveUrl
+            if 'vidara' in page_url:
+                video = vidara(page_url)
+                if video:
+                     video_urls.append(['m3u8', video])
+                     return video_urls
 
         if resuelto:
             if resuelto.endswith('.zip') or resuelto.endswith('.rar'):
@@ -278,5 +288,36 @@ def savefiles(page_url):
     resp = httptools.downloadpage('https://savefiles.com/dl', post=post, headers=headers)
 
     video = scrapertools.find_single_match(resp.data, 'file:"(.*?)"')
+
+    return video
+
+
+def vidara(page_url):
+    resp = httptools.downloadpage(page_url)
+
+    data = resp.data
+
+    if resp.code == 404: return ''
+
+    elif 'File Not Found' in resp.data or 'File is no longer available' in resp.data:
+        return ''
+
+    id = scrapertools.find_single_match(page_url, '/e/([A-z0-9]+)')
+
+    if not id: id = scrapertools.find_single_match(page_url, '/v/([A-z0-9]+)')
+
+    if not id: return ''
+
+    from core.jsontools import json
+
+    post_url = 'https://vidara.to/api/stream'
+
+    post = json.dumps({'filecode': id, 'device': 'web'})
+
+    headers = {'Referer': page_url}
+
+    data = httptools.downloadpage('https://vidara.to/api/stream', post=post, headers = headers).data
+
+    video = scrapertools.find_single_match(data, '"streaming_url":"(.*?)"')
 
     return video

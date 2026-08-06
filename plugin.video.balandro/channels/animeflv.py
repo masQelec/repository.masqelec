@@ -112,7 +112,7 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    url_genre = url = host + 'browse'
+    url_genre = host + 'browse'
 
     data = do_downloadpage(url_genre)
 
@@ -134,7 +134,7 @@ def anios(item):
     logger.info()
     itemlist = []
 
-    url_anio = url = host + 'browse'
+    url_anio = host + 'browse'
 
     tope_year = 1989
 

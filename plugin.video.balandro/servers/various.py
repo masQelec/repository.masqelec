@@ -119,7 +119,7 @@ def get_video_url(page_url, url_referer=''):
 
                   page_url = page_url.replace('.html', '')
 
-    elif 'filemoon' in page_url or 'fmoonembed' in page_url or 'embedmoon' in page_url or 'moonjscdn' in page_url or 'l1afav' in page_url or 'byseqekaho' in page_url or 'bysedikamoum' in page_url or 'bysevepoin' in page_url or 'byseraguci' in page_url or 'bysewihe' in page_url or 'bysejikuar' in page_url or 'embedplaybyse' in page_url or 'byse' in page_url:
+    elif 'filemoon' in page_url or 'fmoonembed' in page_url or 'embedmoon' in page_url or 'moonjscdn' in page_url or 'l1afav' in page_url or 'byseqekaho' in page_url or 'bysedikamoum' in page_url or 'bysevepoin' in page_url or 'byseraguci' in page_url or 'bysewihe' in page_url or 'bysejikuar' in page_url or 'embedplaybyse' in page_url or 'bysekoze' in page_url or 'byse' in page_url:
           # ~ 19/1/26  Anulado en ResolveUrl
           # ~ txt_server = 'Filemoon'
 
@@ -135,7 +135,7 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('/bysesukior.com/', '/filemoon.sx/').replace('/byselapuix.com/', '/filemoon.sx/').replace('/bysezoxexe.com/', '/filemoon.sx/')
 
-          page_url = page_url.replace('/embedplaybyse.top/', '/filemoon.sx/')
+          page_url = page_url.replace('/embedplaybyse.top/', '/filemoon.sx/').replace('/bysekoze.com/', '/filemoon.sx/')
 
     elif 'streamhub' in page_url:
           txt_server = 'Streamhub'

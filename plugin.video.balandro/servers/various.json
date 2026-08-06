@@ -93,6 +93,10 @@
         "url": "https://filemoon.sx/e/\\1"
       },
       {
+        "pattern": "https://bysekoze.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
         "pattern": "https://byse.sx/(?:e/|d/|download/)([0-9a-zA-Z]+)",
         "url": "https://filemoon.sx/e/\\1"
       },

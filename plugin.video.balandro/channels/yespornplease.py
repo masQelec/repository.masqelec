@@ -45,10 +45,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'xxxx'))
 
     itemlist.append(item.clone( title = 'Por canal', action = 'canales'))
-    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + 'xxx-categories/' ))
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + 'xxx-categories-xxx/' ))
     itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars', url = host + 'pornstars/' ))
 
     return itemlist
@@ -160,6 +160,8 @@ def list_all(item):
 
     if itemlist:
         next_page = scrapertools.find_single_match(data,'<link rel="next" href="(.*?)"')
+
+        if not next_page: next_page = scrapertools.find_single_match(data,'<a class="next page-numbers" href="(.*?)"')
 
         if next_page:
             if'/page/' in next_page:

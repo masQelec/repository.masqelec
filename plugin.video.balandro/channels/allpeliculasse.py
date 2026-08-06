@@ -19,14 +19,14 @@ host = 'https://allpeliculas.la/'
 
 per_page = '20'
 
-rut_movies = host + 'wp-api/v1/tops?postType=movies&range=day&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
-rut_series = host + 'wp-api/v1/tops?postType=tvshows&range=day&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
 
-ten_movies = host + 'wp-api/v1/tops?postType=movies&range=month&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
-ten_series = host + 'wp-api/v1/tops?postType=tvshows&range=month&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
-
+rut_movies = host + 'wp-api/v1/listing/movies?postType=movies&range=day&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
+rut_series = host + 'wp-api/v1/listing/tvshows?postType=tvshows&range=day&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
 rut_animes = host + 'wp-api/v1/listing/animes?postType=animes&range=day&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
-ten_animes = host + 'wp-api/v1/tops?postType=animes&range=week&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
+
+top_movies = host + 'wp-api/v1/tops?postType=movies&range=month&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
+top_series = host + 'wp-api/v1/tops?postType=tvshows&range=month&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
+top_animes = host + 'wp-api/v1/tops?postType=animes&range=week&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
 
 
 def item_configurar_proxies(item):
@@ -134,7 +134,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = rut_movies, search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Tendencias', action = 'list_all', url = ten_movies, search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = top_movies, search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', search_type = 'movie' ))
@@ -159,7 +159,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = rut_series, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Tendencias', action = 'list_all', url = ten_series, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = top_series, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', search_type = 'tvshow' ))
@@ -184,7 +184,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = rut_animes, tipo = 'Animes', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Tendencias', action = 'list_all', url = ten_animes, tipo = 'Animes', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = top_animes, tipo = 'Animes', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', tipo = 'Animes', search_type = 'tvshow' ))
 
@@ -660,7 +660,7 @@ def findvideos(item):
     data = do_downloadpage(url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = re.compile('"url":"(.*?)".*?"server":"(.*?)".*?"lang":"(.*?)"(.*?)}', re.DOTALL).findall(data)
+    matches = re.compile('"url":"(.*?)".*?"server":"(.*?)".*?"lang":"(.*?)"(.*?)"resolution"', re.DOTALL).findall(str(data))
 
     ses = 0
 

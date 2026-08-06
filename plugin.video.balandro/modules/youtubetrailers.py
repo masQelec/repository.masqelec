@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import xbmc, re, time
+import xbmc, re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -101,8 +101,6 @@ def youtube_play(ini_page_url):
 
     video_urls = []
 
-    reintentar = False
-
     if ini_page_url.startswith(host + '/watch?v='):
         ids_ini_page_url = ini_page_url.replace(host + '/watch?v=', '')
 
@@ -111,96 +109,22 @@ def youtube_play(ini_page_url):
         if mvideo:
            idvideo = mvideo.group(1)
 
-           new_page_url = 'https://inv.perditum.com/api/v1/videos/%s' % idvideo
+           if addons:
+               from servers import youtube
 
-           hdata = httptools.downloadpage(new_page_url).data
+               yt_new_url = 'https://www.youtube.com/watch?v=%s' % idvideo
 
-           if hdata:
-               if 'This helps protect our community' in str(hdata):
-                   if config.get_setting('developer_mode', default=False):
-                       if config.get_setting('developer_team'):
-                           platformtools.dialog_notification(config.__addon_name, '[B][COLOR yellow]Perditum Error Acceso[/B][/COLOR]')
+               yt_video = youtube.get_video_url(yt_new_url)
 
-                   if addons:
-                       from servers import youtube
+               if yt_video:
+                   if not 'No se pudo Reproducir el Vídeo' in str(yt_video):
+                       yt_player = scrapertools.find_single_match(str(yt_video), "'mp4',.*?'(.*?)'")
 
-                       yt_new_url = 'https://www.youtube.com/watch?v=%s' % idvideo
+                       if yt_player:
+                           video_urls.append(['mp4', yt_player])
+                           return video_urls
 
-                       yt_video = youtube.get_video_url(yt_new_url)
-
-                       if yt_video:
-                           if not 'No se pudo Reproducir el Vídeo' in str(yt_video):
-                               yt_player = scrapertools.find_single_match(str(yt_video), "'mp4',.*?'(.*?)'")
-
-                               if yt_player:
-                                   video_urls.append(['mp4', yt_player])
-                                   return video_urls
-
-                   return video_urls
-
-               elif 'try again later' in str(hdata):
-                   if config.get_setting('servers_time', default=True):
-                       platformtools.dialog_notification('Cargando [COLOR cyan][B]YouTube[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
-
-                       time.sleep(int(espera))
-
-                   reintentar = True
-
-                   hdata = httptools.downloadpage(new_page_url).data
-
-               else:
-                   if config.get_setting('developer_mode', default=False):
-                       if config.get_setting('developer_team'):
-                           platformtools.dialog_notification(config.__addon_name, '[B][COLOR yellow]Perditum Error Acceso[/B][/COLOR]')
-
-                   reintentar = True
-
-               hvideo = scrapertools.find_single_match(hdata, '"formatStreams":.*?"url":"(.*?)"')
-
-               if hvideo:
-                   video_urls.append(['mp4', hvideo])
-                   return video_urls
-
-               if reintentar:
-                   if addons:
-                       from servers import youtube
-
-                       yt_new_url = 'https://www.youtube.com/watch?v=%s' % idvideo
-
-                       yt_video = youtube.get_video_url(yt_new_url)
-
-                       if yt_video:
-                           if not 'No se pudo Reproducir el Vídeo' in str(yt_video):
-                               yt_player = scrapertools.find_single_match(str(yt_video), "'mp4',.*?'(.*?)'")
-
-                               if yt_player:
-                                   video_urls.append(['mp4', yt_player])
-                                   return video_urls
-
-                   if platformtools.dialog_yesno(config.__addon_name , '[B][COLOR yellow]YouTube Saturado.[/B][/COLOR]', '¿ [B][COLOR cyan]Desea Re-Intentar el Acceso[/B][/COLOR] ?'):
-                       time.sleep(int(espera))
-
-                       hdata = httptools.downloadpage(new_page_url).data
-
-                       if hdata:
-                           if 'This helps protect our community' in str(hdata):
-                               if config.get_setting('developer_mode', default=False):
-                                   if config.get_setting('developer_team'):
-                                       platformtools.dialog_notification(config.__addon_name, '[B][COLOR yellow]Perditum Error Acceso[/B][/COLOR]')
-
-                           elif 'try again later' in str(hdata):
-                              if config.get_setting('servers_time', default=True):
-                                  platformtools.dialog_notification('Cargando [COLOR cyan][B]YouTube[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
-
-                                  time.sleep(int(espera))
-
-                                  hdata = httptools.downloadpage(new_page_url).data
-
-                           hvideo = scrapertools.find_single_match(hdata, '"formatStreams":.*?"url":"(.*?)"')
-
-                           if hvideo:
-                               video_urls.append(['mp4', hvideo])
-                               return video_urls
+           return video_urls
 
     if not video_urls:
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR cyan]No se localizaron Tráilers y/ó Vídeos en YouTube[/B][/COLOR]')

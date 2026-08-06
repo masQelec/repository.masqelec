@@ -10,7 +10,6 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://ww3.monoschinos3.com/'
 
 
-
 def do_downloadpage(url, post=None, headers=None):
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
@@ -230,6 +229,17 @@ def last_epis(item):
         season = scrapertools.find_single_match(url, '-temporada-(.*?)/')
         if not season: season = scrapertools.find_single_match(url, '-temporada-(.*?)$')
 
+        if not season:
+            if '-2nd-season': season = 2
+            elif '-3rd-season': season = 3
+            elif '-4th-season': season = 4
+            elif '-5th-season': season = 5
+            elif '-6th-season': season = 6
+            elif '-7th-season': season = 7
+            elif '-8th-season': season = 8
+            elif '-9th-season': season = 9
+
+
         if not season: season = scrapertools.find_single_match(match, 'alt=".*?Temporada(.*?)"').strip()
 
         if not season: season = 1
@@ -385,6 +395,8 @@ def episodios(item):
 
     for match in matches[item.page * item.perpage:]:
         url = scrapertools.find_single_match(match, 'href="(.*?)"')
+
+        if not 'http' in url: continue
 
         epis = scrapertools.find_single_match(match, '<h2 class="fs-5 mt-2 mb-1 text-light text-truncate d-flex gap-1">.*?Capitulo(.*?)<').strip()
         if not epis: epis = 1

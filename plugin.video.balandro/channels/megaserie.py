@@ -56,8 +56,6 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    if '/release/' in url: raise_weberror = False
-
     hay_proxies = False
     if config.get_setting('channel_megaserie_proxies', default=''): hay_proxies = True
 
@@ -141,8 +139,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
-    itemlist.append(item.clone ( title = 'Por año', action = 'anios', search_type = 'movie' ))
-
     return itemlist
 
 
@@ -157,8 +153,6 @@ def mainlist_series(item):
     itemlist.append(item.clone ( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone ( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -216,32 +210,13 @@ def generos(item):
     return itemlist
 
 
-def anios(item):
-    logger.info()
-    itemlist = []
-
-    if item.search_type == 'movie': text_color = 'deepskyblue'
-    else: text_color = 'hotpink'
-
-    from datetime import datetime
-    current_year = int(datetime.today().year)
-
-    if item.search_type == 'movie': top_year = 1955
-    else: top_year = 1998
-
-    for x in range(current_year, top_year, -1):
-        itemlist.append(item.clone( title = str(x), url = host + 'release/' + str(x) + '/', action = 'list_all', text_color = text_color ))
-
-    return itemlist
-
-
 def list_all(item): 
     logger.info()
     itemlist = []
 
     data = do_downloadpage(item.url)
 
-    if '/release/' in item.url or '/?type=' in item.url:
+    if '/?type=' in item.url:
         if item.search_type == 'movie':
             bloque = scrapertools.find_single_match(data, '</h1>(.*?)>Peliculas Populares<')
         else:
@@ -452,6 +427,8 @@ def findvideos(item):
         ses += 1
 
         srv = scrapertools.find_single_match(srv_lang, '(.*?)-').lower().strip()
+
+        if not srv: srv = scrapertools.find_single_match(srv_lang, '(.*?)$').lower().strip()
 
         if not srv == 'descargaonline':
             if servertools.is_server_available(srv):

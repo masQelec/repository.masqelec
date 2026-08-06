@@ -190,7 +190,7 @@ def list_all(item):
 
             if not epis: epis = 1
 
-            titulo = '[COLOR goldenrod]Epis. [/COLOR]' + str(epis) + ' ' + title.replace('Episodio', '').strip()
+            titulo = '[COLOR goldenrod]Epis. [/COLOR]' + str(epis) + ' ' + title.replace('Episodio', '').replace(' ' + str(epis), '').strip()
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, infoLabels={'year': '-'},
                                         contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber = epis))
@@ -349,15 +349,15 @@ def findvideos(item):
 
             unpack = jsunpack.unpack(match)
 
+            unpack = unpack.replace('\\/', '/')
+            unpack = unpack.replace('=\\', '=').replace('\\"', '/"')
+            unpack = unpack.replace('=/', '=').replace('\/"', '"')
 
             url = scrapertools.find_single_match(unpack, 'file(?:"|):"([^"]+)')
 
-            if not url:
-                unpack = unpack.replace('\\/', '/')
-                unpack = unpack.replace('=\\', '=').replace('\\"', '/"')
-                unpack = unpack.replace('=/', '=').replace('\/"', '"')
+            if not url: url = scrapertools.find_single_match(unpack, '<iframe src="(.*=)"')
 
-                url = scrapertools.find_single_match(unpack, '<iframe src="(.*=)"')
+            if not url: url = scrapertools.find_single_match(unpack, "<iframe src='(.*?)'")
 
             if not url:
                 slug = scrapertools.find_single_match(unpack, '"slug":"(.*?)"')

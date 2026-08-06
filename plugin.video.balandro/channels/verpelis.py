@@ -11,7 +11,7 @@ host = 'https://verpelis.gratis/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    if '/anos/' in url: raise_weberror = False
+    if '/ano/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
@@ -87,7 +87,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1959, -1):
-        itemlist.append(item.clone( title = str(x), url = host + 'anos/' + str(x) + '/', action = 'list_all', text_color='deepskyblue' ))
+        itemlist.append(item.clone( title = str(x), url = host + 'ano/' + str(x) + '/', action = 'list_all', text_color='deepskyblue' ))
 
     return itemlist
 
@@ -296,7 +296,14 @@ def findvideos(item):
 
             embed = scrapertools.find_single_match(data1, '"embed_url":"(.*?)"')
 
-            if not embed: continue
+            if not embed:
+                ses = ses - 1
+                continue
+
+        if 'mx.png' in option: lng = 'Lat'
+        elif 'es.png' in option: lng = 'Esp'
+        elif 'vose.png' in option: lng = 'Vose'
+        else: lng = '?'
 
         embed = embed.replace('\\/', '/')
 
@@ -311,7 +318,7 @@ def findvideos(item):
             elif servidor == 'zures': other = servertools.corregir_zures(url)
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                  language = '?', other = other ))
+                                  language = lng, other = other ))
 
             continue
 
@@ -345,14 +352,15 @@ def findvideos(item):
 
         link = scrapertools.find_single_match(match, "<a href='(.*?)'")
 
-        if not link: continue
-
-        lng = '?'
+        if not link:
+            ses = ses - 1
+            continue
 
         if 'Latino' in match: lng = 'Lat'
         elif 'Castellano' in match: lng = 'Esp'
         elif 'Español' in match: lng = 'Esp'
         elif 'Subtitulado' in match: lng = 'Vose'
+        else: lng = '?'
 
         datad = do_downloadpage(link)
 

@@ -31,9 +31,9 @@ else:
 color_alert = config.get_setting('notification_alert_color', default='red')
 
 
-# ~ 25/6/26
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.7871.24 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.7871.47 Safari/537.36"
+# ~ 24/7/26
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.7871.129 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.7871.187 Safari/537.36"
 
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)

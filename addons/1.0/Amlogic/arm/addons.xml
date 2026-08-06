@@ -659,7 +659,7 @@ Added support for Kodi v19 (Matrix)
   </extension>
 </addon>
 
-<addon id="plugin.video.balandro" name="[B]Balandro[/B]" version="4.0.30" provider-name="Team Balandro">
+<addon id="plugin.video.balandro" name="[B]Balandro[/B]" version="4.0.31" provider-name="Team Balandro">
   <requires>
      <import addon="script.module.requests" optional="true"/>
   </requires>
@@ -679,7 +679,7 @@ Added support for Kodi v19 (Matrix)
       <screenshot>resources/screenshots/4.jpg</screenshot>
     </assets>
     <news>
-    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.30[/COLOR][COLOR chartreuse]  Junio de 2026[/B][/COLOR]
+    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.31[/COLOR][COLOR chartreuse]  Julio de 2026[/B][/COLOR]
 
     [COLOR goldenrod][B]Media Centers:[/B][/COLOR]
         [COLOR tan][B]Kodi Versiones Oficiales Soportadas:[/B][/COLOR]

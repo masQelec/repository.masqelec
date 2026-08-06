@@ -11,7 +11,7 @@ host = 'https://www2.pelisforte.se/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://pelisforte.co/', 'https://pelisforte.nu/','https://www1.pelisforte.se/' ]
+ant_hosts = ['https://pelisforte.co/', 'https://pelisforte.nu/', 'https://www1.pelisforte.se/']
 
 domain = config.get_setting('dominio', 'pelisforte', default='')
 
@@ -303,14 +303,14 @@ def findvideos(item):
             srv = srv.lower().strip()
 
             if srv == 'pf': continue
-            elif srv == 'w1tv': continue
 
             elif srv == 'mxdrop': srv = 'mixdrop'
 
-            if servertools.is_server_available(srv):
-                if not servertools.is_server_enabled(srv): continue
-            else:
-                if not config.get_setting('developer_mode', default=False): continue
+            if not srv == 'wltv' and not srv == 'ok' and not srv == 'playpf' and not srv == 'ds':
+                if servertools.is_server_available(srv):
+                    if not servertools.is_server_enabled(srv): continue
+                else:
+                    if not config.get_setting('developer_mode', default=False): continue
 
             servidor = servertools.corregir_servidor(srv)
 
@@ -336,11 +336,12 @@ def findvideos(item):
                 other = srv
                 servidor = 'directo'
 
-            elif srv == 'wltv':
-                other = srv
+            elif srv == 'w1tv':
+                other = 'kinoger'
                 servidor = 'directo'
 
             elif servidor == 'directo': other = srv
+
             elif servidor == 'various': other = servertools.corregir_other(srv)
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, ref = ref,

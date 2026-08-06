@@ -16,6 +16,14 @@ no_porns = config.get_setting('descartar_xxx', default=False)
 def do_downloadpage(url, post=None, headers=None):
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
+    if not data:
+        if not '/get-posts/keywords:' in url:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('TorrentGalaxy', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
+
+            timeout = config.get_setting('channels_repeat', default=30)
+
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+
     return data
 
 
@@ -254,7 +262,7 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '>Download<(.*?)</center></center>')
+    bloque = scrapertools.find_single_match(data, '>Download<.*?</center>(.*?)</center>')
 
     matches1 = re.compile("<a href='(.*?)'", re.DOTALL).findall(bloque)
 
@@ -270,13 +278,8 @@ def findvideos(item):
 
         url = url.replace('http://', 'https://')
 
-        if 'torrent?title=' in url:
-            vid = url.split("torrent?title=")[1]
-
-            url = url.replace('/itorrents.org/torrent/', '/watercache.nanobytes.org/get/')
-            url = url.replace('.torrent?title=', '/')
-
-            url = url + vid
+        if '.torrent?title=' in url:
+            if not url.endswith('.torrent'): url = url + '.torrent'
 
         if '.torrent?' in url: url = url.replace('.torrent?', '.torrent')
 
@@ -286,18 +289,9 @@ def findvideos(item):
 
            if "&library=" in url: url = url.split("&library=")[0]
 
+        url = url.replace('&amp;', '&')
+
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language=item.languages, other=other ))
-
-    return itemlist
-
-
-def play(item):
-    logger.info()
-    itemlist = []
-
-    item.url = item.url.replace('&amp;', '&')
-
-    itemlist.append(item.clone( url = item.url, server = 'torrent' ))
 
     return itemlist
 

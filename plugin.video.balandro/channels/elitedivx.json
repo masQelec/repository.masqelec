@@ -13,5 +13,5 @@
 
   "clusters": ["clone", "onlyone", "torrents", "news", "lasts", "qualityes", "kids", "docs", "4k"],
 
-  "notes": "Canal con enlaces Torrent exclusivamente. Películas, Series y Documentales, por géneros, calidad y año. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Canal con enlaces Torrent exclusivamente. Películaspor géneros y años. También Series y Documentales. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

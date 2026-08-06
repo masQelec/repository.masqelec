@@ -16,7 +16,7 @@ else:
 import os, xbmc, time
 
 from platformcode import config, logger, platformtools
-from core import filetools, httptools, scrapertools, jsontools
+from core import filetools, httptools, scrapertools
 
 
 espera = config.get_setting('servers_waiting', default=6)
@@ -63,186 +63,76 @@ def get_video_url(page_url, url_referer=''):
         return "Archivo inexistente ó eliminado"
 
     elif 'restringido por el propietario' in resp.data:
-        return 'Archivo restringido por el propietario'
+        return 'Archivo Restringido por el Propietario'
 
-    data = jsontools.load(resp.data)
-
-    if not data:
+    if not resp.data:
         if '/geo.dailymotion.com/player.html?video=' in page_url:
             page_url = page_url.replace('/geo.dailymotion.com/player.html?video=', '/www.dailymotion.com/player/metadata/video/')
 
-            resp = httptools.downloadpage(page_url)
+    if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+        path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'dailymotion.py'))
 
-            data = jsontools.load(resp.data)
+        existe = filetools.exists(path)
+        if not existe:
+            return 'El Plugin No existe en Resolveurl'
 
-            _player = scrapertools.find_single_match(resp.data, '"auto":.*?"url":"(.*?)"')
+        if config.get_setting('servers_time', default=True):
+            platformtools.dialog_notification('Cargando [COLOR cyan][B]Dailymotion[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
+            time.sleep(int(espera))
 
-            if _player:
-                _player = _player.replace('\\/', '/')
+        try:
+            import_libs('script.module.resolveurl')
 
-                _player += '|Referer=https://geo.dailymotion.com/'
+            if xbmc.getCondVisibility('System.HasAddon("script.module.cloudrequest")'):
+                import_libs('script.module.cloudrequest')
 
-                video_urls.append(['m3u8', _player])
+            import resolveurl
+            page_url = ini_page_url
+            resuelto = resolveurl.resolve(page_url)
+
+            if resuelto:
+                if '.m3u8' in resuelto: video_urls.append(['m3u8', resuelto])
+                elif '.m3u' in resuelto: video_urls.append(['m3u', resuelto])
+                elif '.mp4' in resuelto: video_urls.append(['mp4', resuelto])
+                else: video_urls.append(['', resuelto])
                 return video_urls
 
-    try:
-        sub_data = data['subtitles'].get('data', '')
-    except:
-        if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-            path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'dailymotion.py'))
+            color_exec = config.get_setting('notification_exec_color', default='cyan')
+            el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
+            el_srv += ('ResolveUrl[/B][/COLOR]')
+            platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
 
-            existe = filetools.exists(path)
-            if not existe:
-                return 'El Plugin No existe en Resolveurl'
+            page_url = ini_page_url
 
-            if config.get_setting('servers_time', default=True):
-                platformtools.dialog_notification('Cargando [COLOR cyan][B]Dailymotion[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
-                time.sleep(int(espera))
+            return 'No se pudo Reproducir el Vídeo con ResolveUrl'
 
-            try:
-                import_libs('script.module.resolveurl')
+        except:
+            import traceback
+            logger.error(traceback.format_exc())
 
-                if xbmc.getCondVisibility('System.HasAddon("script.module.cloudrequest")'):
-                    import_libs('script.module.cloudrequest')
+            if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
+                trace = traceback.format_exc()
+                if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
+                    return 'Archivo inexistente ó eliminado'
 
-                import resolveurl
-                page_url = ini_page_url
-                resuelto = resolveurl.resolve(page_url)
+                elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
+                    return 'Fichero sin link al vídeo ó restringido'
 
-                if resuelto:
-                    if '.m3u8' in resuelto: video_urls.append(['m3u8', resuelto])
-                    elif '.m3u' in resuelto: video_urls.append(['m3u', resuelto])
-                    elif '.mp4' in resuelto: video_urls.append(['mp4', resuelto])
-                    else: video_urls.append(['', resuelto])
-                    return video_urls
+                elif 'Cloudflare challenge' in trace:
+                    return 'Cloudflare Challenge Check'
 
-                color_exec = config.get_setting('notification_exec_color', default='cyan')
-                el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
-                el_srv += ('ResolveUrl[/B][/COLOR]')
-                platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+            elif "No module named 'cloudscraper'" in traceback.format_exc():
+                return 'Falta script.module.cloudrequest'
 
-                page_url = ini_page_url
+            elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
+                return 'Archivo inexistente'
 
-                return 'No se pudo Reproducir el Vídeo con ResolveUrl'
+            elif '<urlopen error' in traceback.format_exc():
+                return 'No se puede establecer la conexión'
 
-            except:
-                import traceback
-                logger.error(traceback.format_exc())
+            return 'Sin Respuesta ResolveUrl'
 
-                if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
-                    trace = traceback.format_exc()
-                    if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
-                        return 'Archivo inexistente ó eliminado'
-
-                    elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
-                        return 'Fichero sin link al vídeo ó restringido'
-
-                    elif 'Cloudflare challenge' in trace:
-                        return 'Cloudflare Challenge Check'
-
-                elif "No module named 'cloudscraper'" in traceback.format_exc():
-                    return 'Falta script.module.cloudrequest'
-
-                elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
-                    return 'Archivo inexistente'
-
-                elif '<urlopen error' in traceback.format_exc():
-                    return 'No se puede establecer la conexión'
-
-                return 'Sin Respuesta ResolveUrl'
-
-        else:
-            return 'Falta ResolveUrl'
-
-        return video_urls
-
-    stream_url = ''
-    subtitle = ''
-
-    try:
-        sub_es = sub_data.get('es') or sub_data.get('en')
-        subtitle = sub_es.get('urls', [])[0]
-    except:
-        pass
-
-    try:
-        stream_url = data['qualities']['auto'][0]['url']
-    except:
-        pass
-
-    if stream_url:
-        if subtitle:
-            video_urls.append(['m3u8', stream_url, 0, subtitle])
-        else:
-            video_urls.append(['m3u8', stream_url, 0])
-
-        return video_urls[::-1]
-
-    if not video_urls:
-        if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-            path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'dailymotion.py'))
-
-            existe = filetools.exists(path)
-            if not existe:
-                return 'El Plugin No existe en Resolveurl'
-
-            if config.get_setting('servers_time', default=True):
-                platformtools.dialog_notification('Cargando [COLOR cyan][B]Dailymotion[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
-                time.sleep(int(espera))
-
-            try:
-                import_libs('script.module.resolveurl')
-
-                if xbmc.getCondVisibility('System.HasAddon("script.module.cloudrequest")'):
-                    import_libs('script.module.cloudrequest')
-
-                import resolveurl
-                page_url = ini_page_url
-                resuelto = resolveurl.resolve(page_url)
-
-                if resuelto:
-                    if '.m3u8' in resuelto: video_urls.append(['m3u8', resuelto])
-                    elif '.m3u' in resuelto: video_urls.append(['m3u', resuelto])
-                    elif '.mp4' in resuelto: video_urls.append(['mp4', resuelto])
-                    else: video_urls.append(['', resuelto])
-                    return video_urls
-
-                color_exec = config.get_setting('notification_exec_color', default='cyan')
-                el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
-                el_srv += ('ResolveUrl[/B][/COLOR]')
-                platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
-
-                page_url = ini_page_url
-
-                return 'No se pudo Reproducir el Vídeo con ResolveUrl'
-
-            except:
-                import traceback
-                logger.error(traceback.format_exc())
-
-                if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
-                    trace = traceback.format_exc()
-                    if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
-                        return 'Archivo inexistente ó eliminado'
-
-                    elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
-                        return 'Fichero sin link al vídeo ó restringido'
-
-                    elif 'Cloudflare challenge' in trace:
-                        return 'Cloudflare Challenge Check'
-
-                elif "No module named 'cloudscraper'" in traceback.format_exc():
-                    return 'Falta script.module.cloudrequest'
-
-                elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
-                    return 'Archivo inexistente'
-
-                elif '<urlopen error' in traceback.format_exc():
-                    return 'No se puede establecer la conexión'
-
-                return 'Sin Respuesta ResolveUrl'
-
-        else:
-            return 'Falta ResolveUrl'
+    else:
+        return 'Falta ResolveUrl'
 
     return video_urls

@@ -18,10 +18,10 @@ from lib import decrypters
 host = 'https://4144-don.mirror.pm/'
 
 
-# ~ 3/6/26 last domain  'https://dontorrent.review/'
+# ~ 24/7/26 last domain  'https://dontorrent.management/'
 
 # ~ Web Search
-web_search_dontorrent = 'https://dontorrent.review/'
+web_search_dontorrent = 'https://dontorrent.management/'
 
 
 # ~ Alternative Webs Clons
@@ -127,7 +127,7 @@ ant_hosts =  [
              'https://dontorrent.prof/', 'https://dontorrent.info/', 'https://dontorrent.promo/',
              'https://dontorrent.photos/', 'https://dontorrent.cfd/', 'https://dontorrent.pink/',
              'https://dontorrent.reisen/', 'https://dontorrent.racing/', 'https://dontorrent.rocks/',
-             'https://dontorrent.science/', 'https://dontorrent.support/']
+             'https://dontorrent.science/', 'https://dontorrent.support/', 'https://dontorrent.review/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')

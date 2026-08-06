@@ -146,14 +146,19 @@ def list_all(item):
                if not season: season = 1
 
         if item.group == 'last':
-            if ':' in SerieName: SerieName = title.split(":")[0]
+            if ': ' in SerieName: SerieName = title.split(": ")[0]
+
+            epis = scrapertools.find_single_match(title, '(\d{.*?})')
+            if not epis: epis = 1
 
             titulo = '[COLOR goldenrod]Epis. [/COLOR]' + title
 
             titulo = titulo.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
+            SerieName = SerieName.replace(str(epis), '').strip()
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, infoLabels={'year': '-'},
-                                        contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = 1))
+                                        contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis))
         else:
             if tipo == 'tvshow':
                 if item.search_type != 'all':

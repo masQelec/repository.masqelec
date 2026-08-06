@@ -597,7 +597,7 @@ def developer_mode_check_findvideos(itemlist, parent_item):
 
         # ~ Server Various y anulados/controlados
         if apuntar:
-            if it.server in ['dropload', 'dr0pstream', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'hexload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'yadi.', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'luluvid', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'stbturbo', 'turbovidhls', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidroba', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhide', 'hxfile', 'drop', 'embedv', 'vgplayer', 'userload', 'uploadraja', 'cdnwish', 'goodstream', 'asnwish', 'flastwish', 'jodwish', 'fmoonembed', 'embedmoon', 'moonjscdn', 'rumble', 'bembed', 'javlion', 'streamruby', 'sruby', 'rubystream', 'stmruby', 'rubystm', 'rubyvid', 'rubyvidhub', 'swhoi', 'listeamed', 'go-streamer.net', 'fsdcmo', 'fdewsdc', 'peytonepre', 'ryderjet', 'smoothpre' , 'qiwi', 'swdyu', 'streamhihi', 'luluvdoo', 'lulu', 'ponmi', 'wishonly', 'streamsilk', 'playerwish', 'hlswish', 'iplayerhls', 'hlsflast', 'ghbrisk', 'cybervynx', 'streamhg', 'stbhg', 'dhcplay', 'wish', 'stblion', 'terabox', 'dhtpre', 'dramacool', 'morencius', 'l1afav', 'byseqekaho', 'bysedikamoum', 'bysevepoin', 'byseraguci', 'bysewihe', 'bysejikuar', 'bysesukior', 'byselapuix', 'bysezoxexe', 'embedplaybyse', 'byse', 'hlsflex', 'swiftplayers', 'movearnpre', 'seraphinap', 'seraphinapl', 'gradehgplus', 'tryzendm', 'hglink', 'hailindihg', 'guxhag', 'habetar', 'yuguaab', 'mivalyo', 'taylorplayer', 'xenolyzb', 'hgplaycdn', 'videoland', 'bingezove', 'dinisglows', 'dingtezuni', 'dintezuvio', 'callistanise', 'minochinos', 'earnvids', 'd00ds.site', 'davioad', 'haxloppd', 'dumbalag', 'kravaxxa', 'hgbazooka', 'cavanhabg', 'uasopt', 'hgcloud', 'vibuxer', 'hanerix', 'masukestin', 'audinifer']:
+            if it.server in ['dropload', 'dr0pstream', 'fastupload', 'filemoon', 'moonplayer', 'hexupload', 'hexload', 'krakenfiles', 'mvidoo', 'rutube', 'streamhub', 'streamwish', 'tubeload', 'uploadever', 'videowood', 'yandex', 'yadi.', 'desiupload', 'filelions', 'youdbox', 'yodbox', 'youdboox', 'vudeo', 'embedgram', 'embedrise', 'embedwish', 'wishembed', 'vidguard', 'vgfplay', 'v6embed', 'vgembed', 'vembed', 'vid-guard', 'strwish', 'azipcdn', 'awish', 'dwish', 'mwish', 'swish', 'lulustream', 'luluvdo', 'luluvid', 'lion', 'alions', 'dlions', 'mlions', 'turboviplay', 'emturbovid', 'tuborstb', 'stbturbo', 'turbovidhls', 'streamvid' 'upload.do', 'uploaddo', 'file-upload', 'wishfast', 'doodporn', 'vidello', 'vidroba', 'vidspeed', 'sfastwish', 'fviplions', 'moonmov', 'flaswish', 'vkspeed', 'vkspeed7', 'obeywish', 'twitch', 'vidhide', 'hxfile', 'drop', 'embedv', 'vgplayer', 'userload', 'uploadraja', 'cdnwish', 'goodstream', 'asnwish', 'flastwish', 'jodwish', 'fmoonembed', 'embedmoon', 'moonjscdn', 'rumble', 'bembed', 'javlion', 'streamruby', 'sruby', 'rubystream', 'stmruby', 'rubystm', 'rubyvid', 'rubyvidhub', 'swhoi', 'listeamed', 'go-streamer.net', 'fsdcmo', 'fdewsdc', 'peytonepre', 'ryderjet', 'smoothpre' , 'qiwi', 'swdyu', 'streamhihi', 'luluvdoo', 'lulu', 'ponmi', 'wishonly', 'streamsilk', 'playerwish', 'hlswish', 'iplayerhls', 'hlsflast', 'ghbrisk', 'cybervynx', 'streamhg', 'stbhg', 'dhcplay', 'wish', 'stblion', 'terabox', 'dhtpre', 'dramacool', 'morencius', 'l1afav', 'byseqekaho', 'bysedikamoum', 'bysevepoin', 'byseraguci', 'bysewihe', 'bysejikuar', 'bysesukior', 'byselapuix', 'bysezoxexe', 'embedplaybyse', 'bysekoze', 'byse', 'hlsflex', 'swiftplayers', 'movearnpre', 'seraphinap', 'seraphinapl', 'gradehgplus', 'tryzendm', 'hglink', 'hailindihg', 'guxhag', 'habetar', 'yuguaab', 'mivalyo', 'taylorplayer', 'xenolyzb', 'hgplaycdn', 'videoland', 'bingezove', 'dinisglows', 'dingtezuni', 'dintezuvio', 'callistanise', 'minochinos', 'earnvids', 'd00ds.site', 'davioad', 'haxloppd', 'dumbalag', 'kravaxxa', 'hgbazooka', 'cavanhabg', 'uasopt', 'hgcloud', 'vibuxer', 'hanerix', 'masukestin', 'audinifer']:
                 apuntar = False
 
             elif it.server in ['allviid', 'cloudfile', 'cloudmail', 'dailyuploads', 'darkibox', 'dembed', 'downace', 'fastdrive', 'filegram', 'gostream', 'letsupload', 'liivideo', 'myupload', 'neohd', 'oneupload', 'pandafiles', 'rovideo', 'send', 'streamable', 'streamdav', 'streamgzzz', 'streamoupload', 'turbovid', 'tusfiles', 'uploadba', 'uploadflix', '1uploadflix', 'uploadhub', 'uploady', 'upvid', 'veev', 'doods', 'veoh', 'vidbob', 'vidlook', 'vidmx', 'vidnest', 'vido.', 'vidpro', 'vidstore', 'vipss', 'vkprime', 'worlduploads', 'ztreamhub' 'amdahost', 'updown', 'videa', 'asianplay', 'swiftload', 'udrop', 'vidtube',  'bigwarp', 'bgwp', 'wecima', 'asianload', 'savefiles', 'streamhls', 'vidbasic', 'streamup', 'strmup', 'vimeos', 'bigshare', 'streamix', 'stmix', 'vidara', 'vidsonic']:
@@ -1233,23 +1233,53 @@ def dialogo_busquedas_por_fallo_web(item):
         busqueda = 'la serie [COLOR gold]%s[/COLOR]' % item.contentSerieName
 
     if item.sin_enlaces:
-        if dialog_yesno('Sin Enlaces en el canal [COLOR yellow][B]' + item.channel.capitalize() + '[/B][/COLOR]', 
-                        '¿ Buscar [B]%s[/B] en [COLOR pink][B]el resto de los canales[/B][/COLOR] ?' % busqueda):
+        buscar_solo = False
 
-            infolabels = {'tmdb_id': item.infoLabels['tmdb_id']} if item.infoLabels['tmdb_id'] else {}
-            item_search = Item(channel='search', action='search', from_channel=item.channel, infoLabels=infolabels)
+        if item.extra == 'documentaries':
+            if dialog_yesno('Sin Enlaces en el canal [COLOR yellow][B]' + item.channel.capitalize() + '[/B][/COLOR]', 
+                            '¿ Buscar [B]%s[/B][COLOR pink][B] Solo en los Canales de[/B][/COLOR] [COLOR cyan][B]Documentales[/B][/COLOR] ?' % busqueda):
+
+                buscar_solo = True
+
+                infolabels = {'tmdb_id': item.infoLabels['tmdb_id']} if item.infoLabels['tmdb_id'] else {}
+                item_search = Item(channel='search', action='search', search_special = item.extra, from_channel=item.channel, infoLabels=infolabels)
+
+        elif item.extra == 'dorama':
+            if dialog_yesno('Sin Enlaces en el canal [COLOR yellow][B]' + item.channel.capitalize() + '[/B][/COLOR]', 
+                            '¿ Buscar [B]%s[/B][COLOR pink][B] Solo en los Canales de[/B][/COLOR] [COLOR firebrick][B]Doramas[/B][/COLOR] ?' % busqueda):
+
+                buscar_solo = True
+
+                infolabels = {'tmdb_id': item.infoLabels['tmdb_id']} if item.infoLabels['tmdb_id'] else {}
+                item_search = Item(channel='search', action='search', search_special = item.extra, from_channel=item.channel, infoLabels=infolabels)
+
+        elif item.extra == 'anime':
+            if dialog_yesno('Sin Enlaces en el canal [COLOR yellow][B]' + item.channel.capitalize() + '[/B][/COLOR]', 
+                            '¿ Buscar [B]%s[/B][COLOR pink][B] Solo en los Canales de[/B][/COLOR] [COLOR springgreen][B]Animes[/B][/COLOR] ?' % busqueda):
+
+                buscar_solo = True
+
+                infolabels = {'tmdb_id': item.infoLabels['tmdb_id']} if item.infoLabels['tmdb_id'] else {}
+                item_search = Item(channel='search', action='search', search_special = item.extra, from_channel=item.channel, infoLabels=infolabels)
+
+        if not buscar_solo:
+            if dialog_yesno('Sin Enlaces en el canal [COLOR yellow][B]' + item.channel.capitalize() + '[/B][/COLOR]', 
+                            '¿ Buscar [B]%s[/B] en [COLOR pink][B]el Resto de los Canales[/B][/COLOR] ?' % busqueda):
+
+                infolabels = {'tmdb_id': item.infoLabels['tmdb_id']} if item.infoLabels['tmdb_id'] else {}
+                item_search = Item(channel='search', action='search', from_channel=item.channel, infoLabels=infolabels)
 
     else:
         if dialog_yesno('Error en el canal [COLOR yellow][B]' + item.channel.capitalize() + '[/B][/COLOR]', 
                         'El enlace ó la Web de la que depende parece no estar disponible.',
-                        '¿ Buscar [B]%s[/B] en [COLOR pink][B]Otros canales[/B][/COLOR] ?' % busqueda):
+                        '¿ Buscar [B]%s[/B] en [COLOR pink][B]Otros Canales[/B][/COLOR] ?' % busqueda):
 
             infolabels = {'tmdb_id': item.infoLabels['tmdb_id']} if item.infoLabels['tmdb_id'] else {}
             item_search = Item(channel='search', action='search', from_channel=item.channel, infoLabels=infolabels)
         else:
             if dialog_yesno('Error en el canal [COLOR yellow][B]' + item.channel.capitalize() + '[/B][/COLOR]', 
                             'Si la Web funciona, quizás ha cambiado el enlace.',
-                            '¿ Volver a buscar [B]%s[/B] en el [COLOR cyan][B]Mismo canal[/B][/COLOR] ?' % busqueda):
+                            '¿ Volver a buscar [B]%s[/B] en el [COLOR cyan][B]Mismo Canal[/B][/COLOR] ?' % busqueda):
 
                 item_search = Item(channel=item.channel, action='search')
 

@@ -1773,7 +1773,7 @@ def show_infos_buscar(item):
 
     itemlist.append(item.clone( action='show_help_bucle', title = ' - Las Búsquedas hacen [COLOR yellow][B]Bucle [COLOR goldenrod](piden de nuevo el texto a buscar)[/COLOR][/B]', thumbnail=config.get_thumb('news') ))
 
-    itemlist.append(item.clone( channel='search', action='show_help', title = ' - [COLOR green][B]Información[/B][/COLOR] sobre Búsquedas', thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( action='show_help_search', title = ' - [COLOR green][B]Información[/B][/COLOR] sobre Búsquedas', thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( action='show_help_audios', title= ' - [COLOR green][B]Información[/B][/COLOR] [COLOR cyan][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news') ))
 
@@ -2810,10 +2810,6 @@ def show_help_animeonline(item):
     item.notice = 'animeonline'
     show_help_canales(item)
 
-def show_help_cine24h(item):
-    item.notice = 'cine24h'
-    show_help_canales(item)
-
 def show_help_cinecalidad(item):
     item.notice = 'cinecalidad'
     show_help_canales(item)
@@ -2834,16 +2830,8 @@ def show_help_cuevana3pro(item):
     item.notice = 'cuevana3pro'
     show_help_canales(item)
 
-def show_help_detodo(item):
-    item.notice = 'detodo'
-    show_help_canales(item)
-
 def show_help_doramasyt(item):
     item.notice = 'doramasyt'
-    show_help_canales(item)
-
-def show_help_dpeliculas(item):
-    item.notice = 'dpeliculas'
     show_help_canales(item)
 
 def show_help_entrepeliculasyseries(item):
@@ -3059,12 +3047,6 @@ def show_help_canales(item):
 
         txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
 
-    elif item.notice == 'cine24h':
-        if config.get_setting('channel_cine24h_proxies', default=''):
-	        txt += '[CR][B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
-
-        txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
-
     elif item.notice == 'cinecalidad':
         if config.get_setting('channel_cinecalidad_proxies', default=''):
 	        txt += '[CR][B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
@@ -3096,20 +3078,8 @@ def show_help_canales(item):
         txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
         txt += '[COLOR yellow][B][CR]Además efectuan control de acceso que puede [COLOR indianred]Bloquear[/COLOR] la Web incluso con el uso [COLOR red]Proxies[/COLOR].[/COLOR][/B][CR]'
 
-    elif item.notice == 'detodo':
-        if config.get_setting('channel_detodo_proxies', default=''):
-	        txt += '[CR][B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
-
-        txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
-
     elif item.notice == 'doramasyt':
         if config.get_setting('channel_doramasyt_proxies', default=''):
-	        txt += '[CR][B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
-
-        txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
-
-    elif item.notice == 'dpeliculas':
-        if config.get_setting('channel_dpeliculas_proxies', default=''):
 	        txt += '[CR][B][COLOR cyan]Actualmente Tiene[/COLOR] [COLOR red]Proxies Configurados[/COLOR][/B][CR]'
 
         txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
@@ -3262,22 +3232,6 @@ def show_help_canales(item):
         txt += '[COLOR violet][B]  Openproxy,  Github[/B][/COLOR] Proveedores Lista Vias Alternativas'
 
     platformtools.dialog_textviewer('Información canal ' + item.notice.capitalize(), txt)
-
-
-def show_help_tiodonghua_patreon(item):
-    logger.info()
-
-    txt = '[CR]Si el Canal [COLOR plum][B] NO Obtiene Resultados[/B][/COLOR]:[CR]'
-
-    txt += '[COLOR darkcyan][B]Aviso del Web Master de este canal [/COLOR][COLOR cyan] (a partir del 28/8/2025)[/COLOR][COLOR darkcyan]:[/B][/COLOR][CR]'
-
-    txt += '  [COLOR gold][B]Lastimosamente desde esa Fecha la Comunidad Cierra sus puertas.[/B][/COLOR][CR]'
-
-    txt += '  y Todo el [COLOR goldenrod][B]NUEVO[/B][/COLOR] contenido solo estará disponible para los [COLOR yellow][B]Usuarios Nivel Patreon ó más.[/B][/COLOR][CR]'
-
-    txt += '  [COLOR yellowgreen][B]Todo el contenido anterior a esa fecha seguirá disponible para todos.[/B][/COLOR]'
-
-    platformtools.dialog_textviewer('Información contenido TioDonghua', txt)
 
 
 def show_help_audios(item):
@@ -6607,7 +6561,7 @@ def show_help_parameters_search(item):
     if config.get_setting('mnu_documentales', default=True): presentar = True
 
     if presentar:
-        txt += '[CR][COLOR darkcyan][B]    DocumentaryHeaven,  TopDocumentaryFilms,  YouTubeDocs[/B][/COLOR]'
+        txt += '[CR][COLOR darkcyan][B]    DocumentaryHeaven,  YouTubeDocs[/B][/COLOR]'
 
     presentar = False
     if config.get_setting('mnu_series', default=True): presentar = True

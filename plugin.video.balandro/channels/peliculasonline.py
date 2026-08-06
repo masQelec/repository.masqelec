@@ -298,6 +298,11 @@ def findvideos(item):
         elif '=SUB' in url: lang = 'Vose'
         else: lang = '?'
 
+        if lang == '?':
+            if '(Castellano)' in data: lang = 'Esp'
+            elif '(Latino)' in data: lang = 'Lat'
+            elif '(Substitulado)' in data: lang = 'Vose'
+
         if '/ul.' in url: continue
         elif '/1fichier.' in url: continue
         elif '/rapidgator' in url: continue
@@ -309,8 +314,11 @@ def findvideos(item):
         elif '/powvideo.' in url: continue
 
         elif '/viewsb.' in url: continue
-        elif '/www.fembed.' in url: continue
+
+        elif '.fembed.' in url: continue
         elif '/fembed.' in url: continue
+
+        elif '/feurl.' in url: continue
 
         if '/player.cuevana.ac/' in url:
             url = url.replace('/player.cuevana.ac/', '/waaw.to/')
@@ -353,8 +361,11 @@ def findvideos(item):
                     elif '/powvideo.' in url: continue
 
                     elif '/viewsb.' in url: continue
-                    elif '/www.fembed.' in url: continue
+
+                    elif '.fembed.' in url: continue
                     elif '/fembed.' in url: continue
+
+                    elif '/feurl.' in url: continue
 
                     if '/player.cuevana.ac/' in url:
                         url = url.replace('/player.cuevana.ac/', '/waaw.to/')
@@ -409,7 +420,8 @@ def findvideos(item):
             elif '/powvideo.' in url: continue
 
             elif '/viewsb.' in url: continue
-            elif '/www.fembed.' in url: continue
+
+            elif '.fembed.' in url: continue
             elif '/fembed.' in url: continue
 
             elif '/feurl.' in url: continue
@@ -425,7 +437,12 @@ def findvideos(item):
             if servidor == 'various': other = servertools.corregir_other(url)
             elif servidor == 'zures': other = servertools.corregir_zures(url)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = '?', other = other ))
+            if '(Castellano)' in data: lang = 'Esp'
+            elif '(Latino)' in data: lang = 'Lat'
+            elif '(Substitulado)' in data: lang = 'Vose'
+            else: lang = '?'
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
 
     # ~ Downloads  No se tratan
 

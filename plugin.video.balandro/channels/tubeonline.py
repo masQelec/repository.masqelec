@@ -230,6 +230,7 @@ def play(item):
         elif '/flashservice.' in url: return itemlist
         elif '/xhamster.' in url: return itemlist
         elif '/www.xvideos.' in url: return itemlist
+        elif '/firestream.' in url: return itemlist
 
         servidor = servertools.get_server_from_url(url)
 

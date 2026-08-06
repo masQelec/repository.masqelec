@@ -23,6 +23,8 @@ if domain:
 
 _player = '.gnulahd.'
 
+perpage = 25
+
 
 def item_configurar_proxies(item):
     color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
@@ -164,15 +166,11 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver/?status=&type=Pelicula', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver/peliculas/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por tema', action = 'temas', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Por estudio', action = 'estudios', search_type = 'movie', text_color='moccasin' ))
-
-    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'movie' ))
 
     return itemlist
 
@@ -185,7 +183,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver/?status=&type=Serie', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver/series/', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -198,7 +196,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color = 'springgreen' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver/?status=&type=Anime', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver/anime/', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -210,9 +208,9 @@ def generos(item):
     data = do_downloadpage(host + 'generos/')
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<span>Generos</span>.*?-->(.*?)</div>')
+    bloque = scrapertools.find_single_match(data, '>Explora por género<(.*?)<h2>Subgéneros y temáticas<')
 
-    matches = re.compile('<a href="(.*?)".*?<span class="gnvp-genre-name">(.*?)</span>', re.DOTALL).findall(bloque)
+    matches = re.compile('<a href="(.*?)".*?<span class="gnrd-gitem-name">(.*?)</span>', re.DOTALL).findall(bloque)
 
     for url, title in matches:
         itemlist.append(item.clone( title=title, url=url, action='list_all', text_color = 'deepskyblue' ))
@@ -224,88 +222,44 @@ def temas(item):
     logger.info()
     itemlist = []
 
-    if item.search_type == 'movie': text_color = 'deepskyblue'
-    else: text_color = 'hotpink'
-
     data = do_downloadpage(host + 'generos/')
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, 'Tematicas</span>(.*?)</label>')
+    bloque = scrapertools.find_single_match(data, '>Subgéneros y temáticas<(.*?)</section>')
 
-    matches = re.compile('<a href="(.*?)".*?<span class="gnvp-sg-name">(.*?)</span>', re.DOTALL).findall(bloque)
+    matches = re.compile('<a href="(.*?)".*?<span class="gnrd-sgrow-name">(.*?)</span>', re.DOTALL).findall(bloque)
 
     for url, title in matches:
-        itemlist.append(item.clone( title=title, url=url, action='list_all', text_color = text_color ))
+        itemlist.append(item.clone( title=title, url=url, action='list_all', text_color = 'deepskyblue' ))
 
     return sorted(itemlist, key=lambda x: x.title)
-
-
-def paises(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(host + 'ver/')
-
-    bloque = scrapertools.find_single_match(data, '> Pais <(.*?)</ul>')
-
-    matches = re.compile('value="(.*?)".*?">(.*?)</label>', re.DOTALL).findall(bloque)
-
-    for value, title in matches:
-        url = host + 'ver/?country[]=' + value
-
-        itemlist.append(item.clone( title=title, url=url, action='list_all', text_color = 'deepskyblue' ))
-
-    return itemlist
-
-
-def estudios(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(host + 'ver/')
-
-    bloque = scrapertools.find_single_match(data, '> Network <(.*?)</ul>')
-
-    matches = re.compile('value="(.*?)".*?">(.*?)</label>', re.DOTALL).findall(bloque)
-
-    for value, title in matches:
-        url = host + 'ver/?studio[]=' + value
-
-        itemlist.append(item.clone( title=title, url=url, action='list_all', text_color = 'deepskyblue' ))
-
-    return itemlist
-
-
-def alfabetico(item):
-    logger.info()
-    itemlist = []
-
-    for letra in '#0ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-        if letra == '#': letter = '.'
-        elif letra == '0': letter = '0-9'
-        else: letter = letra.upper()
-
-        url = host + 'az-lists/?show=' + letter
-
-        itemlist.append(item.clone ( title = letra, url = url, action = 'list_all', text_color = 'deepskyblue' ))
-
-    return itemlist
 
 
 def list_all(item):
     logger.info()
     itemlist = []
 
+    if not item.page: item.page = 0
+
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    patron  = '<article class="bs".*?<a href="(.*?)".*?title="(.*?)".*?<div class="typez(.*?)</div>.*?src="(.*?)".*?</article>'
+    matches = re.compile('<a class="gnrd-card"(.*?)</a>', re.DOTALL).findall(data)
 
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    num_matches = len(matches)
 
-    for url, title, type, thumb in matches:
+    for match in matches[item.page * perpage:]:
+        title = scrapertools.find_single_match(match, 'title="(.*?)"')
+
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
+
+        if not title or not url: continue
+
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
         title = title.replace('&#8217;', "'").replace('&#038;', "&").replace('&#8230;', '').replace('&#8211;', '')
 
-        tipo = 'movie' if '>Pelicula' in type else 'tvshow'
+        tipo = 'tvshow' if '/series/' in item.url or '/anime/' in item.url or item.search_type == 'tvshow' else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'movie':
@@ -322,37 +276,25 @@ def list_all(item):
             itemlist.append(item.clone( action = 'temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo = sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
 
+        if len(itemlist) >= perpage: break
+
     tmdb.set_infoLabels(itemlist)
 
-    if itemlist:
-        if '>Siguiente' in data:
-            if '<div class="hpage">' in data:
-                blk_next = scrapertools.find_single_match(data, '<div class="hpage">(.*?)</div>')
+    buscar_next = True
+    if num_matches > perpage:
+        hasta = (item.page * perpage) + perpage
+        if hasta < num_matches:
+            itemlist.append(item.clone( title='Siguientes ...', url= item.url, page=item.page + 1, action='list_all', text_color='coral' ))
+            buscar_next = False
 
-                if 'Atras<' in blk_next:
-                    next_page = scrapertools.find_single_match(blk_next, 'Atras<.*?href="(.*?)"')
-                else:
-                    next_page = scrapertools.find_single_match(blk_next, 'href="(.*?)"')
+    if buscar_next:
+        if itemlist:
+            if 'aria-label="Paginación">' in data:
+                next_page = scrapertools.find_single_match(data, 'aria-label="Paginación">.*?class="page-numbers current">.*?href="(.*?)"')
 
                 if next_page:
                     if '?page=' in next_page:
-                        next_page = host + 'ver/' + next_page
-
                         itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
-
-            elif '<div class="pagination">' in data:
-                next_page = scrapertools.find_single_match(data, '<div class="pagination">.*?class="page-numbers current">.*?href="(.*?)"')
-
-                if next_page:
-                    if '/page/' in next_page:
-                        itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
-
-        elif 'class="gnvp-pagination">' in data:
-            next_page = scrapertools.find_single_match(data, 'class="gnvp-pagination">.*?class="page-numbers current">.*?href="(.*?)"')
-
-            if next_page:
-                if '?page=' in next_page:
-                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -361,12 +303,34 @@ def temporadas(item):
     logger.info()
     itemlist = []
 
-    platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]sin Temporadas[/COLOR]')
+    seasons = []
 
-    item.page = 0
-    item.contentType = 'season'
-    item.contentSeason = 0
-    itemlist = episodios(item)
+    data = do_downloadpage(item.url)
+
+    temporadas = re.compile('data-s="(.*?)"', re.DOTALL).findall(data)
+
+    for tempo in temporadas:
+        tempo = tempo.strip()
+
+        title = 'Temporada ' + tempo
+
+        if len(temporadas) == 1:
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
+
+        if tempo in seasons: continue
+
+        seasons.append(tempo)
+
+        itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
+
+    tmdb.set_infoLabels(itemlist)
 
     return itemlist
 
@@ -381,7 +345,7 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = re.compile('<li data-index=".*?<a href="(.*?)".*?<div class="epl-num">(.*?)</div>.*?<div class="epl-title">(.*?)</div>', re.DOTALL).findall(data)
+    matches = re.compile('<a class="gnrd-epc".*?href="(.*?)".*?data-s="(.*?)".*?data-e="(.*?)".*?<span class="gnrd-epc-title">(.*?)</span>', re.DOTALL).findall(data)
 
     num_matches = len(matches)
 
@@ -430,21 +394,19 @@ def episodios(item):
                     item.perpage = sum_parts
                 else: item.perpage = 50
 
-    for url, temp_epis, title in matches:
-        temp = scrapertools.find_single_match(temp_epis, "(.*?)x")
-        if not temp: temp = 1
-
-        epis = scrapertools.find_single_match(temp_epis, "x(.*?)$")
+    for url, temp, epis, title in matches:
+        if not temp == str(item.contentSeason): continue
+        
         if not epis: epis = 1
 
-        titulo = str(temp) + 'x' + str(epis) + ' ' + title.replace(temp_epis, '').strip()
+        titulo = str(temp) + 'x' + str(epis) + ' ' + title
 
         titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
         titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
         titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
-                                    contentType = 'episode', contentSeason=temp, contentEpisodeNumber=epis ))
+                                    contentType = 'episode', contentSeason=item.contentSeason, contentEpisodeNumber=epis ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -839,24 +801,6 @@ def play(item):
         itemlist.append(item.clone(server = servidor, url = url))
 
     return itemlist
-
-
-def _news(item):
-    logger.info()
-
-    item.url = host + 'ver/?status=&type=Pelicula&order=latest'
-    item.search_type = 'movie'
-
-    return list_all(item)
-
-
-def _lasts(item):
-    logger.info()
-
-    item.url = host + '/ver/?status=&type=Serie&order=latest'
-    item.search_type = 'tvshow'
-
-    return list_all(item)
 
 
 def search(item, texto):

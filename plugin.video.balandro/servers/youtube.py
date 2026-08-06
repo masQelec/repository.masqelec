@@ -242,33 +242,6 @@ def extract_videos(video_id, ini_page_url):
 
     youtube_page_data = ''
 
-    if ini_page_url.startswith('https://www.youtube.com/watch?v='):
-        ids_ini_page_url = ini_page_url.replace('https://www.youtube.com/watch?v=', '')
-
-        mvideo = re.match(r"^([0-9A-Za-z_-]{11})", ids_ini_page_url)
-
-        if mvideo:
-           idvideo = mvideo.group(1)
-
-           new_page_url = 'https://inv.perditum.com/api/v1/videos/%s' % idvideo
-
-           hdata = httptools.downloadpage(new_page_url).data
-
-           if hdata:
-               if 'try again later' in hdata:
-                   if config.get_setting('servers_time', default=True):
-                       platformtools.dialog_notification('Cargando [COLOR cyan][B]YouTube[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
-
-                       time.sleep(int(espera))
-
-                   hdata = httptools.downloadpage(new_page_url).data
-
-               hvideo = scrapertools.find_single_match(hdata, '"formatStreams":.*?"url":"(.*?)"')
-
-               if hvideo:
-                   video_urls.append(['mp4', hvideo])
-                   return video_urls
-
     # ~ Acceso Obligatorio aunque NO sea válido para que ResolveUrl se salte "Sign in to confirm you’re not a bot"
     url =  web_yt + '/get_video_info?c=TVHTML5&cver=7.20201028&html5=1&video_id=%s&eurl=https://youtube.googleapis.com/v/%s&ssl_stream=1' % (video_id, video_id)
 

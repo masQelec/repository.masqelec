@@ -220,14 +220,33 @@ def findvideos(item):
             i += 1
             other = str(i)
 
-        servidor = servertools.get_server_from_url(url)
-
         if not 'http' in url: url = 'https:' + url
+
+        servidor = servertools.get_server_from_url(url)
 
         url = url.replace('/www.youtube-nocookie.com/', '/www.youtube.com/')
 
         if servidor and servidor != 'directo':
             itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url, language = 'Esp', other = other ))
+
+    if not itemlist:
+        matches = scrapertools.find_multiple_matches(data, '<strong>Watch:</strong>(.*?)</p>')
+
+        for url in matches:
+            ses += 1
+
+            url = url.strip()
+
+            if not 'http' in url: url = 'https:' + url
+
+            if not '.youtube.' in url: continue
+ 
+            other = ''
+            if num_matches > 1:
+                i += 1
+                other = str(i)
+
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server='youtube', url=url, language = 'Esp', other = other ))
 
     if not itemlist:
         if not ses == 0:

@@ -214,10 +214,10 @@ def list_all(item):
         if '/release/' in item.url: year = scrapertools.find_single_match(item.url, "/release/(.*?)/")
 
         langs = []
-        if 'espana.png' in match.lower(): langs.append('Esp')
-        if 'mexico.png' in match.lower(): langs.append('Lat')
-        if 'ingles.png' in match.lower(): langs.append('Vose')
-        if 'japon.png' in match.lower(): langs.append('Jap')
+        if 'castellano.png' in match.lower(): langs.append('Esp')
+        if 'latino.png' in match.lower(): langs.append('Lat')
+        if 'ingles2.webp' in match.lower(): langs.append('Vose')
+        if 'japones.webp' in match.lower(): langs.append('Jap')
 
         title = title.replace('&#038;', '&')
 

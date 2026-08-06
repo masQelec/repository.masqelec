@@ -5,7 +5,7 @@
 
   "active": true,
 
-  "searchable": false,
+  "searchable": true,
   "search_types": ["documentary"],
 
   "categories": ["documentary"],

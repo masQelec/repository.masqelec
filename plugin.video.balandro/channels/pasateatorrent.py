@@ -334,6 +334,7 @@ def episodios(item):
 
         if url.startswith("/"): url = host[:-1] + url
 
+        if not url: continue
         if (str(season) + 'x' + str(episode)) in tab_episodes: continue
 
         tab_episodes.append(str(season) + 'x' + str(episode))
@@ -359,7 +360,7 @@ def findvideos(item):
 
     lang = 'Esp'
 
-    if '/download_tt.php?'in item.url:
+    if '/download_tt.php?' in item.url or item.url.endswith('.torrent'):
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = item.url, server = 'torrent', language = lang, other = 'D' ))
         return itemlist
 

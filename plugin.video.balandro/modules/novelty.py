@@ -445,8 +445,10 @@ def mainlist(item):
             if not 'tvshow' in ch['categories']: continue
 
             if item.extra == 'animes':
-                if ch['id'] == 'animeclub': pass
+                if ch['id'] == 'animeav1': pass
+                elif ch['id'] == 'animeclub': pass
                 elif ch['id'] == 'animeflv': pass
+                elif ch['id'] == 'animeflvone': pass
                 elif ch['id'] == 'animejara': pass
                 elif ch['id'] == 'animejl': pass
                 elif ch['id'] == 'animeonline': pass
@@ -461,15 +463,16 @@ def mainlist(item):
                 elif ch['id'] == 'mundodonghua': pass
                 elif ch['id'] == 'mundodonghuaxyz': pass
                 elif ch['id'] == 'tioanime': pass
-                elif ch['id'] == 'tiodonghua': pass
                 elif ch['id'] == 'veranime': pass
                 elif ch['id'] == 'villaanimex': pass
 
                 else: continue
 
             elif item.extra == 'new_animes':
-                if ch['id'] == 'animeclub': pass
+                if ch['id'] == 'animeav1': pass
+                elif ch['id'] == 'animeclub': pass
                 elif ch['id'] == 'animeflv': pass
+                elif ch['id'] == 'animeflvone': pass
                 elif ch['id'] == 'animejara': pass
                 elif ch['id'] == 'animeyt': pass
                 elif ch['id'] == 'estrenosanime': pass

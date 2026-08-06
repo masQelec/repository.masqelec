@@ -3,7 +3,7 @@
   "name": "Zures",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Allviid,  Amdahost,  Asianload,  Asianplay,  Bigshare,  Bigwarp,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohd,  Oneupload,  Pandafiles,  Rovideo,  Savefiles,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamix, Streamoupload,  Streamup,  SwiftLoad,  Turbovid,  Tusfiles,  Udrop,  Updown,  Uploadbaz,  Uploadflix,  Uploadhub,  Uploady,  Upvid,  Veev,  Veoh,  Vidara,  Vidbasic,  Vidbob,  Videa,  Vidlook,  Vidmx,  Vidnest, Vido,  Vidpro,  Vidsonic,  Vidstore,  Vidtube,  Vimeos,  Vipss,  Vkprime,  Wecima,  Worlduploads,  Ztreamhub)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Allviid,  Amdahost,  Asianload,  Asianplay,  Bigshare,  Bigwarp,  BowFile,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohd,  Oneupload,  Pandafiles,  Rovideo,  Savefiles,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamix, Streamoupload,  Streamup,  SwiftLoad,  Turbovid,  Tusfiles,  Udrop,  Updown,  Uploadbaz,  Uploadflix,  Uploadhub,  Uploady,  Upvid,  Veev,  Veoh,  Vidara,  Vidbasic,  Vidbob,  Videa,  Vidlook,  Vidmx,  Vidnest, Vido,  Vidpro,  Vidsonic,  Vidstore,  Vidtube,  Vimeos,  Vipss,  Vkprime,  Wecima,  Worlduploads,  Ztreamhub)",
 
   "find_videos": {
     "ignore_urls": [],
@@ -325,8 +325,16 @@
         "url": "https:/vidara.to/v/\\1"
       },
       {
+        "pattern": "https://vidaraa.cc/(?:e/|v/)([0-9a-zA-Z]+)",
+        "url": "https:/vidara.to/v/\\1"
+      },
+      {
         "pattern": "https://vidsonic.net/(?:d/|e/)([0-9a-zA-Z]+)",
         "url": "https://vidsonic.net/e/\\1"
+      },
+      {
+        "pattern": "https://bowfile.com/(?:video/|embed/)([0-9a-zA-Z]+)",
+        "url": "https://bowfile.com/video/\\1"
       }
     ]
   }

@@ -12,8 +12,7 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    # ~ reCaptcha
-    # ~ itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'documentary', text_color='cyan' ))
+    itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'documentary', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'all'))
 
@@ -106,7 +105,7 @@ def findvideos(item):
 def search(item, texto):
     logger.info()
     try:
-        item.url = host + 'search/?results=' + texto.replace(" ", "+")
+        item.url = host + 'search/?s=' + texto.replace(" ", "+")
         return list_all(item)
     except:
         import sys

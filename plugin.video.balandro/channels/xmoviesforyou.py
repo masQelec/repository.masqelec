@@ -49,6 +49,104 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'most-viewed'))
 
+    itemlist.append(item.clone( title = 'Por estudio', action = 'estudios', url = host + 'studios?page=1' ))
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + 'categories/' ))
+    itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars', url = host + 'pornstars?page=1' ))
+
+    return itemlist
+
+
+def estudios(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+
+    bloque = scrapertools.find_single_match(data, '>All Studios<(.*?)</main>')
+
+    matches = re.compile('<a(.*?)</a>', re.DOTALL).findall(bloque)
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
+
+        title = scrapertools.find_single_match(match, '<h3.*?">(.*?)</h3>')
+
+        if not url or not title: continue
+
+        url = host[:-1] + url
+
+        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color='orange' ))
+
+    if itemlist:
+        bloque = scrapertools.find_single_match(data, '<div class="flex justify-center mt-12 gap-2">(.*?)</main>')
+
+        next_page = scrapertools.find_single_match(bloque, '<a href="(.*?)"')
+
+        if next_page:
+            next_page = host[:-1] + next_page
+
+            itemlist.append(item.clone (action='estudios', title='Siguientes ...', url=next_page, text_color = 'coral') )
+
+    return itemlist
+
+
+def categorias(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+
+    bloque = scrapertools.find_single_match(data, '>Categories</h1>(.*?)</main>')
+
+    matches = re.compile('<a(.*?)</a>', re.DOTALL).findall(bloque)
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
+
+        title = scrapertools.find_single_match(match, '<h3.*?">(.*?)</h3>')
+
+        if not url or not title: continue
+
+        url = host[:-1] + url
+
+        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'moccasin' ))
+
+    return sorted(itemlist, key=lambda x: x.title)
+
+
+def pornstars(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+
+    bloque = scrapertools.find_single_match(data, '>All Pornstars<(.*?)</main>')
+
+    matches = re.compile('<a(.*?)</a>', re.DOTALL).findall(bloque)
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
+
+        title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+
+        if not url or not title: continue
+
+        thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
+
+        url = host[:-1] + url
+
+        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='orange' ))
+
+    if itemlist:
+        bloque = scrapertools.find_single_match(data, '<div class="flex justify-center mt-12 gap-2">(.*?)</main>')
+
+        next_page = scrapertools.find_single_match(bloque, '<a href="(.*?)"')
+
+        if next_page:
+            next_page = host[:-1] + next_page
+
+            itemlist.append(item.clone (action='pornstars', title='Siguientes ...', url=next_page, text_color = 'coral') )
+
     return itemlist
 
 
@@ -86,7 +184,6 @@ def list_all(item):
         if next_page:
             next_page = host[:-1] + next_page
 
-            #if '/page/' in next_page:
             itemlist.append(item.clone (action='list_all', title='Siguientes ...', url=next_page, text_color = 'coral') )
 
     return itemlist

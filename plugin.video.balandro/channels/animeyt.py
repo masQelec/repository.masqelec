@@ -7,12 +7,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://wwv.animeytx.net/'
+host = 'https://animeyt.cc/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://animeyt.moe/', 'https://animeenlatino.moe/', 'https://aniyt.net/',
-             'https://wvw.aniyt.net/', 'https://animeytx.com/', 'https://animeytx.net/']
+             'https://wvw.aniyt.net/', 'https://animeytx.com/', 'https://animeytx.net/',
+             'https://wwv.animeytx.net/']
 
 
 domain = config.get_setting('dominio', 'animeyt', default='')
@@ -28,6 +29,11 @@ def do_downloadpage(url, post=None, headers=None):
         url = url.replace(ant, host)
 
     data = httptools.downloadpage(url, post=post).data
+
+    if '<title>Just a moment...</title>' in data:
+        if not '/?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
 
     return data
 

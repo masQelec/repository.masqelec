@@ -160,6 +160,10 @@ def list_all(item):
 
         title = title.replace('Ver Anime', '').replace('Online Gratis', '').strip()
 
+        if not title:
+            match = match.replace('""', '"').strip()
+            title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+
         title = title.replace('&quot;', '').replace('&amp;', '').replace('&#039;', "'")
 
         title = title.replace('Japonés', '[COLOR yellowgreen]Japonés[/COLOR]')
@@ -461,7 +465,7 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    lng = 'Vo'
+    lng = 'Vose'
 
     if 'castellano' in item.url: lng = 'Esp'
     elif 'latino' in item.url: lng = 'Lat'

@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://tiodonghua.com/'
+host = 'https://tiodonghua.lat/'
 
 
 def item_configurar_proxies(item):
@@ -43,6 +43,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://tiodonghua.com/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if not headers: headers = {'Referer': host}
 
     hay_proxies = False
@@ -90,8 +96,6 @@ def acciones(item):
 
     itemlist.append(Item( channel='helper', action='show_help_tiodonghua', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('tiodonghua') ))
 
-    itemlist.append(item.clone(channel='helper', action = 'show_help_tiodonghua_patreon', title = '[COLOR aquamarine][B]Aviso[/COLOR] [COLOR violet][B]Contenido[/B][/COLOR] canal',  thumbnail=config.get_thumb('tiodonghua') ))
-
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -120,9 +124,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'donghua/', group = 'donghua', search_type = 'tvshow' )) 
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host, group = 'free', search_type = 'tvshow', text_color = 'cyan' ))
-
-    itemlist.append(item.clone( title = 'Últimos animes', action = 'list_last', url = host + 'genero/mundo-donghua/', search_type = 'tvshow', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Últimos donghuas', action = 'list_last', url = host + 'genero/mundo-donghua/', search_type = 'tvshow', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'Episodios', action = 'list_all', url = host + 'episodios/', group = 'last', search_type = 'tvshow' ))
 
@@ -171,13 +173,12 @@ def list_all(item):
     logger.info()
     itemlist = []
 
+    if not item.page: item.page = 0
+
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    if item.group == 'free':
-        bloque = scrapertools.find_single_match(data, 'Episodios Gratis<(.*?)>Top del Mes')
-    else:
-        bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>Top Series')
+    bloque = scrapertools.find_single_match(data, '>Recently added<(.*?)Top Cultivadores<')
 
     if not bloque: bloque = data
 
@@ -185,11 +186,15 @@ def list_all(item):
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
-        title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+
+        title = scrapertools.find_single_match(match, '<div class="title".*?">(.*?)<br>')
+
+        if not title:  title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
         if not url or not title: continue
 
         if '>Película<' in match: continue
+
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
         title = title.replace('&#8217;s', "'s").replace('&#8211;', '').replace('&#8217;', '').replace('&#8220;', '').replace('&#8221;', '').replace('&#038;', '').strip()
@@ -224,13 +229,21 @@ def list_all(item):
         if item.group == 'pelis':
             if not '/peliculas/' in url: continue
 
+            titulo = title
+ 
+            if 'Película Completa' in titulo: titulo = titulo.split("Película Completa")[0]
+            if 'Sub Español' in titulo: titulo = titulo.split("Sub Español")[0]
+            if '- Portada' in titulo: titulo = titulo.split("- Portada")[0]
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
-                                            contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+                                            contentType = 'movie', contentTitle = titulo, infoLabels = {'year': year} ))
 
             continue
 
         elif item.group == 'donghua':
             if not '/donghua/' in url: continue
+
+            if '- Portada Oficial' in title: title = title.split("- Portada Oficial")[0]
 
             title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
 
@@ -239,14 +252,16 @@ def list_all(item):
 
             continue
 
-        elif item.group == 'free' or item.group == 'last' or 'Episodio' in title or 'EPISODIO' in title:
-            epi = scrapertools.find_single_match(match, '>Episodio(.*?)</a>').strip()
+        elif item.group == 'last' or 'Episodio' in title or 'EPISODIO' in title:
+            epi = scrapertools.find_single_match(match, '>Episodio(.*?)</span>').strip()
             if not epi: epi = scrapertools.find_single_match(url, '-episodio-(.*?)-').strip()
 
             if not epi: epi = 1
 
             if epi:
                 SerieName = SerieName.replace(' ' + str(epi), '').strip()
+
+            if '- Portada Oficial' in title: title = title.split("- Portada Oficial")[0]
 
             titulo = '[COLOR goldenrod]Epis. [/COLOR]' + str(epi) + ' ' + title.replace('Episodio ' + str(epi), '') + title.replace('Episodio ', '').strip()
 
@@ -260,6 +275,8 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
+        next_page = ''
+
         if '<div class="pagination">' in data:
             next_page = scrapertools.find_single_match(data,'<div class="pagination">.*?<span class="current">.*?ref="(.*?)"')
 
@@ -277,6 +294,105 @@ def list_all(item):
                 if '/page/' in next_page:
                     itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_all', url = next_page, text_color = 'coral' ))
 
+        if not next_page:
+            item.page = item.page + 1
+
+            post = {'action': 'td_tvshows_loadmore', 'nonce': '422b45ce6e', 'status': 'completed', 'page': item.page, 'per_page': '12'}
+
+            headers = {'Referer': item.url}
+
+            data_more = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers)
+
+            if data_more:
+                if '"success":true' in data_more:
+                    itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_more', url = item.url, page = item.page,
+                                                data_more = data_more, text_color = 'coral' ))
+
+    return itemlist
+
+
+def list_more(item):
+    logger.info()
+    itemlist = []
+
+    if not item.page: item.page = 0
+
+    bloque = item.data_more
+
+    bloque = bloque.replace('\\/', '/')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
+
+    for match in matches:
+        match = match.replace('=\\', '=').replace('\\"', '/"')
+
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+
+        title = scrapertools.find_single_match(match, '<div class="title".*?">(.*?)<br>')
+
+        if not title:  title = scrapertools.find_single_match(match, 'alt="(.*?)"')
+
+        if not url or not title: continue
+
+        if '>Película<' in match: continue
+
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
+        title = title.replace('&#8217;s', "'s").replace('&#8211;', '').replace('&#8217;', '').replace('&#8220;', '').replace('&#8221;', '').replace('&#038;', '').strip()
+
+        year = scrapertools.find_single_match(match, '</h3>.*?<span>.*?,(.*?)</span>')
+        if ',' in year: year = year.split(",")[1].strip()
+
+        if not year: year = '-'
+
+        SerieName = corregir_SerieName(title)
+
+        season = 1
+
+        if '>T2' in match: season = 2
+        elif '>T3' in match: season = 3
+        elif '>T4' in match: season = 4
+        elif '>T5' in match: season = 5
+        elif '>T6' in match: season = 6
+        elif '>T7' in match: season = 7
+        elif '>T8' in match: season = 8
+        elif '>T9' in match: season = 9
+
+        elif 'Temporada 2' in match: season = 2
+        elif 'Temporada 3' in match: season = 3
+        elif 'Temporada 4' in match: season = 4
+        elif 'Temporada 5' in match: season = 5
+        elif 'Temporada 6' in match: season = 6
+        elif 'Temporada 7' in match: season = 7
+        elif 'Temporada 8' in match: season = 8
+        elif 'Temporada 9' in match: season = 9
+
+        if 'Sub Espa' in title: title = title.split("Sub Espa")[0]
+        if 'Donghua Sub' in title: title = title.split("Donghua Sub")[0]
+
+        title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
+
+        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, infoLabels={'year': year},
+                                        contentSerieName = SerieName, contentType = 'tvshow', contentSeason = season  ))
+
+        continue
+
+    tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        item.page = item.page + 1
+
+        post = {'action': 'td_tvshows_loadmore', 'nonce': '422b45ce6e', 'status': 'completed', 'page': item.page, 'per_page': '12'}
+
+        headers = {'Referer': item.url}
+
+        data_more = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers)
+
+        if data_more:
+            if '"success":true' in data_more:
+                itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_more', url = item.url, page = item.page,
+                                            data_more = data_more, text_color = 'coral' ))
+
     return itemlist
 
 
@@ -287,7 +403,7 @@ def list_last(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>Top Episodios Semanal<')
+    bloque = scrapertools.find_single_match(data, '>Recently added<(.*?)Top Cultivadores<')
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
@@ -355,6 +471,8 @@ def temporadas(item):
     data = do_downloadpage(item.url)
 
     temporadas = re.compile("<span class='title'>Temporada(.*?)<", re.DOTALL).findall(data)
+
+    if not temporadas: temporadas = re.compile("<span class='title'>Season(.*?)<", re.DOTALL).findall(data)
 
     for tempo in temporadas:
         tempo = tempo.strip()
@@ -462,7 +580,7 @@ def episodios(item):
         try:
            temp = int(temp)
         except:
-           temp = ''
+           pass
 
         if temp:
             if not str(temp) == str(item.contentSeason): continue
@@ -556,7 +674,9 @@ def findvideos(item):
                 ses += 1
 
                 if 'tioplayer.' in url: continue
-                elif 'tiodonghua.' in url: continue
+
+                elif 'tiodonghua.' in url:
+                   if not '.p2pstream.' in url: continue 
 
                 if location:
                     new_url = ''
@@ -576,7 +696,9 @@ def findvideos(item):
                     url = new_url
 
                     if 'tioplayer.' in url: continue
-                    elif 'tiodonghua.' in url: continue
+
+                    elif 'tiodonghua.' in url:
+                       if not '.p2pstream.' in url: continue 
 
                 if 'http:' in url: url = url.replace('http:', 'https:')
 
@@ -612,7 +734,9 @@ def findvideos(item):
 
                 if servidor == 'directo':
                     if 'tioplayer.' in url: continue
-                    elif 'tiodonghua.' in url: continue
+
+                    elif 'tiodonghua.' in url:
+                       if not '.p2pstream.' in url: continue 
 
                     elif '/csst.online' in url: continue
 
@@ -625,7 +749,6 @@ def findvideos(item):
                     elif config.get_setting('developer_mode', default=False):
                         other = url.split("/")[2]
                         other = other.replace('https:', '').strip()
-
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vos', other = other ))
 
@@ -642,7 +765,10 @@ def findvideos(item):
         elif 'sharezweb.com' in url: continue
         elif 'videopress.com' in url: continue
         elif 'tioplayer.' in url: continue
-        elif 'tiodonghua.' in url: continue
+
+        elif 'tiodonghua.' in url:
+             if not '.p2pstream.' in url: continue 
+
         elif 'likessb.com' in url: continue
         elif '.animefenix.' in url: continue
         elif '/odysee.' in url: continue
@@ -656,11 +782,15 @@ def findvideos(item):
         if url.startswith("https://sb"): continue
         elif 'fembed' in url or  'streamsb' in url or 'playersb' in url or 'fcom' in url or 'lvturbo' in url: continue
 
-        if 'es.png' in match: lang = 'Esp'
-        elif 'mx.png' in match: lang = 'Lat'
-        elif 'br.png' in match: lang = 'Pt'
-        elif 'en.png' in match: lang = 'Vose'
-        else: lang = '?'
+        if '-sub-espanol' in item.url: lang = 'Vose'
+        else:
+            lang = '?'
+
+            if 'es.png' in match: lang = 'Esp'
+            elif 'mx.png' in match: lang = 'Lat'
+            elif 'br.png' in match: lang = 'Pt'
+            elif 'en.png' in match: lang = 'Vo'
+            elif 'sub.png' in match: lang = 'Vose'
 
         servidor = servertools.get_server_from_url(url)
 
@@ -712,10 +842,6 @@ def findvideos(item):
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
 
-        if '>Te permite ver todo el contenido publicado hasta el 28/08/2025<':
-            platformtools.dialog_ok(config.__addon_name + ' TioDonghua', '[COLOR cyan][B]Los Nuevos contenidos a partir del [COLOR yellow]28/8/2025[/B][/COLOR]', '[COLOR red][B]La Web Obliga a Registrarse.[/B][/COLOR]')
-            return
-
     return itemlist
 
 
@@ -726,7 +852,9 @@ def play(item):
     url_play = item.url
 
     if 'tioplayer.' in url_play: url_play = ''
-    elif 'tiodonghua.' in url_play: url_play = ''
+
+    elif 'tiodonghua.' in url_play:
+       if not '.p2pstream.' in url_play: url_play = ''
 
     elif '/csst.online' in url_play: url_play = ''
 
@@ -756,7 +884,7 @@ def list_search(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '>Resultados encontrados(.*?)<script>')
+    bloque = scrapertools.find_single_match(data, '>Results found(.*?)Top Cultivadores<')
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
@@ -871,16 +999,6 @@ def corregir_SerieName(SerieName):
     SerieName = SerieName.strip()
 
     return SerieName
-
-
-def _epis(item):
-    logger.info()
-
-    item.url = host
-    item.group = 'free'
-    item.search_type = 'tvshow'
-
-    return list_all(item)
 
 
 def _news(item):

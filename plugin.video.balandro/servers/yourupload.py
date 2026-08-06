@@ -28,9 +28,16 @@ def get_video_url(page_url, url_referer=''):
         else:
             url = scrapertools.find_single_match(data, "file:\s*'([^']+)'")
 
-    if url and '/embed/novideo.mp4' not in url:
+    logger.info("check-001-: %s" % url)
+
+    if url == '/embed/novideo.mp4':
+        new_url = 'https://www.yourupload.com' + url
+        url = httptools.downloadpage(new_url, headers=referer, follow_redirects=False, only_headers=True).headers.get("location", "")
+ 
+    if url:
         if "vidcache" not in url:
-            url = "https://www.yourupload.com%s" % url
+            url = 'https://www.yourupload.com' + url
+
             location = httptools.downloadpage(url, headers=referer, follow_redirects=False, only_headers=True)
             media_url = location.headers["location"].replace("?start=0", "")
 

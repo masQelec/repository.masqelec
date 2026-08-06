@@ -139,11 +139,11 @@ def generos(item):
     itemlist = []
 
     data = do_downloadpage(host + 'lista-donghuas')
-    data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '</i> Generos<(.*?)</ul>')
+    bloque = scrapertools.find_single_match(data, '</i> Géneros(.*?)</div>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?"><.*?>(.*?)</span>')
+    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?">(.*?)</a>')
 
     for url, title in matches:
         if not host in url: url = host[:-1] + url
@@ -160,19 +160,26 @@ def list_all(item):
     if not item.page: item.page = 0
 
     data = do_downloadpage(item.url)
-    data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data,'> Lista de(.*?)</center>')
-    if not bloque: bloque = scrapertools.find_single_match(data,'> Resultados de la busqueda(.*?)<center>')
+    bloque = scrapertools.find_single_match(data,'> Lista de(.*?)</section>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<div class="item col-lg-2 col-md-2 col-xs-4">(.*?)</div></div></div>')
-    if not matches:  matches = scrapertools.find_multiple_matches(bloque, '<div class="item col-lg-3 col-md-3 col-xs-4">(.*?)</div></a></div>')
+    if not bloque: bloque = scrapertools.find_single_match(data,'> Género(.*?)</section>')
+
+    if not bloque: bloque = scrapertools.find_single_match(data,'> Resultados(.*?)</section>')
+
+    if not bloque: bloque = scrapertools.find_single_match(data,'> Últimos(.*?)</section>')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<div class="md-card">(.*?)</div></a></div>')
 
     num_matches = len(matches)
 
     for match in matches[item.page * perpage:]:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
-        title = scrapertools.find_single_match(match, '<h5 class="sf fc-dark f-bold fs-14">(.*?)</h5>')
+
+        title = scrapertools.find_single_match(match, '<h3 class="md-card-title">(.*?)</h3>')
+
+        if not title: title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
         if not url or not title: continue
 
@@ -186,11 +193,11 @@ def list_all(item):
 
         if item.group == 'last_epis':
             epis = scrapertools.find_single_match(match,'Episodio (.*?)$').strip()
-            if '</h5>' in epis: epis = scrapertools.find_single_match(epis,'(.*?)</h5>').strip()
+            if '</h3>' in epis: epis = scrapertools.find_single_match(epis,'(.*?)</h3>').strip()
 
             if not epis: epis = 1
 
-            titulo = '[COLOR goldenrod]Epis. [/COLOR]' + str(epis) + ' ' + title.replace('Episodio', '').strip()
+            titulo = '[COLOR goldenrod]Epis. [/COLOR]' + str(epis) + ' ' + title.replace('Episodio', '').replace(' ' + str(epis), '').strip()
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, infoLabels={'year': '-'},
                                         contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber = epis))
@@ -218,7 +225,7 @@ def list_all(item):
                 buscar_next = False
 
         if buscar_next:
-            next_page = scrapertools.find_single_match(data,'<ul class="pagination">.*?<li class="active">.*?<li>.*?<a href="(.*?)"')
+            next_page = scrapertools.find_single_match(data,'<nav class="md-pagination">.*?<span class="active">.*?<a href="(.*?)"')
 
             if next_page:
                 if not host in next_page: next_page = host[:-1] + next_page
@@ -236,13 +243,14 @@ def episodios(item):
     if not item.perpage: item.perpage = 50
 
     data = do_downloadpage(item.url)
-    data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, 'Lista de Episodios<(.*?)</ul></div></div>')
-    if not bloque: bloque = scrapertools.find_single_match(data, 'Listade Episodios<(.*?)</ul></div></div>')
+    bloque = scrapertools.find_single_match(data, 'Lista de Episodios<(.*?)</section>')
+    if not bloque: bloque = scrapertools.find_single_match(data, 'Listade Episodios<(.*?)</section>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?<img src="(.*?)".*?<blockquote class="message sf fc-dark f-bold fs-16">(.*?)</blockquote>')
-    if not matches: matches = scrapertools.find_multiple_matches(bloque, '<ahref="(.*?)".*?<img src="(.*?)".*?<blockquote class="message sf fc-dark f-bold fs-16">(.*?)</blockquote>')
+    matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?<img src="(.*?)".*?<h5>(.*?)</h5>')
+
+    if not matches: matches = scrapertools.find_multiple_matches(bloque, '<ahref="(.*?)".*?<img src="(.*?)".*?<h5>(.*?)</h5>')
 
     if not matches:
         url = scrapertools.find_single_match(bloque, '<a href="(.*?)"')
@@ -349,15 +357,15 @@ def findvideos(item):
 
             unpack = jsunpack.unpack(match)
 
+            unpack = unpack.replace('\\/', '/')
+            unpack = unpack.replace('=\\', '=').replace('\\"', '/"')
+            unpack = unpack.replace('=/', '=').replace('\/"', '"')
 
             url = scrapertools.find_single_match(unpack, 'file(?:"|):"([^"]+)')
 
-            if not url:
-                unpack = unpack.replace('\\/', '/')
-                unpack = unpack.replace('=\\', '=').replace('\\"', '/"')
-                unpack = unpack.replace('=/', '=').replace('\/"', '"')
+            if not url: url = scrapertools.find_single_match(unpack, '<iframe src="(.*=)"')
 
-                url = scrapertools.find_single_match(unpack, '<iframe src="(.*=)"')
+            if not url: url = scrapertools.find_single_match(unpack, "<iframe src='(.*?)'")
 
             if not url:
                 slug = scrapertools.find_single_match(unpack, '"slug":"(.*?)"')

@@ -420,18 +420,20 @@ def findvideos(item):
                     elif 'fembed' in url: continue
                     elif 'fcom' in url: continue
 
-                    lang = '?'
-                    if '#idioma=lat' in url: lang = 'Lat'
-                    elif '#lang=lat' in url: lang = 'Lat'
+                    if not lang:
+                        lang = '?'
 
-                    elif '#idioma=cas' in url: lang = 'Esp'
-                    elif '#lang=cas' in url: lang = 'Esp'
+                        if '#idioma=lat' in url: lang = 'Lat'
+                        elif '#lang=lat' in url: lang = 'Lat'
 
-                    elif '#idioma=vos' in url: lang = 'Vose'
-                    elif '#lang=vos' in url: lang = 'Vose'
+                        elif '#idioma=cas' in url: lang = 'Esp'
+                        elif '#lang=cas' in url: lang = 'Esp'
 
-                    if '#idioma' in url: url = url.split("#idioma")[0]
-                    elif '#lang=' in url: url = url.split("#lang=")[0]
+                        elif '#idioma=vos' in url: lang = 'Vose'
+                        elif '#lang=vos' in url: lang = 'Vose'
+
+                        if '#idioma' in url: url = url.split("#idioma")[0]
+                        elif '#lang=' in url: url = url.split("#lang=")[0]
 
                     if '/player.cuevana.ac/' in url: url = url.replace('/player.cuevana.ac/', '/waaw.to/')
                     elif '/player.cuevana.one/' in url: url = url.replace('/player.cuevana3.one/', '/waaw.to/')
@@ -450,7 +452,7 @@ def findvideos(item):
                     elif servidor == 'zures': other = servertools.corregir_zures(url)
 
                     itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url,
-                                          language = lang, other = other ))
+                                          language=IDIOMAS.get(lang,lang), other=other ))
 
                 continue
 

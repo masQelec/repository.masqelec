@@ -73,9 +73,11 @@ def get_video_url(page_url, url_referer=''):
 
        id_url = scrapertools.find_single_match(page_url, '/#(.*?)$')
 
+       if '|Referer=' in id_url: id_url = id_url.split("|Referer=")[0]
+
        if id_url:
            new_url = page_url.split("/#")[0]
- 
+
            new_url = new_url + '/api/v1/video?id=' + id_url
 
            data = httptools.downloadpage(new_url).data

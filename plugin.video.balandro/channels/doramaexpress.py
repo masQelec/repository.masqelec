@@ -203,7 +203,7 @@ def news_epis(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '>Últimos episodios<(.*?)>Últimos')
+    bloque = scrapertools.find_single_match(data, '>Últimos episodios(.*?)>Últimos')
 
     matches = re.compile('<div class="sideranking-item"(.*?)</div> </div> </div>').findall(bloque)
 
@@ -539,7 +539,8 @@ def findvideos(item):
         else:
             if not config.get_setting('developer_mode', default=False): continue
 
-        lang = '?'
+        if 'Sub Español' in data: lang = 'Vose'
+        else: lang = '?'
 
         other = ''
 
