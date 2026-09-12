@@ -157,16 +157,16 @@ def list_all(item):
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
 
-            if '/series?' in item.url or '/serie/':
-                ref = host + 'serie/' + url + '/'
-
-                url = host + 'wp-json/wpreact/v1/serie/' + url + '/related/'
-            else:
+            if rut_animes in item.url:
                 ref = host + 'anime/' + url + '/'
 
                 url = host + 'wp-json/wpreact/v1/anime/' + url + '/related/'
+            else:
+                ref = host + 'serie/' + url + '/'
 
-            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+                url = host + 'wp-json/wpreact/v1/serie/' + url + '/related/'
+
+            itemlist.append(item.clone( action='temporadas', url=url, ref=ref, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
         if tipo == 'movie':
@@ -206,7 +206,9 @@ def temporadas(item):
 
     seasons = []
 
-    data = do_downloadpage(item.url)
+    headers = {'Referer': item.ref}
+
+    data = do_downloadpage(item.url, headers=headers)
 
     temporadas = re.compile('"season":(.*?),', re.DOTALL).findall(str(data))
 
@@ -430,7 +432,15 @@ def play(item):
 
         elif url_base64.endswith(".torrent"):
            itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
+
     else:
+        if url.startswith(host + 'player.php?t='):
+           data = do_downloadpage(url)
+
+           url = scrapertools.find_single_match(data, 'src="(.*?)"')
+
+           if not url: return itemlist
+
         servidor = servertools.get_server_from_url(url)
 
         url = servertools.normalize_url(servidor, url)

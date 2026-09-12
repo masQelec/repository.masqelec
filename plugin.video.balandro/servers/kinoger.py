@@ -57,7 +57,8 @@ def get_video_url(page_url, url_referer=''):
 
     ini_page_url = page_url
 
-    if url_referer: ini_page_url = url_referer
+    if not '/kory.' in page_url:
+        if url_referer: ini_page_url = url_referer
 
     resp = httptools.downloadpage(page_url)
 
@@ -73,12 +74,20 @@ def get_video_url(page_url, url_referer=''):
 
        id_url = scrapertools.find_single_match(page_url, '/#(.*?)$')
 
+       if not id_url:
+           id_url = scrapertools.find_single_match(page_url, 'id=(.*?)$')
+
        if '|Referer=' in id_url: id_url = id_url.split("|Referer=")[0]
 
        if id_url:
            new_url = page_url.split("/#")[0]
 
-           new_url = new_url + '/api/v1/video?id=' + id_url
+           if not new_url: new_url = page_url.split("id=")[0]
+
+           if not '/api/v1/video?id=' in page_url:
+               new_url = new_url + '/api/v1/video?id=' + id_url
+           else:
+               new_url = page_url
 
            data = httptools.downloadpage(new_url).data
 

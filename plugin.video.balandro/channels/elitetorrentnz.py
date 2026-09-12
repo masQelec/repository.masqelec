@@ -56,8 +56,6 @@ def acciones(item):
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_elitetorrentnz', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
-    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
-
     itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'elitetorrentnz' ))
 
     platformtools.itemlist_refresh()
@@ -89,8 +87,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_all', url = host + 'estrenos/', search_type = 'movie', text_color='cyan' ))
-
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
@@ -108,8 +104,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo episodios', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'estrenos/', search_type = 'tvshow', text_color='cyan' ))
 
     return itemlist
 
@@ -190,6 +184,9 @@ def list_all(item):
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
         title = scrapertools.find_single_match(match, 'title="(.*?)"')
+
+        if title == "Peso de pelicula":
+            title = scrapertools.find_single_match(match, 'title=(.*?)alt=').strip()
 
         if not url or not title: continue
 

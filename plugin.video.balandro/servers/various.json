@@ -777,6 +777,10 @@
         "url": "https://vidspeeds.com/\\1"
       },
       {
+        "pattern": "https://www.vidspeed.org/(?:embed-|)([0-9a-zA-Z]+)",
+        "url": "https://vidspeeds.com/\\1"
+      },
+      {
         "pattern": "https://vidspeeds.com/(?:embed-|)([0-9a-zA-Z]+)",
         "url": "https://vidspeeds.com/\\1"
       },

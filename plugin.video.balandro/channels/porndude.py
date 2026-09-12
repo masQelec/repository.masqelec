@@ -34,7 +34,7 @@ def mainlist_pelis(item):
 
         config.set_setting('ses_pin', True)
 
-    itemlist.append(item.clone( title = '[B]BigWank[/B]', action = 'mainlist_submenu', ch = 'bigwank', host = 'https://www.bigwank.tv/', thumbnail = 'https://i.postimg.cc/N0DNJB4D/bigwank.png', text_color = 'orange' ))
+    itemlist.append(item.clone( title = '[B]BigWank[/B]', action = 'mainlist_submenu', ch = 'bigwank', host = 'https://www.bigwank.com/', thumbnail = 'https://i.postimg.cc/N0DNJB4D/bigwank.png', text_color = 'orange' ))
 
     itemlist.append(item.clone( title = '[B]FapGuru[/B]', action = 'mainlist_submenu', ch = 'fapguru', host = 'https://www.fapguru.com/', thumbnail = 'https://i.postimg.cc/dQgpbQ2t/fapguru.png', text_color = 'orange' ))
 

@@ -552,6 +552,7 @@ def findvideos(item):
         lang = scrapertools.find_single_match(idio_qlty, '(.*?)-').strip()
 
         if 'Latino/Ingles' in lang: lang = 'Lat'
+        elif 'Inglés' in lang: lang = 'Lat'
         elif 'Castellano/Ingles' in lang: lang = 'Esp'
         elif 'Castellano' in lang: lang = 'Esp'
         elif 'Latino' in lang: lang = 'Lat'
@@ -606,6 +607,7 @@ def findvideos(item):
         lang = scrapertools.find_single_match(match, '<!-- <td><span>(.*?)</span>')
 
         if 'Latino/Ingles' in lang: lang = 'Lat'
+        elif 'Inglés' in lang: lang = 'Lat'
         elif 'Castellano/Ingles' in lang: lang = 'Esp'
         elif 'Castellano' in lang: lang = 'Esp'
         elif 'Latino' in lang: lang = 'Lat'
@@ -631,6 +633,11 @@ def findvideos(item):
 
 
 def puntuar_calidad(txt):
+    try:
+        if ' - ' in txt: txt = txt.split(" - ")[1]
+    except:
+        pass
+
     orden = ['CAMRip', 'Dual 720p', '720', 'HD 720p', 'DVDRip', 'WEBRip', 'Full HD', 'HD', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', 'HD', 'WEBRip 1080p', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1

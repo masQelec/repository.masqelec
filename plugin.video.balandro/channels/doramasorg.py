@@ -358,17 +358,26 @@ def findvideos(item):
 
         headers = {'Referer': item.url, 'X-Requested-With': 'XMLHttpRequest', 'Connection': 'keep-alive'}
 
-        datap = do_downloadpage(host + 'ajax/play.php', post = post, headers = headers)
+        if item.contentType == 'movie':
+            datap = do_downloadpage(host + 'ajax/play_peliculas.php', post = post, headers = headers)
+        else:
+            datap = do_downloadpage(host + 'ajax/play.php', post = post, headers = headers)
 
         url = scrapertools.find_single_match(datap, '<iframe.*?src="(.*?)"')
 
         if url:
+            other = ''
+
             servidor = servertools.get_server_from_url(url)
 
             url = servertools.normalize_url(servidor, url)
 
+            if '/abyssplayer.' in url:
+                servidor = 'zures'
+                other = 'Abyss'
+
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vose' ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vose', other=other ))
 
     # ~ 23/12/25  es por las Peliculas
     if not itemlist:
@@ -377,12 +386,18 @@ def findvideos(item):
         if url:
             ses += 1
 
+            other = ''
+
             servidor = servertools.get_server_from_url(url)
 
             url = servertools.normalize_url(servidor, url)
 
+            if '/abyssplayer.' in url:
+                servidor = 'zures'
+                other = 'Abyss'
+
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vose' ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vose', other=other ))
 
     if not itemlist:
         if not ses == 0:

@@ -307,6 +307,54 @@
       {
         "pattern": "https://jessicayeahcatch.com/(?:e/|)([A-z0-9]+)",
         "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://johnbeyondnation.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://jeanprofessorcentral.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://juliewomanwish.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://garylargeavailable.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://jennifereconomicgive.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://pamelachangemission.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://ellenpoliticalfollow.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://caseyimpactstation.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://matthewhotelscience.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://jessicachoosemake.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://stevenfamilyedge.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
+      },
+      {
+        "pattern": "https://tracylocalschool.com/(?:e/|)([A-z0-9]+)",
+        "url": "https://voe.sx/e/\\1"
       }
     ]
   }

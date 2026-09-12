@@ -18,19 +18,18 @@ else:
 
 
 channels_currents = [
-        'animeflv', 'animeonline', 'animeyt',
+        'animeonline', 'animeyt',
         'cinecalidad', 'cinecalidadla', 'cinecalidadlol', 'cuevana2', 'cuevana3pro',
         'divxtotal', 'dontorrents', 'dontorrentsin',
         'elifilms', 'elitetorrent', 'elitetorrentnz', 'ennovelastv', 'entrepeliculasyseries',
-        'gnula', 'grantorrent',
+        'grantorrent',
         'hdfull', 'homecine',
         'mejortorrentapp', 'mitorrent',
         'peliculaspro', 
         'pelisforte', 'pelismart', 'pelispanda', 'pelisplushdlat', 'pelisplushdnz',
         'poseidonhd2',
         'serieskao', 'seriespapayato', 'srnovelas', 'subtorrents',
-        'todotorrents',
-        'veronline'
+        'todotorrents'
         ]
 
 dominioshdfull = [
@@ -84,52 +83,6 @@ color_infor = config.get_setting('notification_infor_color', default='pink')
 color_adver = config.get_setting('notification_adver_color', default='violet')
 color_avis = config.get_setting('notification_avis_color', default='yellow')
 color_exec = config.get_setting('notification_exec_color', default='cyan')
-
-
-def manto_domain_animeflv(item):
-    logger.info()
-
-    channel_json = 'animeflv.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    id = params['id']
-    name = params['name']
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] ' + name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando AnimeFlv[/B][/COLOR]' % color_exec)
-
-    manto_domain_common(item, id, name)
-
-
-def test_domain_animeflv(item):
-    logger.info()
-
-    datos = channeltools.get_channel_parameters('animeflv')
-    if not datos['active']:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
-        return
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('AnimeFlv')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - AnimeFlv', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_animeonline(item):
@@ -221,7 +174,7 @@ def test_domain_animeyt(item):
     try:
         tester.test_channel('AnimeYt')
     except:
-        platformtools.dialog_notification(config.__addon_name + ' - AnimeFlv', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+        platformtools.dialog_notification(config.__addon_name + ' - AnimeYt', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_cinecalidad(item):
@@ -991,52 +944,6 @@ def test_domain_entrepeliculasyseries(item):
         tester.test_channel('EntrePeliculasySeries')
     except:
         platformtools.dialog_notification(config.__addon_name + ' - EntrePeliculasySeries', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
-
-def manto_domain_gnula(item):
-    logger.info()
-
-    channel_json = 'gnula.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    id = params['id']
-    name = params['name']
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] ' + name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando Gnula[/B][/COLOR]' % color_exec)
-
-    manto_domain_common(item, id, name)
-
-
-def test_domain_gnula(item):
-    logger.info()
-
-    datos = channeltools.get_channel_parameters('gnula')
-    if not datos['active']:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
-        return
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('Gnula')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - Gnula', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
 def manto_domain_grantorrent(item):
@@ -2172,51 +2079,6 @@ def test_domain_todotorrents(item):
     except:
         platformtools.dialog_notification(config.__addon_name + ' - TodoTorrents', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
-def manto_domain_veronline(item):
-    logger.info()
-
-    channel_json = 'veronline.json'
-    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
-
-    data = filetools.read(filename_json)
-    params = jsontools.load(data)
-
-    try:
-       data = filetools.read(filename_json)
-       params = jsontools.load(data)
-    except:
-       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
-       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
-       return
-
-    id = params['id']
-    name = params['name']
-
-    if params['active'] == False:
-        el_canal = ('[B][COLOR %s] ' + name) % color_avis
-        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
-        return
-
-    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando VerOnline[/B][/COLOR]' % color_exec)
-
-    manto_domain_common(item, id, name)
-
-
-def test_domain_veronline(item):
-    logger.info()
-
-    datos = channeltools.get_channel_parameters('veronline')
-    if not datos['active']:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
-        return
-
-    config.set_setting('developer_test_channels', '')
-
-    try:
-        tester.test_channel('VerOnline')
-    except:
-        platformtools.dialog_notification(config.__addon_name + ' - VerOnline', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
-
 
 def manto_domain_common(item, id, name):
     logger.info()
@@ -2272,17 +2134,7 @@ def manto_domain_common(item, id, name):
            else:
                platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B]' + name + '[/B][/COLOR]', '[B][COLOR %s]Nuevo Dominio No localizado[/B][/COLOR]' % color_alert)
 
-    if id == 'animeflv':
-        config.set_setting('user_test_channel', '')
-
-        if not domain: domain = 'https://'
-
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio AnimeFlv  -->  [COLOR %s]https://????.animeflv.???/[/COLOR]' % color_avis)
-
-        if new_domain is None: return
-        elif new_domain == 'https://': return
-
-    elif id == 'animeonline':
+    if id == 'animeonline':
         config.set_setting('user_test_channel', '')
 
         if not domain: domain = 'https://'
@@ -2431,16 +2283,6 @@ def manto_domain_common(item, id, name):
 
         if new_domain is None: return
         elif new_domain == 'https://entrepeliculasyseries.': return
-
-    elif id == 'gnula':
-        config.set_setting('user_test_channel', '')
-
-        if not domain: domain = 'https://gnulahd.'
-
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio Gnula  -->  [COLOR %s]https://gnulahd.??/[/COLOR]' % color_avis)
-
-        if new_domain is None: return
-        elif new_domain == 'https://gnulahd.': return
 
     elif id == 'grantorrent':
         config.set_setting('user_test_channel', '')
@@ -2611,16 +2453,6 @@ def manto_domain_common(item, id, name):
 
         if new_domain is None: return
         elif new_domain == 'https://todotorrents.': return
-
-    elif id == 'veronline':
-        config.set_setting('user_test_channel', '')
-
-        if not domain: domain = 'https://www.veronline.'
-
-        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio VerOnline  -->  [COLOR %s]https://www.veronline.???/[/COLOR]' % color_avis)
-
-        if new_domain is None: return
-        elif new_domain == 'https://www.veronline.': return
 
     else:
         return

@@ -354,7 +354,11 @@ def last_epis(item):
 
         titulo = title.replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
-        itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail = thumb, url = url,
+        if 'latino' in title.lower(): lang = 'Lat'
+        elif 'español' in title.lower(): lang = 'Esp'
+        else: lang = 'Vose'
+
+        itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail = thumb, url = url, languages = lang,
                                     contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
     tmdb.set_infoLabels(itemlist)
@@ -390,6 +394,8 @@ def episodios(item):
     data_ajax = scrapertools.find_single_match(data, 'data-ajax="(.*?)"')
     _token = scrapertools.find_single_match(data, '<meta name="csrf-token" content="(.*?)"')
     _url = scrapertools.find_single_match(data, '<div class="d-flex gap-3 mt-3">.*?<a href="(.*?)"')
+
+    if '/genero/' in _url: _url = ''
 
     if not data_ajax or not _token or not _url: return itemlist
 
@@ -547,8 +553,11 @@ def findvideos(item):
         if not srv == 'directo':
             if not srv == 'various': other = ''
 
+        lang = 'Vose'
+        if item.languages: lang = item.languages
+
         itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', d_play = d_play,
-                              language = 'Vose', other = other.capitalize(), force_input = force_input ))
+                              language = lang, other = other.capitalize(), force_input = force_input ))
 
     # download
     bloque = scrapertools.find_single_match(data, '>Descargas<(.*?)</div>')
@@ -604,8 +613,11 @@ def findvideos(item):
 
         if other == 'lulustream': force_input = True
 
+        lang = 'Vose'
+        if item.languages: lang = item.languages
+
         itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', url = url,
-                              language = 'Vose', other = other.capitalize(), force_input = force_input ))
+                              language = lang, other = other.capitalize(), force_input = force_input ))
 
     if not itemlist:
         if not ses == 0:

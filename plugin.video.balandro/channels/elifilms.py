@@ -151,7 +151,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = api + 'listing?page=1&post_type=movies&posts_per_page=25', _next = '&post_type=movies&posts_per_page=25', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = api + 'tops?range=month&limit=25&post_type=movies', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = api + 'tops?range=month&limit=25&post_type=movies', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -169,7 +169,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = api + 'listing?page=1&post_type=tvshows&posts_per_page=25', _next = '&post_type=tvshows&posts_per_page=25', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = api + 'tops?range=month&limit=25&post_type=tvshows', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = api + 'tops?range=month&limit=25&post_type=tvshows', search_type = 'tvshow' ))
 
     if not config.get_setting('descartar_anime', default=False):
         itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', search_type = 'tvshow', text_color = 'springgreen' ))
@@ -190,7 +190,7 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = api + 'listing?page=1&post_type=animes&posts_per_page=25', _next = '&post_type=animes&posts_per_page=25', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = api + 'tops?range=month&limit=25&post_type=animes', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = api + 'tops?range=month&limit=25&post_type=animes', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', group = 'animes', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', group = 'animes', search_type = 'tvshow' ))

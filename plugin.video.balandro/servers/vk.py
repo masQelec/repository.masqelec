@@ -75,20 +75,29 @@ def get_video_url(page_url, url_referer=''):
     if '<p>Por causas ajenas a' in data or '>Por causas ajenas a' in data:
         return 'Servidor Bloqueado por su Operadora'
 
-    url_savevk = 'https://savevk.com/' + page_url.replace('https://vk.com/', '')
+    url_savevk = 'https://savevk.com/' + page_url.replace('https://vk.com/', '').replace('https://vkvideo.ru/', '')
 
     data = httptools.downloadpage(url_savevk).data
 
+    p_id = ''
+    p_server = ''
+    p_token = ''
+
+    p_c_key = ''
+    p_e_key = ''
+
     bloque = scrapertools.find_single_match(data, 'window\.videoParams = \{(.*?)\};')
 
-    p_id = scrapertools.find_single_match(bloque, 'id: "([^"]+)')
-    p_server = scrapertools.find_single_match(bloque, 'server: "([^"]+)')
-    p_token = scrapertools.find_single_match(bloque, 'token: "([^"]+)')
+    if bloque:
+        p_id = scrapertools.find_single_match(bloque, 'id: "([^"]+)')
+        p_server = scrapertools.find_single_match(bloque, 'server: "([^"]+)')
+        p_token = scrapertools.find_single_match(bloque, 'token: "([^"]+)')
 
     p_credentials = scrapertools.find_single_match(bloque, 'credentials: "([^"]+)')
-    p_c_key = scrapertools.find_single_match(bloque, 'c_key: "([^"]+)')
-    p_e_key = scrapertools.find_single_match(bloque, 'e_key: "([^"]+)')
-    p_i_key = scrapertools.find_single_match(bloque, 'i_key: "([^"]+)')
+
+    if bloque:
+        p_c_key = scrapertools.find_single_match(bloque, 'c_key: "([^"]+)')
+        p_e_key = scrapertools.find_single_match(bloque, 'e_key: "([^"]+)')
 
     if not p_id or not p_server or not p_token:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
@@ -154,18 +163,19 @@ def get_video_url(page_url, url_referer=''):
         else:
            return 'Falta ResolveUrl'
 
-    url = 'https://%s/method/video.get?credentials=%s&token=%s&videos=%s&extra_key=%s&ckey=%s' % (base64.b64decode(p_server[::-1]), p_credentials, p_token, p_id, p_e_key, p_c_key)
+    if p_server and p_credentials and p_token and p_id and p_e_key and p_c_key:
+        url = 'https://%s/method/video.get?credentials=%s&token=%s&videos=%s&extra_key=%s&ckey=%s' % (base64.b64decode(p_server[::-1]), p_credentials, p_token,p_id, p_e_key, p_c_key)
 
-    if "/b'" in str(url): url = url.replace("/b'", "/").replace("'/", "/")
+        if "/b'" in str(url): url = url.replace("/b'", "/").replace("'/", "/")
 
-    data = httptools.downloadpage(url, headers={'Referer': url_savevk}).data.replace('\\/', '/')
+        data = httptools.downloadpage(url, headers={'Referer': url_savevk}).data.replace('\\/', '/')
 
-    bloque = scrapertools.find_single_match(data, '"files":\{(.*?)\}')
+        bloque = scrapertools.find_single_match(data, '"files":\{(.*?)\}')
 
-    matches = scrapertools.find_multiple_matches(bloque, '"([^"]+)":"([^"]+)')
+        matches = scrapertools.find_multiple_matches(bloque, '"([^"]+)":"([^"]+)')
 
-    for lbl, url in matches:
-        video_urls.append([lbl, url])
+        for lbl, url in matches:
+           video_urls.append([lbl, url])
 
     if not video_urls:
         data = httptools.downloadpage(page_url).data

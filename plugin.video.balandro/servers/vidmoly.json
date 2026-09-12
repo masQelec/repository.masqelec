@@ -23,6 +23,10 @@
       {
         "pattern": "https://vidmoly.biz/(?:embed-|d/|w/|v/|dl/)([A-z0-9]+)",
         "url": "https://vidmoly.me/embed-\\1.html"
+      },
+      {
+        "pattern": "https://vidmoly.org/(?:embed-|d/|w/|v/|dl/)([A-z0-9]+)",
+        "url": "https://vidmoly.me/embed-\\1.html"
       }
     ]
   }

@@ -3033,6 +3033,14 @@ def resumen_canales(item):
     others = 0
     no_actives = 0
 
+    stars = 0
+    directors = 0
+
+    genres_p = 0
+    genres_s = 0
+
+    grupos = 0
+ 
     temas_adults = 0
 
     filtros = {'active': False}
@@ -3092,7 +3100,28 @@ def resumen_canales(item):
         if 'onlyone' in ch['clusters']: onlyones += 1
         if 'suggested' in ch['clusters']: suggesteds += 1
 
+        if 'por géneros' in ch['notes']: genres_p += 1
+        elif 'por Géneros' in ch['notes']: genres_s += 1
+ 
         if ch['searchable'] == False: nosearchables += 1
+
+        if not 'por géneros' in ch['notes']:
+            if not 'por Géneros' in ch['notes']:
+                if 'news' in ch['clusters']: grupos += 1
+                elif 'lasts' in ch['clusters']: grupos += 1
+                elif 'classic' in ch['clusters']: grupos += 1
+                elif 'rankings' in ch['clusters']: grupos += 1
+                elif 'countries' in ch['clusters']: grupos += 1
+                elif 'qualityes' in ch['clusters']: grupos += 1
+                elif 'producers' in ch['clusters']: grupos += 1
+                elif 'years' in ch['clusters']: grupos += 1
+                elif 'lists' in ch['clusters']: grupos += 1
+                elif 'categories' in ch['clusters']: grupos += 1
+                elif 'docs' in ch['clusters']: grupos += 1
+                elif 'kids' in ch['clusters']: grupos += 1
+                elif 'infantil' in ch['clusters']: grupos += 1
+                elif '3d' in ch['clusters']: grupos += 1
+                elif '4k' in ch['clusters']: grupos += 1
 
         tipos = ch['search_types']
 
@@ -3277,6 +3306,9 @@ def resumen_canales(item):
                         if con_problemas:
                             if ch['name'] in str(con_problemas): bus_animes -= 1
 
+        if 'stars' in ch['clusters']: stars += 1
+        if 'directors' in ch['clusters']: directors += 1
+
         if config.get_setting('mnu_adultos', default=True):
             if '+18' in ch['notes']: adults += 1
 
@@ -3298,51 +3330,65 @@ def resumen_canales(item):
     if not inactives == 0:
         txt += '             ' + str(inactives) + ' [COLOR palevioletred][B]Inactivos[/B][/COLOR][CR]'
 
-        if not cerrados == 0: txt += '                   [COLOR darkred][B]Cerrados[/B][/COLOR] ' + str(cerrados) + '[CR]'
-        if not anulados == 0: txt += '                   [COLOR darkviolet][B]Anulados[/B][/COLOR] ' + str(anulados) + '[CR]'
+        if not cerrados == 0: txt += '                   [COLOR darkred][B]Cerrados[/B][/COLOR] [B]' + str(cerrados) + '[/B][CR]'
+        if not anulados == 0: txt += '                   [COLOR darkviolet][B]Anulados[/B][/COLOR] [B]' + str(anulados) + '[/B][CR]'
 
-        if not others == 0: txt += '                   [COLOR palegoldenrod][B]Otros[/B][/COLOR] ' + str(others) + '[CR]'
-        if not temporarys == 0: txt += '                   [COLOR mediumaquamarine][B]Temporalmente[/B][/COLOR] ' + str(temporarys) + '[CR]'
+        if not others == 0: txt += '                   [COLOR palegoldenrod][B]Otros[/B][/COLOR] [B]' + str(others) + '[/B][CR]'
+        if not temporarys == 0: txt += '                   [COLOR mediumaquamarine][B]Temporalmente[/B][/COLOR] [B]' + str(temporarys) + '[/B][CR]'
 
-        if not privates == 0: txt += '                   [COLOR grey][B]Privados[/B][/COLOR] ' + str(privates) + '[CR]'
+        if not privates == 0: txt += '                   [COLOR grey][B]Privados[/B][/COLOR] [B]' + str(privates) + '[/B][CR]'
 
     txt += '[CR]  ' + str(activos) + ' [COLOR cyan][B]CANALES ACTIVOS DISTRIBUCIÓN:[/B][/COLOR][CR]'
 
     if not PY3:
-        if not mismatcheds == 0: txt +=  '          [COLOR violet][B]Con Posible Incompatibilidad[/B][/COLOR] ' + str(mismatcheds) + '[CR]'
+        if not mismatcheds == 0: txt +=  '          [COLOR violet][B]Con Posible Incompatibilidad[/B][/COLOR] [B]' + str(mismatcheds) + '[/B][CR]'
 
-    if not inestables == 0: txt += '          [COLOR plum][B]Inestables[/B][/COLOR] ' + str(inestables) + '[CR]'
+    if not inestables == 0: txt += '          [COLOR plum][B]Inestables[/B][/COLOR] [B]' + str(inestables) + '[/B][CR]'
 
-    if not problematics == 0: txt += '          [COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR] ' + str(problematics) + '[CR]'
+    if not problematics == 0: txt += '          [COLOR darkgoldenrod][B]Problemáticos[/B][/COLOR] [B]' + str(problematics) + '[/B][CR]'
 
-    if not clons == 0:txt += '          [COLOR aquamarine][B]Principales con Clones[/B][/COLOR] ' + str(clons) + '[CR]' 
+    if not clons == 0: txt += '          [COLOR aquamarine][B]Principales con Clones[/B][/COLOR] [B]' + str(clons) + '[/B][CR]' 
 
-    if not clones == 0: txt += '          [COLOR turquoise][B]Que son Clones de un Canal Principal[/B][/COLOR] ' + str(clones) + '[CR]'
+    if not clones == 0: txt += '          [COLOR turquoise][B]Que son Clones de un Canal Principal[/B][/COLOR] [B]' + str(clones) + '[/B][CR]'
 
-    if not notices == 0: txt += '          [COLOR olivedrab][B]Con Control CloudFlare Protection[/B][/COLOR] ' + str(notices) + '[CR]'
+    if not notices == 0: txt += '          [COLOR olivedrab][B]Con Control CloudFlare Protection[/B][/COLOR] [B]' + str(notices) + '[/B][CR]'
 
-    if not cryptos == 0: txt += '          [COLOR darksalmon][B]Que Requieren Descifrar Enlaces[/B][/COLOR] ' + str(cryptos) + '[CR]' 
+    if not cryptos == 0: txt += '          [COLOR darksalmon][B]Que Requieren Descifrar Enlaces[/B][/COLOR] [B]' + str(cryptos) + '[/B][CR]' 
 
-    if not proxies == 0: txt += '          [COLOR red][B]Que Pueden Usar Proxies[/B][/COLOR] ' + str(proxies) + '[CR]'
+    if not proxies == 0: txt += '          [COLOR red][B]Que Pueden Usar Proxies[/B][/COLOR] [B]' + str(proxies) + '[/B][CR]'
 
-    if not registers == 0: txt += '          [COLOR teal][B]Que Requieren Cuenta[/B][/COLOR] ' + str(registers) + '[CR]'
+    if not registers == 0: txt += '          [COLOR teal][B]Que Requieren Cuenta[/B][/COLOR] [B]' + str(registers) + '[/B][CR]'
 
-    if not dominios == 0: txt += '          [COLOR green][B]Con Varios Dominios[/B][/COLOR] ' + str(dominios) + '[CR]'
+    if not dominios == 0: txt += '          [COLOR green][B]Con Varios Dominios[/B][/COLOR] [B]' + str(dominios) + '[/B][CR]'
 
-    if not currents == 0: txt += '          [COLOR goldenrod][B]Con Gestión Dominio Vigente[/B][/COLOR] ' + str(currents) + '[CR]'
+    if not currents == 0: txt += '          [COLOR goldenrod][B]Con Gestión Dominio Vigente[/B][/COLOR] [B]' + str(currents) + '[/B][CR]'
 
-    if not streaminytorrent == 0: txt += '          [COLOR magenta][B]Con enlaces Streaming y Torrent[/B][/COLOR] ' + str(streaminytorrent) +'[CR]'
+    if not streaminytorrent == 0: txt += '          [COLOR magenta][B]Con enlaces Streaming y Torrent[/B][/COLOR] [B]' + str(streaminytorrent) + '[/B][CR]'
 
-    if not onlyones == 0: txt += '          [COLOR fuchsia][B]Con un Único Servidor[/B][/COLOR] ' + str(onlyones) + '[CR]'
+    if not onlyones == 0: txt += '          [COLOR fuchsia][B]Con un Único Servidor[/B][/COLOR] [B]' + str(onlyones) + '[/B][CR]'
 
-    if not nosearchables == 0: txt += '          [COLOR aquamarine][B]Que No Intervienen en Búsquedas[/B][/COLOR] ' + str(nosearchables) + '[CR]'
+    genres = (genres_p + genres_s)
+
+    if not genres == 0: txt += '          [COLOR thistle][B]Con Géneros[/B][/COLOR] [B]' + str(genres) + '[/B][CR]'
+
+    if not grupos == 0: txt += '          [COLOR paleturquoise][B]Con Grupos/Agrupaciones[/B][/COLOR] [B]' + str(grupos) + '[/B][CR]'
+
+    if config.get_setting('mnu_adultos', default=True):
+        if not adults == 0: txt += '          [COLOR orange][B]Con Vídeos Para Adultos[/B][/COLOR] [B]' + str(adults) + '[/B][CR]'
+
+    if not nosearchables == 0: txt += '          [COLOR aquamarine][B]Que No Intervienen en Búsquedas[/B][/COLOR] [B]' + str(nosearchables) + '[/B][CR]'
 
     con_tipologia = (mismatcheds + inestables + problematics + clons + clones + notices + cryptos + proxies + registers + dominios + currents + streaminytorrent + onlyones + nosearchables)
 
     sin_tipologia = (activos - con_tipologia)
-    sin_tipologia = (sin_tipologia * (- 1))
- 
-    txt += '          [COLOR palegreen][B]Sin Tipología Especial[/B][/COLOR] ' + str(sin_tipologia) + '[CR]'
+
+    if sin_tipologia < 0: sin_tipologia = (sin_tipologia * (- 1))
+
+    sin_tipologia = (sin_tipologia - genres)
+
+    if sin_tipologia < 0: sin_tipologia = (sin_tipologia * (- 1))
+
+    txt += '          [COLOR palegreen][B]Sin Tipología Especial[/B][/COLOR] [B]' + str(sin_tipologia) + '[/B][CR]'
 
     if txt_status:
         if no_accesibles:
@@ -3401,7 +3447,7 @@ def resumen_canales(item):
         txt += '[CR]  ' + str(canales) + ' [COLOR aqua][B]Canales[/B][/COLOR][CR]'
 
     else:
-        if config.get_setting('mnu_pelis', default=True):txt += '[CR]  ' + str(peliculas) + ' [COLOR deepskyblue][B]Películas[/B][/COLOR][CR]' 
+        if config.get_setting('mnu_pelis', default=True): txt += '[CR]    ' + str(peliculas) + ' [COLOR deepskyblue][B]Películas[/B][/COLOR][CR]' 
 
         if config.get_setting('mnu_series', default=True): txt += '    ' + str(series) + ' [COLOR hotpink][B]Series[/B][/COLOR][CR]'
 
@@ -3420,36 +3466,36 @@ def resumen_canales(item):
 
         if config.get_setting('mnu_torrents', default=True): txt += '    ' + str(torrents) + ' [COLOR blue][B]Torrents[/B][/COLOR][CR]'
 
-        if config.get_setting('mnu_doramas', default=True): txt += '    ' + str(doramas) + '  [COLOR firebrick][B]Doramas[/B][/COLOR][CR]'
+        if config.get_setting('mnu_doramas', default=True): txt += '      ' + str(doramas) + '  [COLOR firebrick][B]Doramas[/B][/COLOR][CR]'
 
         if config.get_setting('mnu_animes', default=True):
             if not config.get_setting('descartar_anime', default=False): txt += '    ' + str(animes) + '  [COLOR springgreen][B]Animes[/B][/COLOR][CR]'
 
-        if not trailers == 0: txt += '      ' + str(trailers) + '  [COLOR darkgoldenrod][B]Traílers[/B][/COLOR][CR]'
-
         if config.get_setting('mnu_adultos', default=True):
             if not adults == 0: txt += '    ' + str(adults) + '  [COLOR orange][B]Adultos[/B][/COLOR][CR]'
+
+        if not trailers == 0: txt += '      ' + str(trailers) + '  [COLOR darkgoldenrod][B]Traílers[/B][/COLOR][CR]'
 
     txt += '[CR][COLOR powderblue][B]BÚSQUEDAS POR TÍTULO EN CANALES DISPONIBLES:[/B][/COLOR][CR]'
 
     txt += '  ' + str(bus_pelisyoseries) + ' [COLOR yellow][B]Películas y/ó Series[/B][/COLOR][CR]'
 
     bus_tematica_documentales = bus_documentales + bus_documentaryes
-    txt += '          [COLOR darkcyan][B]Con Temática Documental[/B][/COLOR] ' + str(bus_tematica_documentales) + '[CR]'
+    txt += '          [COLOR darkcyan][B]Con Temática Documental[/B][/COLOR] [B]' + str(bus_tematica_documentales) + '[/B][CR]'
 
     bus_tematica_infantil = bus_kids + bus_infantiles
-    txt += '          [COLOR lightyellow][B]Con Temática Infantil[/B][/COLOR] ' + str(bus_tematica_infantil) + '[CR]'
+    txt += '          [COLOR lightyellow][B]Con Temática Infantil[/B][/COLOR] [B]' + str(bus_tematica_infantil) + '[/B][CR]'
 
-    if not bus_torrents == 0: txt += '          [COLOR blue][B]Con Contenido Torrent[/B][/COLOR] ' + str(bus_torrents) + '[CR]'
+    if not bus_torrents == 0: txt += '          [COLOR blue][B]Con Contenido Torrent[/B][/COLOR] [B]' + str(bus_torrents) + '[/B][CR]'
 
     bus_tematica_doramas = bus_doramas + doramas
-    if not bus_tematica_doramas == 0: txt += '          [COLOR firebrick][B]Con Temática Dorama[/B][/COLOR] ' + str(bus_tematica_doramas) +'[CR]'
+    if not bus_tematica_doramas == 0: txt += '          [COLOR firebrick][B]Con Temática Dorama[/B][/COLOR] [B]' + str(bus_tematica_doramas) + '[/B][CR]'
 
     bus_tematica_animes = bus_animes + animes
     if not bus_tematica_animes == 0:
-        if not config.get_setting('descartar_anime', default=True): txt += '          [COLOR springgreen][B]Con Temática Anime[/B][/COLOR] ' + str(bus_tematica_animes) + '[CR]'
+        if not config.get_setting('descartar_anime', default=True): txt += '          [COLOR springgreen][B]Con Temática Anime[/B][/COLOR] [B]' + str(bus_tematica_animes) + '[/B][CR]'
 
-    if not temas_adults == 0: txt += '          [COLOR orange][B]Con Temática Adultos[/B][/COLOR] ' + str(temas_adults) + '[CR]'
+    if not temas_adults == 0: txt += '          [COLOR orange][B]Con Temática Adultos[/B][/COLOR] [B]' + str(temas_adults) + '[/B][CR]'
 
     if config.get_setting('mnu_pelis', default=True): txt += '[CR]    ' + str(bus_pelis) + ' [COLOR deepskyblue][B]Películas[/B][/COLOR][CR]'
 
@@ -3466,8 +3512,45 @@ def resumen_canales(item):
         if not config.get_setting('descartar_anime', default=True):
             if not bus_tematica_animes == 0: txt += '    ' + str(bus_tematica_animes) + ' [COLOR springgreen][B]Animes[/COLOR][/B][CR]'
 
+    if config.get_setting('mnu_adultos', default=True):
+        if not adults == 0: txt += '    ' + str(adults) + ' [COLOR orange][B]Adultos[/COLOR][/B][CR]'
+
     if not bus_trailers == 0:
-        if config.get_setting('search_extra_trailers', default=False): txt += '      ' + str(bus_trailers) + ' [COLOR darkgoldenrod][B]Traílers[/B][/COLOR]'
+        if config.get_setting('search_extra_trailers', default=False):
+            txt += '      ' + str(bus_trailers) + ' [COLOR darkgoldenrod][B]Traílers[/B][/COLOR][CR]'
+
+    if not (stars + directors) == 0:
+        txt += '[CR][COLOR salmon][B]BÚSQUEDAS DE PERSONAS EN LOS CANALES:[/B][/COLOR][CR]'
+
+        if not stars == 0: txt += '    ' + str(stars) + ' [COLOR pink][B]Intérpretes[/B][/COLOR][CR]'
+        if not directors == 0: txt += '    ' + str(directors) + ' [COLOR pink][B]Directores[/B][/COLOR][CR]'
+
+    presentar = False
+    if config.get_setting('search_youtube', default=True): presentar = True
+
+    elif not config.get_setting('mnu_simple', default=False):
+        if config.get_setting('search_extra_main', default=False) or config.get_setting('channels_link_pyse', default=False): presentar = True 
+
+    if presentar:
+        txt += '[CR][COLOR yellowgreen][B]BÚSQUEDAS ESPECIALES POR TÍTULO:[/B][/COLOR][CR]'
+
+        if config.get_setting('search_youtube', default=True):
+            if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
+                bus_youtube = 0
+ 
+                try:
+                   cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
+                   bus_youtube = 1
+                except:
+                   pass
+
+                if not bus_youtube == 0:
+                    txt += '      ' + str(bus_youtube) + ' [COLOR darksalmon][B]Youtube[/B][/COLOR][CR]'
+
+        if not config.get_setting('mnu_simple', default=False):
+            if config.get_setting('search_extra_main', default=False) or config.get_setting('channels_link_pyse', default=False):
+                txt += '         Búsquedas y Listas ó Personas en [COLOR violet][B]TMDB[/B][/COLOR][CR]'
+                txt += '         Búsquedas y Listas ó Personas en [COLOR violet][B]Filmaffinity[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Resúmenes de Canales y su Distribución (según sus Ajustes)', txt)
 
@@ -3592,10 +3675,10 @@ def resumen_servidores(item):
     if not inactivos == 0:
         txt += '          ' + str(inactivos) + ' [COLOR palevioletred][B]Inactivos[/B][/COLOR][CR]'
 
-        txt += '                [COLOR darkviolet][B]Desactivados[/B][/COLOR] ' + str(inactives) + '[CR]'
-        txt += '                [COLOR darkred][B]Sin Soporte[/B][/COLOR] ' + str(notsuported) + '[CR]'
+        txt += '                [COLOR darkviolet][B]Desactivados[/B][/COLOR] [B]' + str(inactives) + '[/B][CR]'
+        txt += '                [COLOR darkred][B]Sin Soporte[/B][/COLOR] [B]' + str(notsuported) + '[/B][CR]'
 
-        if outservice > 0: txt += '                [COLOR red][B]Sin Servicio[/B][/COLOR] ' + str(outservice) + '[CR]'
+        if outservice > 0: txt += '                [COLOR red][B]Sin Servicio[/B][/COLOR] [B]' + str(outservice) + '[/B][CR]'
 
     txt += '[CR]    ' + str(disponibles) + ' [COLOR cyan][B]SERVIDORES ACTIVOS[/B][/COLOR][CR]'
 
@@ -3707,9 +3790,9 @@ def resumen_servidores(item):
 
     txt += '  ' + str(accesibles) + '  [COLOR gold][B]Disponibles[/B][/COLOR][CR]'
 
-    txt += '           [COLOR cyan][B]Activos[/B][/COLOR] ' + str(disponibles) + '[CR]'
+    txt += '           [COLOR cyan][B]Activos[/B][/COLOR] [B]' + str(disponibles) + '[/B][CR]'
 
-    txt += '           [COLOR cyan][B]Otras Vías[/B][/COLOR] ' + str(otrasvias) + '[CR]'
+    txt += '           [COLOR cyan][B]Otras Vías[/B][/COLOR] [B]' + str(otrasvias) + '[/B][CR]'
 
     txt += '[CR][COLOR dodgerblue][B]SERVIDORES ACCESIBLES:[/B][/COLOR][CR]'
 

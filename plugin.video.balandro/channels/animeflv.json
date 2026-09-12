@@ -3,7 +3,7 @@
   "name": "AnimeFlv",
   "thumbnail": "animeflv.png",
 
-  "active": true,
+  "active": false,
 
   "searchable": false,
   "search_types": ["tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["tvshow"],
   "language": ["cast", "lat", "vose", "vo"],
 
-  "clusters": ["current", "anime"],
+  "clusters": ["anime"],
 
-  "notes": "Web dedicada exclusivamente al anime."
+  "notes": "Web ANULADA. Web dedicada exclusivamente al anime."
 }

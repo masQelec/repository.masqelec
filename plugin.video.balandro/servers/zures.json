@@ -3,11 +3,15 @@
   "name": "Zures",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Allviid,  Amdahost,  Asianload,  Asianplay,  Bigshare,  Bigwarp,  BowFile,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Letsupload,  Liivideo,  Myupload,  Neohd,  Oneupload,  Pandafiles,  Rovideo,  Savefiles,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamix, Streamoupload,  Streamup,  SwiftLoad,  Turbovid,  Tusfiles,  Udrop,  Updown,  Uploadbaz,  Uploadflix,  Uploadhub,  Uploady,  Upvid,  Veev,  Veoh,  Vidara,  Vidbasic,  Vidbob,  Videa,  Vidlook,  Vidmx,  Vidnest, Vido,  Vidpro,  Vidsonic,  Vidstore,  Vidtube,  Vimeos,  Vipss,  Vkprime,  Wecima,  Worlduploads,  Ztreamhub)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Abyss,  Allviid,  Amdahost,  Asianload,  Asianplay,  Bigshare,  Bigwarp,  BowFile,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Gupload,  Letsupload,  Liivideo,  Myupload,  Neohd,  Oneupload,  Pandafiles,  Rovideo,  Savefiles,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamix, Streamoupload,  Streamup,  SwiftLoad,  Turbovid,  Tusfiles,  Udrop,  Updown,  Uploadbaz,  Uploadflix,  Uploadhub,  Uploady,  Upvid,  Veev,  Veoh,  Vidara,  Vidbasic,  Vidbob,  Videa,  Vidlook,  Vidmx,  Vidnest, Vido,  Vidpro,  Vidsonic,  Vidstore,  Vidtube,  Vimeos,  Vipss,  Vkprime,  Wecima,  Worlduploads,  Ztreamhub)",
 
   "find_videos": {
     "ignore_urls": [],
     "patterns": [
+      {
+        "pattern": "https://abyssplayer.com/([0-9a-zA-Z_-]+)",
+        "url": "https://abyssplayer.com/\\1"
+      },
       {
         "pattern": "https://allviid.xyz/([0-9a-zA-Z]+)",
         "url": "https://allviid.xyz/\\1"
@@ -149,6 +153,10 @@
         "url": "https://veev.to/e/\\1"
       },
       {
+        "pattern": "https://veev.pro/(?:d/|e)([0-9a-zA-Z]+)",
+        "url": "https://veev.to/e/\\1"
+      },
+      {
         "pattern": "https://doods.to/(?:d/|e)([0-9a-zA-Z]+)",
         "url": "https://veev.to/e/\\1"
       },
@@ -277,6 +285,10 @@
         "url": "https://vidbasic.top/embed/\\1"
       },
       {
+        "pattern": "https://vidb.top/(?:embed/)([0-9a-zA-Z]+)",
+        "url": "https://vidbasic.top/embed/\\1"
+      },
+      {
         "pattern": "(https://streamup.)(?:to|wf|ws|cc)/([0-9a-zA-Z]+)",
         "url": "https://streamup.ws/\\2"
       },
@@ -335,6 +347,10 @@
       {
         "pattern": "https://bowfile.com/(?:video/|embed/)([0-9a-zA-Z]+)",
         "url": "https://bowfile.com/video/\\1"
+      },
+      {
+        "pattern": "(https://gupload.xyz/data/e/[A-z0-9]+)",
+        "url": "\\1"
       }
     ]
   }

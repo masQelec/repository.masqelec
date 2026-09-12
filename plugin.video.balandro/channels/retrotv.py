@@ -417,11 +417,12 @@ def findvideos(item):
 
         srv = srv.replace('<strong>', '').replace('</strong>', '').strip()
 
+        if ' VIP' in srv: continue
+
         _srv = srv
         srv = servertools.corregir_servidor(srv)
 
-        if srv == 'various':
-            link_other = servertools.corregir_other(_srv)
+        if srv == 'various': link_other = servertools.corregir_other(_srv)
 
         url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '".*?src="(.*?)".*?</div>')
 
@@ -553,6 +554,8 @@ def play(item):
             return 'Servidor [COLOR red]CloudFlare ReCaptcha[/COLOR]'
 
         if url.startswith('//') == True: url = 'https:' + url
+
+        url = url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&').strip()
 
         servidor = servertools.get_server_from_url(url)
 

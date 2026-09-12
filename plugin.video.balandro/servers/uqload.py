@@ -20,6 +20,9 @@ from core import filetools, httptools, scrapertools
 from lib import jsunpack
 
 
+host= 'https://uqload.vc/'
+
+
 espera = config.get_setting('servers_waiting', default=6)
 
 color_exec = config.get_setting('notification_exec_color', default='cyan')
@@ -56,7 +59,7 @@ def get_video_url(page_url, url_referer=''):
 
     ini_page_url = page_url
 
-    if 'embed-' not in page_url:
+    if not 'embed-' in page_url:
         page_url = page_url.replace('/uqload.com/', '/uqload.com/embed-')
         page_url = page_url.replace('/uqload.org/', '/uqload.com/embed-')
         page_url = page_url.replace('/uqload.co/', '/uqload.com/embed-')
@@ -67,12 +70,13 @@ def get_video_url(page_url, url_referer=''):
         page_url = page_url.replace('/uqload.cx/', '/uqload.com/embed-')
         page_url = page_url.replace('/uqload.bz/', '/uqload.com/embed-')
         page_url = page_url.replace('/uqload.is/', '/uqload.com/embed-')
+        page_url = page_url.replace('/uqload.vc/', '/uqload.com/embed-')
 
     if not page_url.endswith('.html'): page_url += '.html'
 
     page_url = page_url.replace('.html/.html', '.html')
 
-    data = httptools.downloadpage(page_url).data
+    data = httptools.downloadpage(page_url, headers = {'Referer': host, 'Origin': host}).data
 
     if 'File was deleted' in data:
         return 'Archivo inexistente ó eliminado'
@@ -89,6 +93,8 @@ def get_video_url(page_url, url_referer=''):
         try:
             packed = scrapertools.find_single_match(data, "text/javascript'>(eval.*?)\s*</script>")
 
+            if not packed: packed = scrapertools.find_single_match(data, 'p,a,c,k,e,d.*?</script>')
+
             if packed: unpacked = jsunpack.unpack(packed)
         except:
             pass
@@ -96,13 +102,18 @@ def get_video_url(page_url, url_referer=''):
         if unpacked:
             bloque = scrapertools.find_single_match(unpacked, 'sources\s*:\s*\[(.*?)\]')
 
+            if not bloque: bloque = scrapertools.find_single_match(unpacked, 'sources:\[\{file:"([^"]+)"')
+
     matches = scrapertools.find_multiple_matches(bloque, '(http.*?)"')
 
     for url in matches:
         if '.m3u8' in url: type = 'm3u8'
         elif '.m3u' in url: type = 'm3u8'
         else: type = 'mp4'
-        video_urls.append(['mp4', url + '|Referer=https://uqload.com/'])
+
+        url = url + '|Referer=%s' + host
+
+        video_urls.append(['mp4', url ])
 
     if not video_urls:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):

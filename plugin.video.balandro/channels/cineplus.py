@@ -9,14 +9,12 @@ from core import httptools, scrapertools, tmdb, servertools
 
 # ~ 25/1/26  la Web NO busca en series solo en peliculas
 
-
-host = 'https://ww2.dipelis.com/'
-
+host = 'https://w2.dipelis.com/'
 
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://dipelis.com/']
+    ant_hosts = ['https://dipelis.com/', 'https://ww2.dipelis.com/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -64,7 +62,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catalogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'series/', search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
 
     return itemlist
 
@@ -161,6 +159,8 @@ def last_epis(item):
     data = do_downloadpage(item.url)
 
     bloque = scrapertools.find_single_match(data, '>Últimos Capítulos Publicados(.*?)>Últimas Series Agregadas<')
+
+    if not bloque: bloque = scrapertools.find_single_match(data, '>Últimos Capítulos Publicados(.*?)>Películas Recién Agregadas<')
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
 
@@ -425,7 +425,7 @@ def _news(item):
 def _epis(item):
     logger.info()
 
-    item.url = host + 'series/'
+    item.url = host
     item.search_type = 'tvshow'
 
     return last_epis(item)

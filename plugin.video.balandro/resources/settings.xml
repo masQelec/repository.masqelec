@@ -287,7 +287,6 @@
 
         <setting label="Canales con Gestión de Dominios:" type="lsep"/>
 
-        <setting id="opc_animeflv" type="action" label="[COLOR gold]AnimeFlv[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_animeflv)"/>
         <setting id="opc_animeonline" type="action" label="[COLOR gold]AnimeOnline[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_animeonline)"/>
         <setting id="opc_animeyt" type="action" label="[COLOR gold]AnimeYt[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_animeyt)"/>
 
@@ -312,7 +311,6 @@
         <setting id="opc_ennovelastv" type="action" label="[COLOR gold]EnNovelasTv[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_ennovelastv)"/>
         <setting id="opc_entrepeliculasyseries" type="action" label="[COLOR gold]EntrePeliculasySeries[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_entrepeliculasyseries)"/>
 
-        <setting id="opc_gnula" type="action" label="[COLOR gold]Gnula[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_gnula)"/>
         <setting id="opc_grantorrent" type="action" label="[COLOR gold]GranTorrent[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_grantorrent)"/>
 
 		<setting id="ac_hdfull" type="bool" label="[COLOR gold][B]HdFull[/B][/COLOR]" default="false"/>
@@ -342,8 +340,6 @@
         <setting id="opc_subtorrents" type="action" label="[COLOR gold]SubTorrents[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_subtorrents)"/>
 
         <setting id="opc_todotorrents" type="action" label="[COLOR gold]TodoTorrents[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_todotorrents)"/>
-
-        <setting id="opc_veronline" type="action" label="[COLOR gold]VerOnline[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_veronline)"/>
     </category>
 
     <category label="Cuentas">

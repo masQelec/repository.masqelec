@@ -6,12 +6,12 @@
   "active": true,
 
   "searchable": true,
-  "search_types": ["movie"],
+  "search_types": ["all", "movie", "tvshow"],
 
-  "categories": ["movie", "torrent"],
+  "categories": ["movie", "tvshow", "torrent"],
   "language": ["cast"],
 
-  "clusters": ["onlyone", "torrents", "news", "rankings", "kids", "docs"],
+  "clusters": ["onlyone", "torrents"],
 
-  "notes": "Canal con enlaces Torrent exclusivamente. Películas por géneros."
+  "notes": "Canal con enlaces Torrent exclusivamente. Películas y Series."
 }

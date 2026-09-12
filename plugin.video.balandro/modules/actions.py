@@ -473,7 +473,6 @@ def manto_params(item):
 
         config.set_setting('proxies', '', 'test_providers')
 
-        config.set_setting('channel_animeflv_dominio', '')
         config.set_setting('channel_animeonline_dominio', '')
         config.set_setting('channel_animeyt_dominio', '')
 
@@ -493,7 +492,6 @@ def manto_params(item):
         config.set_setting('channel_ennovelastv_dominio', '')
         config.set_setting('channel_entrepeliculasyseries_dominio', '')
 
-        config.set_setting('channel_gnula_dominio', '')
         config.set_setting('channel_grantorrent_dominio', '')
 
         config.set_setting('channel_hdfull_dominio', '')
@@ -521,8 +519,6 @@ def manto_params(item):
         config.set_setting('channel_subtorrents_dominio', '')
 
         config.set_setting('channel_todotorrents_dominio', '')
-
-        config.set_setting('channel_veronline_dominio', '')
 
         config.set_setting('autoplay_max_links', '10')
 
@@ -593,7 +589,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '150.0.7871.187')  # ~ 24/7/26
+        config.set_setting('chrome_last_version', '153.0.8010.12')  # ~ 28/8/26
 
         config.set_setting('debug', '0')
 
@@ -1703,10 +1699,6 @@ def resumen_fix(item):
         platformtools.dialog_textviewer('Resumen Fix Instalado', res)
 
 
-def opciones_animeflv(item):
-    item.from_channel = 'animeflv'
-    opciones_domains_common(item)
-
 def opciones_animeonline(item):
     item.from_channel = 'animeonline'
     opciones_domains_common(item)
@@ -1765,10 +1757,6 @@ def opciones_ennovelastv(item):
 
 def opciones_entrepeliculasyseries(item):
     item.from_channel = 'entrepeliculasyseries'
-    opciones_domains_common(item)
-
-def opciones_gnula(item):
-    item.from_channel = 'gnula'
     opciones_domains_common(item)
 
 def opciones_grantorrent(item):
@@ -1839,10 +1827,6 @@ def opciones_todotorrents(item):
     item.from_channel = 'todotorrents'
     opciones_domains_common(item)
 
-def opciones_veronline(item):
-    item.from_channel = 'veronline'
-    opciones_domains_common(item)
-
 
 def opciones_domains_common(item):
     logger.info()
@@ -1895,9 +1879,7 @@ def opciones_domains_common(item):
         from modules import domains
 
         if ret == 0:
-            if item.from_channel == 'animeflv': domains.manto_domain_animeflv(item)
-
-            elif item.from_channel == 'animeonline': domains.manto_domain_animeonline(item)
+            if item.from_channel == 'animeonline': domains.manto_domain_animeonline(item)
 
             elif item.from_channel == 'cinecalidad': domains.manto_domain_cinecalidad(item)
 
@@ -1924,8 +1906,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'ennovelastv': domains.manto_domain_ennovelastv(item)
 
             elif item.from_channel == 'entrepeliculasyseries': domains.manto_domain_entrepeliculasyseries(item)
-
-            elif item.from_channel == 'gnula': domains.manto_domain_gnula(item)
 
             elif item.from_channel == 'grantorrent': domains.manto_domain_grantorrent(item)
 
@@ -1961,15 +1941,11 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'todotorrents': domains.manto_domain_todotorrents(item)
 
-            elif item.from_channel == 'veronline': domains.manto_domain_veronline(item)
-
             else:
                platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Acción No Permitida[/B][/COLOR]' % color_alert)
 
         elif ret == 1:
-            if item.from_channel == 'animeflv': domains.test_domain_animeflv(item)
-
-            elif item.from_channel == 'animeonline': domains.test_domain_animeonline(item)
+            if item.from_channel == 'animeonline': domains.test_domain_animeonline(item)
 
             elif item.from_channel == 'cinecalidad': domains.test_domain_cinecalidad(item)
 
@@ -1996,8 +1972,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'ennovelastv': domains.test_domain_ennovelastv(item)
 
             elif item.from_channel == 'entrepeliculasyseries': domains.test_domain_entrepeliculasyseries(item)
-
-            elif item.from_channel == 'gnula': domains.test_domain_gnula(item)
 
             elif item.from_channel == 'grantorrent': domains.test_domain_grantorrent(item)
 
@@ -2033,8 +2007,6 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'todotorrents': domains.test_domain_todotorrents(item)
 
-            elif item.from_channel == 'veronline': domains.test_domain_veronline(item)
-
             else:
                platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Acción No Permitida[/B][/COLOR]' % color_alert)
 
@@ -2048,8 +2020,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'cuevana3pro': helper.show_help_cuevana3pro(item)
 
             elif item.from_channel == 'entrepeliculasyseries': helper.show_help_entrepeliculasyseries(item)
-
-            elif item.from_channel == 'gnula': helper.show_help_gnula(item)
 
             elif item.from_channel == 'hdfull': helper.show_help_hdfull(item)
 

@@ -11,7 +11,7 @@
   "categories": ["movie"],
   "language": ["lat"],
 
-  "clusters": ["adults", "news", "rankings", "kids"],
+  "clusters": ["adults", "news", "rankings", "years", "kids"],
 
   "notes": "Películas por géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

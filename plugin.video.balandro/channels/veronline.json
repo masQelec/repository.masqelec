@@ -3,7 +3,7 @@
   "name": "VerOnline",
   "thumbnail": "veronline.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["suggested", "current", "crypto", "lasts", "countries", "years", "kids", "docs", "vos"],
 
-  "notes": "Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Web CERRADA. Series por Géneros."
 }

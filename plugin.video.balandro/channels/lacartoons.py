@@ -20,7 +20,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Más destacadas', action = 'list_all', url = host + '?Categoria_id=1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + '?Categoria_id=1', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por productora', action = 'categorias', url = host, search_type = 'tvshow', text_color = 'moccasin' ))
 
@@ -35,16 +35,14 @@ def categorias(item):
 
     data = httptools.downloadpage(item.url).data
 
-    bloque = scrapertools.find_single_match(data, 'botontes-categorias.*?</ul>')
+    bloque = scrapertools.find_single_match(data, '>Categorías</h3>.*?</ul>')
 
-    matches = scrapertools.find_multiple_matches(bloque, 'submit" value="([^"]+).*?value="([^"]+)')
+    matches = scrapertools.find_multiple_matches(bloque, 'type="submit">(.*?)</button>.*?value="([^"]+)')
 
     for title, id in matches:
-        if id == '1': continue
-
         itemlist.append(item.clone( title = title, url = host + '?Categoria_id=' + id, action = 'list_all', text_color = 'hotpink' ))
 
-    return itemlist
+    return sorted(itemlist, key=lambda x: x.title)
 
 
 def alfabetico(item):

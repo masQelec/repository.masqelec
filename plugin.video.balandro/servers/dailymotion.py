@@ -65,6 +65,9 @@ def get_video_url(page_url, url_referer=''):
     elif 'restringido por el propietario' in resp.data:
         return 'Archivo Restringido por el Propietario'
 
+    elif '"private":true' in resp.data:
+        return 'Archivo Privado'
+
     if not resp.data:
         if '/geo.dailymotion.com/player.html?video=' in page_url:
             page_url = page_url.replace('/geo.dailymotion.com/player.html?video=', '/www.dailymotion.com/player/metadata/video/')

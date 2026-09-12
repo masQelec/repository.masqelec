@@ -362,7 +362,6 @@ def mainlist(item):
             elif ch['id'] == 'seriesretro': continue
             elif ch['id'] == 'star': continue
             elif ch['id'] == 'verflix': continue
-            elif ch['id'] == 'veronline': continue
             elif ch['id'] == 'verserieonline': continue
 
         elif item.extra == 'documentaries':
@@ -447,7 +446,6 @@ def mainlist(item):
             if item.extra == 'animes':
                 if ch['id'] == 'animeav1': pass
                 elif ch['id'] == 'animeclub': pass
-                elif ch['id'] == 'animeflv': pass
                 elif ch['id'] == 'animeflvone': pass
                 elif ch['id'] == 'animejara': pass
                 elif ch['id'] == 'animejl': pass
@@ -471,7 +469,6 @@ def mainlist(item):
             elif item.extra == 'new_animes':
                 if ch['id'] == 'animeav1': pass
                 elif ch['id'] == 'animeclub': pass
-                elif ch['id'] == 'animeflv': pass
                 elif ch['id'] == 'animeflvone': pass
                 elif ch['id'] == 'animejara': pass
                 elif ch['id'] == 'animeyt': pass
@@ -515,7 +512,6 @@ def mainlist(item):
             elif ch['id'] == 'ennovelastv': continue
             elif ch['id'] == 'estrenoscinesaa': continue
             elif ch['id'] == 'entrepeliculasyseries': continue
-            elif ch['id'] == 'gnula': continue
             elif ch['id'] == 'hdcinema': continue
             elif ch['id'] == 'lacartoons': continue
             elif ch['id'] == 'lamovie': continue

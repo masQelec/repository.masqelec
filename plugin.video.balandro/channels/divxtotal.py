@@ -225,15 +225,16 @@ def list_all(item):
         if item.search_type == 'movie': bloque = scrapertools.find_single_match(data, '>Películas</h3>(.*?)>Series</h3>')
         else:
            bloque = scrapertools.find_single_match(data, '>Series</h3>(.*?)>Programas</h3>')
-           if not bloque: bloque = scrapertools.find_single_match(data, '>Series</h3>(.*?)$')
+           if not bloque: bloque = scrapertools.find_single_match(data, '>Series</h3>(.*?)>Descargar Peliculas y Series Torrent en HD</h1>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<tr>(.*?)</tr>')
+
     if not matches:
         if item.search_type == 'tvshow':
              matches = scrapertools.find_multiple_matches(bloque, '<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 serie-card">(.*?)</div>')
 
     if not matches:
-        if item.group == 'lasts': matches = scrapertools.find_multiple_matches(bloque, '<div class="row">(.*?)</div></div>')
+        if item.group == 'lasts': matches = scrapertools.find_multiple_matches(bloque, '<div class=row>(.*?)</div></div>')
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
@@ -303,6 +304,8 @@ def temporadas(item):
 
     temporadas = re.compile('class="titulotemporada".*?">(.*?)</a>', re.DOTALL).findall(data)
 
+    if not temporadas: temporadas = re.compile('>Temporada(.*?)</a>', re.DOTALL).findall(data)
+
     for tempo in temporadas:
         tempo = tempo.replace('Temporada', '').strip()
 
@@ -342,7 +345,9 @@ def episodios(item):
         title = scrapertools.find_single_match(match, 'title="">(.*?)</a>')
         if not title: title = scrapertools.find_single_match(match, '<a href=.*?title="(.*?)"')
 
-        if not title: continue
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
+
+        if not url or not title: continue
 
         s_e = scrapertools.get_season_and_episode(title)
 
@@ -356,7 +361,7 @@ def episodios(item):
 
         title = '%sx%s %s' % (str(item.contentSeason), episode, item.contentSerieName)
 
-        itemlist.append(item.clone( action='findvideos', url=match, title=title, match=match,
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, match=match,
                                     language = 'Esp', contentSeason = item.contentSeason, contentType = 'episode', contentEpisodeNumber = episode ))
 
     tmdb.set_infoLabels(itemlist)
@@ -380,6 +385,7 @@ def findvideos(item):
     else:
        idioma = scrapertools.find_single_match(data, '<td>.*?<img src=".*?/images/(.*?).png')
        if not idioma: idioma = scrapertools.find_single_match(data, '<td.*?<img src=".*?/images/(.*?).png')
+       if not idioma: idioma = scrapertools.find_single_match(data, 'src=".*?/images/(.*?).png')
 
        if idioma == 'ES': lang = 'Esp'
        elif idioma == 'LA': lang = 'Lat'
@@ -396,9 +402,14 @@ def findvideos(item):
 
     link2 = scrapertools.find_multiple_matches(data, 'class="opcion_2".*?href="(.*?)"')
 
-    link3 =  scrapertools.find_multiple_matches(data, 'class="linktorrent".*?data-src="(.*?)"')
+    link3 = scrapertools.find_multiple_matches(data, 'class="linktorrent".*?data-src="(.*?)"')
 
-    links = link1 + link2 + link3
+    link4 = scrapertools.find_multiple_matches(data, '<a class=linktorrent.*?data-src="(.*?)"')
+
+    if item.match:
+        if not link4:link4 = scrapertools.find_multiple_matches(data, '<a class=linktorrent.*?data-src=(.*?)href=')
+
+    links = link1 + link2 + link3 + link4
 
     ses = 0
 
@@ -417,7 +428,8 @@ def findvideos(item):
            if '/short-info.' in link: other = 'Short'
            elif '/download_tt.php?' in link: other = 'Down'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent', language = lang, quality = qlty, other = other))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent',
+                              language = lang, quality = qlty, other = other))
 
     if not itemlist:
         if not ses == 0:
@@ -461,6 +473,10 @@ def play(item):
 
         else:
             new_url = base64.b64decode(item.url).decode("utf-8")
+
+            if new_url.endswith('.torrent'):
+                itemlist.append(item.clone( url = new_url, server = 'torrent' ))
+                return itemlist
 
             if PY3:
                 from core import requeststools

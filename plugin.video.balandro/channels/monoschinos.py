@@ -19,6 +19,14 @@ def do_downloadpage(url, post=None, headers=None):
 
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
+    if not data:
+        if not '/animes?buscar=' in url:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('MonosChinos', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
+
+            timeout = config.get_setting('channels_repeat', default=30)
+
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+
     return data
 
 

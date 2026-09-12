@@ -277,9 +277,9 @@ def get_video_url(page_url, url_referer=''):
     elif 'vidspeed' in page_url or 'vidroba' in page_url:
           txt_server = 'Vidspeed'
 
-          page_url = page_url.replace('/www.vidspeeds.com/', '/vidspeeds.com/')
+          page_url = page_url.replace('/vidspeeds.com/', '/www.vidspeed.org/')
 
-          page_url = page_url.replace('/vidspeed.cc/', '/vidspeeds.com/').replace('/vidspeeds.org/', '/vidspeeds.com/').replace('/vidroba/', '/vidspeeds.com/')
+          page_url = page_url.replace('/vidspeed.cc/', '/www.vidspeed.org/').replace('/vidspeeds.org/', '/www.vidspeed.org/').replace('/vidroba/', '/www.vidspeed.org/')
 
           page_url = page_url.replace('/embed-', '/')
 

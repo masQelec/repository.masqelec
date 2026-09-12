@@ -214,11 +214,11 @@ def last_epis(item):
 
     bloque = scrapertools.find_single_match(data, 'Últimos Episodios<(.*?)</section>')
 
-    patron = '<a href="(.*?)".*?<img data-src="(.*?)".*?alt="(.*?)".*?<span class="ep-tag">(.*?)</span>'
+    patron = '<a href="(.*?)".*?<span class="ep-tag">(.*?)</span>.*?<img data-src="(.*?)".*?alt="(.*?)"'
 
     matches = re.compile(patron, re.DOTALL).findall(bloque)
 
-    for url, thumb, title, temp_epis in matches:
+    for url, temp_epis, thumb, title in matches:
         title = title.replace('#8217;', "'").replace('#8211;', '')
 
         SerieName = title

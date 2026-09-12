@@ -448,6 +448,8 @@ def findvideos(item):
         if 'latino' in qlty: qlty = qlty.replace('latino', '')
         if 'ingles' in qlty: qlty = qlty.replace('ingles', '')
 
+        if 'Utorrent' in qlty: qlty = qlty.replace('Utorrent', '')
+
         qlty = qlty.strip()
 
         if 'Torrent' in qlty: qlty = qlty.replace('Torrent','').strip()
@@ -465,6 +467,8 @@ def findvideos(item):
             if 'espanol' in qlty or 'castellano' in qlty: qlty = qlty.replace('espanol', '').replace('castellano', '')
             if 'latino' in qlty: qlty = qlty.replace('latino', '')
             if 'ingles' in qlty: qlty = qlty.replace('ingles', '')
+
+            if 'Utorrent' in qlty: qlty = qlty.replace('Utorrent', '')
 
             qlty = qlty.strip()
 

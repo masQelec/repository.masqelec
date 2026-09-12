@@ -15,6 +15,14 @@
       {
         "pattern": "vk\\.[a-z]+\\/video(?:-|)(\\d+)_(\\d+)",
         "url": "https://vk.com/video\\1\\2"
+      },
+      {
+        "pattern": "(vk\\.[a-z]+\\/video[0-9]+_[0-9]+)",
+        "url": "https://\\1"
+      },
+      {
+        "pattern": "(vkvideo\\.[a-z]+\\/video[0-9]+_[0-9]+)",
+        "url": "https://\\1"
       }
     ]
   }

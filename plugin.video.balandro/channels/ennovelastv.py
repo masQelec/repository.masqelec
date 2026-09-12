@@ -611,6 +611,11 @@ def findvideos(item):
            u_link = scrapertools.find_single_match(data2, '<iframe.*?src="(.*?)"')
            if not u_link: u_link = scrapertools.find_single_match(data2, '<IFRAME.*?SRC="(.*?)"')
 
+           if not u_link:
+               u_link = data2
+
+               if not 'http' in u_link: continue
+
            if u_link.startswith('//'): u_link = 'https:' + u_link
 
            if '/wp-admin/' in u_link: u_link = ''

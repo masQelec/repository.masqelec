@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
 
-host = 'https://ww2.tuanime.net/'
+host = 'https://w2.tuanime.net/'
 
 
 perpage = 25
@@ -15,7 +15,7 @@ perpage = 25
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://ww1.tuanime.net/']
+    ant_hosts = ['https://ww1.tuanime.net/', 'https://ww2.tuanime.net/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)

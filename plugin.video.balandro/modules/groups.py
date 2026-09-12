@@ -496,6 +496,8 @@ def mainlist(item):
 
         itemlist.append(item.clone( channel='helper', action='show_help_audios', title= ' - [COLOR green][B]Información[/B][/COLOR] [COLOR cyan][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news') ))
 
+        itemlist.append(item.clone( channel='helper', action='show_ratings', title= ' - [COLOR green][B]Información[/B][/COLOR] [COLOR khaki][B]Ratings[/B][/COLOR] (valoración Películas ó Series)', thumbnail=config.get_thumb('news') ))
+
         itemlist.append(item.clone( channel='helper', action='show_play_parameters', title=' - Qué [COLOR chocolate][B]Ajustes[/B][/COLOR] tiene en preferencias [COLOR fuchsia][B]Play[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
         itemlist.append(item.clone( title = ' - Audio [COLOR goldenrod][B]Múltiple[/B][/COLOR]', action = 'ch_groups', group = 'all', extra = 'mixed', thumbnail=config.get_thumb('stack'), langs = True, detallar = True ))
@@ -535,6 +537,8 @@ def submnu_news(item):
 
     if presentar:
         itemlist.append(item.clone( channel='helper', action='show_help_audios', title= '[COLOR green][B]Información[/B][/COLOR] [COLOR tomato][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news') ))
+
+        itemlist.append(item.clone( channel='helper', action='show_ratings', title= '[COLOR green][B]Información[/B][/COLOR] [COLOR khaki][B]Ratings[/B][/COLOR] (valoración Películas ó Series)', thumbnail=config.get_thumb('news') ))
 
         if config.get_setting('sub_mnu_favoritos', default=False):
             itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[COLOR plum][B]Favoritos[/B][/COLOR]', context=context_cfg_search, thumbnail=config.get_thumb('star') ))
@@ -642,7 +646,7 @@ def submnu_alls(item):
     itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] Novedades Series[/B]', channel='novelty', action='mainlist', context=context_usual, thumbnail=config.get_thumb('tvshow'), extra = 'tvshows', search_type = 'tvshow', text_color='hotpink' ))
 
     if config.get_setting('mnu_novelas', default=True):
-        itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] [COLOR hotpink]Novedades[/COLOR] Últimas novelas[/B]', channel='novelty', action='mainlist', context=context_usual, thumbnail=config.get_thumb('booklet'), extra = 'novelas', search_type = 'tvshow', text_color='limegreen' ))
+        itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] [COLOR hotpink]Novedades[/COLOR] Últimas novelas[/B]', channel='novelty', action='mainlist', context=context_usual, thumbnail=config.get_thumb('booklet'), news = 'lasts', extra = 'novelas', search_type = 'tvshow', text_color='limegreen' ))
 
     itemlist.append(item.clone( channel='submnuctext', action='submnu_channels', title='[COLOR yellow][B]Buscar[/B][/COLOR]', context=context_buscar, extra = 'mixed', thumbnail=config.get_thumb('search') ))
 
@@ -754,7 +758,7 @@ def submnu_series(item):
     itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] Novedades Series[/B]', channel='novelty', action='mainlist', context=context_usual, thumbnail=config.get_thumb('tvshow'), extra = 'tvshows', search_type = 'tvshow', text_color='hotpink' ))
 
     if config.get_setting('mnu_novelas', default=True):
-        itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] [COLOR hotpink]Novedades[/COLOR] Últimas novelas[/B]', channel='novelty', action='mainlist', context=context_usual, thumbnail=config.get_thumb('booklet'), extra = 'novelas', search_type = 'tvshow', text_color='limegreen' ))
+        itemlist.append(item.clone( title = '[B][COLOR gold]Canales[/COLOR] [COLOR hotpink]Novedades[/COLOR] Últimas novelas[/B]', channel='novelty', action='mainlist', context=context_usual, thumbnail=config.get_thumb('booklet'), news = 'lasts', extra = 'novelas', search_type = 'tvshow', text_color='limegreen' ))
 
     itemlist.append(item.clone( channel='submnuctext', action='submnu_channels', title='[COLOR yellow][B]Buscar[/B][/COLOR]', context=context_buscar, extra = 'tvshows', thumbnail=config.get_thumb('search') ))
 

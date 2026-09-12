@@ -447,6 +447,7 @@ def findvideos(item):
             if 'SUB' in lang: lang = 'Vose'
             elif 'LAT' in lang: lang = 'Lat'
             elif 'ESP' in lang: lang = 'Esp'
+            elif 'JAP' in lang: lang = 'Jap'
             else: lang = '?'
 
             for srv, link in links:

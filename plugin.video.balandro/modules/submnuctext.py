@@ -298,6 +298,8 @@ def submnu_news(item):
 
     itemlist.append(item.clone( channel='helper', action='show_help_audios', title= '[COLOR green][B]Información[/B][/COLOR] [COLOR tomato][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news'), fanart=fanart ))
 
+    itemlist.append(item.clone( channel='helper', action='show_ratings', title= '[COLOR green][B]Información[/B][/COLOR] [COLOR khaki][B]Ratings[/B][/COLOR] (valoración Películas ó Series)', thumbnail=config.get_thumb('news') ))
+
     if config.get_setting('sub_mnu_favoritos', default=False):
         if  item.mnupral == 'main':
              itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[B]Favoritos[/B]', context=context_cfg_search, thumbnail=config.get_thumb('star'), fanart=fanart, text_color='plum' ))
@@ -488,6 +490,8 @@ def submnu_special(item):
     itemlist.append(item.clone( action='', title='[B]ESPECIALES:[/B]', context=context_cfg_search, folder=False, text_color='pink' ))
 
     itemlist.append(item.clone( channel='helper', action='show_help_audios', title= '[COLOR green][B]Información[/B][/COLOR] [COLOR tomato][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news'), fanart=fanart ))
+
+    itemlist.append(item.clone( channel='helper', action='show_ratings', title= '[COLOR green][B]Información[/B][/COLOR] [COLOR khaki][B]Ratings[/B][/COLOR] (valoración Películas ó Series)', thumbnail=config.get_thumb('news') ))
 
     if config.get_setting('sub_mnu_favoritos', default=False):
         if  item.mnupral == 'main':
@@ -1001,6 +1005,8 @@ def show_infos(item):
 
     itemlist.append(item.clone( channel='helper', action='show_help_audios', title= ' - [COLOR green][B]Información[/B][/COLOR] [COLOR cyan][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news') ))
 
+    itemlist.append(item.clone( channel='helper', action='show_ratings', title= ' - [COLOR green][B]Información[/B][/COLOR] [COLOR khaki][B]Ratings[/B][/COLOR] (valoración Películas ó Series)', thumbnail=config.get_thumb('news') ))
+
     if config.get_setting('mnu_torrents', default=True):
         itemlist.append(item.clone( channel='helper', action='show_help_semillas', title= ' - [COLOR green][B]Información[/B][/COLOR] archivos Torrent [COLOR gold][B]Semillas[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
@@ -1219,9 +1225,7 @@ def _dominio_vigente(item):
 def _dominio_memorizado(item):
     from modules import domains
 
-    if item.from_channel == 'animeflv': domains.manto_domain_animeflv(item)
-
-    elif item.from_channel == 'animeonline': domains.manto_domain_animeonline(item)
+    if item.from_channel == 'animeonline': domains.manto_domain_animeonline(item)
 
     elif item.from_channel == 'animeyt': domains.manto_domain_animeyt(item)
 
@@ -1250,8 +1254,6 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'ennovelastv': domains.manto_domain_ennovelastv(item)
 
     elif item.from_channel == 'entrepeliculasyseries': domains.manto_domain_entrepeliculasyseries(item)
-
-    elif item.from_channel == 'gnula': domains.manto_domain_gnula(item)
 
     elif item.from_channel == 'grantorrent': domains.manto_domain_grantorrent(item)
 
@@ -1286,8 +1288,6 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'subtorrents': domains.manto_domain_subtorrents(item)
 
     elif item.from_channel == 'todotorrents': domains.manto_domain_todotorrents(item)
-
-    elif item.from_channel == 'veronline': domains.manto_domain_veronline(item)
 
     else:
         platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Ajuste No Permitido[/B][/COLOR]' % color_alert)
@@ -1514,26 +1514,12 @@ def _proxies(item):
 
         if config.get_setting('channel_estrenoscinesaa_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'eztv':
-        from channels import eztv
-        item.channel = 'eztv'
-        eztv.configurar_proxies(item)
-
-        if config.get_setting('channel_eztv_proxies') is None: refrescar = False
-
     elif item.from_channel == 'gatotv':
         from channels import gatotv
         item.channel = 'gatotv'
         gatotv.configurar_proxies(item)
 
         if config.get_setting('channel_gatotv_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'gnula':
-        from channels import gnula
-        item.channel = 'gnula'
-        gnula.configurar_proxies(item)
-
-        if config.get_setting('channel_gnula_proxies') is None: refrescar = False
 
     elif item.from_channel == 'gnulatv':
         from channels import gnulatv
@@ -1591,13 +1577,6 @@ def _proxies(item):
 
         if config.get_setting('channel_latanime_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'lilatorrent':
-        from channels import lilatorrent
-        item.channel = 'lilatorrent'
-        lilatorrent.configurar_proxies(item)
-
-        if config.get_setting('channel_lilatorrent_proxies') is None: refrescar = False
-
     elif item.from_channel == 'megaserie':
         from channels import megaserie
         item.channel = 'megaserie'
@@ -1632,13 +1611,6 @@ def _proxies(item):
         mundodonghuaxyz.configurar_proxies(item)
 
         if config.get_setting('channel_mundodonghuaxyz_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'naranjatorrent':
-        from channels import naranjatorrent
-        item.channel = 'naranjatorrent'
-        naranjatorrent.configurar_proxies(item)
-
-        if config.get_setting('channel_naranjatorrent_proxies') is None: refrescar = False
 
     elif item.from_channel == 'pasateatorrent':
         from channels import pasateatorrent
@@ -1745,13 +1717,6 @@ def _proxies(item):
 
         if config.get_setting('channel_repelishd_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'rojotorrent':
-        from channels import rojotorrent
-        item.channel = 'rojotorrent'
-        rojotorrent.configurar_proxies(item)
-
-        if config.get_setting('channel_rojotorrent_proxies') is None: refrescar = False
-
     elif item.from_channel == 'seriesgato':
         from channels import seriesgato
         item.channel = 'seriesgato'
@@ -1835,20 +1800,6 @@ def _proxies(item):
         ultrapelis.configurar_proxies(item)
 
         if config.get_setting('channel_ultrapelis_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'verdetorrent':
-        from channels import verdetorrent
-        item.channel = 'verdetorrent'
-        verdetorrent.configurar_proxies(item)
-
-        if config.get_setting('channel_verdetorrent_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'veronline':
-        from channels import veronline
-        item.channel = 'veronline'
-        veronline.configurar_proxies(item)
-
-        if config.get_setting('channel_veronline_proxies') is None: refrescar = False
 
     elif item.from_channel == 'zonaleros':
         from channels import zonaleros

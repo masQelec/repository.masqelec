@@ -136,12 +136,29 @@ def findvideos(item):
 
     jdata = jsontools.load(data)
 
-    for Video in jdata['sources']:
-        url = Video["src"]
-        qlty = Video["quality"]
-        if not url.startswith("http"): url = 'https:' + url 
- 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, quality = qlty, language = 'VO' ))
+    try:
+        for Video in jdata['sources']:
+            url = Video["src"]
+            qlty = Video["quality"]
+
+            if not url.startswith("http"): url = 'https:' + url 
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, quality = qlty, language = 'VO' ))
+    except:
+         pass
+
+    if not itemlist:
+        matches = scrapertools.find_multiple_matches(str(jdata), "{'src':(.*?)'video/mp4'")
+
+        for match in matches:
+            url = scrapertools.find_single_match(match, "'(.*?)'")
+            qlty = scrapertools.find_single_match(match, "'quality': '(.*?)'")
+
+            if url.startswith("http"): continue
+
+            url = 'https:' + url 
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, quality = qlty, language = 'VO' ))
 
     return itemlist
 

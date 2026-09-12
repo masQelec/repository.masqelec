@@ -545,6 +545,7 @@ def findvideos(item):
         elif 'voe' in url: servidor = 'voe'
         elif 'mixdrop' in url: servidor = 'mixdrop'
         elif 'mp4upload' in url: servidor = 'mp4upload'
+        elif 'zippyshare' in url: servidor = 'zippyshare'
 
         elif 'streamwish' in url or 'wish' in url or 'dhcplay' in url: servidor = 'various'
         elif 'filelions' in url: servidor = 'various'

@@ -491,7 +491,7 @@ def findvideos(item):
             elif '/hgbazooka.' in url: continue
             elif '.tickcounter.' in url: continue
             elif '/zuvioeb.' in url: continue
-            elif '/abyssplayer.' in url: continue
+            elif '.abyssplayer.' in url: continue
 
             url = url.replace('/Mivalyo.com/', '/mivalyo.com/')
 
@@ -529,8 +529,7 @@ def findvideos(item):
         ses += 1
 
         if '/short.' in url: continue
-
-        elif '/abyssplayer.' in url: continue
+        elif '.abyssplayer.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
 
@@ -540,6 +539,7 @@ def findvideos(item):
             if not config.get_setting('developer_mode', default=False): continue
 
         if 'Sub Español' in data: lang = 'Vose'
+        elif '/audios/latino/' in data: lang = 'Lat'
         else: lang = '?'
 
         other = ''

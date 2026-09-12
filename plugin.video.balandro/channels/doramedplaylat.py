@@ -334,12 +334,14 @@ def findvideos(item):
 
         ses += 1
 
+        _url = ''
+
         if 'peertubeLink' in url:
-            url = url.replace('&amp;', '&')
+            _url = url.replace('&amp;', '&')
 
-            if '/video.doramedplay.net/' in url: continue
+            if '/video.doramedplay.net/' in _url: continue
 
-            data1 = do_downloadpage(url)
+            data1 = do_downloadpage(_url)
 
             if data1:
                 data1 = data1.replace('\\/', '/')
@@ -351,14 +353,15 @@ def findvideos(item):
 
                 new_url = scrapertools.find_single_match(str(blk1), '/peertube/(.*?)"')
 
-                if new_url:
-                    url = 'https://peertube.uno/videos/embed/' + new_url
- 
+                if new_url: url = 'https://peertube.uno/videos/embed/' + new_url
+
         servidor = servertools.get_server_from_url(url)
 
         url = servertools.normalize_url(servidor, url)
 
-        if url.startswith('https://player.doramed.top/'):
+        if url.startswith('https://peertube.uno/videos/watch/'): url += '|Referer=' + _url
+
+        elif url.startswith('https://player.doramed.top/'):
             data2 = do_downloadpage(url)
 
             url = scrapertools.find_single_match(str(data2), "'file':'(.*?)'")

@@ -123,6 +123,8 @@ def findvideos(item):
     if not matches:
         matches = scrapertools.find_multiple_matches(data, 'youtube_url(.*?)&quot;,&quot;')
 
+        if not matches: matches = scrapertools.find_multiple_matches(data, "window.open.*?'(.*?)'")
+
     ses = 0
 
     for url in matches:
@@ -131,6 +133,8 @@ def findvideos(item):
         url = url.replace('\\/', '/').replace('&quot;:&quot;','').strip()
 
         if url.startswith("//"): url = 'https:' + url
+
+        if '/dzen.ru' in url: continue
 
         servidor = servertools.get_server_from_url(url)
 

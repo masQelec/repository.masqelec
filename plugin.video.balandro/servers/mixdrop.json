@@ -71,6 +71,18 @@
       {
         "pattern": "https://miiixdrop.net/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
         "url": "https://mixdrop.ag/e/\\1"
+      },
+      {
+        "pattern": "https://miixdrop.com/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
+        "url": "https://mixdrop.ag/e/\\1"
+      },
+      {
+        "pattern": "https://miiixdrop.com/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
+        "url": "https://mixdrop.ag/e/\\1"
+      },
+      {
+        "pattern": "https://miiixdrop.top/(?:e|f|embed)/(?:embed-|)([A-z0-9]+)",
+        "url": "https://mixdrop.ag/e/\\1"
       }
     ]
   }

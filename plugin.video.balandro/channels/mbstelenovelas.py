@@ -30,7 +30,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'tele/completas/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimas novelas', action = 'list_all', url = host + 'tele/novelas/', search_type = 'tvshow', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_all', url = host + 'tele/novelas/', search_type = 'tvshow', text_color = 'moccasin' ))
 
     return itemlist
 

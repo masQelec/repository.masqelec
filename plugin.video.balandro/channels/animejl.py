@@ -182,7 +182,8 @@ def list_all(item):
     matches = re.compile('<article(.*?)</article>').findall(data)
 
     for match in matches:
-        url = scrapertools.find_single_match(match, "<a href='(.*?)'")
+        url = scrapertools.find_single_match(match, "href='(.*?)'")
+
         title = scrapertools.find_single_match(match, "<h3 class='Title'>(.*?)</h3>")
 
         if not url or not title: continue
@@ -205,7 +206,7 @@ def list_all(item):
         lang = ''
 
         if tipo == 'movie':
-            if item.search_type != 'all':
+            if item.search_type == 'all':
                 if item.search_type == 'tvshow': continue
 
             PeliName = corregir_SerieName(title)
@@ -219,7 +220,7 @@ def list_all(item):
                                         contentType = 'movie', contentTitle = PeliName, infoLabels={'year': '-', 'plot': plot} ))
 
         if tipo == 'tvshow':
-            if item.search_type != 'all':
+            if item.search_type == 'all':
                 if item.search_type == 'movie': continue
 
             SerieName = corregir_SerieName(title)
@@ -258,7 +259,7 @@ def last_epis(item):
 
     bloque = scrapertools.find_single_match(data, ">Episodios Recientes Agregados<(.*?)</ul>")
 
-    patron = "<li><a href='(.*?)' class.*?<img src='(.*?)' alt='(.*?)'></span><span class='Capi'>(.*?)</span>"
+    patron = "<li>.*?href='(.*?)'.*?<img src='(.*?)' alt='(.*?)'></span><span class='Capi'>(.*?)</span>.*?</li>"
 
     matches = scrapertools.find_multiple_matches(bloque, patron)
 
@@ -288,7 +289,10 @@ def last_epis(item):
         else:
             titulo = titulo.replace('Episodio', 'Epis.').replace('episodio', 'Epis.').replace('Capítulo', 'Epis.').replace('capítulo', 'Epis.')
 
-        titulo = '[COLOR goldenrod]Epis. [/COLOR]' + str(epis) + ' ' + titulo.strip()
+        if 'Movie' in epis:
+            titulo = '[COLOR deepskyblue]Film. [/COLOR]'+ titulo.strip()
+        else:
+            titulo = '[COLOR goldenrod]Epis. [/COLOR]' + str(epis) + ' ' + titulo.strip()
 
         titulo = titulo.replace('Audio', '[COLOR red]Audio[/COLOR]')
 
@@ -297,8 +301,14 @@ def last_epis(item):
         if 'Español Latino' in title or 'Español Latino' in title or 'español Latino' in title or 'español latino' in title: lang = 'Lat'
         elif 'Español' in title or 'español' in title or 'Castellano' in title or 'castellano' in title: lang = 'Esp'
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, lang=lang,
-                                    contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber=epis))
+        if 'Movie' in epis:
+            PeliName = SerieName
+
+            itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, lang=lang,
+                                        contentType = 'movie', contentTitle = PeliName, infoLabels={'year': '-'} ))
+        else:
+            itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb, lang=lang,
+                                        contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber=epis))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -369,10 +379,30 @@ def episodios(item):
         season = 1
 
         if '-temporada-' in item.url or '-season-' in item.url:
-            season = scrapertools.find_single_match(item.url, '-season-(.*?)-').strip()
+            season = scrapertools.find_single_match(item.url, '-season-(.*?)$').strip()
             if not season : season = scrapertools.find_single_match(item.url, '-temporada-(.*?)$').strip()
 
             if not season: season = 1
+
+        elif 'var anime_info =' in data:
+            season = scrapertools.find_single_match(data, 'var anime_info =.*?-season-(.*?)-').strip()
+            if not season: season = scrapertools.find_single_match(data, 'var anime_info =.*?-temporada-(.*?)-').strip()
+
+            if not season: season = scrapertools.find_single_match(data, 'var anime_info =.*?Season(.*?)').strip()
+            if not season: season = scrapertools.find_single_match(data, 'var anime_info =.*?Temporada(.*?)"').strip()
+
+            if not season: season = 1
+
+        try:
+            if 'Español' in season: season = season.split("Español")[0]
+            elif 'Castellano' in season: season = season.split("Castellano")[0]
+            elif 'Latino' in season: season = season.split("Latino")[0]
+
+            elif '-español-' in season: season = season.split("-español-")[0]
+            elif '-castellano-' in season: season = season.split("-castellano-")[0]
+            elif '-latino-' in season: season = season.split("-latino-")[0]
+        except:
+            pass
 
         url = "%s/%s" % (item.url, url)
 
@@ -452,9 +482,9 @@ def findvideos(item):
         if not matches: matches = scrapertools.find_multiple_matches(bloque, '"episodio-(.*?)"')
 
     for url in matches:
-        ses += 1
-
         if url:
+            ses += 1
+
             if not 'http' in url: url = item.url + '/episodio-' + url
 
             if url.startswith('//'): url = 'https:' + url

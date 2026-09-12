@@ -265,6 +265,8 @@ def show_infos(item):
 
     itemlist.append(item.clone( channel='helper', action='show_help_audios', title= ' - [COLOR green][B]Información[/B][/COLOR] [COLOR cyan][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news') ))
 
+    itemlist.append(item.clone( channel='helper', action='show_ratings', title= ' - [COLOR green][B]Información[/B][/COLOR] [COLOR khaki][B]Ratings[/B][/COLOR] (valoración Películas ó Series)', thumbnail=config.get_thumb('news') ))
+
     if config.get_setting('mnu_torrents', default=True):
         itemlist.append(item.clone( channel='helper', action='show_help_semillas', title= ' - [COLOR green][B]Información[/B][/COLOR] archivos Torrent [COLOR goldenrod][B]Semillas[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
@@ -286,7 +288,9 @@ def show_infos(item):
 
     itemlist.append(item.clone( channel='helper', action='show_channels_list_temporaries', title= ' - Canales que están [COLOR darkcyan][B]Temporalmente[/B][/COLOR] Inactivos', thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( channel='filters', action='no_actives', title= ' - Qué canales [COLOR goldenrod][B]Nunca[/B][/COLOR] intervendrán en las búsquedas', no_searchables = True, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( channel='filters', action='no_actives', title= ' - Canales que [COLOR goldenrod][B]NO[/B][/COLOR] intervienen en las búsquedas de [COLOR gold][B]Peliculas, Series y/ó Documentales[/B][/COLOR]', no_searchables = True, thumbnail=config.get_thumb('stack') ))
+
+    itemlist.append(item.clone( channel='helper', action='show_never_searchables', title= ' - Qué canales [COLOR goldenrod][B]Nunca[/B][/COLOR] intervendrán en las búsquedas', thumbnail=config.get_thumb('stack') ))
 
     itemlist.append(item.clone( action='', title='[COLOR fuchsia][B]BUSCAR Reproducciones:[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
 
@@ -1112,6 +1116,8 @@ def do_search(item, tecleado):
                         itemlist.append(Item( channel='submnuctext', action='submnu_search', title='[B]Personalizar Próximas búsquedas[/B]', context=context_cfg_search, extra = item.search_type, thumbnail=config.get_thumb('help'), fanart=fanart, text_color='moccasin' ))
 
                     itemlist.append(item.clone( channel='helper', action='show_help_audios', title= '[COLOR green][B]Información[/B][/COLOR] [COLOR cyan][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news'), fanart=fanart ))
+
+                    itemlist.append(item.clone( channel='helper', action='show_ratings', title= '[COLOR green][B]Información[/B][/COLOR] [COLOR khaki][B]Ratings[/B][/COLOR] (valoración Películas ó Series)', thumbnail=config.get_thumb('news') ))
 
                 item.from_channel = mem_from_channel
 

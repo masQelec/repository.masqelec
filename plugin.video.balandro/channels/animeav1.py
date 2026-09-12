@@ -366,9 +366,10 @@ def findvideos(item):
         ses += 1
 
         if '/player.' in url: continue
-        elif '/animeav1.' in url: continue
 
+        elif '/animeav1.' in url: continue
         elif '/1fichier.' in url: continue
+        elif '/transfer.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
 

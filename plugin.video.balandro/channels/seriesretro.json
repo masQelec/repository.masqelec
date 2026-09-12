@@ -6,7 +6,7 @@
   "active": true,
 
   "searchable": true,
-  "search_types": ["tvshow"],
+  "search_types": ["all", "movie", "tvshow"],
 
   "categories": ["movie", "tvshow", "torrent"],
   "language": ["lat"],

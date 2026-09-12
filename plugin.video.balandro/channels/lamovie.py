@@ -475,7 +475,8 @@ def episodios(item):
     logger.info()
     itemlist = []
 
-    page = item.page
+    page = 1
+    if item.page: page = item.page
 
     _id = item._id
 
@@ -513,10 +514,10 @@ def episodios(item):
     tmdb.set_infoLabels(itemlist)
 
     try:
-        pagination = data_json['data']['pagination']
+        pagination = jdata['data']['pagination']
 
         if pagination['next_page_url']:
-            itemlist.append(item.clone (action = 'episodios`', title = 'Siguientes ...',
+            itemlist.append(item.clone (action = 'episodios', title = 'Siguientes ...', id = item._id, season = item.contentSeason,
                                         contentType='season', contentSeason=item.contentSeason, page = page + 1, text_color='coral'))  
     except:
         pass
@@ -528,7 +529,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'Latino': 'Lat', 'Castellano': 'Esp', 'Ingles': 'Vo', 'Subtitulado': 'Vose', 'Latino/Inglés': 'Vose', 'Japones': 'Jap', 'Japonés - Subtítulos Latino': 'Jap/Sub Lat'}
+    IDIOMAS = {'Latino': 'Lat', 'Castellano': 'Esp', 'Ingles': 'Vo', 'Subtitulado': 'Vose', 'Latino/Inglés': 'Vose', 'Japones': 'Jap', 'Japonés - Subtítulos Latino': 'Jap/Sub Lat', 'Latino - Inglés': 'Lat/Vo'}
 
     _id = item._id
 
@@ -628,7 +629,7 @@ def findvideos(item):
 
 
 def puntuar_calidad(txt):
-    orden = ['CAMRip', 'Dual 720p', '720', 'HDTV', 'BDRip', 'DVDRip', 'WEBRip', 'Full HD', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', 'HD', 'WEBRip 1080p', 'REMUX 1080p' , 'MicroHD 1080p', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
+    orden = ['CAMRip', 'Dual 720p', '720', '720p', 'HDTV', 'BDRip', 'DVDRip', 'WEBRip', 'Full HD', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', '1080p', 'HD', 'WEBRip 1080p', 'REMUX 1080p' , 'MicroHD 1080p', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
     if txt not in orden: return 0
     else: return orden.index(txt) + 1
 
@@ -636,17 +637,22 @@ def puntuar_calidad(txt):
 def get_lang(lang_ids):
     langs = []
 
-    lang_list = {"58651": "Lat",
+    lang_list = {
+                 "58651": "Lat",
                  "58652": "Ing",
                  "58653": "Esp",
                  "58654": "Jap",
-                 "58655": "Vose"}
+                 "58655": "Vose",
+                 "58661": "Pt",
+                 "58667": "Cor"
+                 }
 
     for lang_id in lang_ids:
-        langs.append(lang_list[str(lang_id)])
+        try: langs.append(lang_list[str(lang_id)])
+        except: langs.append('?')
 
     if not langs: langs.append('Lat')
- 
+
     langs = ', '.join(langs)
 
     return langs

@@ -105,15 +105,16 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
 
-    url = host + 'pelicula/ultimas-peliculas/'
+    url = host + 'estrenos.html'
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_all', url = url, grp = url, search_type = 'movie', text_color='cyan' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = url, grp = url, search_type = 'movie', text_color='cyan' ))
 
     url = host + 'pelicula/peliculas-mas-vistas/'
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = url, grp = url, search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
     return itemlist
 
@@ -123,16 +124,32 @@ def generos(item):
     itemlist = []
 
     data = do_downloadpage(host)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '>Selecciona tu categoria<(.*?)</ul>')
+    bloque = scrapertools.find_single_match(data, '>Peliculas<(.*?)</div></div>')
 
-    matches = scrapertools.find_multiple_matches(bloque, 'href="(.*?)">(.*?)</a>')
+    matches = scrapertools.find_multiple_matches(bloque, 'href="(.*?)".*?</span>(.*?)</a>')
 
     for url, title in matches:
         if config.get_setting('descartar_xxx', default=False):
             if title == 'Eroticas +18': continue
 
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, grp = url, text_color = 'deepskyblue' ))
+
+    return itemlist
+
+
+def anios(item):
+    logger.info()
+    itemlist = []
+
+    from datetime import datetime
+    current_year = int(datetime.today().year)
+
+    for x in range(current_year, 1989, -1):
+        url = host + '/buscar/?q=' + str(x)
+
+        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', grp = '/anios/', text_color='deepskyblue' ))
 
     return itemlist
 
@@ -144,13 +161,14 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '>Ver Peliculas Online Completas<(.*?)</li></ul>')
-    if not bloque: bloque = scrapertools.find_single_match(data, '<div class="bkcnpels br1px brdr10px mgtop15px">(.*?)</li></ul>')
+    bloque = scrapertools.find_single_match(data, '>Peliculas Agregadas Recientemente<(.*?)</main>')
+    if not bloque: bloque = scrapertools.find_single_match(data, 'Resultados para(.*?)</main>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<li class="peli_bx br1px brdr10px ico_a">(.*?)</a></div>')
+    matches = scrapertools.find_multiple_matches(bloque, '<a class="group(.*?)</div></a>')
+    if not matches: matches = scrapertools.find_multiple_matches(bloque, '<div class="group(.*?)</span></div></div>')
 
     for match in matches:
-        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
         title = scrapertools.find_single_match(match, 'title="(.*?)"')
         if not title: title = scrapertools.find_single_match(match, 'alt="(.*?)"')
@@ -159,25 +177,40 @@ def list_all(item):
 
         title = title.replace('&#039;s', "'s")
 
-        thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
+        year = scrapertools.find_single_match(match, '<span class="">(.*?)</span>')
+        if not year: year = scrapertools.find_single_match(match, '<span class="text-primary text-[11px] mt-1">(.*?)</span>')
+
+        if not year: year = '-'
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
-                                    contentType = 'movie', contentTitle = title, infoLabels={'year': '-'} ))
+                                    contentType = 'movie', contentTitle = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
+    if '/peliculas-mas-vistas/' in item.url: return itemlist
+
     if itemlist:
-        if '<ul class="nav bgdeg4 bold brdr10px bxshd2 clr fs18px lnht30px liasbrdr10px lstinl pd10px txt_cen white">' in data:
-            next_page = scrapertools.find_single_match(data, '<ul class="nav bgdeg4 bold brdr10px bxshd2 clr fs18px lnht30px liasbrdr10px lstinl pd10px txt_cen white">.*?</b>.*?<a href="(.*?)".*?</ul>')
+        next_page = ''
 
-            if next_page:
-                if '?page=' in next_page or '&page=' in next_page:
-                    if not item.grp:
-                        next_page = host + next_page
-                    else:
-                        next_page = item.grp + next_page
+        if '<ul class="flex items-center gap-2 flex-wrap justify-center">' in data:
+            next_page = scrapertools.find_single_match(data, '<ul class="flex items-center gap-2 flex-wrap justify-center">.*?<span class="w-10 h-10 flex items-center justify-center rounded-full bg-primary text-on-primary font-bold shadow-md">.*?<a href="(.*?)".*?</ul>')
 
-                    itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
+        elif '<nav class="flex gap-2">' in data:
+            next_page = scrapertools.find_single_match(data, '<nav class="flex gap-2">.*?<span class="w-10 h-10 flex items-center justify-center rounded-full bg-primary text-on-primary font-bold shadow-md">.*?<a href="(.*?)".*?</nav>')
+
+        if next_page:
+            if '?page=' in next_page or '&page=' in next_page:
+                if not item.grp:
+                    next_page = host + next_page
+                else:
+                    if '/anios/' in item.grp: next_page = host + 'buscar/' + next_page
+
+                    elif '/categoria/' in item.grp: pass
+                    else: next_page = item.grp + next_page
+
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -196,7 +229,11 @@ def findvideos(item):
     for url in matches:
         ses += 1
 
-        if '.mystream.' in url: continue
+        if '.youtube.' in url: continue
+ 
+        elif '.mystream.' in url: continue
+
+        elif "' + url + '" in url: continue
 
         if '/reproductor.php?v=' in url:
            _url = scrapertools.find_single_match(url, '/reproductor.php(.*?)$')
@@ -242,7 +279,7 @@ def findvideos(item):
 def _news(item):
     logger.info()
 
-    url = host + 'pelicula/ultimas-peliculas/'
+    url = host + 'estrenos.html'
 
     item.url = url
     item.grp = url

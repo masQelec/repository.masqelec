@@ -54,14 +54,14 @@ def list_all(item):
     matches = scrapertools.find_multiple_matches(data, '<article(.*?)</article>')
 
     for match in matches:
-        url = scrapertools.find_single_match(match, 'href=(.*?) title=')
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
         title = scrapertools.find_single_match(match, 'title="(.*?)"')
 
         if not url or not title: continue
 
         url = url.strip()
 
-        thumb = scrapertools.find_single_match(match, 'src=(.*?) class="').strip()
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"').strip()
 
         thumb = host[:-1] + thumb
 
@@ -75,7 +75,7 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, 'class=active>.*?</a>.*?href=(.*?)>')
+        next_page = scrapertools.find_single_match(data, '<li class="active">.*?</a>.*?href="(.*?)"')
 
         next_page = next_page.strip()
 

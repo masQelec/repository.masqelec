@@ -110,8 +110,6 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo episodios', action = 'list_all', url = host + 'series-20-1/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_all', url = host + 'estrenos-23/', search_type = 'tvshow', text_color='cyan' ))
-
     return itemlist
 
 
@@ -371,6 +369,15 @@ def play(item):
             itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'estrenos-23/'
+    item.search_type = 'movie'
+
+    return list_all(item)
 
 
 def search(item, texto):

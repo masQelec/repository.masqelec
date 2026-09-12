@@ -535,11 +535,9 @@ def test_channel(channel_name):
 
             txt_clons = ''
 
-            if channel_id == 'dontorrents': txt_clons = 'DivxATope, DonTorrent21, DonTorrentsIn, EliteDivx, LilaTorrent, MejorTorrentApp, MejorTorrentIn, NaranjaTorrent, ReinvenTorrent, RojoTorrent, TodoTorrents, TomaDivx, VerdeTorrent'
+            if channel_id == 'dontorrents': txt_clons = 'DivxATope, DonTorrent21, DonTorrentsIn, EliteDivx, MejorTorrentApp, MejorTorrentIn, ReinvenTorrent, TodoTorrents, TomaDivx'
 
             elif channel_id == 'doramasflix': txt_clons = 'DoramasFlixIn, DoramasFlixIo'
-
-            elif channel_id == 'elitetorrent': txt_clons = 'EliteTorrentNz'
 
             elif channel_id == 'entrepeliculasyseries': txt_clons = 'MegaDedeOficial, PelisGratisHd'
 
@@ -563,24 +561,19 @@ def test_channel(channel_name):
             elif channel_id == 'doramasflixin': txt_clones = 'DoramasFlix'
             elif channel_id == 'doramasflixio': txt_clones = 'DoramasFlix'
             elif channel_id == 'elitedivx': txt_clones = 'DonTorrents'
-            elif channel_id == 'elitetorrentnz': txt_clones = 'EliteTorrent'
             elif channel_id == 'gatotv': txt_clones = 'SeriesGato'
-            elif channel_id == 'lilatorrent': txt_clones = 'DonTorrents'
             elif channel_id == 'megadedeoficial': txt_clones = 'EntrePeliculasySeries'
             elif channel_id == 'mejortorrentapp': txt_clones = 'DonTorrents'
             elif channel_id == 'mejortorrentin': txt_clones = 'DonTorrents'
             elif channel_id == 'mundodonghuaxyz': txt_clones = 'MundoDonghua'
-            elif channel_id == 'naranjatorrent': txt_clones = 'DonTorrents'
             elif channel_id == 'pelisgratishd': txt_clones = 'EntrePeliculasySeries'
             elif channel_id == 'pelispediais': txt_clones = 'HomeCine'
             elif channel_id == 'pelisplushdnz': txt_clones = 'SeriesKao'
             elif channel_id == 'reinventorrent': txt_clones = 'DonTorrents'
-            elif channel_id == 'rojotorrent': txt_clones = 'DonTorrents'
             elif channel_id == 'serieskao': txt_clones = 'PelisPlusHdNz'
             elif channel_id == 'seriesmetron': txt_clones = 'HomeCine'
             elif channel_id == 'tomadivx': txt_clones = 'DonTorrents'
             elif channel_id == 'todotorrents': txt_clones = 'DonTorrents'
-            elif channel_id == 'verdetorrent': txt_clones = 'DonTorrents'
 
             if txt_clones:
                 txt_diag  += '[CR]clone: ' + '[COLOR turquoise][B]Clon del Canal Principal[/COLOR][COLOR gold] ' + txt_clones + '[/B][/COLOR]'
@@ -1400,18 +1393,20 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
              if 'No se puede establecer una conexión' in str(response.code): txt += '[CR][COLOR darkgoldenrod][B]Host error NO responde[/B][/COLOR][CR]'
              else: txt += '[CR][COLOR darkgoldenrod][B]Tiempo máximo de acceso agotado.[/B][/COLOR][CR]'
 
-             if 'actuales:' in txt:
-                 if 'Sin proxies' in txt: txt += txt_proxs
-                 else:
-                    if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
-                    txt += txt_provs
+             if str(len(response.data)) == '0': txt += '[COLOR springgreen][B]Sin Información de Datos.[/B][/COLOR][CR]'
              else:
-                if config.get_setting(cfg_proxies_channel, default=''): txt += '[COLOR red][B]Obtenga nuevos proxies[/B][/COLOR][CR]'
-                else: txt += '[COLOR orangered][B]Tiempo máximo de espera excedido.[/B][/COLOR][CR]'
+                 if 'actuales:' in txt:
+                     if 'Sin proxies' in txt: txt += txt_proxs
+                     else:
+                        if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
+                        txt += txt_provs
+                 else:
+                    if config.get_setting(cfg_proxies_channel, default=''): txt += '[COLOR red][B]Obtenga nuevos proxies[/B][/COLOR][CR]'
+                    else: txt += '[COLOR orangered][B]Tiempo máximo de espera excedido.[/B][/COLOR][CR]'
 
-                txt += txt_coffs
-                txt += txt_checs
-                txt += txt_routs
+                    txt += txt_coffs
+                    txt += txt_checs
+                    txt += txt_routs
 
         else:
             if '| 502: Bad gateway</title>' in response.data or '| 522: Connection timed out</title>' in response.data: txt += '[CR]gate: [COLOR orangered][B]Host error[/B][/COLOR]'
@@ -1458,7 +1453,9 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
             elif '>This site is currently suspended<' in response.data: txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
             elif '>This website has been suspended!<' in response.data: txt += '[CR]status: [COLOR red][B]Suspendida[/B][/COLOR]'
 
-            elif '>The domain has expired and may be available at' in response.data: txt += '[CR]web: [COLOR red][B]Dominio Expirado[/B][/COLOR]'
+            elif '>The domain has expired and may be available at' in response.data or '>Domain registration has' in response.data:
+                  txt += '[CR]web: [COLOR red][B]Dominio Expirado[/B][/COLOR]'
+
             elif 'Renew Now' in response.data: txt += '[CR]web: [COLOR red][B]Dominio Expirado[/B][/COLOR]'
             elif '<title>Redirecting...</title>' in response.data: txt += '[CR]web: [COLOR red][B]Dominio Expirado[/B][/COLOR]'
 
@@ -1540,7 +1537,7 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
                             txt = txt.replace('[CR]quitar: ' + txt_quita, '[CR]quitar: [COLOR orangered][B]NO se pueden Eliminar los Proxies del Canal[/COLOR]')
                             txt += "[CR]invalid: [COLOR goldenrod][B]Acceso sin Host Válido en los datos.[/B][/COLOR]"
                     else:
-                        if 'This domain has expired' in str(response.data):
+                        if 'This domain has expired' in str(response.data) or '>Domain registration has' in str(response.data):
                             if not 'Dominio Expirado' in txt: txt += "[CR]web: [COLOR red][B]Dominio Expirado[/B][/COLOR]"
 
                 elif channel_id in str(channels_despised):
@@ -1877,12 +1874,15 @@ def acces_channel(channel_name, host, txt_dominio, dominio, txt, ant_hosts, foll
 
                 if 'Proxies:' in txt:
                     if 'actuales:' in txt:
-                        if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
+                        if not 'CloudFlare Human Verify' in txt:
+                            if not str(response.code) == '403' and not str(response.code) == '500':
+                                if not 'Dominio Expirado' in txt:
+                                    if not 'Sugerencias:' in txt: txt += '[CR][CR][COLOR moccasin][B]Sugerencias:[/B][/COLOR][CR]'
 
-                        if 'Sin proxies' in txt: txt += txt_proxs
-                        else:
-                           if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
-                           txt += txt_provs
+                                    if 'Sin proxies' in txt: txt += txt_proxs
+                                    else:
+                                       if not 'Configure Nuevos Proxies a Usar' in txt: txt += txt_pnews
+                                       txt += txt_provs
 
                 if not 'Headers:' in txt:
                     if response.sucess == False:
@@ -2184,9 +2184,11 @@ def acces_server(server_name, url, txt, follow_redirects=None):
              if 'No se puede establecer una conexión' in str(response.code): txt += '[COLOR darkgoldenrod][B]Host error NO responde[/B][/COLOR][CR]'
              else: txt += '[COLOR darkgoldenrod][B]Tiempo máximo de acceso agotado.[/B][/COLOR][CR]'
 
-             txt += txt_coffs
-             txt += txt_checs
-             txt += txt_routs
+             if str(len(response.data)) == '0': txt += '[COLOR springgreen][B]Sin Información de Datos.[/B][/COLOR][CR]'
+             else:
+                txt += txt_coffs
+                txt += txt_checs
+                txt += txt_routs
 
         else:
             if '| 502: Bad gateway</title>' in response.data or '| 522: Connection timed out</title>' in response.data: txt += '[CR]gate: [COLOR orangered][B]Host error[/B][/COLOR]'

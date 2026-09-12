@@ -19,13 +19,14 @@ host = 'https://seriesyonkis.cx/'
 
 per_page = '20'
 
-rut_movies = host + 'wp-api/v1/tops?postType=movies&range=day&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
-rut_series = host + 'wp-api/v1/tops?postType=tvshows&range=day&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
 
-ten_movies = host + 'wp-api/v1/tops?postType=movies&range=month&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
-ten_series = host + 'wp-api/v1/tops?postType=tvshows&range=month&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
-
+rut_movies = host + 'wp-api/v1/listing/movies?postType=movies&range=day&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
+rut_series = host + 'wp-api/v1/listing/tvshows?postType=tvshows&range=day&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
 rut_animes = host + 'wp-api/v1/listing/animes?postType=animes&range=day&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
+
+top_movies = host + 'wp-api/v1/tops?postType=movies&range=month&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
+top_series = host + 'wp-api/v1/tops?postType=tvshows&range=month&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
+top_animes = host + 'wp-api/v1/tops?postType=animes&range=week&orderBy=latest&order=desc&postsPerPage=' + per_page + '&page=1'
 
 
 def item_configurar_proxies(item):
@@ -83,6 +84,11 @@ def do_downloadpage(url, post=None, headers=None):
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
+    if '<title>Just a moment...</title>' in data:
+        if not '/search?' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
     return data
 
 
@@ -127,7 +133,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = rut_movies, search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Tendencias', action = 'list_all', url = ten_movies, search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = top_movies, search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -147,7 +153,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = rut_series, search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Tendencias', action = 'list_all', url = ten_series, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = top_series, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
@@ -166,6 +172,8 @@ def mainlist_animes(item):
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', tipo = 'Animes', search_type = 'tvshow', text_color = 'springgreen' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = rut_animes, tipo = 'Animes', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = top_animes, tipo = 'Animes', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', tipo = 'Animes', search_type = 'tvshow' ))
 
@@ -691,6 +699,9 @@ def play(item):
 
         elif '/acortalink.' in url:
            return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
+
+        elif '/embed.html?v=1' in url:
+           return 'Enlace al servidor [COLOR plum]Incompleto[/COLOR]'
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()

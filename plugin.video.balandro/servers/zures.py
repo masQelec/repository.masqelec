@@ -52,7 +52,8 @@ def get_video_url(page_url, url_referer=''):
 
     txt_server = 'Unknow'
 
-    if 'amdahost' in page_url: txt_server = 'Amdahost'
+    if 'abyss' in page_url: txt_server = 'Abyss'
+    elif 'amdahost' in page_url: txt_server = 'Amdahost'
     elif 'allviid' in page_url: txt_server = 'Allviid'
     elif 'asianload' in page_url: txt_server = 'Asianload'
 
@@ -82,6 +83,7 @@ def get_video_url(page_url, url_referer=''):
     elif 'fastplay' in page_url: txt_server = 'Fastplay'
     elif 'filegram' in page_url: txt_server = 'Filegram'
     elif 'gostream' in page_url: txt_server = 'Gostream'
+    elif 'gupload' in page_url: txt_server = 'Gupload'
     elif 'letsupload' in page_url: txt_server = 'Letsupload'
     elif 'liivideo' in page_url: txt_server = 'Liivideo'
     elif 'myupload' in page_url: txt_server = 'Myupload'
@@ -163,7 +165,9 @@ def get_video_url(page_url, url_referer=''):
     elif 'swiftload' in page_url: txt_server = 'SwiftLoad'
     elif 'vidtube' in page_url: txt_server = 'Vidtube'
     elif 'wecima' in page_url: txt_server = 'Wecima'
-    elif 'vidbasic' in page_url: txt_server = 'Vidbasic'
+
+    elif 'vidbasic' in page_url or 'vidb' in page_url: txt_server = 'Vidbasic'
+
     elif 'vimeos' in page_url: txt_server = 'Vimeos'
     elif 'bigshare' in page_url: txt_server = 'Bigshare'
     elif 'vkvideo' in page_url: txt_server = 'Vk'
